@@ -8,97 +8,73 @@ interface HeroVideoProps {
   className?: string;
 }
 
-/** Network Information API (Chromium only); used to honour data-saver mode. */
-type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean } };
+const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
 /**
- * Decorative, silent, looping hero footage.
- * - preload="none": nothing is downloaded until playback is wanted; the
- *   poster (identical to the first frame) is the first paint.
- * - Plays only while at least a quarter of it is on screen, and pauses when
- *   scrolled away, to save battery and data.
- * - Never autoplays under prefers-reduced-motion or data-saver; the poster
- *   stays and the button can start it.
- * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it
- *   stays paused until they press play again.
- * - Loops forever. `loop` does this natively; the `ended` handler restarts
- *   it in any browser that stops at the end instead, so the frame never
- *   goes blank.
+ * Silent hero footage that starts on its own as soon as the page opens and
+ * loops continuously (Alex's request).
+ * - The <video> is written as HTML so `autoplay muted loop playsinline` are
+ *   in the server-rendered markup: browsers (iOS included) start it before
+ *   any JavaScript runs. React does not render the `muted` attribute, which
+ *   autoplay requires.
+ * - `loop` repeats it natively; the `ended` handler restarts it in any
+ *   browser that stops at the end instead, so it never sits on a blank frame.
+ * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it stays
+ *   paused until they press play again.
+ * - Some devices block autoplay entirely (e.g. iPhone Low Power Mode); the
+ *   poster stays and the play button starts it.
  */
 export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const userPaused = useRef(false);
+  const [playing, setPlaying] = useState(true);
+
+  const html =
+    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover">` +
+    sources.map((s) => `<source src="${escapeAttr(s.src)}" type="${escapeAttr(s.type)}">`).join("") +
+    "</video>";
+
+  const video = () => containerRef.current?.querySelector("video") ?? null;
 
   useEffect(() => {
-    const video = ref.current;
-    if (!video) return;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true;
-    if (reduceMotion || saveData) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !userPaused.current) {
-          // Autoplay can still be refused (e.g. low-power mode); the button remains.
-          video.play().then(
-            () => setPlaying(true),
-            () => setPlaying(false),
-          );
-        } else if (!entry.isIntersecting && !video.paused) {
-          video.pause();
-          setPlaying(false);
-        }
-      },
-      { threshold: 0.25 },
-    );
-    observer.observe(video);
-    return () => observer.disconnect();
+    const v = containerRef.current?.querySelector("video");
+    if (!v) return;
+    const sync = () => setPlaying(!v.paused);
+    const restart = () => {
+      if (userPaused.current) return;
+      v.currentTime = 0;
+      v.play().catch(sync);
+    };
+    v.muted = true;
+    v.addEventListener("play", sync);
+    v.addEventListener("pause", sync);
+    v.addEventListener("ended", restart);
+    // In case autoplay hasn't started yet (e.g. the page was restored from cache).
+    if (v.paused) v.play().catch(sync);
+    return () => {
+      v.removeEventListener("play", sync);
+      v.removeEventListener("pause", sync);
+      v.removeEventListener("ended", restart);
+    };
   }, []);
 
   const toggle = () => {
-    const video = ref.current;
-    if (!video) return;
-    if (video.paused) {
+    const v = video();
+    if (!v) return;
+    if (v.paused) {
       userPaused.current = false;
-      video.play().then(
-        () => setPlaying(true),
-        () => setPlaying(false),
-      );
+      v.play().catch(() => setPlaying(false));
     } else {
       userPaused.current = true;
-      video.pause();
-      setPlaying(false);
+      v.pause();
     }
-  };
-
-  const restart = () => {
-    const video = ref.current;
-    if (!video || userPaused.current) return;
-    video.currentTime = 0;
-    video.play().catch(() => setPlaying(false));
   };
 
   return (
     <div className={className}>
-      {/* Width-led: the parent sets the width, the 4:5 frame sets the height. */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink">
-        <video
-          ref={ref}
-          poster={poster}
-          muted
-          loop
-          playsInline
-          preload="none"
-          onEnded={restart}
-          aria-hidden="true"
-          tabIndex={-1}
-          className="size-full object-cover"
-        >
-          {sources.map((s) => (
-            <source key={s.src} src={s.src} type={s.type} />
-          ))}
-        </video>
+        {/* The video element itself is static HTML; see the comment above. */}
+        <div ref={containerRef} className="size-full" dangerouslySetInnerHTML={{ __html: html }} />
         <button
           type="button"
           onClick={toggle}

@@ -287,12 +287,22 @@ test("hero video loops back to the start instead of stopping on a blank frame", 
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.ended && !v.paused && v.currentTime < 2), { timeout: 5000 }).toBe(true);
 });
 
-test("hero video does not autoplay for reduced-motion users", async ({ page }) => {
+test("hero video starts on its own for everyone, even before JavaScript runs", async ({ page, browser, baseURL }) => {
+  // Visitors with Reduce Motion switched on (common on iPhones) see it play too.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await page.waitForTimeout(800);
-  expect(await page.locator("main video").evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
-  await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+  const video = page.locator("main video");
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused && v.currentTime > 0)).toBe(true);
+  await expect(page.getByRole("button", { name: "Pause background video" })).toBeVisible();
+
+  // The autoplay attributes are in the server HTML, so it doesn't wait for scripts.
+  const noJs = await browser.newContext({ baseURL, javaScriptEnabled: false });
+  const plain = await noJs.newPage();
+  await plain.goto("/");
+  const attrs = await plain.locator("main video").evaluate((v) => ["autoplay", "muted", "loop", "playsinline"].map((a) => v.hasAttribute(a)));
+  expect(attrs).toEqual([true, true, true, true]);
+  await expect.poll(() => plain.locator("main video").evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
+  await noJs.close();
 });
 
 test("menu open on mobile has no accessibility violations and is keyboard operable", async ({ page }) => {
@@ -370,17 +380,6 @@ test("browser JavaScript contains no server-only configuration names", async ({ 
       expect(body.includes(name), `${name} in ${src}`).toBe(false);
     }
   }
-});
-
-test("hero video downloads nothing for reduced-motion users", async ({ page }) => {
-  const media: string[] = [];
-  page.on("request", (req) => {
-    if (/\/media\/hero\.(webm|mp4)/.test(req.url())) media.push(req.url());
-  });
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/", { waitUntil: "networkidle" });
-  expect(media).toEqual([]);
-  await expect(page.locator("main video")).toHaveAttribute("poster", "/media/hero-poster.jpg");
 });
 
 test("a paused hero video stays paused after scrolling away and back", async ({ page }) => {
