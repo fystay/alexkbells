@@ -26,6 +26,17 @@ file-based metadata images in `src/app/` (`icon.png`, `apple-icon.png`,
 Pillow was used because `sharp` (bundled with Next) has no native binary in
 the development container.
 
+### Hero video
+
+`scripts/hero_video.py` (Python + OpenCV + numpy + ffmpeg, run manually)
+cuts the hero loop from Alex's reel. It removes his own caption/handle
+overlays by building exact per-pixel templates (pixels bright in every frame
+across differently lit clips) and inpainting only those pixels, crops each
+clip to 4:5, grades to black and white, and encodes VP9 WebM (first source)
+and H.264 MP4 (Safari/iOS) from a lossless master, plus a JPEG poster.
+Outputs (~1.2 MB each; browsers fetch one) are committed; the 30 MB source
+reel is not. `HeroVideo` is the only other client component.
+
 ## Structure
 
 ```

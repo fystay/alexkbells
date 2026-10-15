@@ -52,6 +52,20 @@ export const site = {
     },
   },
 
+  /**
+   * Homepage hero loop cut from Alex's own Instagram reel by
+   * scripts/hero_video.py (his caption/handle overlays removed, black and
+   * white, silent, 4:5). Takes priority over photos.hero. Null to disable.
+   */
+  heroVideo: {
+    // Browsers use the first format they support.
+    sources: [
+      { src: "/media/hero.webm", type: "video/webm" },
+      { src: "/media/hero.mp4", type: "video/mp4" },
+    ],
+    poster: "/media/hero-poster.jpg",
+  } as { sources: { src: string; type: string }[]; poster: string } | null,
+
   /** Genuine photos of Alex / his coaching only. Empty until supplied. */
   photos: {
     hero: null as Photo | null,

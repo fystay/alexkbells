@@ -178,6 +178,28 @@ test("supplied logo renders in header and footer as labelled home links", async 
   }
 });
 
+test("hero video plays silently, can be paused, and offers WebM + MP4", async ({ page }) => {
+  await page.goto("/");
+  const video = page.locator("main video");
+  await expect(video).toHaveAttribute("aria-hidden", "true");
+  expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop && v.playsInline)).toBe(true);
+  const types = await video.locator("source").evaluateAll((els) => els.map((e) => e.getAttribute("type")));
+  expect(types).toEqual(["video/webm", "video/mp4"]);
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
+
+  await page.getByRole("button", { name: "Pause background video" }).click();
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+});
+
+test("hero video does not autoplay for reduced-motion users", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.waitForTimeout(800);
+  expect(await page.locator("main video").evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+});
+
 test("robots and sitemap are served", async ({ request }) => {
   expect((await request.get("/robots.txt")).status()).toBe(200);
   const sitemap = await request.get("/sitemap.xml");

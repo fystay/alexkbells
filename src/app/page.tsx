@@ -14,6 +14,7 @@ import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { HeroVideo } from "@/components/sections/HeroVideo";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 export const metadata: Metadata = {
@@ -41,7 +42,9 @@ const benefits = [
 
 function Hero() {
   const booking = getClassBookingAction();
-  const photo = site.photos.hero;
+  const video = site.heroVideo;
+  const photo = video ? null : site.photos.hero;
+  const hasMedia = Boolean(video || photo);
   const showTimes = isPublishable(timetable.status);
   const days = sortSessions(timetable.sessions).map((s) => shortDay(s.day));
 
@@ -54,12 +57,16 @@ function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
       <div className="container-page pt-12 pb-10 sm:pt-20 lg:pt-24">
-        <div className={photo ? "grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end" : undefined}>
-          <div className={photo ? "lg:col-span-7" : undefined}>
+        <div className={hasMedia ? "grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-12" : undefined}>
+          <div className={hasMedia ? "lg:col-span-7" : undefined}>
             <p className="eyebrow text-muted">
               {site.descriptor} · {site.location.town}
             </p>
-            <h1 id="hero-heading" className="mt-5 font-display text-display">
+            {/* Beside media, the headline steps down on wide screens so it fits 7 columns. */}
+            <h1
+              id="hero-heading"
+              className={`mt-5 font-display text-display ${hasMedia ? "lg:text-h1" : ""}`}
+            >
               Kettlebell
               <br />
               coaching in
@@ -79,6 +86,13 @@ function Hero() {
               </ButtonLink>
             </div>
           </div>
+          {video ? (
+            <HeroVideo
+              sources={video.sources}
+              poster={video.poster}
+              className="w-full max-w-md lg:col-span-5 lg:max-w-none"
+            />
+          ) : null}
           {photo ? (
             <div className="lg:col-span-5">
               <Image

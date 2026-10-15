@@ -26,7 +26,13 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Favicon, apple-touch icon, Open Graph image; JSON-LD `logo`
 - [x] e2e: logo visible and labelled in header/footer; icon routes served
 
+### Done (2026-10-15, hero video)
+- [x] 9.6 s hero loop from Alex's reel: overlays removed, best kettlebell/group-class moments, B&W, 4:5, WebM + MP4 + poster
+- [x] `HeroVideo` component: reduced-motion safe, pause/play button, poster-first
+- [x] e2e: plays muted/looping with both sources, pause works, no autoplay under reduced motion
+
 ### To launch
+- [ ] **P1** Alex confirms people in the hero footage are happy to appear on the site
 - [ ] **P0** Alex confirms timetable → set `timetable.status = "confirmed"` (and duration if known)
 - [ ] **P0** Alex confirms or updates prices → set statuses
 - [ ] **P0** Decide domain; set `SITE_URL` on Vercel production

@@ -50,7 +50,8 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | Favicon / apple icon | Generated (monogram on ink) | `src/app/icon.png`, `src/app/apple-icon.png` |
 | Open Graph image | Generated (lockup on ink, 1200×630) | `src/app/opengraph-image.png` + `.alt.txt` |
 | Vector (SVG) logo | Not available — the JPG is the only version | Don't request again; derived PNGs are the master web assets |
-| Hero photo of Alex coaching | Missing | `public/images/`, set `site.photos.hero` |
+| Hero video (10 clips, 9.6 s, B&W, silent, 4:5) | Generated 2026-10-15 from Alex's reel | `public/media/hero.webm`, `hero.mp4`, `hero-poster.jpg`; configured as `site.heroVideo`. Regenerate with `scripts/hero_video.py` (source reel not committed — 30 MB) |
+| Hero photo of Alex coaching | Not needed while the video is set | `public/images/`, set `site.photos.hero` |
 | About photo | Missing | `public/images/`, set `site.photos.about` |
 
 Regenerate all derived logo files with `python3 scripts/brand_assets.py` (needs Pillow) if the source changes.
@@ -70,6 +71,10 @@ Coaching
 8. Reconfirm: one-to-one from £35/session; 4 sessions £130/month; online £79/month.
 9. Session length; where one-to-one sessions take place (always Media House?).
 10. How online coaching works day to day (app? check-ins? video review?).
+
+Hero video
+- Confirm everyone identifiable in the clips is happy to appear on the website (it was already public on Instagram, but a website is a different use).
+- Several clips were filmed at other gyms. Fine as "Alex coaching", but don't caption them as Media House.
 
 About & trust
 11. Short bio in Alex's words; qualifications/certifications (with names of issuing bodies).
