@@ -83,7 +83,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
 - Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.
-  - Header: monogram mark (36–40 px tall) + brand name text from 360 px; mark only below 360 px.
+  - Header: monogram mark (36–40 px tall) + the name as written on the artwork, "ALEX.KBELLS" (`site.logo.wordmark`), over "KETTLEBELL COACH" between two short rules, echoing the lockup. Mark only below 360 px and at tablet widths (768–1023 px), where the navigation needs the space; an e2e test checks the header never overlaps.
   - Footer: full lockup, 192–224 px wide.
   - Never redraw, recolour or re-typeset the logo; regenerate from source with `scripts/brand_assets.py`.
 

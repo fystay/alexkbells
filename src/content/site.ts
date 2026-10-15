@@ -26,7 +26,9 @@ export const site = {
       height: 554,
       alt: "Alex K Bells, Kettlebell Coach",
     },
-  } as { mark: Logo; lockup: Logo } | null,
+    /** Name as written on the logo artwork; shown beside the mark in the header. */
+    wordmark: "ALEX.KBELLS",
+  } as { mark: Logo; lockup: Logo; wordmark: string } | null,
 
   location: {
     venue: "Media House",

@@ -211,6 +211,24 @@ test("booking buttons lead to the right step of the on-site booking flow", async
   await expect(page.getByRole("banner").getByRole("link", { name: /book a session/i })).toHaveAttribute("href", "/book");
 });
 
+test("header logo, navigation and booking button never overlap", async ({ page }) => {
+  for (const width of [320, 360, 390, 768, 900, 1024, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+    const logo = await page.locator("header a[aria-label$=', home']").evaluate((el) => {
+      // The wordmark can be wider than its link box, so measure the visible content.
+      const rects = [...el.querySelectorAll("img, span")].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0);
+      return Math.max(...rects.map((r) => r.right));
+    });
+    const firstControl = Math.min(
+      ...(await page.locator("header nav a:visible, header button:visible, header .md\\:block > a:visible").evaluateAll((els) =>
+        els.map((el) => el.getBoundingClientRect().left),
+      )),
+    );
+    expect(logo, `logo overlaps navigation at ${width}px`).toBeLessThanOrEqual(firstControl);
+  }
+});
+
 test("cross-page section anchors exist", async ({ page }) => {
   await page.goto("/coaching");
   await expect(page.locator("#one-to-one")).toHaveCount(1);

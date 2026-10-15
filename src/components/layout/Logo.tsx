@@ -15,19 +15,21 @@ interface LogoProps {
   priority?: boolean;
 }
 
-function BrandText({ tone, className }: { tone: "dark" | "light"; className?: string }) {
+function BrandText({ tone, name, className }: { tone: "dark" | "light"; name: string; className?: string }) {
+  const muted = tone === "dark" ? "text-muted-inverse" : "text-muted";
   return (
-    <span className={cn("flex-col leading-none", className)}>
-      <span className="whitespace-nowrap text-base font-extrabold uppercase tracking-[0.06em] [font-stretch:112%] sm:text-lg">
-        {site.name}
+    <span className={cn("flex-col items-center leading-none", className)}>
+      {/* Negative right margin cancels the trailing letter-spacing so the text centres. */}
+      <span className="mr-[-0.1em] whitespace-nowrap text-base font-extrabold uppercase tracking-[0.1em] [font-stretch:112%] sm:mr-[-0.14em] sm:text-lg sm:tracking-[0.14em]">
+        {name}
       </span>
-      <span
-        className={cn(
-          "mt-1 text-[0.625rem] font-medium uppercase tracking-[0.24em]",
-          tone === "dark" ? "text-muted-inverse" : "text-muted",
-        )}
-      >
-        {site.descriptor}
+      {/* As on the logo artwork: the descriptor between two short rules. */}
+      <span className={cn("mt-1.5 flex w-full items-center gap-1.5", muted)}>
+        <span aria-hidden="true" className="h-px min-w-2 flex-1 bg-current" />
+        <span className="mr-[-0.24em] whitespace-nowrap text-[0.5625rem] font-medium uppercase tracking-[0.24em] sm:text-[0.625rem]">
+          {site.descriptor}
+        </span>
+        <span aria-hidden="true" className="h-px min-w-2 flex-1 bg-current" />
       </span>
     </span>
   );
@@ -48,7 +50,7 @@ export function Logo({ variant = "mark", tone = "dark", className, priority = fa
       aria-label={`${site.name}, home`}
     >
       {!logo ? (
-        <BrandText tone={tone} className="flex" />
+        <BrandText tone={tone} name={site.name} className="flex" />
       ) : variant === "lockup" ? (
         <Image
           src={logo.lockup.src}
@@ -69,8 +71,9 @@ export function Logo({ variant = "mark", tone = "dark", className, priority = fa
             sizes="96px"
             className={cn("h-9 w-auto sm:h-10", tile)}
           />
-          {/* Name alongside the mark from 360px up; the narrowest phones show the mark alone. */}
-          <BrandText tone={tone} className="hidden 2xs:flex" />
+          {/* Name beside the mark from 360px up, except at tablet widths (md) where the
+              navigation needs the space; there, and on the narrowest phones, the mark stands alone. */}
+          <BrandText tone={tone} name={logo.wordmark} className="hidden 2xs:flex md:hidden lg:flex" />
         </>
       )}
     </Link>
