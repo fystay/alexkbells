@@ -31,18 +31,33 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] `HeroVideo` component: reduced-motion safe, pause/play button, poster-first
 - [x] e2e: plays muted/looping with both sources, pause works, no autoplay under reduced motion
 
-### To launch
-- [ ] **P1** Alex confirms people in the hero footage are happy to appear on the site
-- [ ] **P0** Alex confirms timetable → set `timetable.status = "confirmed"` (and duration if known)
-- [ ] **P0** Alex confirms or updates prices → set statuses
-- [ ] **P0** Decide domain; set `SITE_URL` on Vercel production
-- [ ] **P1** Genuine photos (hero, about) with permission
-- [ ] **P1** Verified bio → consider `/about` page
-- [ ] **P1** Public email/phone if Alex wants them (`site.contact`)
-- [ ] **P1** Set up Vercel project (client-owned account), preview env `CONTENT_PREVIEW=true`
-- [ ] **P1** Manual checks on real devices (iOS Safari, Android Chrome), 200% zoom, VoiceOver/TalkBack pass
-- [ ] **P1** Privacy notice (even without forms, Vercel logs IPs; add if analytics are introduced)
-- [ ] **P2** Lighthouse run on the deployed URL
+### Done (2026-10-15, launch preparation)
+- [x] Found and fixed: Vercel framework preset "Other" served 404 for every page → `vercel.json` (`framework: nextjs`)
+- [x] Provisional content can never render on Vercel production, even with `CONTENT_PREVIEW=true`
+- [x] Non-production builds: `noindex` meta + robots Disallow
+- [x] Per-page titles, canonical URLs and social previews; inner pages were missing the share image
+- [x] CSP + HSTS; validated `SITE_URL`
+- [x] Hero: first frame no longer crops the head; poster = first frame; `preload="none"`; plays only on screen; data-saver respected; user pause sticks
+- [x] Contact page: what to include in an enquiry
+- [x] Classes meta description no longer promises class times
+- [x] e2e: console/CSP/failed-request check, mobile axe incl. open menu, FAQ keyboard, metadata, JSON-LD, headers, no server env in client JS, video network behaviour
+- [x] DEPLOYMENT.md
+
+### To launch — owner decisions (Alex)
+- [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
+- [ ] **P0** Choose and register the domain
+- [ ] **P0** Confirm or withhold timetable, duration, prices (CONTENT.md questions). Site launches safely either way
+- [ ] **P1** Confirm people shown in the hero video are happy to appear; confirm footage from other gyms is fine
+- [ ] **P1** Public email/phone if wanted (`site.contact`)
+- [ ] **P1** Genuine photos, bio, qualifications → consider `/about`
+
+### To launch — technical
+- [ ] **P0** Check the next Vercel preview serves the homepage (framework fix) — DEPLOYMENT.md "Get a preview URL"
+- [ ] **P0** In the owning project: production branch, `SITE_URL` (Production), `CONTENT_PREVIEW=true` (Preview only)
+- [ ] **P1** Real-device pass: iOS Safari (MP4 playback), Android Chrome, VoiceOver/TalkBack, 200% zoom
+- [ ] **P1** Privacy notice page (Vercel logs IP addresses; required before analytics or a contact form)
+- [ ] **P1** Test `https://ig.me/m/alex.kbells` on a phone; if it opens a DM reliably, use it as the primary contact button (not verifiable from the build environment)
+- [ ] **P2** Lighthouse on the preview URL
 - [ ] **P2** CI (GitHub Actions): `npm run check` + e2e on PRs
 
 ### Acceptance criteria (Phase 1)

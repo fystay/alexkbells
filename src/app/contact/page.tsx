@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { getClassBookingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
     "Get in touch with Alex K Bells about group kettlebell classes, one-to-one coaching or online coaching in Cumbernauld.",
-  alternates: { canonical: "/contact" },
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   const { email, phone } = site.contact;
@@ -34,9 +35,13 @@ export default function ContactPage() {
               <p className="eyebrow text-muted-inverse">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">{site.social.instagram.handle}</p>
               <p className="mt-4 max-w-md text-muted-inverse">
-                Send a direct message with what you are interested in (classes, one-to-one or
-                online coaching) and any questions you have.
+                Send a direct message on Instagram. It helps to include:
               </p>
+              <ul className="mt-3 max-w-md list-disc space-y-1 pl-5 text-muted-inverse marker:text-muted-inverse">
+                <li>What you are interested in: group classes, one-to-one or online coaching</li>
+                <li>Whether you have trained with kettlebells before</li>
+                <li>Any questions you have</li>
+              </ul>
               <ButtonLink href={site.social.instagram.url} external tone="dark" className="mt-8">
                 Open Instagram
               </ButtonLink>

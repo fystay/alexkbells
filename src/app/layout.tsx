@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { site } from "@/content/site";
-import { siteUrl } from "@/lib/env";
+import { isIndexable, siteUrl } from "@/lib/env";
+import { DEFAULT_TITLE, baseOpenGraph } from "@/lib/metadata";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { JsonLd } from "@/components/sections/JsonLd";
@@ -18,18 +19,15 @@ const archivo = Archivo({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: `${site.name} | Kettlebell Coaching in Cumbernauld`,
+    default: DEFAULT_TITLE,
     template: `%s | ${site.name}`,
   },
   description: site.description,
   applicationName: site.name,
-  openGraph: {
-    type: "website",
-    locale: "en_GB",
-    siteName: site.name,
-    title: `${site.name} | Kettlebell Coaching in Cumbernauld`,
-    description: site.description,
-  },
+  openGraph: { ...baseOpenGraph, title: DEFAULT_TITLE, description: site.description },
+  twitter: { card: "summary_large_image", images: ["/og-image.png"] },
+  // Previews and review builds must never be indexed (see lib/env.ts).
+  ...(isIndexable() ? {} : { robots: { index: false, follow: false } }),
 };
 
 export const viewport: Viewport = {

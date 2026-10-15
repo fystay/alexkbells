@@ -31,7 +31,7 @@ W, H = 720, 900  # 4:5
 # (start s, end s, crop y-offset px, brightness gain) — order is the edit order.
 # Gain lifts the darker gym clips so the sequence reads evenly.
 CLIPS = [
-    (19.05, 20.00, 260, 1.0),   # outdoor double-bell lunge
+    (19.30, 20.00, 200, 1.0),   # outdoor double-bell lunge (starts mid-descent: full figure in frame)
     (15.90, 16.85, 80, 1.0),    # double-bell overhead press
     (14.90, 15.85, 190, 1.0),   # group goblet squats
     (24.30, 25.25, 280, 1.0),   # double-bell deadlift
@@ -42,7 +42,7 @@ CLIPS = [
     (33.00, 34.20, 150, 1.3),   # group double-bell press
     (36.90, 37.65, 30, 1.6),    # kneeling overhead hold
 ]
-POSTER_AT = (0, 0.45)  # (clip index, seconds into clip)
+POSTER_AT = (0, 0.0)  # (clip index, seconds into clip) — first frame, so play starts without a jump
 
 # Overlay search boxes (x0, y0, x1, y1), measured from the source.
 BOXES = {

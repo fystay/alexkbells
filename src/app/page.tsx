@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/content/site";
+import { pageMetadata } from "@/lib/metadata";
 import { getService, services } from "@/content/services";
 import { timetable } from "@/content/classes";
 import { getClassBookingAction } from "@/lib/booking";
@@ -17,9 +18,7 @@ import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroVideo } from "@/components/sections/HeroVideo";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
 const benefits = [
   {

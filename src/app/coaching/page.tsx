@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
@@ -11,12 +12,12 @@ import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "One-to-One & Online Kettlebell Coaching",
   description:
     "Face-to-face kettlebell coaching in Cumbernauld tailored to you, or online coaching with personalised programming, support and progression.",
-  alternates: { canonical: "/coaching" },
-};
+  path: "/coaching",
+});
 
 function ServiceDetail({
   service,

@@ -63,7 +63,7 @@ def main():
     app = ROOT / "src/app"
     on_ink(mark, (512, 512), 0.8).save(app / "icon.png", optimize=True)
     on_ink(mark, (180, 180), 0.78).save(app / "apple-icon.png", optimize=True)
-    on_ink(lockup, (1200, 630), 0.55).save(app / "opengraph-image.png", optimize=True)
+    on_ink(lockup, (1200, 630), 0.55).save(public.parent / "og-image.png", optimize=True)
 
     for name, img in [("logo-mark", mark), ("logo-lockup", lockup)]:
         print(f"{name}: {img.width}x{img.height}")

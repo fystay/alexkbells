@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { publicRoutes } from "../../src/lib/routes";
 
-const widths = [320, 390, 768, 1280, 1600];
+const widths = [320, 360, 390, 768, 1024, 1280, 1600];
 
 for (const route of publicRoutes) {
   test.describe(`route ${route}`, () => {
@@ -24,12 +24,55 @@ for (const route of publicRoutes) {
       }
     });
 
-    test("has no detectable WCAG A/AA violations", async ({ page }) => {
+    test("has no detectable WCAG A/AA violations (desktop and mobile)", async ({ page }) => {
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(route);
+        const results = await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+          .analyze();
+        expect(results.violations.map((v) => `${v.id}: ${v.help}`), `at ${width}px`).toEqual([]);
+      }
+    });
+
+    test("loads without console errors, CSP violations or failed requests", async ({ page }) => {
+      const problems: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error") problems.push(`console: ${msg.text()}`);
+      });
+      page.on("pageerror", (err) => problems.push(`pageerror: ${err.message}`));
+      page.on("requestfailed", (req) => {
+        // Expected cancellations: link prefetches (?_rsc=) and media aborted
+        // when the test navigates away. Anything else is a real failure.
+        const cancelled = /ERR_ABORTED/.test(req.failure()?.errorText ?? "");
+        if (cancelled && (/[?&]_rsc=/.test(req.url()) || /\/media\//.test(req.url()))) return;
+        problems.push(`failed: ${req.url()} ${req.failure()?.errorText ?? ""}`);
+      });
+      page.on("response", (res) => {
+        if (res.status() >= 400 && new URL(res.url()).origin === new URL(page.url() || res.url()).origin) {
+          problems.push(`${res.status()}: ${res.url()}`);
+        }
+      });
+      for (const width of [390, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(route, { waitUntil: "networkidle" });
+      }
+      expect(problems).toEqual([]);
+    });
+
+    test("has page-specific social preview and canonical metadata", async ({ page }) => {
       await page.goto(route);
-      const results = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-        .analyze();
-      expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+      const meta = (sel: string) => page.locator(sel).first().getAttribute("content");
+      const title = await page.title();
+      expect(await meta('meta[property="og:title"]')).toBe(title);
+      expect(await meta('meta[property="og:url"]')).toMatch(new RegExp(`${route === "/" ? "/?" : route}$`));
+      expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toMatch(
+        new RegExp(`${route === "/" ? "/?" : route}$`),
+      );
+      expect(await meta('meta[property="og:image"]')).toMatch(/\/og-image\.png$/);
+      expect(await meta('meta[property="og:image:alt"]')).toBeTruthy();
+      expect(await meta('meta[name="twitter:card"]')).toBe("summary_large_image");
+      expect(await meta('meta[name="description"]')).toBeTruthy();
     });
 
     test("has 44px tap targets on phones and tablets (outside running text)", async ({ page }) => {
@@ -173,7 +216,7 @@ test("supplied logo renders in header and footer as labelled home links", async 
     const footer = page.locator("footer").getByRole("link", { name: "Alex K Bells, home" });
     await expect(footer.locator('img[src*="logo-lockup"]')).toBeVisible();
   }
-  for (const path of ["/icon.png", "/apple-icon.png", "/opengraph-image.png"]) {
+  for (const path of ["/icon.png", "/apple-icon.png", "/og-image.png"]) {
     expect((await request.get(path)).status(), path).toBe(200);
   }
 });
@@ -198,6 +241,93 @@ test("hero video does not autoplay for reduced-motion users", async ({ page }) =
   await page.waitForTimeout(800);
   expect(await page.locator("main video").evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+});
+
+test("menu open on mobile has no accessibility violations and is keyboard operable", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Menu" });
+  await toggle.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Classes" })).toBeFocused();
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+});
+
+test("FAQ items open and close with the keyboard", async ({ page }) => {
+  await page.goto("/");
+  const summary = page.locator("main details summary").first();
+  const details = page.locator("main details").first();
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  await expect(details).toHaveAttribute("open", "");
+  await page.keyboard.press("Space");
+  await expect(details).not.toHaveAttribute("open", "");
+});
+
+test("business structured data is valid JSON with the verified address only", async ({ page }) => {
+  await page.goto("/");
+  const raw = await page.locator('script[type="application/ld+json"]').textContent();
+  const data = JSON.parse(raw ?? "{}");
+  expect(data["@type"]).toBe("LocalBusiness");
+  expect(data.address.postalCode).toBe("G67 3EN");
+  expect(data.sameAs).toEqual(["https://www.instagram.com/alex.kbells/"]);
+  // Nothing unconfirmed: no prices, hours, ratings or phone numbers.
+  for (const key of ["priceRange", "openingHours", "openingHoursSpecification", "aggregateRating", "telephone"]) {
+    expect(data[key], key).toBeUndefined();
+  }
+});
+
+test("security headers are sent", async ({ request }) => {
+  const res = await request.get("/");
+  const h = res.headers();
+  expect(h["content-security-policy"]).toContain("default-src 'self'");
+  expect(h["content-security-policy"]).toContain("frame-ancestors 'none'");
+  expect(h["x-content-type-options"]).toBe("nosniff");
+  expect(h["strict-transport-security"]).toContain("max-age=");
+  expect(h["x-powered-by"]).toBeUndefined();
+});
+
+test("browser JavaScript contains no server-only configuration names", async ({ page, request }) => {
+  const scripts = new Set<string>();
+  for (const route of publicRoutes) {
+    await page.goto(route);
+    for (const src of await page.locator("script[src]").evaluateAll((els) => els.map((e) => e.getAttribute("src")!))) {
+      scripts.add(src);
+    }
+  }
+  expect(scripts.size).toBeGreaterThan(0);
+  for (const src of scripts) {
+    const body = await (await request.get(src)).text();
+    for (const name of ["CONTENT_PREVIEW", "BOOKING_URL", "SITE_URL", "VERCEL_ENV"]) {
+      expect(body.includes(name), `${name} in ${src}`).toBe(false);
+    }
+  }
+});
+
+test("hero video downloads nothing for reduced-motion users", async ({ page }) => {
+  const media: string[] = [];
+  page.on("request", (req) => {
+    if (/\/media\/hero\.(webm|mp4)/.test(req.url())) media.push(req.url());
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "networkidle" });
+  expect(media).toEqual([]);
+  await expect(page.locator("main video")).toHaveAttribute("poster", "/media/hero-poster.jpg");
+});
+
+test("a paused hero video stays paused after scrolling away and back", async ({ page }) => {
+  await page.goto("/");
+  const video = page.locator("main video");
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
+  await page.getByRole("button", { name: "Pause background video" }).click();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(500);
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
 });
 
 test("robots and sitemap are served", async ({ request }) => {

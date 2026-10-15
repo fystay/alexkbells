@@ -16,6 +16,12 @@ describe("content publishing gate", () => {
     expect(isPublishable("provisional", preview)).toBe(true);
   });
 
+  it("never publishes provisional content on Vercel production, even if preview is set", () => {
+    expect(isPublishable("provisional", { CONTENT_PREVIEW: "true", VERCEL_ENV: "production" })).toBe(false);
+    expect(isPublishable("provisional", { CONTENT_PREVIEW: "true", VERCEL_ENV: "preview" })).toBe(true);
+    expect(isPublishable("confirmed", { VERCEL_ENV: "production" })).toBe(true);
+  });
+
   it("filters lists", () => {
     const items = [
       { id: 1, status: "confirmed" as const },

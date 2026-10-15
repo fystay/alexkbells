@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { getClassBookingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -9,12 +10,12 @@ import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { CtaBand } from "@/components/sections/CtaBand";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
   description:
-    "Group kettlebell classes at Media House, Cumbernauld. See class times and get in touch to join a session.",
-  alternates: { canonical: "/classes" },
-};
+    "Group kettlebell classes at Media House, Cumbernauld. Get in touch to join a session.",
+  path: "/classes",
+});
 
 export default function ClassesPage() {
   const booking = getClassBookingAction();

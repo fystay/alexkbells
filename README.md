@@ -36,4 +36,5 @@ CONTENT_PREVIEW=true npm run dev
 - [CONTENT.md](CONTENT.md) — sitemap, content sources, approval workflow, questions for the client
 - [ARCHITECTURE.md](ARCHITECTURE.md) — technical decisions, env vars, future booking design
 - [TASKS.md](TASKS.md) — checklist
+- [DEPLOYMENT.md](DEPLOYMENT.md) — Vercel setup, environment variables, preview and launch steps
 - [AGENTS.md](AGENTS.md) — rules for AI-assisted development

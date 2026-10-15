@@ -1,19 +1,11 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/lib/env";
+import { isIndexable, siteUrl } from "@/lib/env";
 
-/**
- * Only the production deployment is indexable. Vercel previews (and any
- * build with CONTENT_PREVIEW=true) are excluded from search engines.
- */
+/** Only the production site is crawlable; previews and review builds are not. */
 export default function robots(): MetadataRoute.Robots {
-  const indexable =
-    process.env.CONTENT_PREVIEW !== "true" &&
-    (process.env.VERCEL_ENV === undefined || process.env.VERCEL_ENV === "production");
-
-  if (!indexable) {
+  if (!isIndexable()) {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
-
   return {
     rules: { userAgent: "*", allow: "/" },
     sitemap: `${siteUrl()}/sitemap.xml`,

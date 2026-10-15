@@ -74,7 +74,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 ## Imagery
 
 - Only genuine photos of Alex, his coaching and the venue. No stock, no AI imagery presented as real.
-- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~10 s loop of genuine footage. Desktop: 5 of 12 columns beside the headline (headline steps down to `text-h1` at `lg` so "CUMBERNAULD" fits). Mobile: below the CTAs, max 28rem wide. Starts after hydration (poster is first paint), never autoplays under `prefers-reduced-motion`, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
+- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~10 s loop of genuine footage. Desktop: 5 of 12 columns beside the headline (headline steps down to `text-h1` at `lg` so "CUMBERNAULD" fits). Mobile: below the CTAs, max 28rem wide. `preload="none"`; the poster is identical to the first frame and is the first paint. Plays only while ≥25% visible, never autoplays under `prefers-reduced-motion` or data-saver, stays paused once the visitor pauses it, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
 - Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.

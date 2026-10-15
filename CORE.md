@@ -53,6 +53,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Bookings | — | Previously Setmore; payments cash / bank transfer |
 | Square | P | Account created. Rate quoted as 1.4% + 25p per online card payment — unverified. Enabled products unknown |
 | Domain | U | Not chosen |
+| Hosting account | P | Vercel project `alexkbells` exists in the developer's personal Hobby account; Alex's own account (likely Pro for commercial use) recommended before launch — see DEPLOYMENT.md |
 
 ## Constraints
 

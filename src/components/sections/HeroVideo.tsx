@@ -8,37 +8,62 @@ interface HeroVideoProps {
   className?: string;
 }
 
+/** Network Information API (Chromium only); used to honour data-saver mode. */
+type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean } };
+
 /**
  * Decorative, silent, looping hero footage.
- * - Never autoplays for visitors who prefer reduced motion (poster only).
- * - Visible pause/play control (WCAG 2.2.2) for motion longer than 5 s.
- * - Starts after hydration, so the poster is the first paint.
+ * - preload="none": nothing is downloaded until playback is wanted; the
+ *   poster (identical to the first frame) is the first paint.
+ * - Plays only while at least a quarter of it is on screen, and pauses when
+ *   scrolled away, to save battery and data.
+ * - Never autoplays under prefers-reduced-motion or data-saver; the poster
+ *   stays and the button can start it.
+ * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it
+ *   stays paused until they press play again.
  */
 export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const userPaused = useRef(false);
 
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduce.matches) return;
-    // Autoplay can still be refused (e.g. low-power mode); the button remains.
-    video.play().then(
-      () => setPlaying(true),
-      () => setPlaying(false),
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true;
+    if (reduceMotion || saveData) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !userPaused.current) {
+          // Autoplay can still be refused (e.g. low-power mode); the button remains.
+          video.play().then(
+            () => setPlaying(true),
+            () => setPlaying(false),
+          );
+        } else if (!entry.isIntersecting && !video.paused) {
+          video.pause();
+          setPlaying(false);
+        }
+      },
+      { threshold: 0.25 },
     );
+    observer.observe(video);
+    return () => observer.disconnect();
   }, []);
 
   const toggle = () => {
     const video = ref.current;
     if (!video) return;
     if (video.paused) {
+      userPaused.current = false;
       video.play().then(
         () => setPlaying(true),
         () => setPlaying(false),
       );
     } else {
+      userPaused.current = true;
       video.pause();
       setPlaying(false);
     }
@@ -53,7 +78,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           aria-hidden="true"
           tabIndex={-1}
           className="size-full object-cover"
@@ -69,11 +94,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           className="absolute right-3 bottom-3 inline-flex size-11 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink"
         >
           <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
-            {playing ? (
-              <path d="M4 2h3v12H4zM9 2h3v12H9z" />
-            ) : (
-              <path d="M4 2l10 6-10 6z" />
-            )}
+            {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}
           </svg>
         </button>
       </div>
