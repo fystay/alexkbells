@@ -49,7 +49,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | Logo lockup (full crop, transparent) | Generated | `public/brand/logo-lockup.png` — footer |
 | Favicon / apple icon | Generated (monogram on ink) | `src/app/icon.png`, `src/app/apple-icon.png` |
 | Open Graph image | Generated (lockup on ink, 1200×630) | `src/app/opengraph-image.png` + `.alt.txt` |
-| Vector (SVG) logo | Nice to have | Would give sharper rendering than the supplied JPG |
+| Vector (SVG) logo | Not available — the JPG is the only version | Don't request again; derived PNGs are the master web assets |
 | Hero photo of Alex coaching | Missing | `public/images/`, set `site.photos.hero` |
 | About photo | Missing | `public/images/`, set `site.photos.about` |
 

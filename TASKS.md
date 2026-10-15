@@ -27,7 +27,6 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] e2e: logo visible and labelled in header/footer; icon routes served
 
 ### To launch
-- [ ] **P2** Ask for a vector (SVG) version of the logo for sharper rendering
 - [ ] **P0** Alex confirms timetable → set `timetable.status = "confirmed"` (and duration if known)
 - [ ] **P0** Alex confirms or updates prices → set statuses
 - [ ] **P0** Decide domain; set `SITE_URL` on Vercel production
