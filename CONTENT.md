@@ -50,7 +50,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | Favicon / apple icon | Generated (monogram on ink) | `src/app/icon.png`, `src/app/apple-icon.png` |
 | Open Graph / social preview image | Generated (lockup on ink, 1200×630) | `public/og-image.png`, declared for every page in `src/lib/metadata.ts` |
 | Vector (SVG) logo | Not available — the JPG is the only version | Don't request again; derived PNGs are the master web assets |
-| Hero video (10 clips, 9.6 s, B&W, silent, 4:5) | Generated 2026-10-15 from Alex's reel | `public/media/hero.webm`, `hero.mp4`, `hero-poster.jpg`; configured as `site.heroVideo`. Regenerate with `scripts/hero_video.py` (source reel not committed — 30 MB) |
+| Hero video (9 clips, 8.3 s, B&W, silent, 4:5; opens on the group class) | Generated 2026-10-15 from Alex's reel | `public/media/hero.webm`, `hero.mp4`, `hero-poster.jpg`; configured as `site.heroVideo`. Regenerate with `scripts/hero_video.py` (source reel not committed — 30 MB) |
 | Hero photo of Alex coaching | Not needed while the video is set | `public/images/`, set `site.photos.hero` |
 | About photo | Missing | `public/images/`, set `site.photos.about` |
 

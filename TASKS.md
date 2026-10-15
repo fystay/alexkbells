@@ -27,7 +27,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] e2e: logo visible and labelled in header/footer; icon routes served
 
 ### Done (2026-10-15, hero video)
-- [x] 9.6 s hero loop from Alex's reel: overlays removed, best kettlebell/group-class moments, B&W, 4:5, WebM + MP4 + poster
+- [x] Hero loop from Alex's reel (now 9 clips, 8.3 s): overlays removed, best kettlebell/group-class moments, B&W, 4:5, WebM + MP4 + poster
 - [x] `HeroVideo` component: reduced-motion safe, pause/play button, poster-first
 - [x] e2e: plays muted/looping with both sources, pause works, no autoplay under reduced motion
 
@@ -42,6 +42,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Classes meta description no longer promises class times
 - [x] e2e: console/CSP/failed-request check, mobile axe incl. open menu, FAQ keyboard, metadata, JSON-LD, headers, no server env in client JS, video network behaviour
 - [x] DEPLOYMENT.md
+- [x] Hero video: clips where the Instagram icon sat top-right are now framed to exclude that area (no inpainted patch); deadlift and lunge clips replaced by a double-bell swing; opens on the group class
 - [x] Fixed: hero buttons overflowed on 416–600 px phones (e.g. iPhone Pro Max); button groups now stack below 640 px and wrap above it; e2e covers 16 widths and controls past the screen edge
 
 ### To launch — owner decisions (Alex)

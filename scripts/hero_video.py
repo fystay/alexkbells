@@ -28,19 +28,24 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "public/media"
 W, H = 720, 900  # 4:5
 
-# (start s, end s, crop y-offset px, brightness gain) — order is the edit order.
+# (start s, end s, crop, brightness gain) — order is the edit order.
+# crop is a y-offset for a full-width 720x900 window, or (x, y, w) for a
+# smaller 4:5 window that is scaled up to 720x900.
 # Gain lifts the darker gym clips so the sequence reads evenly.
+#
+# Where the Instagram icon sat top-right (ig_right), inpainting left a soft
+# patch over busy backgrounds, so those clips are framed to exclude the icon
+# area (source x >= 552 and y <= 377) instead of relying on the fill.
 CLIPS = [
-    (19.30, 20.00, 200, 1.0),   # outdoor double-bell lunge (starts mid-descent: full figure in frame)
-    (15.90, 16.85, 80, 1.0),    # double-bell overhead press
-    (14.90, 15.85, 190, 1.0),   # group goblet squats
-    (24.30, 25.25, 280, 1.0),   # double-bell deadlift
-    (22.15, 23.15, 200, 1.0),   # coaching swings side by side
-    (10.90, 11.85, 250, 1.1),   # single-bell clean
-    (29.40, 30.30, 300, 1.25),  # swing in class
-    (31.40, 32.40, 100, 1.3),   # group class
-    (33.00, 34.20, 150, 1.3),   # group double-bell press
-    (36.90, 37.65, 30, 1.6),    # kneeling overhead hold
+    (14.90, 15.85, 190, 1.0),            # group goblet squats (opening frame + poster)
+    (15.90, 16.85, 80, 1.0),             # double-bell overhead press
+    (12.00, 12.85, 260, 1.0),            # double-bell swing
+    (22.15, 22.85, 378, 1.0),            # coaching swings side by side (crop below the icon)
+    (10.90, 11.85, 250, 1.1),            # single-bell clean
+    (29.40, 30.30, 300, 1.25),           # swing in class
+    (31.40, 32.40, 100, 1.3),            # group class
+    (33.00, 34.20, 150, 1.3),            # group double-bell press
+    (36.90, 37.65, (0, 40, 552), 1.6),   # kneeling overhead hold (crop left of the icon)
 ]
 POSTER_AT = (0, 0.0)  # (clip index, seconds into clip) — first frame, so play starts without a jump
 
@@ -126,9 +131,13 @@ def main(src):
         stdin=subprocess.PIPE,
     )
     poster = None
-    for index, (a, b, y, gain) in enumerate(CLIPS):
+    for index, (a, b, crop, gain) in enumerate(CLIPS):
+        x, y, w = (0, crop, W) if isinstance(crop, int) else crop
+        h = round(w * H / W)
         for i, frame in enumerate(read_clip(cap, fps, a, b)):
-            out = remove_overlays(frame, templates)[y : y + H, 0:W]
+            out = remove_overlays(frame, templates)[y : y + h, x : x + w]
+            if w != W:
+                out = cv2.resize(out, (W, H), interpolation=cv2.INTER_LANCZOS4)
             if gain != 1.0:
                 out = cv2.convertScaleAbs(out, alpha=gain)
             writer.stdin.write(np.ascontiguousarray(out).tobytes())
