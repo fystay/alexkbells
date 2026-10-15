@@ -4,54 +4,74 @@ import { site } from "@/content/site";
 import { cn } from "@/lib/cn";
 
 interface LogoProps {
-  /** Surface behind the logo. */
+  /**
+   * mark: AR monogram + brand name text (header).
+   * lockup: the full supplied logo (footer).
+   */
+  variant?: "mark" | "lockup";
+  /** Surface behind the logo. The artwork is white, so light surfaces get an ink tile. */
   tone?: "dark" | "light";
   className?: string;
   priority?: boolean;
 }
 
+function BrandText({ tone, className }: { tone: "dark" | "light"; className?: string }) {
+  return (
+    <span className={cn("flex-col leading-none", className)}>
+      <span className="whitespace-nowrap text-base font-extrabold uppercase tracking-[0.06em] [font-stretch:112%] sm:text-lg">
+        {site.name}
+      </span>
+      <span
+        className={cn(
+          "mt-1 text-[0.625rem] font-medium uppercase tracking-[0.24em]",
+          tone === "dark" ? "text-muted-inverse" : "text-muted",
+        )}
+      >
+        {site.descriptor}
+      </span>
+    </span>
+  );
+}
+
 /**
- * Uses the supplied logo artwork when configured in site.ts.
- * Fallback is the plain brand name in the body typeface — deliberately not
- * an imitation of the monogram or wordmark.
+ * Uses the supplied logo artwork from site.ts. Without it, falls back to the
+ * plain brand name in the body typeface — never an imitation of the monogram.
  */
-export function Logo({ tone = "dark", className, priority = false }: LogoProps) {
+export function Logo({ variant = "mark", tone = "dark", className, priority = false }: LogoProps) {
   const logo = site.logo;
+  const tile = tone === "light" && "bg-ink p-2";
 
   return (
     <Link
       href="/"
-      className={cn("inline-flex min-h-11 items-center", className)}
+      className={cn("inline-flex min-h-11 items-center gap-3", className)}
       aria-label={`${site.name}, home`}
     >
-      {logo ? (
+      {!logo ? (
+        <BrandText tone={tone} className="flex" />
+      ) : variant === "lockup" ? (
         <Image
-          src={logo.src}
+          src={logo.lockup.src}
           alt=""
-          width={logo.width}
-          height={logo.height}
-          priority={priority}
-          className={cn(
-            "h-10 w-auto sm:h-12",
-            // Black-background artwork sits on ink; on light surfaces it is
-            // framed as a deliberate black tile rather than a stray box.
-            logo.onDark && tone === "light" && "bg-ink p-1.5",
-          )}
+          width={logo.lockup.width}
+          height={logo.lockup.height}
+          sizes="240px"
+          className={cn("h-auto w-48 sm:w-56", tile)}
         />
       ) : (
-        <span className="flex flex-col leading-none">
-          <span className="whitespace-nowrap text-base font-extrabold uppercase tracking-[0.06em] [font-stretch:112%] sm:text-lg">
-            {site.name}
-          </span>
-          <span
-            className={cn(
-              "mt-1 text-[0.625rem] font-medium uppercase tracking-[0.24em]",
-              tone === "dark" ? "text-muted-inverse" : "text-muted",
-            )}
-          >
-            {site.descriptor}
-          </span>
-        </span>
+        <>
+          <Image
+            src={logo.mark.src}
+            alt=""
+            width={logo.mark.width}
+            height={logo.mark.height}
+            priority={priority}
+            sizes="96px"
+            className={cn("h-9 w-auto sm:h-10", tile)}
+          />
+          {/* Name alongside the mark from 360px up; the narrowest phones show the mark alone. */}
+          <BrandText tone={tone} className="hidden 2xs:flex" />
+        </>
       )}
     </Link>
   );

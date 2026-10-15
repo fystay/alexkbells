@@ -44,11 +44,16 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Asset | Status | Needed at |
 |---|---|---|
-| Logo (AR monogram + ALEX.KBELLS + KETTLEBELL COACH) | **Missing** | `public/brand/logo.png` or `.svg`, then set `site.logo` with real pixel size and `onDark` |
-| Favicon / app icon | Missing (derive from logo) | `src/app/icon.png`, `src/app/apple-icon.png` |
-| Open Graph image | Missing (1200×630, derive from logo/photo) | `src/app/opengraph-image.png` |
+| Logo source (1254×1254 JPG, white on black) | **Supplied 2026-10-15** | `assets/brand/alexkbells-logo-source.jpg` (not public) |
+| Logo mark (monogram crop, transparent) | Generated | `public/brand/logo-mark.png` — header |
+| Logo lockup (full crop, transparent) | Generated | `public/brand/logo-lockup.png` — footer |
+| Favicon / apple icon | Generated (monogram on ink) | `src/app/icon.png`, `src/app/apple-icon.png` |
+| Open Graph image | Generated (lockup on ink, 1200×630) | `src/app/opengraph-image.png` + `.alt.txt` |
+| Vector (SVG) logo | Nice to have | Would give sharper rendering than the supplied JPG |
 | Hero photo of Alex coaching | Missing | `public/images/`, set `site.photos.hero` |
 | About photo | Missing | `public/images/`, set `site.photos.about` |
+
+Regenerate all derived logo files with `python3 scripts/brand_assets.py` (needs Pillow) if the source changes.
 
 ## Questions for Alex (client approval required)
 

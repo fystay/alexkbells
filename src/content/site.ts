@@ -11,12 +11,22 @@ export const site = {
     "Kettlebell coaching in Cumbernauld: group classes, one-to-one coaching and online coaching with Alex K Bells.",
 
   /**
-   * The supplied logo. Place the file at public/brand/ and fill this in with
-   * its real pixel dimensions. While null, the header shows the brand name as
-   * plain text (no imitation of the monogram).
-   * `onDark` must be true if the artwork has a black background.
+   * The supplied logo (source: assets/brand/alexkbells-logo-source.jpg),
+   * cropped by scripts/brand_assets.py into transparent white artwork.
+   * These PNGs are for dark surfaces only. Set to null to fall back to the
+   * plain-text brand name.
    */
-  logo: null as (Logo & { onDark: boolean }) | null,
+  logo: {
+    /** AR monogram with kettlebell — header. */
+    mark: { src: "/brand/logo-mark.png", width: 741, height: 368, alt: "" },
+    /** Full lockup: monogram, ALEX.KBELLS, KETTLEBELL COACH — footer. */
+    lockup: {
+      src: "/brand/logo-lockup.png",
+      width: 978,
+      height: 554,
+      alt: "Alex K Bells, Kettlebell Coach",
+    },
+  } as { mark: Logo; lockup: Logo } | null,
 
   location: {
     venue: "Media House",

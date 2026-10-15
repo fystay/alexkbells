@@ -46,7 +46,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Session duration, availability, contract terms | U | |
 | Membership | U | Under consideration; not on the site |
 | Email, phone | U | `site.contact` is null; not rendered |
-| Logo artwork | U | Not yet in repo — needed at `public/brand/` |
+| Logo artwork | C | Supplied 2026-10-15 (`assets/brand/alexkbells-logo-source.jpg`). Monogram reads "AR" with kettlebell; wordmark ALEX.KBELLS; descriptor KETTLEBELL COACH |
 | Photography of Alex / coaching | U | None supplied |
 | Bio, qualifications, history, testimonials | U | Do not invent |
 | Bookings | — | Previously Setmore; payments cash / bank transfer |

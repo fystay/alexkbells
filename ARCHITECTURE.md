@@ -17,6 +17,15 @@ No database, auth or payment SDK is installed — none is needed in Phase 1.
 
 Next 16 differs from older versions; read `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
 
+## Brand assets
+
+`scripts/brand_assets.py` (Python + Pillow, run manually) crops the supplied
+logo in `assets/brand/` into transparent PNGs in `public/brand/` and the
+file-based metadata images in `src/app/` (`icon.png`, `apple-icon.png`,
+`opengraph-image.png`). Outputs are committed, so builds don't need Python.
+Pillow was used because `sharp` (bundled with Next) has no native binary in
+the development container.
+
 ## Structure
 
 ```

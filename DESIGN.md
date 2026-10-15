@@ -53,7 +53,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 - Section rhythm: `py-16 sm:py-24 lg:py-28`; compact `py-10 sm:py-14`.
 - 12-column grid at `lg`; always declare `grid-cols-1` on mobile grids (prevents min-content blowout).
 - Section tones alternate paper → ink → paper → surface; avoid two identical tones adjacent except CTA → footer.
-- Breakpoints: Tailwind defaults plus `xs` (26rem / 416px).
+- Breakpoints: Tailwind defaults plus `2xs` (22.5rem / 360px) and `xs` (26rem / 416px).
 
 ## Components
 
@@ -62,7 +62,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `SiteHeader` | `components/layout` | Sticky ink bar; logo, nav, one CTA. All header targets ≥44 px |
 | `DesktopNav` / `MobileNav` | `components/layout/NavLinks.tsx` | `aria-current`; full-height disclosure panel below the header; Esc closes and returns focus to the toggle; closes on navigation |
 | `SiteFooter` | `components/layout` | Brand, nav, address, verified contact only. Mobile: Explore column sized to content beside Contact + Find us; links ≥44 px below `lg` |
-| `Logo` | `components/layout` | Real artwork from `site.logo`; plain-text name fallback |
+| `Logo` | `components/layout` | `variant="mark"` (header) or `"lockup"` (footer) from `site.logo`; plain-text name fallback if null |
 | `ButtonLink` | `components/ui` | `primary` / `secondary` / `text` × `light` / `dark` tones; min 44–48 px targets; external links announce new tab |
 | `Section`, `SectionHeading` | `components/ui` | Tone + spacing; heading ids wire `aria-labelledby` |
 | `Provisional` | `components/ui` | Content approval gate |
@@ -76,7 +76,10 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 - Only genuine photos of Alex, his coaching and the venue. No stock, no AI imagery presented as real.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
-- Logo: if the artwork has a black background set `onDark: true`; it sits on the ink header/footer, and on light surfaces is framed as a black tile.
+- Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.
+  - Header: monogram mark (36–40 px tall) + brand name text from 360 px; mark only below 360 px.
+  - Footer: full lockup, 192–224 px wide.
+  - Never redraw, recolour or re-typeset the logo; regenerate from source with `scripts/brand_assets.py`.
 
 ## Accessibility requirements
 

@@ -164,6 +164,20 @@ test("contact, Instagram and directions links point at verified destinations", a
   expect(maps && decodeURIComponent(maps)).toContain("1A Dunns Wood Road, Cumbernauld, G67 3EN");
 });
 
+test("supplied logo renders in header and footer as labelled home links", async ({ page, request }) => {
+  for (const width of [320, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/classes");
+    const header = page.locator("header").getByRole("link", { name: "Alex K Bells, home" });
+    await expect(header.locator('img[src*="logo-mark"]')).toBeVisible();
+    const footer = page.locator("footer").getByRole("link", { name: "Alex K Bells, home" });
+    await expect(footer.locator('img[src*="logo-lockup"]')).toBeVisible();
+  }
+  for (const path of ["/icon.png", "/apple-icon.png", "/opengraph-image.png"]) {
+    expect((await request.get(path)).status(), path).toBe(200);
+  }
+});
+
 test("robots and sitemap are served", async ({ request }) => {
   expect((await request.get("/robots.txt")).status()).toBe(200);
   const sitemap = await request.get("/sitemap.xml");
