@@ -41,8 +41,10 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Class times Mon 18:30, Wed 18:30, Sat 09:00 | P | Supplied by client after a Setmore Saturday listing. Start date, weekly frequency unconfirmed. `timetable.status` in `src/content/classes.ts` |
 | Class duration, capacity, price, equipment, booking requirement | U | Do not publish |
 | Cancellation / refund rules | U | Do not publish |
-| One-to-one from £35/session; 4 sessions £130/month | P | Previously published; reconfirm |
-| Online coaching £79/month | P | Previously published; reconfirm |
+| One-to-one from £35/session; 4 sessions £130/month | C | Confirmed by the project owner 2026-10-15 (figures from the original brief); shown on the site |
+| Online coaching £79/month | C | Confirmed by the project owner 2026-10-15; shown on the site |
+| Alex's journey (story, before/after photos) | U | Section built (`content/journey.ts`); hidden until Alex supplies and approves words and photos |
+| Social proof (Instagram following, views, regular clients) | U | Owner reports a large following and regular clients; add exact figures to `journey.highlights` only when supplied |
 | Session duration, availability, contract terms | U | |
 | Membership | U | Under consideration; not on the site |
 | Email, phone | U | `site.contact` is null; not rendered |

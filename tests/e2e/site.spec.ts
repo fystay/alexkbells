@@ -144,7 +144,11 @@ for (const route of publicRoutes) {
     test("shows no provisional content on a production build", async ({ page }) => {
       await page.goto(route);
       await expect(page.locator("[data-provisional]")).toHaveCount(0);
-      await expect(page.locator("main")).not.toContainText("£");
+      // Only the prices confirmed on 2026-10-15 may appear.
+      const amounts = (await page.locator("main").innerText()).match(/£\d+/g) ?? [];
+      for (const amount of amounts) expect(["£35", "£130", "£79"]).toContain(amount);
+      // Alex's journey stays hidden until it is confirmed.
+      await expect(page.locator("#journey-heading")).toHaveCount(0);
     });
   });
 }

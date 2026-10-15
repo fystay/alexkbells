@@ -12,6 +12,7 @@ import { Location } from "@/components/sections/Location";
 import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroVideo } from "@/components/sections/HeroVideo";
+import { Journey } from "@/components/sections/Journey";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
@@ -258,8 +259,10 @@ export default function HomePage() {
       <Benefits />
       <ClassesPreview />
       <About />
-      <CoachingOptions />
+      {/* Bands alternate light/dark: Journey (ink, when published) then Location (surface) before the ink coaching band. */}
+      <Journey />
       <Location />
+      <CoachingOptions />
       <Faq />
       <CtaBand />
     </>

@@ -74,3 +74,32 @@ export interface Photo {
   height: number;
   alt: string;
 }
+
+/** One chapter of Alex's story, e.g. "Where it started". */
+export interface JourneyChapter {
+  label: string;
+  title: string;
+  body: string;
+}
+
+/** A real number worth showing, e.g. Instagram followers. Never estimated. */
+export interface Highlight {
+  value: string;
+  label: string;
+}
+
+export interface Journey {
+  /** "provisional" until Alex approves the words and photos; hidden on production until then. */
+  status: ContentStatus;
+  title: string;
+  intro: string;
+  chapters: JourneyChapter[];
+  /** Genuine photos of Alex, same framing if possible. Null leaves an empty slot in previews only. */
+  before: Photo | null;
+  after: Photo | null;
+  /** e.g. "2019 → 2025". */
+  beforeLabel: string;
+  afterLabel: string;
+  caption: string;
+  highlights: Highlight[];
+}

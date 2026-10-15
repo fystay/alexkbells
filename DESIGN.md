@@ -74,6 +74,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `BookingWizard`, `OnlineOnboarding` | `components/booking` | Step journeys: `Stepper` (bar per step; on phones only the current step is named), one step at a time, `ActionBar` (Back + Continue; sticky at the bottom of the screen below `lg`; Continue disabled with a hint until the step is complete), summary with "Change" links (sticky aside on desktop, one-line list on phones) |
 | `ChoiceGroup` | `components/booking/ui.tsx` | Native radios/checkboxes as square tiles: white with a `muted` border (≥3:1), ink border on hover, solid ink when selected, outline on keyboard focus. `list` rows (≥56 px) or wrapping `chips` (≥48 px) |
 | `AvailabilityCalendar` | `components/booking` | Monday-first month grid in hairline `line` cells (48–56 px tall). Available: bold with a dot; fully booked: muted and struck through; no sessions: muted; selected: solid ink. Times listed beside (desktop) or below (phones). Disabled dates are skipped by arrow keys |
+| `Journey` | `components/sections` | Ink band: eyebrow, display headline and intro beside a before/after pair (4:5 frames, greyscale, paper "Before"/"After" tags), optional big-number highlights, then three numbered chapters. Content in `content/journey.ts`; hidden until confirmed |
 | `DemoNotice`, `DemoLabel` | `components/booking/ui.tsx` | Dashed ink frame or ink "DEMO" tag for demonstration content. Never on production |
 
 ## Imagery

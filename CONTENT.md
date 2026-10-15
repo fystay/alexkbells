@@ -22,7 +22,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your session** + large video; "Explore online coaching" and "Group classes" links) → benefits (+ booking button) → group classes (+ booking button) → about → one-to-one & online (each with its own action) → location → FAQ → closing CTA |
+| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your session** + large video; "Explore online coaching" and "Group classes" links) → benefits (+ booking button) → group classes (+ booking button) → about → Alex's journey (when confirmed) → location → one-to-one & online (each with its own action) → FAQ → closing CTA |
 | `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
@@ -80,7 +80,8 @@ Classes
 7. Cancellation and refund rules?
 
 Coaching
-8. Reconfirm: one-to-one from £35/session; 4 sessions £130/month; online £79/month.
+8. ~~Reconfirm prices~~ — confirmed 2026-10-15 (one-to-one from £35/session; 4 sessions £130/month; online £79/month).
+9. Alex's journey: his story (three short chapters), before/after photos, and any real figures (Instagram followers, clients coached) — see `src/content/journey.ts`.
 9. Session length; where one-to-one sessions take place (always Media House?).
 10. How online coaching works day to day (app? check-ins? video review?).
 

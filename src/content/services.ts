@@ -2,7 +2,8 @@ import type { Service } from "./types";
 
 /**
  * Coaching offers. Descriptions use only previously published wording.
- * All prices are "provisional": previously published, awaiting reconfirmation.
+ * Prices confirmed by the project owner on 2026-10-15 (the figures from the
+ * original brief). Group class prices have not been supplied.
  */
 export const services: Service[] = [
   {
@@ -28,14 +29,14 @@ export const services: Service[] = [
     ],
     prices: [
       {
-        status: "provisional",
+        status: "confirmed",
         label: "Single session",
         prefix: "From",
         amountGbp: 35,
         unit: "per session",
       },
       {
-        status: "provisional",
+        status: "confirmed",
         label: "Four sessions",
         amountGbp: 130,
         unit: "per month",
@@ -52,7 +53,7 @@ export const services: Service[] = [
     points: ["Personalised programming", "Ongoing support", "Progression"],
     prices: [
       {
-        status: "provisional",
+        status: "confirmed",
         label: "Monthly",
         amountGbp: 79,
         unit: "per month",
