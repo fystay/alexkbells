@@ -7,6 +7,8 @@ const bookingWarning = bookingConfigWarning();
 if (bookingWarning) console.warn(`\n⚠ Launch blocker: ${bookingWarning}\n`);
 
 const nextConfig: NextConfig = {
+  // Tests only: lets e2e build a second, production-configured copy alongside the default one.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,

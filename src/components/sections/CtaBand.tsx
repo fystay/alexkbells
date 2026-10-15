@@ -1,4 +1,4 @@
-import { getClassBookingAction, getCoachingEnquiryAction } from "@/lib/booking";
+import { getBookingAction, getOnlineCoachingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
@@ -11,11 +11,11 @@ interface CtaBandProps {
 
 export function CtaBand({
   title = "Pick up a bell.",
-  body = "Come to a group class or get in touch about one-to-one or online coaching.",
+  body = "Book a group class or a one-to-one session, or get started with online coaching.",
   headingId = "cta-heading",
 }: CtaBandProps) {
-  const classes = getClassBookingAction();
-  const coaching = getCoachingEnquiryAction();
+  const classes = getBookingAction("any");
+  const coaching = getOnlineCoachingAction();
 
   return (
     <Section tone="ink" labelledBy={headingId}>

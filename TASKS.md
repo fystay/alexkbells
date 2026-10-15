@@ -54,6 +54,9 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 
 ### To launch — owner decisions (Alex)
 - [x] On-site booking request form (`/book`) emailing Alex via Resend; privacy notice (`/privacy`); e2e against a mock email API
+- [x] Premium UX pass: larger hero video (edge to edge on phones, up to half the grid on desktop); guided booking (service → when → details) with per-service entry points, summary, back/edit, disabled-until-ready Continue; demo availability calendar for previews (labelled, never on production, never sent); online coaching onboarding (`/online-coaching`)
+- [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
+- [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking
 - [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Until then buttons fall back to "Enquire about classes"
 - [ ] **P0** Alex reviews `/privacy` and agrees to confirm requests by reply
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
@@ -73,7 +76,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [ ] **P2** CI (GitHub Actions): `npm run check` + e2e on PRs
 
 ### Acceptance criteria (Phase 1)
-- Headline, booking button and the start of the hero video visible without scrolling on a 390×844 phone; whole video on 1366×768 / 1440×900.
+- Headline, booking button and most of the hero video visible without scrolling on a 390×844 phone; whole video on 1024×768 / 1366×768 / 1440×900.
 - No provisional or invented information on production.
 - `npm run check` and `npm run test:e2e` pass.
 - No horizontal scroll at 320 px; axe reports no WCAG A/AA violations.

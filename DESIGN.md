@@ -8,7 +8,7 @@ how to use them.
 - Monochrome, editorial, athletic. Confidence comes from type and space, not effects.
 - Rules (lines) and solid black bands structure the page; avoid card grids.
 - Square corners. No pills, gradients, neon, glows, floating widgets or fake badges.
-- Motion is limited to colour and small underline/arrow transitions (≤200 ms) and is disabled under `prefers-reduced-motion`.
+- Motion is limited to colour and small underline/arrow transitions (≤200 ms), a 220 ms fade-up when a booking step changes (`animate-step-in`), and a slight press on primary buttons. All of it is disabled under `prefers-reduced-motion`.
 
 ## Colour
 
@@ -38,7 +38,7 @@ One variable family: **Archivo** (Google Fonts via `next/font`, self-hosted at b
 |---|---|
 | `font-display` | 800 weight, 112% width, uppercase, -0.02em — all headings |
 | `text-display` | Hero / closing CTA (30 → 84 px) |
-| `text-display-split` | Hero headline beside media at `lg+` (44 → 68 px) |
+| `text-display-split` | Hero headline beside media at `lg+` (40 → 60 px), sized so each sentence fits on one line in half the grid |
 | `text-h1` | Inner page titles (28 → 64 px) |
 | `text-h2` | Section titles (24 → 44 px) |
 | `text-h3` | Sub-headings (20 → 24 px) |
@@ -71,11 +71,15 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `Timetable` | `components/sections` | Driven by `content/classes.ts` |
 | `PriceList` | `components/sections` | Only publishable prices; otherwise "Get in touch for current pricing" |
 | `Location`, `Faq`, `CtaBand`, `JsonLd` | `components/sections` | |
+| `BookingWizard`, `OnlineOnboarding` | `components/booking` | Step journeys: `Stepper` (bar per step; on phones only the current step is named), one step at a time, `ActionBar` (Back + Continue; sticky at the bottom of the screen below `lg`; Continue disabled with a hint until the step is complete), summary with "Change" links (sticky aside on desktop, one-line list on phones) |
+| `ChoiceGroup` | `components/booking/ui.tsx` | Native radios/checkboxes as square tiles: white with a `muted` border (≥3:1), ink border on hover, solid ink when selected, outline on keyboard focus. `list` rows (≥56 px) or wrapping `chips` (≥48 px) |
+| `AvailabilityCalendar` | `components/booking` | Monday-first month grid in hairline `line` cells (48–56 px tall). Available: bold with a dot; fully booked: muted and struck through; no sessions: muted; selected: solid ink. Times listed beside (desktop) or below (phones). Disabled dates are skipped by arrow keys |
+| `DemoNotice`, `DemoLabel` | `components/booking/ui.tsx` | Dashed ink frame or ink "DEMO" tag for demonstration content. Never on production |
 
 ## Imagery
 
 - Only genuine photos of Alex, his coaching and the venue. No stock, no AI imagery presented as real.
-- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~8 s loop of genuine footage. Desktop (lg+): height `min(100svh − 9rem, 40rem)` with width from the 4:5 ratio, right-aligned beside the headline, so headline, booking button and the whole video sit in the first view at 1024×768, 1366×768 and 1440×900. The headline uses `text-display-split` at lg so each sentence ("Get stronger." / "Move better.") stays on one line. Mobile: directly below the booking button, max 28rem wide; its top starts within the first view (e.g. 86% visible at 390×844). Enforced by e2e. `preload="none"`; the poster is identical to the first frame and is the first paint. Plays only while ≥25% visible, never autoplays under `prefers-reduced-motion` or data-saver, stays paused once the visitor pauses it, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
+- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~8 s loop of genuine footage — the visual centrepiece. Desktop (lg+): the right half of the grid, width `min(100%, (100svh − 7rem) × 0.8, 44rem)` with the height from the 4:5 ratio (never cropped or stretched), so headline, booking button and the whole video sit in the first view at 1024×768, 1366×768 and 1440×900 (564×705 px at 1440×900). The headline uses `text-display-split` at lg. Phones: headline, short intro and full-width booking button first, then the video edge to edge (no side gutters); tablets: max 36rem wide. Secondary links ("Explore online coaching", "Group classes") follow the video on phones. Enforced by e2e. `preload="none"`; the poster is identical to the first frame and is the first paint. Plays only while ≥25% visible, never autoplays under `prefers-reduced-motion` or data-saver, stays paused once the visitor pauses it, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
 - Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.

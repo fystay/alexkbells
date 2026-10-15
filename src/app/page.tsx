@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { timetable } from "@/content/classes";
-import { getClassBookingAction } from "@/lib/booking";
+import { getBookingAction, getClassBookingAction, getOnlineCoachingAction, type CallToAction } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { shortDay, sortSessions } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -40,7 +40,8 @@ const benefits = [
 ];
 
 function Hero() {
-  const booking = getClassBookingAction();
+  const booking = getBookingAction("any");
+  const online = getOnlineCoachingAction();
   const video = site.heroVideo;
   const photo = video ? null : site.photos.hero;
   const hasMedia = Boolean(video || photo);
@@ -53,15 +54,17 @@ function Hero() {
     { label: "Online", value: "Coaching wherever you train" },
   ];
 
-  // The media column is sized from the viewport height on desktop so the
-  // headline, the booking button and the video all sit in the first view.
-  const media = "w-full max-w-md lg:col-span-5 lg:max-w-none lg:w-auto lg:h-[min(calc(100svh-9rem),40rem)] lg:justify-self-end";
+  // Phones: headline and booking button first, then the video edge to edge.
+  // Desktop: text beside the video, which is as large as the first view
+  // allows (up to its half of the grid) without cropping its 4:5 frame.
+  const media =
+    "-mx-4 mt-8 sm:mx-0 sm:max-w-xl lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)] lg:max-w-none lg:self-center lg:justify-self-end";
 
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
-      <div className="container-page pt-8 pb-10 sm:pt-12 lg:pt-8 lg:pb-12">
-        <div className={hasMedia ? "grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10" : undefined}>
-          <div className={hasMedia ? "lg:col-span-7" : undefined}>
+      <div className="container-page pt-6 pb-10 sm:pt-10 lg:pt-4 lg:pb-12">
+        <div className={hasMedia ? "grid grid-cols-1 lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10" : undefined}>
+          <div className={hasMedia ? "lg:col-span-6 lg:row-start-2" : undefined}>
             <p className="eyebrow text-muted">Kettlebell coaching · {site.location.town}</p>
             <h1
               id="hero-heading"
@@ -70,18 +73,15 @@ function Hero() {
               <span className="block">Get stronger.</span>
               <span className="block">Move better.</span>
             </h1>
-            <p className="mt-5 max-w-xl text-lede text-muted">
-              Coached kettlebell classes in {site.location.town}. Build strength, improve your
-              fitness and train with purpose.
+            <p className="mt-4 max-w-xl text-lede text-muted lg:mt-5">
+              Coached kettlebell classes and one-to-one sessions in {site.location.town}, plus online coaching
+              wherever you train.
             </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
-              <ButtonLink href={booking.href} external={booking.external}>
-                {booking.label}
-              </ButtonLink>
-              <ButtonLink href="/coaching" variant="text" className="self-start sm:self-auto">
-                One-to-one &amp; online coaching
-              </ButtonLink>
-            </div>
+          </div>
+          <div className={hasMedia ? "mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8" : "mt-7"}>
+            <ButtonLink href={booking.href} external={booking.external} className="w-full sm:w-auto">
+              {booking.label}
+            </ButtonLink>
           </div>
           {video ? <HeroVideo sources={video.sources} poster={video.poster} className={media} /> : null}
           {photo ? (
@@ -93,10 +93,18 @@ function Hero() {
                 height={photo.height}
                 priority
                 sizes="(min-width: 1024px) 40vw, 100vw"
-                className="aspect-[4/5] h-full w-full object-cover grayscale"
+                className="aspect-[4/5] w-full object-cover grayscale"
               />
             </div>
           ) : null}
+          <div className={hasMedia ? "mt-4 flex flex-wrap gap-x-8 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start" : "mt-3 flex flex-wrap gap-x-8"}>
+            <ButtonLink href={online.href} variant="text">
+              {online.label}
+            </ButtonLink>
+            <ButtonLink href="/classes" variant="text">
+              Group classes
+            </ButtonLink>
+          </div>
         </div>
 
         <dl className={`mt-12 grid grid-cols-1 border-t border-ink ${facts.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
@@ -226,6 +234,10 @@ function About() {
 
 function CoachingOptions() {
   const options = [getService("one-to-one"), getService("online-coaching")];
+  const actions: Record<string, CallToAction> = {
+    "one-to-one": getBookingAction("one-to-one"),
+    "online-coaching": getOnlineCoachingAction(),
+  };
   return (
     <Section tone="ink" labelledBy="options-heading">
       <SectionHeading
@@ -244,10 +256,15 @@ function CoachingOptions() {
             <p className="mt-3 mb-8 max-w-md text-muted-inverse">{service.summary}</p>
             <div className="mt-auto">
               <PriceList prices={service.prices} tone="ink" />
-              <ButtonLink href={service.href} variant="text" tone="dark" className="mt-4">
-                Find out more
-                <span className="sr-only"> about {service.name.toLowerCase()}</span>
-              </ButtonLink>
+              <div className="mt-6 flex flex-col items-start gap-2 xs:flex-row xs:flex-wrap xs:items-center xs:gap-x-8">
+                <ButtonLink href={actions[service.id].href} external={actions[service.id].external} tone="dark">
+                  {actions[service.id].label}
+                </ButtonLink>
+                <ButtonLink href={service.href} variant="text" tone="dark">
+                  Find out more
+                  <span className="sr-only"> about {service.name.toLowerCase()}</span>
+                </ButtonLink>
+              </div>
             </div>
           </article>
         ))}

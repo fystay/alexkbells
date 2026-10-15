@@ -1,25 +1,68 @@
 import type { Env } from "./env";
+import {
+  BOOKABLE_SERVICES,
+  BOOKING_EXPERIENCE,
+  PREFERRED_DAYS,
+  PREFERRED_TIMES,
+  labelFor,
+  listLabels,
+  type BookableService,
+  type BookingExperience,
+  type PreferredDay,
+  type PreferredTime,
+} from "./booking-options";
+import { emailError, isValidEmail, messageError, nameError, phoneError, singleLine } from "./form-validation";
 
 /**
- * Booking requests from the /book form: validation, spam checks, the email
- * Alex receives, and whether the form is configured. Pure functions so they
- * can be unit-tested without a server.
+ * Booking requests from /book: server-side validation, spam checks, the
+ * email Alex receives, and whether delivery is configured. Pure functions so
+ * they can be unit-tested without a server.
  *
- * A request is not a confirmed booking: there is no capacity system, so the
- * site says Alex confirms each place, and only reports success once the
- * email has been accepted by the provider.
+ * A request is not a confirmed booking: no live availability is connected,
+ * so visitors choose a confirmed class time (once the timetable is
+ * published) or their preferred days and times, and Alex confirms by reply.
+ * Success is only reported once the email provider has accepted the email.
  */
 
-export const EXPERIENCE_OPTIONS = [
-  { value: "new", label: "New to kettlebells" },
-  { value: "some", label: "Some kettlebell experience" },
-  { value: "regular", label: "I train with kettlebells regularly" },
-] as const;
-export type Experience = (typeof EXPERIENCE_OPTIONS)[number]["value"];
+/** Anything with FormData's `get`/`getAll` — keeps the parsers testable. */
+export interface FieldSource {
+  get(name: string): FormDataEntryValue | null;
+  getAll(name: string): FormDataEntryValue[];
+}
+
+export const MIN_FILL_MS = 3000;
+
+export function text(source: FieldSource, name: string): string {
+  const value = source.get(name);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function values(source: FieldSource, name: string): string[] {
+  return source.getAll(name).filter((v): v is string => typeof v === "string");
+}
+
+/**
+ * A filled honeypot, or a form submitted faster than a person could fill it
+ * in. The start time is set by the browser after load; when it is absent
+ * only the honeypot applies.
+ */
+export function isSpam(source: FieldSource, now: number = Date.now()): boolean {
+  if (text(source, "website") !== "") return true;
+  const startedAt = Number(text(source, "startedAt"));
+  return Number.isFinite(startedAt) && startedAt > 0 && now - startedAt < MIN_FILL_MS;
+}
+
+export function submissionId(source: FieldSource): string {
+  return singleLine(text(source, "submissionId")).slice(0, 64);
+}
 
 export interface BookingRequest {
+  service: BookableService;
+  /** A confirmed class time, when the timetable is published. */
   session: string;
-  experience: Experience;
+  days: PreferredDay[];
+  times: PreferredTime[];
+  experience: BookingExperience;
   name: string;
   email: string;
   phone: string;
@@ -27,91 +70,86 @@ export interface BookingRequest {
   submissionId: string;
 }
 
-export type BookingField = "session" | "experience" | "name" | "email" | "phone" | "message" | "consent";
-export type FieldErrors = Partial<Record<BookingField, string>>;
+export type BookingField = "service" | "when" | "experience" | "name" | "email" | "phone" | "message";
+export type FieldErrors<F extends string = BookingField> = Partial<Record<F, string>>;
 
-export type ParseResult =
-  | { kind: "valid"; data: BookingRequest }
-  | { kind: "invalid"; errors: FieldErrors }
-  | { kind: "spam" };
+export type ParseResult<T, F extends string> =
+  | { kind: "valid"; data: T }
+  | { kind: "invalid"; errors: FieldErrors<F> }
+  | { kind: "spam" }
+  /** A selection from demonstration availability: never accepted. */
+  | { kind: "demo" };
 
-/** Anything with FormData's `get` — keeps the parser testable. */
-interface FieldSource {
-  get(name: string): FormDataEntryValue | null;
+export interface BookingParseOptions {
+  now?: number;
+  /** Confirmed class times offered for group classes; empty → preferences. */
+  sessions?: readonly string[];
 }
 
-export const MIN_FILL_MS = 3000;
-const EMAIL_RE = /^[^\s@<>()[\],;:"]+@[^\s@<>()[\],;:"]+\.[^\s@<>()[\],;:"]{2,}$/;
-const PHONE_RE = /^[0-9+()\-.\s]{7,30}$/;
-
-function text(source: FieldSource, name: string): string {
-  const value = source.get(name);
-  return typeof value === "string" ? value.trim() : "";
-}
-
-/** Strips control characters (incl. newlines) for single-line fields. */
-function singleLine(value: string): string {
-  return value.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s{2,}/g, " ").trim();
-}
-
-export function isValidEmail(value: string): boolean {
-  return value.length <= 254 && EMAIL_RE.test(value);
-}
-
-export function parseBookingRequest(source: FieldSource, now: number = Date.now()): ParseResult {
-  // Spam checks first: a filled honeypot, or a form submitted faster than a
-  // person could fill it in. The timestamp is set by the browser after load;
-  // without JavaScript it is absent, and only the honeypot applies.
-  if (text(source, "website") !== "") return { kind: "spam" };
-  const startedAt = Number(text(source, "startedAt"));
-  if (Number.isFinite(startedAt) && startedAt > 0 && now - startedAt < MIN_FILL_MS) {
-    return { kind: "spam" };
-  }
+export function parseBookingRequest(
+  source: FieldSource,
+  { now = Date.now(), sessions = [] }: BookingParseOptions = {},
+): ParseResult<BookingRequest, BookingField> {
+  if (isSpam(source, now)) return { kind: "spam" };
+  if (text(source, "slot") !== "") return { kind: "demo" };
 
   const errors: FieldErrors = {};
+  const service = text(source, "service");
   const session = singleLine(text(source, "session"));
+  const days = values(source, "days").filter((d): d is PreferredDay => PREFERRED_DAYS.some((o) => o.value === d));
+  const times = values(source, "times").filter((t): t is PreferredTime => PREFERRED_TIMES.some((o) => o.value === t));
   const experience = text(source, "experience");
   const name = singleLine(text(source, "name"));
   const email = singleLine(text(source, "email")).toLowerCase();
   const phone = singleLine(text(source, "phone"));
   const message = text(source, "message").replace(/\r\n?/g, "\n");
-  const consent = text(source, "consent");
-  const submissionId = singleLine(text(source, "submissionId")).slice(0, 64);
 
-  if (!session) errors.session = "Choose a class, or tell us when you would like to come.";
-  else if (session.length > 80) errors.session = "Keep this under 80 characters.";
-
-  if (!EXPERIENCE_OPTIONS.some((o) => o.value === experience)) {
-    errors.experience = "Choose the option that best describes you.";
+  if (!BOOKABLE_SERVICES.some((s) => s.value === service)) errors.service = "Choose a group class or a one-to-one session.";
+  const usesSessions = service === "group-class" && sessions.length > 0;
+  if (usesSessions) {
+    if (!sessions.includes(session)) errors.when = "Choose a class time.";
+  } else if (days.length === 0) {
+    errors.when = "Choose at least one day that suits you.";
   }
+  if (!BOOKING_EXPERIENCE.some((o) => o.value === experience)) errors.experience = "Choose the option that best describes you.";
 
-  if (!name) errors.name = "Enter your name.";
-  else if (name.length > 100) errors.name = "Keep your name under 100 characters.";
-
-  if (!email) errors.email = "Enter your email address so Alex can reply.";
-  else if (!isValidEmail(email)) errors.email = "Enter a valid email address, like name@example.com.";
-
-  if (phone && !PHONE_RE.test(phone)) errors.phone = "Enter a valid phone number, or leave it blank.";
-
-  if (message.length > 1000) errors.message = "Keep your message under 1,000 characters.";
-
-  if (consent !== "yes") errors.consent = "Tick the box so Alex can use your details to reply.";
+  const fieldErrors = { name: nameError(name), email: emailError(email), phone: phoneError(phone), message: messageError(message) };
+  for (const [field, error] of Object.entries(fieldErrors)) if (error) errors[field as BookingField] = error;
 
   if (Object.keys(errors).length > 0) return { kind: "invalid", errors };
   return {
     kind: "valid",
-    data: { session, experience: experience as Experience, name, email, phone, message, submissionId },
+    data: {
+      service: service as BookableService,
+      session: usesSessions ? session : "",
+      days: usesSessions ? [] : days,
+      times: usesSessions ? [] : times,
+      experience: experience as BookingExperience,
+      name,
+      email,
+      phone,
+      message,
+      submissionId: submissionId(source),
+    },
   };
+}
+
+/** "Mon and Wed · Evening" */
+export function describePreferences(days: readonly string[], times: readonly string[]): string {
+  const dayText = listLabels(days.map((d) => labelFor(PREFERRED_DAYS, d)));
+  const timeText = times.length > 0 ? listLabels(times.map((t) => labelFor(PREFERRED_TIMES, t))) : "Any time";
+  return `${dayText} · ${timeText}`;
 }
 
 /** The email Alex receives. Plain text: nothing from the visitor is rendered as HTML. */
 export function bookingEmail(data: BookingRequest): { subject: string; text: string } {
-  const experience = EXPERIENCE_OPTIONS.find((o) => o.value === data.experience)?.label ?? data.experience;
+  const service = labelFor(BOOKABLE_SERVICES, data.service);
   const lines = [
-    "New class booking request from the website.",
+    `New ${service.toLowerCase()} booking request from the website.`,
     "",
-    `Class: ${data.session}`,
-    `Experience: ${experience}`,
+    `Service: ${service}`,
+    data.session ? `Class: ${data.session}` : `Preferred: ${describePreferences(data.days, data.times)}`,
+    `Experience: ${labelFor(BOOKING_EXPERIENCE, data.experience)}`,
     `Name: ${data.name}`,
     `Email: ${data.email}`,
     `Phone: ${data.phone || "not given"}`,
@@ -121,7 +159,7 @@ export function bookingEmail(data: BookingRequest): { subject: string; text: str
     "",
     "Reply to this email to answer them directly. This is a request, not a confirmed booking.",
   ];
-  return { subject: `Class booking request: ${data.name}`.slice(0, 150), text: lines.join("\n") };
+  return { subject: `${service} booking request: ${data.name}`.slice(0, 150), text: lines.join("\n") };
 }
 
 export interface BookingDeliveryConfig {
@@ -168,13 +206,11 @@ export function isBookingFormEnabled(env: Env = process.env): boolean {
   return bookingDeliveryConfig(env) !== null;
 }
 
-/** State shared between the /book server action and the form (useActionState). */
-export interface BookingFormState {
+/** State shared between a server action and its form (useActionState). */
+export interface FormState<F extends string = string> {
   status: "idle" | "error" | "success";
   message: string;
-  errors: FieldErrors;
-  /** Echoed back so a failed submission keeps what the visitor typed. */
-  values: Partial<Record<Exclude<BookingField, "consent">, string>>;
+  errors: FieldErrors<F>;
 }
 
-export const initialBookingFormState: BookingFormState = { status: "idle", message: "", errors: {}, values: {} };
+export const initialFormState: FormState = { status: "idle", message: "", errors: {} };

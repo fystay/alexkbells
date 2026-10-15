@@ -35,8 +35,11 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         When you send a booking request we receive your name, email address, phone number (if you
-        give one), the class you&apos;re interested in, your kettlebell experience and any message you
-        write. Please don&apos;t include medical details.
+        give one), the service and times you choose, your kettlebell experience and any note you
+        write. When you send an online coaching enquiry we receive your answers (your goal,
+        experience and where you train), your name, email address, how you&apos;d like to be
+        contacted and the phone number or Instagram username you give for that. We don&apos;t ask
+        about your health; please don&apos;t include medical details.
       </p>
     ),
   },
@@ -44,8 +47,8 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Why we use it",
     body: (
       <p>
-        Only to reply to your request and arrange your class, because you asked us to (UK GDPR
-        Article 6(1)(b)). We don&apos;t use it for marketing and we don&apos;t sell or share it.
+        Only to reply to your request or enquiry and arrange your coaching, because you asked us to
+        (UK GDPR Article 6(1)(b)). We don&apos;t use it for marketing and we don&apos;t sell or share it.
       </p>
     ),
   },
@@ -53,7 +56,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Where it goes",
     body: (
       <p>
-        The website does not store your request. It is sent by email to Alex using our email provider
+        The website does not store what you send. It is sent by email to Alex using our email provider
         (Resend), which handles it on our behalf. The website is hosted by Vercel, which processes
         standard technical information such as IP addresses to deliver and protect the site. These
         providers may process data outside the UK under appropriate safeguards.
@@ -62,7 +65,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
   },
   {
     heading: "How long we keep it",
-    body: <p>Only as long as we need it to arrange and run your classes, then we delete it.</p>,
+    body: <p>Only as long as we need it to arrange and run your coaching, then we delete it.</p>,
   },
   {
     heading: "Cookies",

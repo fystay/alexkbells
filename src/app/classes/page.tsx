@@ -35,7 +35,12 @@ export default function ClassesPage() {
         : "Class times are being finalised. Get in touch to hear about current sessions.",
     },
     booking.kind === "booking"
-      ? { title: "Book your place", body: "Use the booking button to reserve your place online." }
+      ? booking.external
+        ? { title: "Book your place", body: "Use the booking button to reserve your place online." }
+        : {
+            title: "Send a booking request",
+            body: "Use the booking button to choose a class and send your request. Alex replies to confirm your place.",
+          }
       : {
           title: "Get in touch to book",
           body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",

@@ -1,7 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { BOOK_LABEL, ENQUIRY_HREF, bookingConfigWarning, getClassBookingAction, parseBookingUrl } from "./booking";
+import {
+  ENQUIRY_HREF,
+  bookingConfigWarning,
+  bookingMode,
+  getBookingAction,
+  getClassBookingAction,
+  getOnlineCoachingAction,
+  isBookingDemoEnabled,
+  onlineEnquiryMode,
+  parseBookingUrl,
+} from "./booking";
 
-const env = (BOOKING_URL?: string) => ({ BOOKING_URL });
+const formEnv = {
+  RESEND_API_KEY: "re_test",
+  BOOKING_NOTIFY_EMAIL: "alex@example.com",
+  BOOKING_FROM_EMAIL: "bookings@example.com",
+};
 
 describe("parseBookingUrl", () => {
   it("accepts https URLs only", () => {
@@ -14,52 +28,75 @@ describe("parseBookingUrl", () => {
   });
 });
 
-describe("getClassBookingAction", () => {
-  it("falls back to an enquiry when no booking URL is configured", () => {
-    const action = getClassBookingAction(env());
-    expect(action).toMatchObject({ kind: "enquiry", href: ENQUIRY_HREF, external: false });
-    expect(action.label).not.toMatch(/book/i);
+describe("demo availability", () => {
+  it("is opt-in", () => {
+    expect(isBookingDemoEnabled({})).toBe(false);
+    expect(isBookingDemoEnabled({ BOOKING_DEMO: "1" })).toBe(false);
+    expect(isBookingDemoEnabled({ BOOKING_DEMO: "true", VERCEL_ENV: "preview" })).toBe(true);
   });
 
-  it("falls back to an enquiry for an invalid URL", () => {
-    expect(getClassBookingAction(env("http://insecure.example")).kind).toBe("enquiry");
-  });
-
-  it("links to the external provider when configured", () => {
-    const action = getClassBookingAction(env("https://booking.example.com/classes"));
-    expect(action).toMatchObject({
-      kind: "booking",
-      label: "Book your class",
-      href: "https://booking.example.com/classes",
-      external: true,
-    });
-    expect(BOOK_LABEL).toBe("Book your class");
+  it("can never be switched on for Vercel production", () => {
+    expect(isBookingDemoEnabled({ BOOKING_DEMO: "true", VERCEL_ENV: "production" })).toBe(false);
+    expect(bookingMode({ ...formEnv, BOOKING_DEMO: "true", VERCEL_ENV: "production" })).toBe("request");
+    expect(bookingMode({ BOOKING_DEMO: "true", VERCEL_ENV: "production" })).toBe("unavailable");
   });
 });
 
-const formEnv = {
-  RESEND_API_KEY: "re_test",
-  BOOKING_NOTIFY_EMAIL: "alex@example.com",
-  BOOKING_FROM_EMAIL: "bookings@example.com",
-};
+describe("bookingMode", () => {
+  it("prefers a real external page, then demo, then email requests", () => {
+    expect(bookingMode({})).toBe("unavailable");
+    expect(bookingMode(formEnv)).toBe("request");
+    expect(bookingMode({ ...formEnv, BOOKING_DEMO: "true" })).toBe("demo");
+    expect(bookingMode({ ...formEnv, BOOKING_DEMO: "true", BOOKING_URL: "https://booking.example.com" })).toBe("external");
+    expect(bookingMode({ BOOKING_URL: "http://insecure.example" })).toBe("unavailable");
+  });
+});
 
-describe("booking routes", () => {
-  it("uses the on-site form when delivery is configured and no external page is set", () => {
-    expect(getClassBookingAction(formEnv)).toMatchObject({ kind: "booking", label: "Book your class", href: "/book", external: false });
+describe("onlineEnquiryMode", () => {
+  it("sends for real whenever email is configured, otherwise demo or unavailable", () => {
+    expect(onlineEnquiryMode({})).toBe("unavailable");
+    expect(onlineEnquiryMode({ BOOKING_DEMO: "true" })).toBe("demo");
+    expect(onlineEnquiryMode({ ...formEnv, BOOKING_DEMO: "true" })).toBe("send");
+    expect(onlineEnquiryMode({ BOOKING_DEMO: "true", VERCEL_ENV: "production" })).toBe("unavailable");
+  });
+});
+
+describe("getBookingAction", () => {
+  it("falls back to an honest enquiry when nothing is configured", () => {
+    const action = getClassBookingAction({});
+    expect(action).toMatchObject({ kind: "enquiry", href: ENQUIRY_HREF, external: false });
+    expect(action.label).not.toMatch(/book/i);
+    expect(getBookingAction("any", {}).label).not.toMatch(/book/i);
   });
 
-  it("prefers an external booking page when both exist", () => {
-    expect(getClassBookingAction({ ...formEnv, BOOKING_URL: "https://booking.example.com" }).href).toBe("https://booking.example.com/");
+  it("points each service at its own step of the on-site flow", () => {
+    expect(getBookingAction("any", formEnv)).toMatchObject({ kind: "booking", label: "Book your session", href: "/book", external: false });
+    expect(getBookingAction("group-class", formEnv)).toMatchObject({ label: "Book your class", href: "/book/group-class" });
+    expect(getBookingAction("one-to-one", formEnv)).toMatchObject({ label: "Book a one-to-one", href: "/book/one-to-one" });
+  });
+
+  it("prefers an external booking page when one is set", () => {
+    expect(getClassBookingAction({ ...formEnv, BOOKING_URL: "https://booking.example.com" })).toMatchObject({
+      href: "https://booking.example.com/",
+      external: true,
+    });
+  });
+});
+
+describe("getOnlineCoachingAction", () => {
+  it("links to the onboarding journey only when it can be completed", () => {
+    expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching");
+    expect(getOnlineCoachingAction({}).href).toBe(ENQUIRY_HREF);
   });
 });
 
 describe("bookingConfigWarning", () => {
-  it("flags a missing or invalid booking URL on production only", () => {
+  it("flags a missing route on production only", () => {
     expect(bookingConfigWarning({ VERCEL_ENV: "production" })).toMatch(/No booking route is configured/);
+    expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_DEMO: "true" })).toMatch(/ignored on production/);
     expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "http://x.example" })).toMatch(/not a valid https URL/);
     expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "https://x.example/book" })).toBeNull();
-    expect(bookingConfigWarning({ VERCEL_ENV: "preview" })).toBeNull();
     expect(bookingConfigWarning({ VERCEL_ENV: "production", ...formEnv })).toBeNull();
-    expect(bookingConfigWarning({})).toBeNull();
+    expect(bookingConfigWarning({ VERCEL_ENV: "preview" })).toBeNull();
   });
 });

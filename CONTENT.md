@@ -22,25 +22,29 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your class** + video) → benefits (+ booking button) → group classes (+ booking button) → about → one-to-one & online (secondary) → location → FAQ → closing CTA |
+| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your session** + large video; "Explore online coaching" and "Group classes" links) → benefits (+ booking button) → group classes (+ booking button) → about → one-to-one & online (each with its own action) → location → FAQ → closing CTA |
 | `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
-| `/book` | Booking request form (class, experience, name, email, optional phone/message, consent) + "How it works" + address. Falls back to an external link or an Instagram prompt when the form isn't configured |
-| `/privacy` | Privacy notice: what the booking form collects, where it goes (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
+| `/book` | "Book your session": guided steps — service (group class or one-to-one) → when → your details. Demo availability calendar on previews; preferred days/times request on production. Falls back to an external link or an Instagram prompt |
+| `/book/group-class`, `/book/one-to-one` | Same flow, starting at "when" for that service |
+| `/online-coaching` | "Get started with online coaching": goal → training → contact → review & send. Alex replies personally |
+| `/privacy` | Privacy notice: what booking requests and online enquiries collect, where they go (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
 
 **Trade-offs taken**
 
 - `/one-to-one` and `/online-coaching` were merged into `/coaching` with anchors: with the verified information available each would be a few sentences. Split them once there is enough real content (session format, programme examples, photos).
 - `/about` is a homepage section only. Without a verified bio, qualifications or photos a standalone page would be thin. Add `/about` once Alex supplies these.
 - Membership is omitted entirely until defined.
-- Booking is a **request form**, not instant booking: there is no confirmed capacity or timetable, so Alex confirms each place by reply. Class times are offered as choices only once the timetable is confirmed; until then visitors type when suits them.
+- Booking is a **request**, not instant booking: there is no live availability, capacity or confirmed timetable, so Alex confirms each place by reply. Class times are offered as choices only once the timetable is confirmed; until then visitors pick the days and times of day that suit them.
+- The calendar's demonstration availability is invented sample data (deliberately on different days from the real timetable) and is always labelled "Demo". It must never be shown on production.
 - No general contact form; `/contact` stays Instagram-first.
 
 ## Copy rules
 
-- Primary CTA text is "Book your class" (`BOOK_LABEL` in `src/lib/booking.ts`), shown only when a real booking route exists: a valid https `BOOKING_URL`, or the configured `/book` form. Without either, buttons honestly read "Enquire about classes" → /contact; never label the contact page as booking.
-- Booking form copy says "request" and "Alex will reply to confirm your place" — never "booked" or "confirmed". The message field asks visitors not to include medical details.
+- Booking buttons (`getBookingAction` in `src/lib/booking.ts`): "Book your session" (general), "Book your class" (group), "Book a one-to-one", and "Book a session" in the header (space at tablet widths). Shown only when a real booking route exists; otherwise they honestly read "Enquire about classes" / "Get in touch" → /contact. Online coaching uses "Explore online coaching" → /online-coaching.
+- Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
+- One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
 - Benefits: build strength, improve fitness, train with confidence, stay consistent — hedged ("can"), no "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
 

@@ -45,22 +45,30 @@ src/
   app/                 routes, metadata, sitemap.ts, robots.ts, not-found.tsx
   components/
     layout/            SiteHeader, NavLinks (client), SiteFooter, Logo
+    booking/           BookingPage, BookingWizard, AvailabilityCalendar, OnlineOnboarding, ui (client)
     ui/                ButtonLink, Section, Provisional
     sections/          Timetable, PriceList, Location, Faq, CtaBand, PageHeader, JsonLd
   content/             typed business data (single source of truth) + tests
-  lib/                 booking adapter, publish gate, schedule/format helpers, env, routes
+  lib/                 booking modes, request/enquiry parsing, form validation, publish gate, schedule/format helpers, env, routes
+    availability/      availability interface, dates, demonstration provider
 tests/e2e/             Playwright specs
 ```
 
-Only `NavLinks.tsx` is a client component (needs `usePathname` and menu state).
+Client components: `NavLinks.tsx` (menu state), `HeroVideo.tsx`, and the booking journeys in `components/booking/`.
 
 ## Key decisions
 
 1. **Content as typed modules, not a CMS.** Small, rarely changing data; type-checked; reviewed in Git. Revisit (Supabase table or headless CMS) when Alex needs to edit without a developer — Phase 4.
 2. **Status-gated content.** `ContentStatus` + `Provisional` component + `CONTENT_PREVIEW` lets unconfirmed information be reviewed without ever shipping it to production.
-3. **Booking boundary** (`src/lib/booking.ts`). Pages ask for a `CallToAction`; they never know the provider. Order of preference: an external `BOOKING_URL` (https only), then the on-site `/book` request form when email delivery is configured, otherwise an enquiry. A Square/Setmore/custom adapter can replace the module later.
-4. **Booking request form** (`/book`). A Server Action (`src/app/book/actions.ts`) validates on the server (`src/lib/booking-request.ts`), rejects spam (honeypot + 3 s minimum fill time), and emails Alex through Resend's REST API with plain `fetch` (`src/lib/send-email.ts`, no SDK dependency) with an idempotency key so retries send once. Nothing is stored, so no database or RLS is needed yet. Success is shown only after the provider accepts the email; it is a request that Alex confirms by reply, not a booking. The form works without JavaScript; with it, values are kept on error and focus moves to the error summary. e2e tests run against a local mock of the Resend endpoint (`tests/e2e/mock-email-server.mjs`).
-5. **No embedded map.** Google Maps link only, avoiding third-party cookies and a consent banner.
+3. **Booking boundary** (`src/lib/booking.ts`). Pages ask for a `CallToAction` and a `bookingMode()`; they never know the provider. Modes, in order: `external` (`BOOKING_URL`, https only) → `demo` (`BOOKING_DEMO=true`, impossible on Vercel production) → `request` (email delivery configured) → `unavailable` (honest "Enquire" buttons → /contact). Each service has its own entry point: `/book` (choose a service), `/book/group-class`, `/book/one-to-one`.
+4. **Guided booking** (`components/booking/BookingWizard.tsx`). Three steps — service, when, details — with a stepper, a summary with "Change" links, Back, and a Continue button disabled until the step is complete. Choices are native radios/checkboxes styled as tiles (keyboard and screen readers work by default); focus moves to each new step's heading. State lives in the client until the final step, which posts to a Server Action (`src/app/book/actions.ts`).
+   - *demo*: a month calendar of **demonstration availability** (`lib/availability/demo.ts`), labelled "Demo" on the page, above the calendar and in the summary. Finishing shows "No booking has been made"; nothing is sent. The demo module is loaded with a dynamic `import()` so it never downloads in request mode, and the server refuses any posted `slot`.
+   - *request*: no live availability yet, so visitors choose a confirmed class time (once the timetable is publishable) or their preferred days and times of day; the request is emailed to Alex, who confirms by reply.
+   - **Replacing the demo with real availability:** implement `AvailabilityProvider` (`lib/availability/types.ts`) for the chosen provider or backend, add a `live` mode that uses it, and make the final step create the booking through that provider (server-side, idempotent, confirmed only by the provider's response). The calendar and wizard do not change.
+5. **Request and enquiry delivery.** Server-side validation (`src/lib/booking-request.ts`, `src/lib/online-enquiry.ts`; field rules shared with the browser in `src/lib/form-validation.ts`), spam checks (honeypot + 3 s minimum time from page load), and email to Alex through Resend's REST API with plain `fetch` (`src/lib/send-email.ts`, no SDK) with an idempotency key so retries send once. Nothing is stored, so no database or RLS is needed yet. Success is shown only after the provider accepts the email.
+6. **Online coaching onboarding** (`/online-coaching`, `components/booking/OnlineOnboarding.tsx`). Not a calendar: goal → training → contact → review & send, with progressive disclosure ("Something else" asks for detail; a phone number or Instagram username is asked for only if that contact method is chosen). Reuses the same primitives, validation and email delivery. No health questions.
+7. **e2e servers.** Playwright builds two copies: the main one (`.next`, booking demo on, email to `tests/e2e/mock-email-server.mjs`) and a Vercel-production one (`NEXT_DIST_DIR=.next-e2e-production`, `VERCEL_ENV=production` with `BOOKING_DEMO` and `CONTENT_PREVIEW` set by mistake) that must show no demo or provisional content. `tsconfig.json` lists the second build's types folder so builds don't rewrite it.
+8. **No embedded map.** Google Maps link only, avoiding third-party cookies and a consent banner.
 
 ## Environment variables
 
@@ -69,11 +77,12 @@ See `.env.example`. All are server/build-time only (no `NEXT_PUBLIC_*`).
 | Name | Purpose |
 |---|---|
 | `SITE_URL` | Canonical origin (metadata, sitemap, JSON-LD). Validated; falls back to `VERCEL_PROJECT_PRODUCTION_URL`, then localhost |
-| `BOOKING_URL` | External booking page (https only); takes priority over the form |
+| `BOOKING_URL` | External booking page (https only); takes priority over everything else |
+| `BOOKING_DEMO` | `true` shows demonstration availability on `/book` (previews/local only). **Ignored when `VERCEL_ENV=production`** |
 | `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` | Booking request form delivery; all three valid → form on, else off. Server-only |
 | `RESEND_API_URL` | Tests only: endpoint override, accepted only for https or `http://localhost` |
 | `CONTENT_PREVIEW` | `true` on preview deployments only. **Ignored when `VERCEL_ENV=production`** |
-| `PLAYWRIGHT_CHROMIUM_PATH` | Tests only |
+| `PLAYWRIGHT_CHROMIUM_PATH`, `NEXT_DIST_DIR`, `E2E_PORT`, `E2E_PRODUCTION_PORT`, `MOCK_EMAIL_PORT` | Tests only |
 
 Per-environment values: DEPLOYMENT.md. Non-production deployments (and local
 builds with `CONTENT_PREVIEW=true`) get `robots.txt` Disallow plus a
@@ -95,7 +104,7 @@ image (`public/og-image.png`) is declared explicitly because a page-level
 
 ## Enquiry form options (not implemented)
 
-The booking request form (above) uses option 3 for class bookings. The
+The booking and online coaching journeys (above) use option 3. The
 contact page itself still has no form; options for general enquiries, in
 order of effort:
 

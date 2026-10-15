@@ -41,7 +41,8 @@ redeploy: pages, including `/book`, are prerendered at build time.
 |---|---|---|---|
 | `SITE_URL` | `https://<chosen domain>` once decided | — | Canonical URLs, sitemap, social previews. Invalid values are ignored. Until set, falls back to the project's production URL (`alexkbells.vercel.app`) |
 | `CONTENT_PREVIEW` | **do not set** | `true` | Shows provisional prices/times with an orange review frame. Ignored on production even if set by mistake |
-| `BOOKING_URL` | Alex's external booking page (https), only if he chooses a hosted provider | optional, to test | Set → every primary button reads "Book your class" and opens it in a new tab; takes priority over the /book form |
+| `BOOKING_URL` | Alex's external booking page (https), only if he chooses a hosted provider | optional, to test | Set → "Book" buttons open it in a new tab; takes priority over everything else |
+| `BOOKING_DEMO` | **do not set** (ignored anyway) | `true` to demo the booking calendar to Alex | Shows labelled sample availability on `/book`; nothing is booked or sent. Ignored when `VERCEL_ENV=production` |
 | `RESEND_API_KEY` | **Launch blocker** (unless `BOOKING_URL` is used): API key from Alex's own Resend account, "sending access" only | a separate test key, optional | Mark as Sensitive in Vercel. With the two settings below, turns on the `/book` request form and points "Book your class" buttons at it |
 | `BOOKING_NOTIFY_EMAIL` | Alex's inbox for booking requests | a test inbox | Requests arrive here with Reply-To set to the visitor |
 | `BOOKING_FROM_EMAIL` | e.g. `Alex K Bells <bookings@<verified domain>>` | same | Must be on a domain verified in Resend (needs the domain decision; DNS records with Alex's approval) |
@@ -51,10 +52,16 @@ about classes" → /contact and production builds log a "Launch blocker" warning
 
 ### Booking request form: what to know
 
-- It sends Alex an **email request**, not a confirmed booking. There is no
-  capacity check, so the site says "Alex will reply to confirm your place",
-  and only reports success once Resend has accepted the email. If sending
-  fails, the visitor sees an error and is pointed to Instagram.
+- `/book` sends Alex an **email request**, not a confirmed booking: visitors
+  choose a service and the days/times that suit them (or a class time once
+  the timetable is confirmed). There is no live availability or capacity
+  check, so the site says Alex will reply to confirm, and only reports
+  success once Resend has accepted the email. If sending fails, the visitor
+  sees an error and is pointed to Instagram. `/online-coaching` enquiries use
+  the same settings and inbox.
+- The calendar seen on previews with `BOOKING_DEMO=true` is a prototype for
+  Alex to try; production never shows it. Real date-and-time booking needs a
+  booking provider or backend (ARCHITECTURE.md → Guided booking).
 - Nothing is stored by the site. Personal data passes through Vercel and
   Resend and lands in Alex's inbox, as described on `/privacy`. **Alex must
   review the privacy notice** (who's responsible, retention) before launch.

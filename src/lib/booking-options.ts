@@ -1,0 +1,92 @@
+/**
+ * Choices offered in the booking and online coaching journeys. Shared by the
+ * browser and the server (which validates against the same lists). Wording
+ * only: no prices, durations or capacity, which Alex has not confirmed.
+ */
+
+export const BOOKABLE_SERVICES = [
+  {
+    value: "group-class",
+    label: "Group class",
+    detail: "Coached group kettlebell class",
+    path: "/book/group-class",
+  },
+  {
+    value: "one-to-one",
+    label: "One-to-one",
+    detail: "Individual coaching session with Alex",
+    path: "/book/one-to-one",
+  },
+] as const;
+export type BookableService = (typeof BOOKABLE_SERVICES)[number]["value"];
+
+export function bookableService(value: string): (typeof BOOKABLE_SERVICES)[number] | undefined {
+  return BOOKABLE_SERVICES.find((s) => s.value === value);
+}
+
+/** One question covers returning clients and newcomers' experience. */
+export const BOOKING_EXPERIENCE = [
+  { value: "returning", label: "I've trained with Alex before" },
+  { value: "new", label: "New to kettlebells" },
+  { value: "some", label: "Some kettlebell experience" },
+] as const;
+export type BookingExperience = (typeof BOOKING_EXPERIENCE)[number]["value"];
+
+/** Preferred days/times, used while live availability isn't connected. */
+export const PREFERRED_DAYS = [
+  { value: "mon", label: "Mon", long: "Monday" },
+  { value: "tue", label: "Tue", long: "Tuesday" },
+  { value: "wed", label: "Wed", long: "Wednesday" },
+  { value: "thu", label: "Thu", long: "Thursday" },
+  { value: "fri", label: "Fri", long: "Friday" },
+  { value: "sat", label: "Sat", long: "Saturday" },
+  { value: "sun", label: "Sun", long: "Sunday" },
+] as const;
+export type PreferredDay = (typeof PREFERRED_DAYS)[number]["value"];
+
+export const PREFERRED_TIMES = [
+  { value: "morning", label: "Morning" },
+  { value: "afternoon", label: "Afternoon" },
+  { value: "evening", label: "Evening" },
+] as const;
+export type PreferredTime = (typeof PREFERRED_TIMES)[number]["value"];
+
+export const ONLINE_GOALS = [
+  { value: "strength", label: "Get stronger" },
+  { value: "fitness", label: "Improve my fitness" },
+  { value: "technique", label: "Learn kettlebell technique" },
+  { value: "consistency", label: "Train consistently with a plan" },
+  { value: "other", label: "Something else" },
+] as const;
+export type OnlineGoal = (typeof ONLINE_GOALS)[number]["value"];
+
+export const ONLINE_EXPERIENCE = [
+  { value: "new", label: "New to kettlebells" },
+  { value: "some", label: "Some experience" },
+  { value: "regular", label: "I train with kettlebells regularly" },
+] as const;
+export type OnlineExperience = (typeof ONLINE_EXPERIENCE)[number]["value"];
+
+export const TRAINING_PLACES = [
+  { value: "home", label: "At home" },
+  { value: "gym", label: "In a gym" },
+  { value: "both", label: "Both" },
+] as const;
+export type TrainingPlace = (typeof TRAINING_PLACES)[number]["value"];
+
+export const CONTACT_METHODS = [
+  { value: "email", label: "Email" },
+  { value: "phone", label: "Phone" },
+  { value: "instagram", label: "Instagram" },
+] as const;
+export type ContactMethod = (typeof CONTACT_METHODS)[number]["value"];
+
+export function labelFor<T extends { value: string; label: string }>(options: readonly T[], value: string): string {
+  return options.find((o) => o.value === value)?.label ?? value;
+}
+
+/** "Mon, Wed and Sat" */
+export function listLabels(labels: readonly string[]): string {
+  if (labels.length <= 1) return labels.join("");
+  return `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
+}

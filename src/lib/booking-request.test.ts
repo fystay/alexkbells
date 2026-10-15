@@ -3,85 +3,121 @@ import {
   MIN_FILL_MS,
   bookingDeliveryConfig,
   bookingEmail,
+  describePreferences,
   isBookingFormEnabled,
   parseBookingRequest,
 } from "./booking-request";
 
 const NOW = 1_800_000_000_000;
-const form = (fields: Record<string, string>) => {
+const form = (fields: Record<string, string | string[]>) => {
   const data = new FormData();
-  for (const [key, value] of Object.entries(fields)) data.set(key, value);
+  for (const [key, value] of Object.entries(fields)) {
+    for (const v of Array.isArray(value) ? value : [value]) data.append(key, v);
+  }
   return data;
 };
 const valid = {
-  session: "Monday 6:30 pm",
-  experience: "new",
+  service: "one-to-one",
+  days: ["mon", "wed"],
+  times: ["evening"],
+  experience: "returning",
   name: "Sam Example",
   email: "Sam@Example.com",
   phone: "07700 900123",
-  message: "First class!",
-  consent: "yes",
+  message: "See you soon",
   website: "",
   startedAt: String(NOW - 20_000),
   submissionId: "abc-123",
 };
+const SESSIONS = ["Monday 6:30 pm", "Saturday 9:00 am"];
 
 describe("parseBookingRequest", () => {
-  it("accepts a complete request and normalises it", () => {
-    const result = parseBookingRequest(form(valid), NOW);
+  it("accepts a preference request and normalises it", () => {
+    const result = parseBookingRequest(form(valid), { now: NOW });
     expect(result.kind).toBe("valid");
     if (result.kind === "valid") {
-      expect(result.data.email).toBe("sam@example.com");
-      expect(result.data.experience).toBe("new");
+      expect(result.data).toMatchObject({ service: "one-to-one", days: ["mon", "wed"], times: ["evening"], email: "sam@example.com", session: "" });
     }
   });
 
-  it("allows phone and message to be blank", () => {
-    expect(parseBookingRequest(form({ ...valid, phone: "", message: "" }), NOW).kind).toBe("valid");
+  it("allows phone, message and time of day to be blank", () => {
+    expect(parseBookingRequest(form({ ...valid, phone: "", message: "", times: [] }), { now: NOW }).kind).toBe("valid");
+  });
+
+  it("requires at least one day when no class times are published", () => {
+    const result = parseBookingRequest(form({ ...valid, service: "group-class", days: [] }), { now: NOW });
+    expect(result.kind === "invalid" && result.errors.when).toBeTruthy();
+  });
+
+  it("requires a published class time for group classes once the timetable is confirmed", () => {
+    const groupForm = { ...valid, service: "group-class", days: [], times: [] };
+    expect(parseBookingRequest(form({ ...groupForm, session: "Monday 6:30 pm" }), { now: NOW, sessions: SESSIONS }).kind).toBe("valid");
+    const invented = parseBookingRequest(form({ ...groupForm, session: "Tuesday 5:00 am" }), { now: NOW, sessions: SESSIONS });
+    expect(invented.kind === "invalid" && invented.errors.when).toBeTruthy();
+  });
+
+  it("ignores unknown day and time values", () => {
+    const result = parseBookingRequest(form({ ...valid, days: ["mon", "funday"], times: ["midnight"] }), { now: NOW });
+    expect(result.kind === "valid" && result.data.days).toEqual(["mon"]);
+    expect(result.kind === "valid" && result.data.times).toEqual([]);
   });
 
   it("reports each invalid field", () => {
     const result = parseBookingRequest(
-      form({ ...valid, session: "", experience: "expert", name: "", email: "nope", phone: "abc", consent: "" }),
-      NOW,
+      form({ ...valid, service: "massage", days: [], experience: "expert", name: "", email: "nope", phone: "abc" }),
+      { now: NOW },
     );
     expect(result.kind).toBe("invalid");
     if (result.kind === "invalid") {
-      expect(Object.keys(result.errors).sort()).toEqual(
-        ["consent", "email", "experience", "name", "phone", "session"].sort(),
-      );
+      expect(Object.keys(result.errors).sort()).toEqual(["email", "experience", "name", "phone", "service", "when"]);
     }
   });
 
   it("enforces length limits", () => {
-    const result = parseBookingRequest(form({ ...valid, name: "x".repeat(101), message: "y".repeat(1001) }), NOW);
+    const result = parseBookingRequest(form({ ...valid, name: "x".repeat(101), message: "y".repeat(1001) }), { now: NOW });
     expect(result.kind === "invalid" && result.errors.name && result.errors.message).toBeTruthy();
   });
 
   it("treats a filled honeypot or an instant submission as spam", () => {
-    expect(parseBookingRequest(form({ ...valid, website: "http://spam" }), NOW).kind).toBe("spam");
-    expect(parseBookingRequest(form({ ...valid, startedAt: String(NOW - MIN_FILL_MS + 1) }), NOW).kind).toBe("spam");
+    expect(parseBookingRequest(form({ ...valid, website: "http://spam" }), { now: NOW }).kind).toBe("spam");
+    expect(parseBookingRequest(form({ ...valid, startedAt: String(NOW - MIN_FILL_MS + 1) }), { now: NOW }).kind).toBe("spam");
   });
 
-  it("still works without JavaScript (no timestamp)", () => {
-    expect(parseBookingRequest(form({ ...valid, startedAt: "" }), NOW).kind).toBe("valid");
+  it("never accepts a demonstration slot", () => {
+    expect(parseBookingRequest(form({ ...valid, slot: "demo-one-to-one-2026-10-20-07:00" }), { now: NOW }).kind).toBe("demo");
   });
 
   it("strips newlines from single-line fields (no header injection)", () => {
-    const result = parseBookingRequest(form({ ...valid, name: "Sam\r\nBcc: evil@example.com" }), NOW);
+    const result = parseBookingRequest(form({ ...valid, name: "Sam\r\nBcc: evil@example.com" }), { now: NOW });
     expect(result.kind === "valid" && result.data.name).toBe("Sam Bcc: evil@example.com");
   });
 });
 
 describe("bookingEmail", () => {
   it("is plain text, marked as a request, with every field", () => {
-    const result = parseBookingRequest(form(valid), NOW);
+    const result = parseBookingRequest(form(valid), { now: NOW });
     if (result.kind !== "valid") throw new Error("expected valid");
     const email = bookingEmail(result.data);
-    expect(email.subject).toBe("Class booking request: Sam Example");
-    expect(email.text).toContain("Class: Monday 6:30 pm");
-    expect(email.text).toContain("Experience: New to kettlebells");
+    expect(email.subject).toBe("One-to-one booking request: Sam Example");
+    expect(email.text).toContain("Preferred: Mon and Wed · Evening");
+    expect(email.text).toContain("Experience: I've trained with Alex before");
     expect(email.text).toContain("not a confirmed booking");
+  });
+
+  it("names the class time when one was chosen", () => {
+    const result = parseBookingRequest(form({ ...valid, service: "group-class", session: "Saturday 9:00 am", days: [] }), {
+      now: NOW,
+      sessions: SESSIONS,
+    });
+    if (result.kind !== "valid") throw new Error("expected valid");
+    expect(bookingEmail(result.data).text).toContain("Class: Saturday 9:00 am");
+  });
+});
+
+describe("describePreferences", () => {
+  it("summarises days and times in plain words", () => {
+    expect(describePreferences(["mon", "wed", "sat"], [])).toBe("Mon, Wed and Sat · Any time");
+    expect(describePreferences(["tue"], ["morning", "evening"])).toBe("Tue · Morning and Evening");
   });
 });
 
