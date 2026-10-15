@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — see DESIGN.md. Monochrome only.
+ * Measured contrast (WCAG 2.x): ink/paper 17.9:1, muted/paper 6.9:1,
+ * muted/surface 6.2:1, muted-inverse/ink 8.0:1, muted-inverse/ink-soft 7.0:1.
+ * `line` is decorative only (1.4:1) — never use it for text.
+ */
+@theme {
+  --color-ink: #0b0b0b;
+  --color-ink-soft: #1c1c1b;
+  --color-paper: #f6f4ef;
+  --color-white: #ffffff;
+  --color-surface: #ece9e2;
+  --color-line: #d6d2c9;
+  --color-line-inverse: #333331;
+  --color-muted: #57544e;
+  --color-muted-inverse: #a9a59d;
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  /* Fluid type scale (min at 320px, max at ~1280px) */
+  --text-display: clamp(1.875rem, 0.9rem + 5vw, 5.25rem);
+  --text-display--line-height: 0.95;
+  --text-h1: clamp(1.75rem, 1rem + 3.5vw, 4rem);
+  --text-h1--line-height: 1;
+  --text-h2: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);
+  --text-h2--line-height: 1.05;
+  --text-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-h3--line-height: 1.2;
+  --text-lede: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --text-lede--line-height: 1.55;
+
+  --tracking-display: -0.02em;
+  --tracking-eyebrow: 0.16em;
+
+  --breakpoint-xs: 26rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* Visible focus for every interactive element */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  [id] {
+    scroll-margin-top: 6rem;
+  }
+}
+
+@utility font-display {
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}

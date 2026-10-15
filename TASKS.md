@@ -1,0 +1,45 @@
+# TASKS — Alex K Bells
+
+Priority: P0 blocks launch · P1 before/at launch · P2 later.
+
+## Phase 1 — Public website
+
+### Done (2026-10-15)
+- [x] Next.js 16 + TS strict + Tailwind v4 scaffold
+- [x] Design tokens and component set (DESIGN.md)
+- [x] Typed content layer with confirmed/provisional gating and preview mode
+- [x] Pages: `/`, `/classes`, `/coaching`, `/contact`, 404; sitemap, robots, JSON-LD, per-page metadata
+- [x] Booking boundary (`BOOKING_URL` → external link; otherwise enquiry)
+- [x] Unit tests (Vitest) and e2e (Playwright: routes, overflow at 320–1600 px, axe WCAG AA, skip link, mobile menu, links, no provisional content in production)
+
+### To launch
+- [ ] **P0** Add the real logo to `public/brand/` and configure `site.logo`
+- [ ] **P0** Alex confirms timetable → set `timetable.status = "confirmed"` (and duration if known)
+- [ ] **P0** Alex confirms or updates prices → set statuses
+- [ ] **P0** Decide domain; set `SITE_URL` on Vercel production
+- [ ] **P1** Favicon / apple icon / OG image from the logo
+- [ ] **P1** Genuine photos (hero, about) with permission
+- [ ] **P1** Verified bio → consider `/about` page
+- [ ] **P1** Public email/phone if Alex wants them (`site.contact`)
+- [ ] **P1** Set up Vercel project (client-owned account), preview env `CONTENT_PREVIEW=true`
+- [ ] **P1** Manual checks on real devices (iOS Safari, Android Chrome), 200% zoom, VoiceOver/TalkBack pass
+- [ ] **P1** Privacy notice (even without forms, Vercel logs IPs; add if analytics are introduced)
+- [ ] **P2** Lighthouse run on the deployed URL
+- [ ] **P2** CI (GitHub Actions): `npm run check` + e2e on PRs
+
+### Acceptance criteria (Phase 1)
+- Class times and booking/enquiry action reachable within one scroll on a 390 px phone.
+- No provisional or invented information on production.
+- `npm run check` and `npm run test:e2e` pass.
+- No horizontal scroll at 320 px; axe reports no WCAG A/AA violations.
+
+## Phase 2 — Booking & payments (blocked)
+Blocked on: provider choice, Square capabilities, class price/capacity/duration, cancellation & refund policy.
+- [ ] Verify Square products enabled on Alex's account and current fees (official docs/dashboard)
+- [ ] Choose option A (hosted) or B (custom) — see ARCHITECTURE.md
+- [ ] If B: Supabase schema + RLS, idempotent booking endpoint, verified webhooks, emails
+- [ ] Tests: last-place race, duplicate requests, payment success/failure/pending, refunds, webhook retries, cross-user access
+- [ ] Contact/enquiry form with server validation, spam protection, privacy notice
+
+## Phase 3 — Membership & accounts (blocked on product definition)
+## Phase 4 — Admin & hardening (scope with Alex)
