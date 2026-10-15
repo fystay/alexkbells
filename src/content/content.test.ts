@@ -20,8 +20,9 @@ describe("content approval state", () => {
     expect(services.find((s) => s.id === "group-classes")?.prices).toEqual([]);
   });
 
-  it("keeps the timetable provisional until confirmed", () => {
-    expect(timetable.status).toBe("provisional");
+  it("publishes the timetable confirmed on 2026-10-15", () => {
+    expect(timetable.status).toBe("confirmed");
+    expect(timetable.sessions.map((s) => `${s.day} ${s.start}`)).toEqual(["Monday 18:30", "Wednesday 18:30", "Saturday 09:00"]);
   });
 
   it("derives the timetable FAQ status from the timetable", () => {

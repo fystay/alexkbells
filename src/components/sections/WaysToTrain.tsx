@@ -18,12 +18,10 @@ interface Option {
 }
 
 /**
- * The three ways to train side by side, each with its price and its own
- * booking button, then how getting started works. One place to compare and
- * choose, instead of separate bands for classes and personal coaching.
+ * "What I offer": the three ways to train side by side, each with its price
+ * and its own booking button. One place to compare and choose.
  */
 export function WaysToTrain() {
-  const booking = getBookingAction("any");
   const timesPublished = isPublishable(timetable.status);
   const options: Option[] = [
     {
@@ -44,21 +42,18 @@ export function WaysToTrain() {
     },
   ];
 
-  const steps = [
-    { title: "Choose how you train", body: "Group class, one-to-one or online." },
-    booking.kind === "booking"
-      ? { title: "Pick a time", body: "Choose a day and time that suits you." }
-      : { title: "Get in touch", body: "Tell Alex what you're looking for." },
-    { title: "Train with Alex", body: "Alex confirms and you're ready to start." },
-  ];
 
   return (
-    <Section tone="ink" labelledBy="ways-heading">
+    <Section tone="ink" id="ways-to-train" labelledBy="ways-heading">
       <div className="max-w-3xl">
-        <p className="eyebrow text-muted-inverse">Ways to train</p>
+        <p className="eyebrow text-muted-inverse">What I offer</p>
         <h2 id="ways-heading" className="mt-4 font-display text-h2 text-balance">
           Choose how you train
         </h2>
+        <p className="mt-5 max-w-2xl text-lede text-muted-inverse">
+          Three ways to train with Alex: coached group classes and one-to-one sessions in Cumbernauld, or online
+          coaching wherever you are.
+        </p>
       </div>
 
       <ul className="mt-12 grid grid-cols-1 border-t border-line-inverse lg:grid-cols-3 lg:border-t-0">
@@ -93,22 +88,6 @@ export function WaysToTrain() {
         ))}
       </ul>
 
-      <div className="mt-16 border-t border-line-inverse pt-10 lg:mt-20">
-        <h3 className="eyebrow text-muted-inverse">Getting started</h3>
-        <ol className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
-          {steps.map((step, i) => (
-            <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-3">
-              <span className="font-display text-h3 leading-none text-muted-inverse" aria-hidden="true">
-                {i + 1}
-              </span>
-              <div>
-                <p className="font-bold">{step.title}</p>
-                <p className="mt-1 text-sm text-muted-inverse">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
     </Section>
   );
 }

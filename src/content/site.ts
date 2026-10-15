@@ -90,9 +90,23 @@ export const site = {
   },
 } as const;
 
+/**
+ * Top navigation answers the four questions Alex wants every visitor to get
+ * answered: what he offers, why kettlebells, who he is, and where/how to book.
+ * Each jumps to that section of the homepage.
+ */
 export const mainNav = [
-  { label: "Classes", href: "/classes" },
-  { label: "Coaching", href: "/coaching" },
+  { label: "Ways to train", href: "/#ways-to-train" },
+  { label: "Why kettlebells", href: "/#why-kettlebells" },
+  { label: "About Alex", href: "/#about" },
+  { label: "How to book", href: "/#how-to-book" },
+] as const;
+
+/** Extra pages listed in the phone menu and footer, after mainNav. */
+export const pageNav = [
+  { label: "Group classes", href: "/classes" },
+  { label: "One-to-one & online", href: "/coaching" },
+  { label: "Online coaching", href: "/online-coaching" },
   { label: "Contact", href: "/contact" },
 ] as const;
 

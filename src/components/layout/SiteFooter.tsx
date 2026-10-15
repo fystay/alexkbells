@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatAddressLines, mainNav, mapsUrl, site } from "@/content/site";
+import { formatAddressLines, mainNav, mapsUrl, pageNav, site } from "@/content/site";
 import { Logo } from "./Logo";
 
 // 44px tap targets on touch layouts; compact rows on desktop.
@@ -29,7 +29,7 @@ export function SiteFooter() {
                 Home
               </Link>
             </li>
-            {mainNav.map((item) => (
+            {[...mainNav, ...pageNav].map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className={footerLink}>
                   {item.label}

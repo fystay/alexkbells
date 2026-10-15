@@ -281,10 +281,13 @@ test.describe("production configuration", () => {
   test("a group class request is emailed to Alex as a request, not a booking", async ({ page, request }) => {
     await page.goto(`${PROD}/book/group-class`);
     await expect(page.getByRole("heading", { name: "When suits you?" })).toBeVisible();
-    await expect(page.getByText("Live availability isn't online yet")).toBeVisible();
+    // The confirmed weekly class times are offered as choices.
+    await expect(page.getByText("Choose the class you'd like to join")).toBeVisible();
     await expect(continueButton(page)).toBeDisabled();
-    await choose(page, "Wed");
-    await choose(page, "Evening");
+    for (const time of ["Monday 6:30 pm", "Wednesday 6:30 pm", "Saturday 9:00 am"]) {
+      await expect(page.getByRole("radio", { name: time })).toBeVisible();
+    }
+    await choose(page, "Wednesday 6:30 pm");
     await continueButton(page).click();
 
     await page.getByRole("button", { name: "Send request" }).click();
@@ -305,7 +308,7 @@ test.describe("production configuration", () => {
     const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Prod Booker");
     expect(sent).toBeDefined();
     expect(sent!.payload.to).toEqual(["alex-e2e@example.com"]);
-    expect(sent!.payload.text).toContain("Preferred: Wed · Evening");
+    expect(sent!.payload.text).toContain("Class: Wednesday 6:30 pm");
     expect(sent!.payload.text).toContain("not a confirmed booking");
     expect(sent!.headers.idempotencyKey).toMatch(/^booking-request\/[0-9a-f]{64}$/);
   });

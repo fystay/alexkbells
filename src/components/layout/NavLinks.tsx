@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { mainNav } from "@/content/site";
+import { mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
 
@@ -14,8 +14,8 @@ function isActive(pathname: string, href: string): boolean {
 export function DesktopNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Main" className="hidden md:block">
-      <ul className="flex items-center gap-6 lg:gap-8">
+    <nav aria-label="Main" className="hidden xl:block">
+      <ul className="flex items-center gap-7">
         {mainNav.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -67,7 +67,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="xl:hidden">
       <button
         ref={buttonRef}
         type="button"
@@ -89,7 +89,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       >
         <nav aria-label="Main" className="container-page">
           <ul className="divide-y divide-line-inverse">
-            {mainNav.map((item) => {
+            {[...mainNav, ...pageNav].map((item) => {
               const active = isActive(pathname, item.href);
               return (
                 <li key={item.href}>

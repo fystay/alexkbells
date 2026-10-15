@@ -30,7 +30,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   const [playing, setPlaying] = useState(true);
 
   const html =
-    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover">` +
+    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-contain">` +
     sources.map((s) => `<source src="${escapeAttr(s.src)}" type="${escapeAttr(s.type)}">`).join("") +
     "</video>";
 

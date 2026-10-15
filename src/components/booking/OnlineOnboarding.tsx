@@ -67,7 +67,13 @@ const STEP_OF: Record<OnlineField, number> = {
  */
 export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
   const demo = mode === "demo";
-  const [step, setStep] = useState(0);
+  const [step, setStepState] = useState(0);
+  // The first step appears without the fade; later steps fade in so the change is noticed.
+  const [moved, setMoved] = useState(false);
+  const setStep = (next: number) => {
+    setMoved(true);
+    setStepState(next);
+  };
   const [a, setA] = useState<Answers>({
     goal: "",
     goalOther: "",
@@ -157,7 +163,7 @@ export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
   return (
     <div>
       <Stepper steps={STEPS} current={step} onSelect={setStep} label="Online coaching steps" />
-      <div key={step} className="mt-8 animate-step-in">
+      <div key={step} className={moved ? "mt-8 animate-step-in" : "mt-8"}>
         {step === 0 ? (
           <section aria-labelledby="step-heading">
             <StepHeading ref={headingRef}>

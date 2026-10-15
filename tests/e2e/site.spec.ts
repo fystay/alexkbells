@@ -192,13 +192,13 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await toggle.click();
   await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Coaching" }).focus();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "About Alex" }).focus();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
   await expect(page.getByRole("button", { name: "Menu" })).toBeFocused();
 
   await page.getByRole("button", { name: "Menu" }).click();
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Classes" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Group classes" }).click();
   await expect(page).toHaveURL(/\/classes$/);
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
 });
@@ -231,6 +231,29 @@ test("header logo, navigation and booking button never overlap", async ({ page }
     );
     expect(logo, `logo overlaps navigation at ${width}px`).toBeLessThanOrEqual(firstControl);
   }
+});
+
+test("the menu answers Alex's four questions, each one tap away", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/contact");
+  const nav = page.getByRole("banner").getByRole("navigation", { name: "Main" });
+  for (const [label, id, heading] of [
+    ["Ways to train", "ways-to-train", /choose how you train/i],
+    ["Why kettlebells", "why-kettlebells", /stronger, fitter/i],
+    ["About Alex", "about", /coached by alex/i],
+    ["How to book", "how-to-book", /where and how to book/i],
+  ] as const) {
+    await nav.getByRole("link", { name: label }).click();
+    await expect(page).toHaveURL(new RegExp(`/#${id}$`));
+    const section = page.locator(`#${id}`);
+    await expect(section.getByRole("heading", { level: 2 })).toHaveText(heading);
+    await expect(section).toBeInViewport();
+  }
+  // "Where and how" gives the address, directions and a booking button together.
+  const book = page.locator("#how-to-book");
+  await expect(book).toContainText("1A Dunns Wood Road");
+  await expect(book.getByRole("link", { name: /get directions/i })).toBeVisible();
+  await expect(book.getByRole("link", { name: /book your session/i })).toBeVisible();
 });
 
 test("cross-page section anchors exist", async ({ page }) => {
@@ -317,7 +340,7 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Classes" })).toBeFocused();
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Ways to train" })).toBeFocused();
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
@@ -398,17 +421,12 @@ test("a paused hero video stays paused after scrolling away and back", async ({ 
   expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
 });
 
-// Includes an iPhone with Safari's toolbars showing (390x664) and a short 320px phone.
+// Tablets and desktop: headline, booking button and the whole video in the first view.
 for (const [width, height] of [
   [1440, 900],
   [1366, 768],
   [1024, 768],
   [768, 1024],
-  [430, 740],
-  [390, 844],
-  [390, 664],
-  [360, 640],
-  [320, 568],
 ]) {
   test(`hero headline, booking button and the whole video are in the first view at ${width}x${height}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
@@ -420,9 +438,34 @@ for (const [width, height] of [
     expect(cta && cta.y + cta.height).toBeLessThanOrEqual(height);
     expect(video!.y).toBeGreaterThanOrEqual(0);
     expect(video!.y + video!.height, "bottom of the video").toBeLessThanOrEqual(height);
-    // Never squeezed into a sliver, and never stretched or cropped (4:5).
-    expect(video!.height).toBeGreaterThan(280);
     expect(Math.abs(video!.width / video!.height - 0.8)).toBeLessThan(0.01);
+  });
+}
+
+// Phones: the video runs edge to edge at its full 4:5 frame, never cropped.
+// The bottom is in the first view on full-height phone screens (and on
+// iPhone Safari once its toolbar collapses as you start to scroll).
+for (const [width, height, wholeInView] of [
+  [430, 932, true],
+  [393, 852, true],
+  [390, 750, true],
+  [390, 664, false],
+  [360, 640, false],
+  [320, 568, false],
+] as const) {
+  test(`hero video runs edge to edge, uncropped, at ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const cta = await page.locator("main section").first().getByRole("link").first().boundingBox();
+    const video = page.locator("main video");
+    const box = (await video.boundingBox())!;
+    expect(cta!.y + cta!.height).toBeLessThanOrEqual(height);
+    expect(box.x).toBe(0);
+    expect(box.x + box.width).toBe(width);
+    expect(Math.abs(box.width / box.height - 0.8)).toBeLessThan(0.01);
+    expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe("contain");
+    if (wholeInView) expect(box.y + box.height).toBeLessThanOrEqual(height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   });
 }
 
@@ -431,7 +474,7 @@ test("phones get a booking bar once the hero scrolls away, hidden near the closi
   await page.goto("/");
   const bar = page.getByTestId("mobile-book-bar");
   await expect(bar).toHaveAttribute("aria-hidden", "true");
-  await page.locator("#ways-heading").scrollIntoViewIfNeeded();
+  await page.locator("#why-kettlebells").scrollIntoViewIfNeeded();
   await expect(bar).toHaveAttribute("aria-hidden", "false");
   await expect(bar.getByRole("link")).toBeInViewport();
   await page.locator("footer").scrollIntoViewIfNeeded();

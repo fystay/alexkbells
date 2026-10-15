@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { getBookingAction, getClassBookingAction, getOnlineCoachingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { Location } from "@/components/sections/Location";
+import { HowToBook } from "@/components/sections/HowToBook";
 import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroVideo } from "@/components/sections/HeroVideo";
@@ -33,6 +33,14 @@ const benefits = [
     title: "Stay consistent",
     body: "Regular group classes give your week structure, and training alongside others can help you keep showing up.",
   },
+  {
+    title: "Efficient, full-body sessions",
+    body: "Swings, cleans and presses work many muscles at once, so a focused session goes a long way.",
+  },
+  {
+    title: "Train anywhere",
+    body: "A kettlebell takes up little space, so what you learn works at home, in the gym or away.",
+  },
 ];
 
 function Hero() {
@@ -41,17 +49,18 @@ function Hero() {
   const video = site.heroVideo;
   const intro = `Classes and one-to-one sessions at ${site.location.venue}, or online coaching anywhere.`;
 
-  // Phones/tablets: headline, booking button and the WHOLE video fill the
-  // first screen (100svh, so browser toolbars never hide it); the video takes
-  // whatever height is left (container query units keep its 4:5 frame).
-  // The intro line and secondary links follow below.
+  // Phones (<640px): headline and booking button, then the video edge to edge
+  // (it breaks out of the page gutters) at its full 4:5 frame, never cropped.
+  // Tablets: headline, button and the whole video fill the first screen; the
+  // video takes the height left (container query units keep its 4:5 frame).
+  // The intro line and secondary links follow below on both.
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping.
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
       <div className="container-page pt-4 pb-10 sm:pt-8 lg:pt-4 lg:pb-8">
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
-          <div className="flex h-[calc(100svh-6rem)] max-h-[64rem] min-h-[30rem] flex-col sm:h-[calc(100svh-9rem)] lg:contents">
+          <div className="flex flex-col sm:h-[calc(100svh-9rem)] sm:max-h-[64rem] sm:min-h-[30rem] lg:contents">
             <div className="lg:col-span-6 lg:row-start-2">
               <p className="eyebrow text-muted">Kettlebell coaching · {site.location.town}</p>
               <h1 id="hero-heading" className="mt-3 font-display text-display text-balance sm:mt-4 lg:text-display-split">
@@ -60,17 +69,17 @@ function Hero() {
               </h1>
               <p className="mt-5 hidden max-w-md text-lede text-muted lg:block">{intro}</p>
             </div>
-            <div className="mt-5 lg:col-span-6 lg:row-start-3 lg:mt-8">
+            <div className="mt-4 sm:mt-5 lg:col-span-6 lg:row-start-3 lg:mt-8">
               <ButtonLink href={booking.href} external={booking.external} className="w-full sm:w-auto">
                 {booking.label}
               </ButtonLink>
             </div>
             {video ? (
-              <div className="mt-5 min-h-0 flex-1 [container-type:size] lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:flex lg:items-center lg:justify-end lg:[container-type:normal]">
+              <div className="-mx-4 mt-4 sm:mx-0 sm:mt-5 sm:min-h-0 sm:flex-1 sm:[container-type:size] lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:flex lg:items-center lg:justify-end lg:[container-type:normal]">
                 <HeroVideo
                   sources={video.sources}
                   poster={video.poster}
-                  className="mx-auto w-[min(100cqw,80cqh)] sm:mx-0 lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
+                  className="w-full sm:w-[min(100cqw,80cqh)] lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
                 />
               </div>
             ) : null}
@@ -93,12 +102,12 @@ function Hero() {
 function Benefits() {
   const booking = getClassBookingAction();
   return (
-    <Section tone="surface" labelledBy="benefits-heading">
+    <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <SectionHeading
             id="benefits-heading"
-            eyebrow="Why kettlebell coaching"
+            eyebrow="Why kettlebells"
             title="Stronger, fitter, more confident"
             intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
           />
@@ -124,12 +133,12 @@ function About() {
   const stills = site.trainingStills;
   const { instagram } = site.social;
   return (
-    <Section labelledBy="about-heading">
+    <Section id="about" labelledBy="about-heading">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
         <div className="lg:col-span-5">
           <SectionHeading
             id="about-heading"
-            eyebrow="About"
+            eyebrow="About Alex"
             title="Coached by Alex"
             intro={
               <p>
@@ -175,12 +184,12 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Benefits />
+      {/* Order answers Alex's four questions: what he offers, why kettlebells, who he is, where and how to book. */}
       <WaysToTrain />
+      <Benefits />
       <About />
-      {/* Bands alternate: Journey is ink (shown once confirmed), Location is surface. */}
       <Journey />
-      <Location />
+      <HowToBook />
       <Faq />
       <CtaBand />
       {booking.kind === "booking" ? (
@@ -188,7 +197,7 @@ export default function HomePage() {
           href={booking.href}
           label={booking.label}
           external={booking.external}
-          hideWhenVisible={["section[aria-labelledby=hero-heading]", "section[aria-labelledby=cta-heading]", "footer"]}
+          hideWhenVisible={["section[aria-labelledby=hero-heading]", "#how-to-book", "section[aria-labelledby=cta-heading]", "footer"]}
         />
       ) : null}
     </>

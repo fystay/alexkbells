@@ -71,9 +71,8 @@ export function Logo({ variant = "mark", tone = "dark", className, priority = fa
             sizes="96px"
             className={cn("h-9 w-auto sm:h-10", tile)}
           />
-          {/* Name beside the mark from 360px up, except at tablet widths (md) where the
-              navigation needs the space; there, and on the narrowest phones, the mark stands alone. */}
-          <BrandText tone={tone} name={logo.wordmark} className="hidden 2xs:flex md:hidden lg:flex" />
+          {/* Name beside the mark from 360px up; the narrowest phones show the mark alone. */}
+          <BrandText tone={tone} name={logo.wordmark} className="hidden 2xs:flex" />
         </>
       )}
     </Link>

@@ -53,7 +53,13 @@ const getServerToday = () => null;
 
 export function BookingWizard({ mode, initialService, sessions }: BookingWizardProps) {
   const demo = mode === "demo";
-  const [step, setStep] = useState(initialService ? 1 : 0);
+  const [step, setStepState] = useState(initialService ? 1 : 0);
+  // The first step appears without the fade; later steps fade in so the change is noticed.
+  const [moved, setMoved] = useState(false);
+  const setStep = (next: number) => {
+    setMoved(true);
+    setStepState(next);
+  };
   const [service, setService] = useState<BookableService | "">(initialService ?? "");
   // Demo availability
   const today = useSyncExternalStore(subscribe, getToday, getServerToday);
@@ -212,7 +218,7 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
           </div>
         ) : null}
 
-        <div key={step} className="mt-8 animate-step-in">
+        <div key={step} className={moved ? "mt-8 animate-step-in" : "mt-8"}>
           {step === 0 ? (
             <section aria-labelledby="step-heading">
               <StepHeading ref={headingRef}>
