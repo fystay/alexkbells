@@ -94,12 +94,17 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-line-inverse">
-        <div className="container-page flex flex-col gap-1 py-5 text-xs text-muted-inverse sm:flex-row sm:justify-between">
+        <div className="container-page flex flex-col gap-1 py-5 text-xs text-muted-inverse sm:flex-row sm:items-center sm:justify-between">
           <p>
             {site.name} · {site.descriptor}
           </p>
-          <p>
-            {site.location.town}, {site.location.region}
+          <p className="flex flex-wrap items-center gap-x-4">
+            <span>
+              {site.location.town}, {site.location.region}
+            </span>
+            <Link href="/privacy" className="inline-flex min-h-11 items-center underline underline-offset-4 hover:no-underline">
+              Privacy notice
+            </Link>
           </p>
         </div>
       </div>

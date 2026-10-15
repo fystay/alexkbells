@@ -46,27 +46,31 @@ for (const route of publicRoutes) {
       }
     });
 
-    test("loads without console errors, CSP violations or failed requests", async ({ page }) => {
+    test("loads without console errors, CSP violations or failed requests", async ({ browser, baseURL }) => {
       const problems: string[] = [];
-      page.on("console", (msg) => {
-        if (msg.type() === "error") problems.push(`console: ${msg.text()}`);
-      });
-      page.on("pageerror", (err) => problems.push(`pageerror: ${err.message}`));
-      page.on("requestfailed", (req) => {
-        // Expected cancellations: link prefetches (?_rsc=) and media aborted
-        // when the test navigates away. Anything else is a real failure.
-        const cancelled = /ERR_ABORTED/.test(req.failure()?.errorText ?? "");
-        if (cancelled && (/[?&]_rsc=/.test(req.url()) || /\/media\//.test(req.url()))) return;
-        problems.push(`failed: ${req.url()} ${req.failure()?.errorText ?? ""}`);
-      });
-      page.on("response", (res) => {
-        if (res.status() >= 400 && new URL(res.url()).origin === new URL(page.url() || res.url()).origin) {
-          problems.push(`${res.status()}: ${res.url()}`);
-        }
-      });
+      // A fresh page per width: navigating one page twice cancels whatever the
+      // first load still had in flight (e.g. lazy images revealed by a resize).
       for (const width of [390, 1280]) {
-        await page.setViewportSize({ width, height: 900 });
+        const page = await browser.newPage({ baseURL, viewport: { width, height: 900 } });
+        page.on("console", (msg) => {
+          if (msg.type() === "error") problems.push(`console: ${msg.text()}`);
+        });
+        page.on("pageerror", (err) => problems.push(`pageerror: ${err.message}`));
+        page.on("requestfailed", (req) => {
+          // Expected cancellations: link prefetches (?_rsc=) and media aborted
+          // when the page closes. Anything else is a real failure.
+          const cancelled = /ERR_ABORTED/.test(req.failure()?.errorText ?? "");
+          if (cancelled && (/[?&]_rsc=/.test(req.url()) || /\/media\//.test(req.url()))) return;
+          problems.push(`failed: ${req.url()} ${req.failure()?.errorText ?? ""}`);
+        });
+        page.on("response", (res) => {
+          if (res.status() >= 400 && new URL(res.url()).origin === new URL(page.url() || res.url()).origin) {
+            problems.push(`${res.status()}: ${res.url()}`);
+          }
+        });
         await page.goto(route, { waitUntil: "networkidle" });
+        page.removeAllListeners("requestfailed");
+        await page.close();
       }
       expect(problems).toEqual([]);
     });
@@ -195,13 +199,14 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
 });
 
-test("without a booking URL, class CTAs are enquiries, not fake bookings", async ({ page }) => {
+test("with the booking form configured, class CTAs open the on-site /book page", async ({ page }) => {
   await page.goto("/classes");
-  await expect(page.getByRole("link", { name: /book (a|your) class/i })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /enquire about classes/i }).first()).toHaveAttribute(
-    "href",
-    "/contact",
-  );
+  const cta = page.getByRole("link", { name: /book your class/i }).first();
+  await expect(cta).toHaveAttribute("href", "/book");
+  await expect(cta).not.toHaveAttribute("target", "_blank");
+  await cta.click();
+  await expect(page).toHaveURL(/\/book$/);
+  await expect(page.getByRole("button", { name: "Send booking request" })).toBeVisible();
 });
 
 test("cross-page section anchors exist", async ({ page }) => {
@@ -312,7 +317,19 @@ test("browser JavaScript contains no server-only configuration names", async ({ 
   expect(scripts.size).toBeGreaterThan(0);
   for (const src of scripts) {
     const body = await (await request.get(src)).text();
-    for (const name of ["CONTENT_PREVIEW", "BOOKING_URL", "SITE_URL", "VERCEL_ENV"]) {
+    for (const name of [
+      "CONTENT_PREVIEW",
+      "BOOKING_URL",
+      "SITE_URL",
+      "VERCEL_ENV",
+      "RESEND_API_KEY",
+      "RESEND_API_URL",
+      "BOOKING_NOTIFY_EMAIL",
+      "BOOKING_FROM_EMAIL",
+      "re_e2e_test_key",
+      "alex-e2e@example.com",
+      "bookings-e2e@example.com",
+    ]) {
       expect(body.includes(name), `${name} in ${src}`).toBe(false);
     }
   }
@@ -376,4 +393,94 @@ test("robots and sitemap are served", async ({ request }) => {
   expect(sitemap.status()).toBe(200);
   const body = await sitemap.text();
   for (const route of publicRoutes.filter((r) => r !== "/")) expect(body).toContain(route);
+});
+
+// Booking form: the e2e server points RESEND_API_URL at tests/e2e/mock-email-server.mjs.
+const mockEmail = `http://localhost:${process.env.MOCK_EMAIL_PORT ?? 3299}`;
+
+interface RecordedEmail {
+  headers: { authorization?: string; idempotencyKey?: string };
+  payload: { from: string; to: string[]; reply_to: string; subject: string; text: string };
+}
+
+async function recordedEmails(request: import("@playwright/test").APIRequestContext): Promise<RecordedEmail[]> {
+  return (await (await request.get(`${mockEmail}/requests`)).json()) as RecordedEmail[];
+}
+
+async function fillBookingForm(page: import("@playwright/test").Page, name: string, email: string) {
+  await page.getByLabel(/which class would you like to join/i).fill("A weekday evening");
+  await page.getByLabel("New to kettlebells").check();
+  await page.getByLabel(/your name/i).fill(name);
+  await page.getByLabel(/^email/i).fill(email);
+  await page.getByLabel(/i agree to alex using these details/i).check();
+}
+
+test.describe("booking request form", () => {
+  test("does not expose delivery settings in the page HTML", async ({ page }) => {
+    await page.goto("/book");
+    const html = await page.content();
+    for (const value of ["re_e2e_test_key", "alex-e2e@example.com", "bookings-e2e@example.com"]) {
+      expect(html.includes(value), value).toBe(false);
+    }
+  });
+
+  test("shows an error summary and field errors for an empty submission", async ({ page }) => {
+    await page.goto("/book");
+    await page.waitForTimeout(3200);
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    const summary = page.locator("form [role=alert]");
+    await expect(summary).toBeFocused();
+    await expect(summary).toContainText("Enter your name.");
+    await expect(summary).toContainText("Enter your email address");
+    await expect(page.getByLabel(/your name/i)).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("Request sent")).toHaveCount(0);
+  });
+
+  test("keeps typed values and flags an invalid email", async ({ page }) => {
+    await page.goto("/book");
+    await page.waitForTimeout(3200);
+    await fillBookingForm(page, "Sam Example", "not-an-email");
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    await expect(page.locator("form [role=alert]")).toContainText("Enter a valid email address");
+    await expect(page.getByLabel(/your name/i)).toHaveValue("Sam Example");
+  });
+
+  test("rejects an instant (bot-speed) submission without claiming success", async ({ page, request }) => {
+    const before = (await recordedEmails(request)).length;
+    await page.goto("/book");
+    await fillBookingForm(page, "Speedy Bot", "speedy@example.com");
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    await expect(page.locator("form [role=alert]")).toContainText("Please wait a few seconds");
+    await expect(page.getByText("Request sent")).toHaveCount(0);
+    expect((await recordedEmails(request)).length).toBe(before);
+  });
+
+  test("sends a valid request to Alex and says it is not yet confirmed", async ({ page, request }) => {
+    await page.goto("/book");
+    await page.waitForTimeout(3200);
+    await fillBookingForm(page, "Jordan Tester", "jordan@example.com");
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    const status = page.getByRole("status");
+    await expect(status).toContainText("Request sent");
+    await expect(status).toContainText("jordan@example.com");
+    await expect(status).toContainText("confirmed once Alex replies");
+
+    const sent = (await recordedEmails(request)).find((e) => e.payload.subject.includes("Jordan Tester"));
+    expect(sent).toBeDefined();
+    expect(sent!.payload.to).toEqual(["alex-e2e@example.com"]);
+    expect(sent!.payload.reply_to).toBe("jordan@example.com");
+    expect(sent!.payload.text).toContain("not a confirmed booking");
+    expect(sent!.headers.idempotencyKey).toMatch(/^booking-request\/[0-9a-f]{64}$/);
+    expect(sent!.headers.authorization).toBe("Bearer re_e2e_test_key");
+  });
+
+  test("shows an error, not success, when the email provider fails", async ({ page }) => {
+    await page.goto("/book");
+    await page.waitForTimeout(3200);
+    await fillBookingForm(page, "FAIL-TEST Person", "fail@example.com");
+    await page.getByRole("button", { name: "Send booking request" }).click();
+    await expect(page.locator("form [role=alert]")).toBeVisible();
+    await expect(page.getByText("Request sent")).toHaveCount(0);
+    await expect(page.getByLabel(/your name/i)).toHaveValue("FAIL-TEST Person");
+  });
 });

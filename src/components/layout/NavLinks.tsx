@@ -15,7 +15,7 @@ export function DesktopNav() {
   const pathname = usePathname();
   return (
     <nav aria-label="Main" className="hidden md:block">
-      <ul className="flex items-center gap-8">
+      <ul className="flex items-center gap-6 lg:gap-8">
         {mainNav.map((item) => {
           const active = isActive(pathname, item.href);
           return (

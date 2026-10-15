@@ -1,15 +1,14 @@
 /**
- * Booking integration boundary.
- *
- * The primary call to action is "Book your class", linking straight to
- * Alex's external booking page (whichever provider he confirms) set via
- * BOOKING_URL. Without a valid https URL the button honestly falls back to
- * an enquiry — never a contact page dressed up as booking, and never a fake
- * booking flow. Swapping in a different provider later only changes this
- * module, not the pages.
+ * Booking integration boundary. The primary call to action is
+ * "Book your class", pointing at (in order of preference):
+ * 1. An external booking page (BOOKING_URL), e.g. Setmore or Square.
+ * 2. The site's own /book request form, once email delivery is configured.
+ * 3. Otherwise an honest "Enquire about classes" → /contact. Never a contact
+ *    page dressed up as booking, and never a fake booking flow.
  */
 
 import type { Env } from "./env";
+import { isBookingFormEnabled } from "./booking-request";
 
 export interface CallToAction {
   kind: "booking" | "enquiry";
@@ -19,18 +18,17 @@ export interface CallToAction {
 }
 
 export const ENQUIRY_HREF = "/contact";
+export const BOOK_PAGE_HREF = "/book";
 export const BOOK_LABEL = "Book your class";
 
 /** Build-time check: a production site without a working booking link cannot take bookings. */
 export function bookingConfigWarning(env: Env = process.env): string | null {
   if (env.VERCEL_ENV !== "production") return null;
-  if (!env.BOOKING_URL) {
-    return "BOOKING_URL is not set: \"Book your class\" buttons fall back to \"Enquire about classes\". Set it to Alex's booking page (https) before launch.";
+  if (env.BOOKING_URL && !parseBookingUrl(env.BOOKING_URL)) {
+    return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
-  if (!parseBookingUrl(env.BOOKING_URL)) {
-    return "BOOKING_URL is not a valid https URL, so it is ignored and buttons fall back to \"Enquire about classes\".";
-  }
-  return null;
+  if (parseBookingUrl(env.BOOKING_URL) || isBookingFormEnabled(env)) return null;
+  return "No booking route is configured: \"Book your class\" buttons fall back to \"Enquire about classes\". Configure the /book form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md.";
 }
 
 export function parseBookingUrl(raw: string | undefined): URL | null {
@@ -49,6 +47,9 @@ export function getClassBookingAction(
   const url = parseBookingUrl(env.BOOKING_URL);
   if (url) {
     return { kind: "booking", label: BOOK_LABEL, href: url.toString(), external: true };
+  }
+  if (isBookingFormEnabled(env)) {
+    return { kind: "booking", label: BOOK_LABEL, href: BOOK_PAGE_HREF, external: false };
   }
   return { kind: "enquiry", label: "Enquire about classes", href: ENQUIRY_HREF, external: false };
 }

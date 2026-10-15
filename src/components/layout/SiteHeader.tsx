@@ -11,7 +11,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 bg-ink text-paper">
       <div className="container-page relative flex h-16 items-center justify-between gap-6 sm:h-20">
         <Logo tone="dark" priority />
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6 lg:gap-8">
           <DesktopNav />
           <div className="hidden md:block">
             <ButtonLink href={cta.href} external={cta.external} tone="dark" className="min-h-11 px-5">

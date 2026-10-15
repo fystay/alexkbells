@@ -58,8 +58,8 @@ Only `NavLinks.tsx` is a client component (needs `usePathname` and menu state).
 
 1. **Content as typed modules, not a CMS.** Small, rarely changing data; type-checked; reviewed in Git. Revisit (Supabase table or headless CMS) when Alex needs to edit without a developer — Phase 4.
 2. **Status-gated content.** `ContentStatus` + `Provisional` component + `CONTENT_PREVIEW` lets unconfirmed information be reviewed without ever shipping it to production.
-3. **Booking boundary** (`src/lib/booking.ts`). Pages ask for a `CallToAction`; they never know the provider. Phase 1 supports an external `BOOKING_URL` (https only) and otherwise falls back to an enquiry. A Square/Setmore/custom adapter can replace the module later.
-4. **No contact form in Phase 1.** Avoids storing personal data before privacy, spam protection and an email provider are decided.
+3. **Booking boundary** (`src/lib/booking.ts`). Pages ask for a `CallToAction`; they never know the provider. Order of preference: an external `BOOKING_URL` (https only), then the on-site `/book` request form when email delivery is configured, otherwise an enquiry. A Square/Setmore/custom adapter can replace the module later.
+4. **Booking request form** (`/book`). A Server Action (`src/app/book/actions.ts`) validates on the server (`src/lib/booking-request.ts`), rejects spam (honeypot + 3 s minimum fill time), and emails Alex through Resend's REST API with plain `fetch` (`src/lib/send-email.ts`, no SDK dependency) with an idempotency key so retries send once. Nothing is stored, so no database or RLS is needed yet. Success is shown only after the provider accepts the email; it is a request that Alex confirms by reply, not a booking. The form works without JavaScript; with it, values are kept on error and focus moves to the error summary. e2e tests run against a local mock of the Resend endpoint (`tests/e2e/mock-email-server.mjs`).
 5. **No embedded map.** Google Maps link only, avoiding third-party cookies and a consent banner.
 
 ## Environment variables
@@ -69,7 +69,9 @@ See `.env.example`. All are server/build-time only (no `NEXT_PUBLIC_*`).
 | Name | Purpose |
 |---|---|
 | `SITE_URL` | Canonical origin (metadata, sitemap, JSON-LD). Validated; falls back to `VERCEL_PROJECT_PRODUCTION_URL`, then localhost |
-| `BOOKING_URL` | External booking page (https only); empty or invalid → enquiry CTAs |
+| `BOOKING_URL` | External booking page (https only); takes priority over the form |
+| `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` | Booking request form delivery; all three valid → form on, else off. Server-only |
+| `RESEND_API_URL` | Tests only: endpoint override, accepted only for https or `http://localhost` |
 | `CONTENT_PREVIEW` | `true` on preview deployments only. **Ignored when `VERCEL_ENV=production`** |
 | `PLAYWRIGHT_CHROMIUM_PATH` | Tests only |
 
@@ -93,8 +95,9 @@ image (`public/og-image.png`) is declared explicitly because a page-level
 
 ## Enquiry form options (not implemented)
 
-No form exists; Instagram is the only confirmed contact route. Simplest
-reliable options, in order of effort:
+The booking request form (above) uses option 3 for class bookings. The
+contact page itself still has no form; options for general enquiries, in
+order of effort:
 
 1. **Instagram only (current).** No personal data stored by the site.
 2. **`mailto:` link** — needs a confirmed public email address; no backend.

@@ -50,7 +50,9 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Photography of Alex / coaching | U | No stills supplied |
 | Hero footage | C | Alex's own Instagram reel (supplied 2026-10-15), used for the homepage hero loop. Filmed at several gyms, some visibly not Media House (e.g. "APEX" signage), and shows other people training. Confirm Alex is happy for it to represent his coaching and that people shown are fine appearing on the website |
 | Bio, qualifications, history, testimonials | U | Do not invent |
-| Bookings | — | Previously Setmore; payments cash / bank transfer |
+| Bookings | — | Previously Setmore; payments cash / bank transfer. Site now has a `/book` request form (emails Alex; he confirms by reply), off until Resend + his inbox are configured |
+| Booking-request inbox / Resend account | U | Needed to switch on `/book`; must be Alex's own |
+| Privacy notice | P | `/privacy` drafted 2026-10-15 for the booking form; Alex to review |
 | Square | P | Account created. Rate quoted as 1.4% + 25p per online card payment — unverified. Enabled products unknown |
 | Domain | U | Not chosen |
 | Hosting account | P | Vercel project `alexkbells` exists in the developer's personal Hobby account; Alex's own account (likely Pro for commercial use) recommended before launch — see DEPLOYMENT.md |
@@ -71,7 +73,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 
 ## Open decisions
 
-1. Booking provider: stay on Setmore, move to Square Appointments, or custom build?
+1. Booking: keep the on-site request form (built), or move to Setmore / Square Appointments / custom booking with payments?
 2. Which Square products are enabled (Online Checkout, Appointments, Subscriptions)?
 3. Membership structure and price.
 4. Domain name and who owns the Vercel / domain accounts.

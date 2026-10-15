@@ -37,12 +37,29 @@ describe("getClassBookingAction", () => {
   });
 });
 
+const formEnv = {
+  RESEND_API_KEY: "re_test",
+  BOOKING_NOTIFY_EMAIL: "alex@example.com",
+  BOOKING_FROM_EMAIL: "bookings@example.com",
+};
+
+describe("booking routes", () => {
+  it("uses the on-site form when delivery is configured and no external page is set", () => {
+    expect(getClassBookingAction(formEnv)).toMatchObject({ kind: "booking", label: "Book your class", href: "/book", external: false });
+  });
+
+  it("prefers an external booking page when both exist", () => {
+    expect(getClassBookingAction({ ...formEnv, BOOKING_URL: "https://booking.example.com" }).href).toBe("https://booking.example.com/");
+  });
+});
+
 describe("bookingConfigWarning", () => {
   it("flags a missing or invalid booking URL on production only", () => {
-    expect(bookingConfigWarning({ VERCEL_ENV: "production" })).toMatch(/BOOKING_URL is not set/);
+    expect(bookingConfigWarning({ VERCEL_ENV: "production" })).toMatch(/No booking route is configured/);
     expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "http://x.example" })).toMatch(/not a valid https URL/);
     expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "https://x.example/book" })).toBeNull();
     expect(bookingConfigWarning({ VERCEL_ENV: "preview" })).toBeNull();
+    expect(bookingConfigWarning({ VERCEL_ENV: "production", ...formEnv })).toBeNull();
     expect(bookingConfigWarning({})).toBeNull();
   });
 });

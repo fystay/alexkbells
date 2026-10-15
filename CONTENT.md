@@ -26,17 +26,21 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
+| `/book` | Booking request form (class, experience, name, email, optional phone/message, consent) + "How it works" + address. Falls back to an external link or an Instagram prompt when the form isn't configured |
+| `/privacy` | Privacy notice: what the booking form collects, where it goes (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
 
 **Trade-offs taken**
 
 - `/one-to-one` and `/online-coaching` were merged into `/coaching` with anchors: with the verified information available each would be a few sentences. Split them once there is enough real content (session format, programme examples, photos).
 - `/about` is a homepage section only. Without a verified bio, qualifications or photos a standalone page would be thin. Add `/about` once Alex supplies these.
 - Membership is omitted entirely until defined.
-- No contact form: it needs an email provider, spam protection and a privacy notice (Phase 2).
+- Booking is a **request form**, not instant booking: there is no confirmed capacity or timetable, so Alex confirms each place by reply. Class times are offered as choices only once the timetable is confirmed; until then visitors type when suits them.
+- No general contact form; `/contact` stays Instagram-first.
 
 ## Copy rules
 
-- Primary CTA text is "Book your class" (`BOOK_LABEL` in `src/lib/booking.ts`), shown only when `BOOKING_URL` is a valid https link. Without it, buttons honestly read "Enquire about classes" → /contact; never label the contact page as booking.
+- Primary CTA text is "Book your class" (`BOOK_LABEL` in `src/lib/booking.ts`), shown only when a real booking route exists: a valid https `BOOKING_URL`, or the configured `/book` form. Without either, buttons honestly read "Enquire about classes" → /contact; never label the contact page as booking.
+- Booking form copy says "request" and "Alex will reply to confirm your place" — never "booked" or "confirmed". The message field asks visitors not to include medical details.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
 - Benefits: build strength, improve fitness, train with confidence, stay consistent — hedged ("can"), no "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
 

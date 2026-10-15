@@ -53,7 +53,9 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] e2e: first-view checks at 5 viewports, how-to-join section
 
 ### To launch — owner decisions (Alex)
-- [ ] **P0** **Booking provider + URL** (Setmore, Square Appointments or other). Without `BOOKING_URL` the site cannot take bookings — buttons fall back to "Enquire about classes"
+- [x] On-site booking request form (`/book`) emailing Alex via Resend; privacy notice (`/privacy`); e2e against a mock email API
+- [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Until then buttons fall back to "Enquire about classes"
+- [ ] **P0** Alex reviews `/privacy` and agrees to confirm requests by reply
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
 - [ ] **P0** Choose and register the domain
 - [ ] **P0** Confirm or withhold timetable, duration, prices (CONTENT.md questions). Site launches safely either way
@@ -65,7 +67,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [ ] **P0** Check the next Vercel preview serves the homepage (framework fix) — DEPLOYMENT.md "Get a preview URL"
 - [ ] **P0** In the owning project: production branch, `SITE_URL` (Production), `CONTENT_PREVIEW=true` (Preview only)
 - [ ] **P1** Real-device pass: iOS Safari (MP4 playback), Android Chrome, VoiceOver/TalkBack, 200% zoom
-- [ ] **P1** Privacy notice page (Vercel logs IP addresses; required before analytics or a contact form)
+- [x] **P1** Privacy notice page (`/privacy`; needs Alex's review)
 - [ ] **P1** Test `https://ig.me/m/alex.kbells` on a phone; if it opens a DM reliably, use it as the primary contact button (not verifiable from the build environment)
 - [ ] **P2** Lighthouse on the preview URL
 - [ ] **P2** CI (GitHub Actions): `npm run check` + e2e on PRs
@@ -82,7 +84,7 @@ Blocked on: provider choice, Square capabilities, class price/capacity/duration,
 - [ ] Choose option A (hosted) or B (custom) — see ARCHITECTURE.md
 - [ ] If B: Supabase schema + RLS, idempotent booking endpoint, verified webhooks, emails
 - [ ] Tests: last-place race, duplicate requests, payment success/failure/pending, refunds, webhook retries, cross-user access
-- [ ] Contact/enquiry form with server validation, spam protection, privacy notice
+- [x] Booking request form with server validation, spam protection, privacy notice (general contact form still not built)
 
 ## Phase 3 — Membership & accounts (blocked on product definition)
 ## Phase 4 — Admin & hardening (scope with Alex)
