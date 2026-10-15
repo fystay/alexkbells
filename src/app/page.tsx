@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { getService, services } from "@/content/services";
+import { getService } from "@/content/services";
 import { timetable } from "@/content/classes";
 import { getClassBookingAction } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
@@ -20,22 +19,23 @@ import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
+// Benefits are hedged ("can") and make no promises about specific results.
 const benefits = [
   {
-    title: "One bell, the whole body",
-    body: "Swings, squats, presses and carries work through the whole body, and a single kettlebell is enough to train them.",
+    title: "Build strength",
+    body: "Swings, squats, presses and carries work the whole body, and one kettlebell is enough to train them.",
   },
   {
-    title: "Strength and conditioning together",
-    body: "Kettlebell training can build strength and work capacity in the same session, without a room full of equipment.",
+    title: "Improve your fitness",
+    body: "Kettlebell sessions can train strength and conditioning together, so you get fitter as you get stronger.",
   },
   {
-    title: "Starts where you are",
-    body: "Bells come in a wide range of weights, so training can begin at your level and progress gradually.",
+    title: "Train with confidence",
+    body: "Learn the key kettlebell movements properly, with a coach watching your technique and helping you progress.",
   },
   {
-    title: "Coaching makes the difference",
-    body: "Kettlebell movements reward good technique. Having a coach watch and correct you helps you learn them well.",
+    title: "Stay consistent",
+    body: "Regular group classes give your week structure, and training alongside others can help you keep showing up.",
   },
 ];
 
@@ -53,47 +53,39 @@ function Hero() {
     { label: "Online", value: "Coaching wherever you train" },
   ];
 
+  // The media column is sized from the viewport height on desktop so the
+  // headline, the booking button and the video all sit in the first view.
+  const media = "w-full max-w-md lg:col-span-5 lg:max-w-none lg:w-auto lg:h-[min(calc(100svh-9rem),40rem)] lg:justify-self-end";
+
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
-      <div className="container-page pt-12 pb-10 sm:pt-20 lg:pt-24">
-        <div className={hasMedia ? "grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-12" : undefined}>
+      <div className="container-page pt-8 pb-10 sm:pt-12 lg:pt-8 lg:pb-12">
+        <div className={hasMedia ? "grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10" : undefined}>
           <div className={hasMedia ? "lg:col-span-7" : undefined}>
-            <p className="eyebrow text-muted">
-              {site.descriptor} · {site.location.town}
-            </p>
-            {/* Beside media, the headline steps down on wide screens so it fits 7 columns. */}
+            <p className="eyebrow text-muted">Kettlebell coaching · {site.location.town}</p>
             <h1
               id="hero-heading"
-              className={`mt-5 font-display text-display ${hasMedia ? "lg:text-h1" : ""}`}
+              className={`mt-4 font-display text-display text-balance ${hasMedia ? "lg:text-display-split" : ""}`}
             >
-              Kettlebell
-              <br />
-              coaching in
-              <br />
-              Cumbernauld
+              <span className="block">Get stronger.</span>
+              <span className="block">Move better.</span>
             </h1>
-            <p className="mt-8 max-w-xl text-lede text-muted">
-              Group classes, one-to-one coaching tailored to you, and online coaching with
-              personalised programming, support and progression.
+            <p className="mt-5 max-w-xl text-lede text-muted">
+              Coached kettlebell classes in {site.location.town}. Build strength, improve your
+              fitness and train with purpose.
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
               <ButtonLink href={booking.href} external={booking.external}>
                 {booking.label}
               </ButtonLink>
-              <ButtonLink href="/coaching" variant="secondary">
-                Explore coaching
+              <ButtonLink href="/coaching" variant="text" className="self-start sm:self-auto">
+                One-to-one &amp; online coaching
               </ButtonLink>
             </div>
           </div>
-          {video ? (
-            <HeroVideo
-              sources={video.sources}
-              poster={video.poster}
-              className="w-full max-w-md lg:col-span-5 lg:max-w-none"
-            />
-          ) : null}
+          {video ? <HeroVideo sources={video.sources} poster={video.poster} className={media} /> : null}
           {photo ? (
-            <div className="lg:col-span-5">
+            <div className={media}>
               <Image
                 src={photo.src}
                 alt={photo.alt}
@@ -101,13 +93,13 @@ function Hero() {
                 height={photo.height}
                 priority
                 sizes="(min-width: 1024px) 40vw, 100vw"
-                className="aspect-[4/5] w-full object-cover grayscale"
+                className="aspect-[4/5] h-full w-full object-cover grayscale"
               />
             </div>
           ) : null}
         </div>
 
-        <dl className={`mt-16 grid grid-cols-1 border-t border-ink ${facts.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+        <dl className={`mt-12 grid grid-cols-1 border-t border-ink ${facts.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
           {facts.map((fact) => (
             <div key={fact.label} className="border-b border-line py-4 sm:border-b-0 sm:pr-6">
               <dt className="eyebrow text-muted">{fact.label}</dt>
@@ -120,12 +112,47 @@ function Hero() {
   );
 }
 
+function Benefits() {
+  const booking = getClassBookingAction();
+  return (
+    <Section tone="surface" labelledBy="benefits-heading">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <SectionHeading
+            id="benefits-heading"
+            eyebrow="Why kettlebell coaching"
+            title="Stronger, fitter, more confident"
+            intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
+          />
+          <ButtonLink href={booking.href} external={booking.external} className="mt-8">
+            {booking.label}
+          </ButtonLink>
+        </div>
+        <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
+          {benefits.map((b) => (
+            <li key={b.title} className="border-t border-ink pt-5">
+              <h3 className="text-lg font-bold">{b.title}</h3>
+              <p className="mt-2 text-muted">{b.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  );
+}
+
 function ClassesPreview() {
   const booking = getClassBookingAction();
   return (
     <Section tone="ink" labelledBy="classes-heading">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <SectionHeading id="classes-heading" eyebrow="Group classes" title="Class times" tone="ink" />
+        <SectionHeading
+          id="classes-heading"
+          eyebrow="Group classes"
+          title="Train in a coached group"
+          intro={`Coached group kettlebell sessions at ${site.location.venue}, Cumbernauld. New to kettlebells? Mention it when you ${booking.kind === "booking" ? "book" : "get in touch"}.`}
+          tone="ink"
+        />
         <ButtonLink href="/classes" variant="text" tone="dark" className="self-start sm:self-auto">
           Class details
         </ButtonLink>
@@ -137,64 +164,6 @@ function ClassesPreview() {
         <ButtonLink href={booking.href} external={booking.external} tone="dark">
           {booking.label}
         </ButtonLink>
-      </div>
-    </Section>
-  );
-}
-
-function Services() {
-  return (
-    <Section labelledBy="services-heading">
-      <SectionHeading
-        id="services-heading"
-        eyebrow="Coaching"
-        title="Three ways to train"
-        intro="Train in a group, one-to-one, or online on your own schedule."
-      />
-      <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
-        {services.map((service, i) => (
-          <li key={service.id} className="flex flex-col border-t-2 border-ink pt-6">
-            <span className="eyebrow text-muted" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h3 className="mt-6 font-display text-h3">
-              <KeepHyphens>{service.name}</KeepHyphens>
-            </h3>
-            <p className="mt-3 flex-1 text-muted">{service.summary}</p>
-            <Link
-              href={service.href}
-              className="mt-6 inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
-            >
-              Find out more
-              <span className="sr-only"> about {service.name.toLowerCase()}</span>
-              <span aria-hidden="true">→</span>
-            </Link>
-          </li>
-        ))}
-      </ol>
-    </Section>
-  );
-}
-
-function WhyKettlebells() {
-  return (
-    <Section tone="surface" labelledBy="why-heading">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <SectionHeading
-            id="why-heading"
-            eyebrow="Why kettlebells"
-            title="A simple tool that goes a long way"
-          />
-        </div>
-        <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
-          {benefits.map((b) => (
-            <li key={b.title} className="border-t border-ink pt-5">
-              <h3 className="text-lg font-bold">{b.title}</h3>
-              <p className="mt-2 text-muted">{b.body}</p>
-            </li>
-          ))}
-        </ul>
       </div>
     </Section>
   );
@@ -262,7 +231,8 @@ function CoachingOptions() {
       <SectionHeading
         id="options-heading"
         eyebrow="Personal coaching"
-        title="Coaching options"
+        title={<KeepHyphens>Prefer one-to-one or online?</KeepHyphens>}
+        intro="Coaching tailored to you, face to face in Cumbernauld or online wherever you train."
         tone="ink"
       />
       <div className="mt-14 grid gap-14 md:grid-cols-2 md:gap-10 lg:gap-16">
@@ -290,9 +260,8 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <Benefits />
       <ClassesPreview />
-      <Services />
-      <WhyKettlebells />
       <About />
       <CoachingOptions />
       <Location />

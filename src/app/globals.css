@@ -22,6 +22,9 @@
   /* Fluid type scale (min at 320px, max at ~1280px) */
   --text-display: clamp(1.875rem, 0.9rem + 5vw, 5.25rem);
   --text-display--line-height: 0.95;
+  /* Hero headline beside media (lg+): each short sentence on one line. */
+  --text-display-split: clamp(2.75rem, 0.6rem + 3.6vw, 4.25rem);
+  --text-display-split--line-height: 0.95;
   --text-h1: clamp(1.75rem, 1rem + 3.5vw, 4rem);
   --text-h1--line-height: 1;
   --text-h2: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);

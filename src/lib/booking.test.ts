@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ENQUIRY_HREF, getClassBookingAction, parseBookingUrl } from "./booking";
+import { BOOK_LABEL, ENQUIRY_HREF, bookingConfigWarning, getClassBookingAction, parseBookingUrl } from "./booking";
 
 const env = (BOOKING_URL?: string) => ({ BOOKING_URL });
 
@@ -29,8 +29,20 @@ describe("getClassBookingAction", () => {
     const action = getClassBookingAction(env("https://booking.example.com/classes"));
     expect(action).toMatchObject({
       kind: "booking",
+      label: "Book your class",
       href: "https://booking.example.com/classes",
       external: true,
     });
+    expect(BOOK_LABEL).toBe("Book your class");
+  });
+});
+
+describe("bookingConfigWarning", () => {
+  it("flags a missing or invalid booking URL on production only", () => {
+    expect(bookingConfigWarning({ VERCEL_ENV: "production" })).toMatch(/BOOKING_URL is not set/);
+    expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "http://x.example" })).toMatch(/not a valid https URL/);
+    expect(bookingConfigWarning({ VERCEL_ENV: "production", BOOKING_URL: "https://x.example/book" })).toBeNull();
+    expect(bookingConfigWarning({ VERCEL_ENV: "preview" })).toBeNull();
+    expect(bookingConfigWarning({})).toBeNull();
   });
 });

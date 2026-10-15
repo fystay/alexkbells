@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
+import { timetable } from "@/content/classes";
+import { site } from "@/content/site";
+import { isPublishable } from "@/lib/publish";
 import { getClassBookingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -20,6 +23,25 @@ export const metadata: Metadata = pageMetadata({
 export default function ClassesPage() {
   const booking = getClassBookingAction();
   const classes = getService("group-classes");
+  const timesPublished = isPublishable(timetable.status);
+  const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;
+
+  // Steps only describe what is confirmed; booking wording follows the real CTA.
+  const joinSteps = [
+    {
+      title: "Choose a session",
+      body: timesPublished
+        ? "Pick the class time that suits you from the timetable above."
+        : "Class times are being finalised. Get in touch to hear about current sessions.",
+    },
+    booking.kind === "booking"
+      ? { title: "Book your place", body: "Use the booking button to reserve your place online." }
+      : {
+          title: "Get in touch to book",
+          body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
+        },
+    { title: "Come to Media House", body: `Classes take place at ${venue}.` },
+  ];
 
   return (
     <>
@@ -31,9 +53,12 @@ export default function ClassesPage() {
         <ButtonLink href={booking.href} external={booking.external}>
           {booking.label}
         </ButtonLink>
+        <ButtonLink href="#book" variant="text" className="self-center">
+          How to join
+        </ButtonLink>
       </PageHeader>
 
-      <Section labelledBy="timetable-heading">
+      <Section id="timetable" labelledBy="timetable-heading">
         <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
         <div className="mt-10">
           <Timetable labelledBy="timetable-heading" />
@@ -45,27 +70,27 @@ export default function ClassesPage() {
         ) : null}
       </Section>
 
-      <Section tone="ink" labelledBy="joining-heading">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+      <Section tone="ink" id="book" labelledBy="join-heading">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <SectionHeading id="joining-heading" eyebrow="Joining" title="Coming to a class" tone="ink" />
+            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
+            <ButtonLink href={booking.href} external={booking.external} tone="dark" className="mt-8">
+              {booking.label}
+            </ButtonLink>
           </div>
-          <div className="space-y-6 text-lede text-muted-inverse lg:col-span-7">
-            {booking.kind === "booking" ? (
-              <p>Book your place online using the button below.</p>
-            ) : (
-              <p>
-                Get in touch before your first class. Send a message to say which session you
-                would like to come to and Alex can let you know everything you need.
-              </p>
-            )}
-            <p>New to kettlebells? Mention it when you get in touch.</p>
-            <div className="pt-2">
-              <ButtonLink href={booking.href} external={booking.external} tone="dark">
-                {booking.label}
-              </ButtonLink>
-            </div>
-          </div>
+          <ol className="grid grid-cols-1 gap-8 lg:col-span-7">
+            {joinSteps.map((step, i) => (
+              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line-inverse pt-5">
+                <span className="eyebrow pt-1 text-muted-inverse" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="text-lg font-bold">{step.title}</h3>
+                  <p className="mt-2 text-muted-inverse">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </Section>
 

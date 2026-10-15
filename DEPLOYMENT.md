@@ -39,7 +39,7 @@ All are read at build time on the server; none reach the browser.
 |---|---|---|---|
 | `SITE_URL` | `https://<chosen domain>` once decided | — | Canonical URLs, sitemap, social previews. Invalid values are ignored. Until set, falls back to the project's production URL (`alexkbells.vercel.app`) |
 | `CONTENT_PREVIEW` | **do not set** | `true` | Shows provisional prices/times with an orange review frame. Ignored on production even if set by mistake |
-| `BOOKING_URL` | only when a booking provider is confirmed (https) | optional, to test | Unset → class buttons say "Enquire about classes" and go to /contact |
+| `BOOKING_URL` | **Launch blocker**: Alex's real booking page (https) once the provider is confirmed | optional, to test | Set → every primary button reads "Book your class" and opens it in a new tab. Unset/invalid → buttons say "Enquire about classes" → /contact, and production builds log a "Launch blocker" warning |
 
 `VERCEL_ENV` and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel
 automatically.

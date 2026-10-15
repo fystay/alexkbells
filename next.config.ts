@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 import { securityHeaders } from "./src/lib/security-headers";
+import { bookingConfigWarning } from "./src/lib/booking";
+
+// Surface the launch blocker in the Vercel build log rather than failing the build.
+const bookingWarning = bookingConfigWarning();
+if (bookingWarning) console.warn(`\n⚠ Launch blocker: ${bookingWarning}\n`);
 
 const nextConfig: NextConfig = {
   cacheComponents: true,

@@ -71,7 +71,8 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
 
   return (
     <div className={className}>
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink">
+      {/* Width-led on mobile; height-led on desktop when the parent sets a height. */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink lg:h-full lg:w-auto">
         <video
           ref={ref}
           poster={poster}

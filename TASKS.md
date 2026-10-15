@@ -45,7 +45,15 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Hero video: clips where the Instagram icon sat top-right are now framed to exclude that area (no inpainted patch); deadlift and lunge clips replaced by a double-bell swing; opens on the group class
 - [x] Fixed: hero buttons overflowed on 416–600 px phones (e.g. iPhone Pro Max); button groups now stack below 640 px and wrap above it; e2e covers 16 widths and controls past the screen edge
 
+### Done (2026-10-15, conversion pass)
+- [x] Hero: "Get stronger. Move better.", booking button first, video in the first view (desktop 100% at 1024×768/1366×768/1440×900; phones from 56% at 320×700 to 86% at 390×844)
+- [x] Primary CTA "Book your class" wired to `BOOKING_URL`; honest "Enquire about classes" fallback; production build warns when missing
+- [x] Homepage reordered for the booking journey; benefits section with booking button; duplicate "Three ways to train" removed (one-to-one/online stay as a secondary section)
+- [x] Classes page: "How to join" (3 steps, `#book`) + header link; `#timetable` anchor
+- [x] e2e: first-view checks at 5 viewports, how-to-join section
+
 ### To launch — owner decisions (Alex)
+- [ ] **P0** **Booking provider + URL** (Setmore, Square Appointments or other). Without `BOOKING_URL` the site cannot take bookings — buttons fall back to "Enquire about classes"
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
 - [ ] **P0** Choose and register the domain
 - [ ] **P0** Confirm or withhold timetable, duration, prices (CONTENT.md questions). Site launches safely either way
@@ -63,7 +71,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [ ] **P2** CI (GitHub Actions): `npm run check` + e2e on PRs
 
 ### Acceptance criteria (Phase 1)
-- Class times and booking/enquiry action reachable within one scroll on a 390 px phone.
+- Headline, booking button and the start of the hero video visible without scrolling on a 390×844 phone; whole video on 1366×768 / 1440×900.
 - No provisional or invented information on production.
 - `npm run check` and `npm run test:e2e` pass.
 - No horizontal scroll at 320 px; axe reports no WCAG A/AA violations.

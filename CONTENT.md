@@ -22,8 +22,8 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Hero, class times, services, why kettlebells, about, coaching options, location, FAQ, CTA |
-| `/classes` | Timetable, joining info, location |
+| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your class** + video) → benefits (+ booking button) → group classes (+ booking button) → about → one-to-one & online (secondary) → location → FAQ → closing CTA |
+| `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
 
@@ -35,6 +35,10 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 - No contact form: it needs an email provider, spam protection and a privacy notice (Phase 2).
 
 ## Copy rules
+
+- Primary CTA text is "Book your class" (`BOOK_LABEL` in `src/lib/booking.ts`), shown only when `BOOKING_URL` is a valid https link. Without it, buttons honestly read "Enquire about classes" → /contact; never label the contact page as booking.
+- Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
+- Benefits: build strength, improve fitness, train with confidence, stay consistent — hedged ("can"), no "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
 
 - Use only verified wording for offers: "tailored to the individual", "personalised programming, support and progression".
 - Benefits copy is hedged ("can build") and makes no medical or results claims.

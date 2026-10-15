@@ -38,6 +38,7 @@ One variable family: **Archivo** (Google Fonts via `next/font`, self-hosted at b
 |---|---|
 | `font-display` | 800 weight, 112% width, uppercase, -0.02em — all headings |
 | `text-display` | Hero / closing CTA (30 → 84 px) |
+| `text-display-split` | Hero headline beside media at `lg+` (44 → 68 px) |
 | `text-h1` | Inner page titles (28 → 64 px) |
 | `text-h2` | Section titles (24 → 44 px) |
 | `text-h3` | Sub-headings (20 → 24 px) |
@@ -74,7 +75,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 ## Imagery
 
 - Only genuine photos of Alex, his coaching and the venue. No stock, no AI imagery presented as real.
-- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~10 s loop of genuine footage. Desktop: 5 of 12 columns beside the headline (headline steps down to `text-h1` at `lg` so "CUMBERNAULD" fits). Mobile: below the CTAs, max 28rem wide. `preload="none"`; the poster is identical to the first frame and is the first paint. Plays only while ≥25% visible, never autoplays under `prefers-reduced-motion` or data-saver, stays paused once the visitor pauses it, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
+- Hero video (`site.heroVideo`): 4:5, black and white, silent, ~8 s loop of genuine footage. Desktop (lg+): height `min(100svh − 9rem, 40rem)` with width from the 4:5 ratio, right-aligned beside the headline, so headline, booking button and the whole video sit in the first view at 1024×768, 1366×768 and 1440×900. The headline uses `text-display-split` at lg so each sentence ("Get stronger." / "Move better.") stays on one line. Mobile: directly below the booking button, max 28rem wide; its top starts within the first view (e.g. 86% visible at 390×844). Enforced by e2e. `preload="none"`; the poster is identical to the first frame and is the first paint. Plays only while ≥25% visible, never autoplays under `prefers-reduced-motion` or data-saver, stays paused once the visitor pauses it, and always has a 44 px pause/play button. The video is decorative (`aria-hidden`); the page must make sense without it.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
 - Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.

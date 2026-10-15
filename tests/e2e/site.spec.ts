@@ -197,7 +197,7 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
 
 test("without a booking URL, class CTAs are enquiries, not fake bookings", async ({ page }) => {
   await page.goto("/classes");
-  await expect(page.getByRole("link", { name: /book a class/i })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /book (a|your) class/i })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /enquire about classes/i }).first()).toHaveAttribute(
     "href",
     "/contact",
@@ -339,6 +339,35 @@ test("a paused hero video stays paused after scrolling away and back", async ({ 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(500);
   expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+});
+
+for (const [width, height] of [
+  [1366, 768],
+  [1440, 900],
+  [1024, 768],
+  [390, 844],
+  [360, 800],
+]) {
+  test(`hero headline, booking button and video are in the first view at ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const h1 = await page.locator("h1").boundingBox();
+    const cta = await page.locator("main section").first().getByRole("link").first().boundingBox();
+    const video = await page.locator("main video").boundingBox();
+    expect(h1 && h1.y + h1.height).toBeLessThanOrEqual(height);
+    expect(cta && cta.y + cta.height).toBeLessThanOrEqual(height);
+    // Desktop: the whole video; phones: at least its first third.
+    const visible = Math.min(video!.y + video!.height, height) - video!.y;
+    expect(visible / video!.height, "share of video visible").toBeGreaterThanOrEqual(width >= 1024 ? 0.95 : 0.33);
+  });
+}
+
+test("class pages link to the how-to-join section", async ({ page }) => {
+  await page.goto("/classes");
+  await expect(page.locator("#book")).toHaveCount(1);
+  await expect(page.locator("#book ol > li")).toHaveCount(3);
+  await page.getByRole("link", { name: "How to join" }).click();
+  await expect(page).toHaveURL(/#book$/);
 });
 
 test("robots and sitemap are served", async ({ request }) => {
