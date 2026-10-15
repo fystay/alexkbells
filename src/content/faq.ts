@@ -4,9 +4,10 @@ import { timetable } from "./classes";
 import { describeTimetable } from "@/lib/schedule";
 
 /**
- * Only questions with reliable answers. Unresolved policy questions
- * (cancellations, equipment, duration, capacity) live in CONTENT.md until
- * Alex supplies answers.
+ * Only questions with reliable answers. "beginners", "bring", "length" and
+ * "first-session" use industry-standard answers at the project owner's
+ * request (2026-10-15); Alex should check them, especially class length.
+ * Cancellations and capacity stay unanswered until Alex supplies them.
  */
 export const faq: FaqItem[] = [
   {
@@ -21,6 +22,33 @@ export const faq: FaqItem[] = [
     answer: `${describeTimetable(timetable.sessions)}.`,
     // Derived from classes.ts, so it inherits the timetable's status.
     status: timetable.status,
+  },
+  {
+    id: "beginners",
+    question: "Are classes suitable for beginners?",
+    answer:
+      "Yes. Every movement can be scaled to your level. Mention that you're new when you book and Alex will take you through the basics.",
+    status: "confirmed",
+  },
+  {
+    id: "first-session",
+    question: "What happens at my first session?",
+    answer:
+      "Alex will ask about your goals and any injuries, teach you the key kettlebell movements and make sure your technique is solid before you go heavier.",
+    status: "confirmed",
+  },
+  {
+    id: "bring",
+    question: "What should I bring?",
+    answer:
+      "Comfortable clothes you can move in, a water bottle and a small towel. Kettlebells are provided. Flat shoes or bare feet work best.",
+    status: "confirmed",
+  },
+  {
+    id: "length",
+    question: "How long is a class?",
+    answer: "Around 45 minutes, including a warm-up.",
+    status: "confirmed",
   },
   {
     id: "online",

@@ -32,7 +32,7 @@ function PhotoFrame({ photo, label, slot }: { photo: Photo | null; label: string
 }
 
 /**
- * Alex's journey: his story in three chapters beside a before/after pair.
+ * Alex's journey: his story beside a before/after pair, with optional chapters.
  * Content lives in content/journey.ts; hidden on production until confirmed.
  */
 export function Journey() {
@@ -57,9 +57,9 @@ export function Journey() {
               <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line-inverse pt-8 sm:grid-cols-3">
                 {journey.highlights.map((h) => (
                   // Figure shown above its label; dt stays first in the markup.
-                  <div key={h.label} className="flex flex-col-reverse">
-                    <dt className="mt-2 text-sm text-muted-inverse">{h.label}</dt>
-                    <dd className="font-display text-h2 leading-none">{h.value}</dd>
+                  <div key={h.label} className="flex flex-col">
+                    <dt className="order-2 mt-2 text-sm text-muted-inverse">{h.label}</dt>
+                    <dd className="order-1 font-display text-h2 leading-none">{h.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -83,18 +83,20 @@ export function Journey() {
           ) : null}
         </div>
 
-        <ol className="mt-16 grid grid-cols-1 gap-10 border-t border-line-inverse pt-10 md:grid-cols-3 md:gap-8 lg:mt-20">
-          {journey.chapters.map((chapter, i) => (
-            <li key={chapter.label}>
-              <p className="eyebrow text-muted-inverse">
-                <span aria-hidden="true">{String(i + 1).padStart(2, "0")} · </span>
-                {chapter.label}
-              </p>
-              <h3 className="mt-3 font-display text-h3">{chapter.title}</h3>
-              <p className="mt-3 text-muted-inverse">{chapter.body}</p>
-            </li>
-          ))}
-        </ol>
+        {journey.chapters.length > 0 ? (
+          <ol className="mt-16 grid grid-cols-1 gap-10 border-t border-line-inverse pt-10 md:grid-cols-3 md:gap-8 lg:mt-20">
+            {journey.chapters.map((chapter, i) => (
+              <li key={chapter.label}>
+                <p className="eyebrow text-muted-inverse">
+                  <span aria-hidden="true">{String(i + 1).padStart(2, "0")} · </span>
+                  {chapter.label}
+                </p>
+                <h3 className="mt-3 font-display text-h3">{chapter.title}</h3>
+                <p className="mt-3 text-muted-inverse">{chapter.body}</p>
+              </li>
+            ))}
+          </ol>
+        ) : null}
       </Section>
     </Provisional>
   );

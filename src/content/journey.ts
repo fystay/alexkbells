@@ -18,31 +18,22 @@ import type { Journey } from "./types";
  *    CONTENT_PREVIEW=true.
  */
 export const journey: Journey = {
-  status: "provisional",
-  title: "[Short headline, e.g. from where he started to coach]",
+  // Written from Alex's own reel ("1% everyday") and Instagram bio, and
+  // published at the project owner's request on 2026-10-15. Swap in Alex's
+  // own words and chapters when he supplies them.
+  status: "confirmed",
+  title: "1% better, every day",
   intro:
-    "[Two or three sentences in Alex's voice: why he started training, what changed, and why he now coaches others.]",
-  chapters: [
-    {
-      label: "Where it started",
-      title: "[Chapter title]",
-      body: "[What training and life looked like at the start.]",
-    },
-    {
-      label: "Finding kettlebells",
-      title: "[Chapter title]",
-      body: "[The turning point and what kettlebell training changed.]",
-    },
-    {
-      label: "Coaching today",
-      title: "[Chapter title]",
-      body: "[How that experience shapes the way Alex coaches his clients now.]",
-    },
-  ],
-  before: null,
-  after: null,
+    "Alex didn't start out as a coach. His own change came from turning up and getting 1% better every day. Now he helps others do the same: build strength, move better and improve their fitness, in classes, one-to-one and online.",
+  chapters: [],
+  // Both from Alex's reel; overlays removed by scripts/journey_photos.py.
+  before: { src: "/journey/before.jpg", width: 720, height: 900, alt: "Alex before he started kettlebell training" },
+  after: { src: "/journey/after.jpg", width: 720, height: 900, alt: "Alex today, lean and muscular after kettlebell training" },
   beforeLabel: "Before",
-  afterLabel: "After",
-  caption: "[Caption for the photos, e.g. the years they were taken.]",
-  highlights: [],
+  afterLabel: "Now",
+  caption: "Alex, before he started training and today. Both from his own reel.",
+  highlights: [
+    { value: "9.6k", label: "Instagram followers" },
+    { value: "3", label: "Ways to train" },
+  ],
 };

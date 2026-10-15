@@ -22,7 +22,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your session** + large video; "Explore online coaching" and "Group classes" links) → benefits (+ booking button) → group classes (+ booking button) → about → Alex's journey (when confirmed) → location → one-to-one & online (each with its own action) → FAQ → closing CTA |
+| `/` | Conversion journey: hero ("Get stronger. Move better." + **Book your session** + large video; "Explore online coaching" and "Group classes" links) → benefits (+ booking button) → ways to train (group / one-to-one / online side by side with prices and booking buttons, plus 3-step getting started) → about (+ training stills, Instagram) → Alex's journey (when confirmed) → location → FAQ → closing CTA; phones get a sticky booking bar after the hero |
 | `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |

@@ -43,13 +43,17 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Cancellation / refund rules | U | Do not publish |
 | One-to-one from £35/session; 4 sessions £130/month | C | Confirmed by the project owner 2026-10-15 (figures from the original brief); shown on the site |
 | Online coaching £79/month | C | Confirmed by the project owner 2026-10-15; shown on the site |
-| Alex's journey (story, before/after photos) | U | Section built (`content/journey.ts`); hidden until Alex supplies and approves words and photos |
-| Social proof (Instagram following, views, regular clients) | U | Owner reports a large following and regular clients; add exact figures to `journey.highlights` only when supplied |
+| Alex's journey (story, before/after photos) | C | Published 2026-10-15 at the owner's request: before/after frames from his reel (`scripts/journey_photos.py`), short text written from his reel motto ("1% everyday") and bio. Swap in Alex's own story when supplied |
+| Coach's name | C | Alex Robertson (Instagram profile, 2026-10-15) |
+| Instagram followers | C | 9,651 on 2026-10-15, shown as "9.6k" (rounded down). Update occasionally |
+| Testimonials / client numbers | U | None supplied; never invent |
+| FAQ: beginners, first session, what to bring, class length (~45 min), kettlebells provided | P→C | Industry-standard answers published at the owner's request 2026-10-15; **Alex to check, especially class length and equipment** |
 | Session duration, availability, contract terms | U | |
 | Membership | U | Under consideration; not on the site |
 | Email, phone | U | `site.contact` is null; not rendered |
 | Logo artwork | C | Supplied 2026-10-15 (`assets/brand/alexkbells-logo-source.jpg`). Monogram "AR" with kettlebell (confirmed intentional); wordmark ALEX.KBELLS; descriptor KETTLEBELL COACH. This JPG is the only version — no vector exists |
 | Photography of Alex / coaching | U | No stills supplied |
+| Training stills | C | Three frames from the same reel (`public/images/training/`); same permission caveat as the hero footage |
 | Hero footage | C | Alex's own Instagram reel (supplied 2026-10-15), used for the homepage hero loop. Filmed at several gyms, some visibly not Media House (e.g. "APEX" signage), and shows other people training. Confirm Alex is happy for it to represent his coaching and that people shown are fine appearing on the website |
 | Bio, qualifications, history, testimonials | U | Do not invent |
 | Bookings | — | Previously Setmore; payments cash / bank transfer. Site has a guided `/book` request flow (emails Alex; he confirms by reply) and an `/online-coaching` enquiry, both off until Resend + his inbox are configured. Calendar availability is a labelled prototype only (previews) |

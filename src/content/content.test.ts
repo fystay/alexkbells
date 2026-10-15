@@ -30,8 +30,14 @@ describe("content approval state", () => {
 
   it("never publishes Alex's journey with placeholders or missing photos", () => {
     if (journey.status !== "confirmed") return;
-    const text = JSON.stringify(journey);
-    expect(text, "replace every [bracketed] placeholder first").not.toMatch(/\[[^\]]+\]/);
+    // Every piece of text in the section, nested or not.
+    const texts: string[] = [];
+    const collect = (value: unknown) => {
+      if (typeof value === "string") texts.push(value);
+      else if (value && typeof value === "object") Object.values(value).forEach(collect);
+    };
+    collect(journey);
+    for (const text of texts) expect(text, "replace every [bracketed] placeholder first").not.toMatch(/\[[^\]]+\]/);
     expect(journey.before && journey.after, "add both photos").toBeTruthy();
   });
 

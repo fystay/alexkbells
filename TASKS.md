@@ -57,7 +57,9 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Premium UX pass: larger hero video (edge to edge on phones, up to half the grid on desktop); guided booking (service → when → details) with per-service entry points, summary, back/edit, disabled-until-ready Continue; demo availability calendar for previews (labelled, never on production, never sent); online coaching onboarding (`/online-coaching`)
 - [x] Prices confirmed (2026-10-15) and published
 - [x] "Alex's journey" section built with slots for his story and before/after photos
-- [ ] **P0** Alex supplies his journey text, before/after photos and any real figures (followers, clients); then set `journey.status = "confirmed"`
+- [x] Journey published with before/after from his reel, 9.6k followers; standard FAQ answers added
+- [ ] **P1** Alex checks the standard FAQ answers (class length, kettlebells provided) and, if he likes, writes his own journey story
+- [ ] **P1** Testimonials from regular clients (with permission)
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking
 - [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Until then buttons fall back to "Enquire about classes"

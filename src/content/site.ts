@@ -51,6 +51,8 @@ export const site = {
     instagram: {
       handle: "@alex.kbells",
       url: "https://www.instagram.com/alex.kbells/",
+      /** From his profile on 2026-10-15 (9,651). Update occasionally; never round up. */
+      followers: "9.6k",
     },
   },
 
@@ -69,6 +71,17 @@ export const site = {
     ],
     poster: "/media/hero-poster.jpg",
   } as { sources: { src: string; type: string }[]; poster: string } | null,
+
+  /**
+   * Stills taken from the same reel as the hero video (genuine training
+   * footage; same permission caveat, see CORE.md). Frames showing other gyms'
+   * branding were left out.
+   */
+  trainingStills: [
+    { src: "/images/training/group.jpg", width: 720, height: 900, alt: "A coached group doing kettlebell goblet squats" },
+    { src: "/images/training/swing.jpg", width: 720, height: 900, alt: "Two people training kettlebell swings in a gym" },
+    { src: "/images/training/rack.jpg", width: 720, height: 900, alt: "A group holding kettlebells in the front rack position" },
+  ] as Photo[],
 
   /** Genuine photos of Alex / his coaching only. Empty until supplied. */
   photos: {

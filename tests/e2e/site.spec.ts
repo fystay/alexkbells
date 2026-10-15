@@ -147,8 +147,8 @@ for (const route of publicRoutes) {
       // Only the prices confirmed on 2026-10-15 may appear.
       const amounts = (await page.locator("main").innerText()).match(/£\d+/g) ?? [];
       for (const amount of amounts) expect(["£35", "£130", "£79"]).toContain(amount);
-      // Alex's journey stays hidden until it is confirmed.
-      await expect(page.locator("#journey-heading")).toHaveCount(0);
+      // No unfilled placeholders anywhere.
+      await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
     });
   });
 }
@@ -398,14 +398,19 @@ test("a paused hero video stays paused after scrolling away and back", async ({ 
   expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
 });
 
+// Includes an iPhone with Safari's toolbars showing (390x664) and a short 320px phone.
 for (const [width, height] of [
-  [1366, 768],
   [1440, 900],
+  [1366, 768],
   [1024, 768],
+  [768, 1024],
+  [430, 740],
   [390, 844],
-  [360, 800],
+  [390, 664],
+  [360, 640],
+  [320, 568],
 ]) {
-  test(`hero headline, booking button and video are in the first view at ${width}x${height}`, async ({ page }) => {
+  test(`hero headline, booking button and the whole video are in the first view at ${width}x${height}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto("/");
     const h1 = await page.locator("h1").boundingBox();
@@ -413,11 +418,29 @@ for (const [width, height] of [
     const video = await page.locator("main video").boundingBox();
     expect(h1 && h1.y + h1.height).toBeLessThanOrEqual(height);
     expect(cta && cta.y + cta.height).toBeLessThanOrEqual(height);
-    // Desktop: the whole video; phones: at least its first third.
-    const visible = Math.min(video!.y + video!.height, height) - video!.y;
-    expect(visible / video!.height, "share of video visible").toBeGreaterThanOrEqual(width >= 1024 ? 0.95 : 0.33);
+    expect(video!.y).toBeGreaterThanOrEqual(0);
+    expect(video!.y + video!.height, "bottom of the video").toBeLessThanOrEqual(height);
+    // Never squeezed into a sliver, and never stretched or cropped (4:5).
+    expect(video!.height).toBeGreaterThan(280);
+    expect(Math.abs(video!.width / video!.height - 0.8)).toBeLessThan(0.01);
   });
 }
+
+test("phones get a booking bar once the hero scrolls away, hidden near the closing call to action", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 664 });
+  await page.goto("/");
+  const bar = page.getByTestId("mobile-book-bar");
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+  await page.locator("#ways-heading").scrollIntoViewIfNeeded();
+  await expect(bar).toHaveAttribute("aria-hidden", "false");
+  await expect(bar.getByRole("link")).toBeInViewport();
+  await page.locator("footer").scrollIntoViewIfNeeded();
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+  // Never on desktop.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.locator("#ways-heading").scrollIntoViewIfNeeded();
+  await expect(bar).toBeHidden();
+});
 
 test("class pages link to the how-to-join section", async ({ page }) => {
   await page.goto("/classes");
