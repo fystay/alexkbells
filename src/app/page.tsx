@@ -3,10 +3,7 @@ import Image from "next/image";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { timetable } from "@/content/classes";
 import { getBookingAction, getClassBookingAction, getOnlineCoachingAction, type CallToAction } from "@/lib/booking";
-import { isPublishable } from "@/lib/publish";
-import { shortDay, sortSessions } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Timetable } from "@/components/sections/Timetable";
@@ -45,15 +42,6 @@ function Hero() {
   const video = site.heroVideo;
   const photo = video ? null : site.photos.hero;
   const hasMedia = Boolean(video || photo);
-  const showTimes = isPublishable(timetable.status);
-  const days = sortSessions(timetable.sessions).map((s) => shortDay(s.day));
-
-  const facts = [
-    { label: "Where", value: `${site.location.venue}, ${site.location.town}` },
-    ...(showTimes ? [{ label: "Classes", value: days.join(" · ") }] : []),
-    { label: "Online", value: "Coaching wherever you train" },
-  ];
-
   // Phones: headline and booking button first, then the video edge to edge.
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping its 4:5 frame.
@@ -62,7 +50,7 @@ function Hero() {
 
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
-      <div className="container-page pt-6 pb-10 sm:pt-10 lg:pt-4 lg:pb-12">
+      <div className="container-page pt-6 pb-12 sm:pt-10 lg:pt-4 lg:pb-8">
         <div className={hasMedia ? "grid grid-cols-1 lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10" : undefined}>
           <div className={hasMedia ? "lg:col-span-6 lg:row-start-2" : undefined}>
             <p className="eyebrow text-muted">Kettlebell coaching · {site.location.town}</p>
@@ -73,9 +61,8 @@ function Hero() {
               <span className="block">Get stronger.</span>
               <span className="block">Move better.</span>
             </h1>
-            <p className="mt-4 max-w-xl text-lede text-muted lg:mt-5">
-              Coached kettlebell classes and one-to-one sessions in {site.location.town}, plus online coaching
-              wherever you train.
+            <p className="mt-4 max-w-md text-lede text-muted lg:mt-5">
+              Classes and one-to-one sessions at {site.location.venue}, or online coaching anywhere.
             </p>
           </div>
           <div className={hasMedia ? "mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8" : "mt-7"}>
@@ -106,15 +93,6 @@ function Hero() {
             </ButtonLink>
           </div>
         </div>
-
-        <dl className={`mt-12 grid grid-cols-1 border-t border-ink ${facts.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-          {facts.map((fact) => (
-            <div key={fact.label} className="border-b border-line py-4 sm:border-b-0 sm:pr-6">
-              <dt className="eyebrow text-muted">{fact.label}</dt>
-              <dd className="mt-1 font-semibold">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );

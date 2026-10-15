@@ -263,12 +263,28 @@ test("hero video plays silently, can be paused, and offers WebM + MP4", async ({
   await expect(video).toHaveAttribute("aria-hidden", "true");
   expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop && v.playsInline)).toBe(true);
   const types = await video.locator("source").evaluateAll((els) => els.map((e) => e.getAttribute("type")));
-  expect(types).toEqual(["video/webm", "video/mp4"]);
+  expect(types).toEqual(['video/mp4; codecs="avc1.64001F"', 'video/webm; codecs="vp9"']);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
 
   await page.getByRole("button", { name: "Pause background video" }).click();
   expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+});
+
+test("hero video loops back to the start instead of stopping on a blank frame", async ({ page }) => {
+  await page.goto("/");
+  const video = page.locator("main video");
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused && v.readyState >= 2)).toBe(true);
+  // Native loop.
+  await video.evaluate((v: HTMLVideoElement) => (v.currentTime = v.duration - 0.3));
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), { timeout: 5000 }).toBeLessThan(2);
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused || v.ended)).toBe(false);
+  // Fallback for browsers that ignore `loop`: the ended handler restarts it.
+  await video.evaluate((v: HTMLVideoElement) => {
+    v.loop = false;
+    v.currentTime = v.duration - 0.3;
+  });
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.ended && !v.paused && v.currentTime < 2), { timeout: 5000 }).toBe(true);
 });
 
 test("hero video does not autoplay for reduced-motion users", async ({ page }) => {

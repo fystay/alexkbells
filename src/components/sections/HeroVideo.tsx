@@ -21,6 +21,9 @@ type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean }
  *   stays and the button can start it.
  * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it
  *   stays paused until they press play again.
+ * - Loops forever. `loop` does this natively; the `ended` handler restarts
+ *   it in any browser that stops at the end instead, so the frame never
+ *   goes blank.
  */
 export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -69,6 +72,13 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
     }
   };
 
+  const restart = () => {
+    const video = ref.current;
+    if (!video || userPaused.current) return;
+    video.currentTime = 0;
+    video.play().catch(() => setPlaying(false));
+  };
+
   return (
     <div className={className}>
       {/* Width-led: the parent sets the width, the 4:5 frame sets the height. */}
@@ -80,6 +90,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           loop
           playsInline
           preload="none"
+          onEnded={restart}
           aria-hidden="true"
           tabIndex={-1}
           className="size-full object-cover"

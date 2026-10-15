@@ -60,10 +60,12 @@ export const site = {
    * white, silent, 4:5). Takes priority over photos.hero. Null to disable.
    */
   heroVideo: {
-    // Browsers use the first format they support.
+    // Browsers use the first format they can play. H.264 MP4 comes first:
+    // Safari/iOS loop it reliably (their WebM looping can stall on a black
+    // frame). Exact codecs let browsers without H.264 skip to the WebM.
     sources: [
-      { src: "/media/hero.webm", type: "video/webm" },
-      { src: "/media/hero.mp4", type: "video/mp4" },
+      { src: "/media/hero.mp4", type: 'video/mp4; codecs="avc1.64001F"' },
+      { src: "/media/hero.webm", type: 'video/webm; codecs="vp9"' },
     ],
     poster: "/media/hero-poster.jpg",
   } as { sources: { src: string; type: string }[]; poster: string } | null,

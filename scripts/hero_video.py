@@ -147,8 +147,8 @@ def main(src):
     if writer.wait() != 0:
         sys.exit("ffmpeg failed writing the master")
 
-    # 2. Delivery formats: VP9 WebM (Chrome, Firefox, Android) listed first,
-    #    H.264 MP4 for Safari/iOS. Both silent.
+    # 2. Delivery formats: H.264 MP4 (listed first on the page: Safari/iOS
+    #    loop it reliably) and VP9 WebM for browsers without H.264. Both silent.
     ffmpeg("-i", str(master), "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "37",
            "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", str(OUT_DIR / "hero.webm"))
     ffmpeg("-i", str(master), "-an", "-c:v", "libx264", "-profile:v", "high", "-preset", "slow",
