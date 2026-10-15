@@ -21,7 +21,7 @@ export function Logo({ tone = "dark", className, priority = false }: LogoProps) 
   return (
     <Link
       href="/"
-      className={cn("inline-flex items-center", className)}
+      className={cn("inline-flex min-h-11 items-center", className)}
       aria-label={`${site.name}, home`}
     >
       {logo ? (

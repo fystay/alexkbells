@@ -59,9 +59,9 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 
 | Component | File | Notes |
 |---|---|---|
-| `SiteHeader` | `components/layout` | Sticky ink bar; logo, nav, one CTA |
-| `DesktopNav` / `MobileNav` | `components/layout/NavLinks.tsx` | `aria-current`, disclosure menu, Esc closes, closes on navigation |
-| `SiteFooter` | `components/layout` | Brand, nav, address, verified contact only |
+| `SiteHeader` | `components/layout` | Sticky ink bar; logo, nav, one CTA. All header targets ≥44 px |
+| `DesktopNav` / `MobileNav` | `components/layout/NavLinks.tsx` | `aria-current`; full-height disclosure panel below the header; Esc closes and returns focus to the toggle; closes on navigation |
+| `SiteFooter` | `components/layout` | Brand, nav, address, verified contact only. Mobile: Explore column sized to content beside Contact + Find us; links ≥44 px below `lg` |
 | `Logo` | `components/layout` | Real artwork from `site.logo`; plain-text name fallback |
 | `ButtonLink` | `components/ui` | `primary` / `secondary` / `text` × `light` / `dark` tones; min 44–48 px targets; external links announce new tab |
 | `Section`, `SectionHeading` | `components/ui` | Tone + spacing; heading ids wire `aria-labelledby` |
@@ -81,5 +81,6 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 ## Accessibility requirements
 
 - WCAG 2.2 AA. Semantic landmarks, one h1 per page, skip link, visible `:focus-visible` outline.
-- Touch targets ≥ 44 px. Native `<details>` for FAQ.
+- Touch targets ≥ 44 px on phones and tablets (enforced in e2e at 390 and 768 px); inline links in running text are exempt. Native `<details>` for FAQ.
+- Repeated "Find out more" links carry screen-reader-only context ("about online coaching").
 - Test: axe (automated in e2e), keyboard pass, 320 px reflow, 200% zoom.

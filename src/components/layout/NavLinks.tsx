@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { mainNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
@@ -24,8 +24,8 @@ export function DesktopNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative py-2 text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
-                  "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
+                  "relative inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
                   active
                     ? "text-paper after:scale-x-100"
                     : "text-muted-inverse after:scale-x-0 hover:text-paper hover:after:scale-x-100",
@@ -46,6 +46,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   const [open, setOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
   const panelId = useId();
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Close the menu whenever the route changes.
   if (pathname !== lastPath) {
@@ -56,7 +57,10 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      // Return focus to the toggle so keyboard users aren't stranded.
+      buttonRef.current?.focus();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -65,6 +69,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   return (
     <div className="md:hidden">
       <button
+        ref={buttonRef}
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
@@ -80,7 +85,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full border-t border-line-inverse bg-ink pb-8"
+        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line-inverse bg-ink pb-8 sm:h-[calc(100dvh-5rem)]"
       >
         <nav aria-label="Main" className="container-page">
           <ul className="divide-y divide-line-inverse">
@@ -97,7 +102,11 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
                     )}
                   >
                     {item.label}
-                    {active ? <span className="eyebrow text-muted-inverse">Current</span> : null}
+                    {active ? (
+                      <span aria-hidden="true" className="eyebrow text-muted-inverse">
+                        Current
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               );
@@ -109,6 +118,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink"
           >
             {cta.label}
+            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
           </Link>
         </nav>
       </div>

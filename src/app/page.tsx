@@ -152,8 +152,8 @@ function Services() {
               href={service.href}
               className="mt-6 inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
             >
-              {service.id === "group-classes" ? "See classes" : "Find out more"}
-              <span className="sr-only">: {service.name}</span>
+              Find out more
+              <span className="sr-only"> about {service.name.toLowerCase()}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </li>
@@ -262,7 +262,8 @@ function CoachingOptions() {
             <div className="mt-auto">
               <PriceList prices={service.prices} tone="ink" />
               <ButtonLink href={service.href} variant="text" tone="dark" className="mt-4">
-                Details<span className="sr-only">: {service.name}</span>
+                Find out more
+                <span className="sr-only"> about {service.name.toLowerCase()}</span>
               </ButtonLink>
             </div>
           </article>

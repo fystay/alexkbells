@@ -12,6 +12,14 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Booking boundary (`BOOKING_URL` → external link; otherwise enquiry)
 - [x] Unit tests (Vitest) and e2e (Playwright: routes, overflow at 320–1600 px, axe WCAG AA, skip link, mobile menu, links, no provisional content in production)
 
+### Done (2026-10-15, polish pass)
+- [x] Audit at 320/375/390/768/1024/1280 px: overflow, heading wraps, tap targets, focus, links, anchors
+- [x] Footer: 44 px touch targets, two-column mobile layout (320 px footer 839 → 639 px)
+- [x] Mobile menu fills the viewport; Esc returns focus to the toggle; external CTA announces new tab
+- [x] Desktop/tablet nav and logo links ≥44 px
+- [x] Consistent "Find out more" link labels with descriptive accessible names
+- [x] e2e: tap targets, heading order, external-link safety, anchors, verified contact/maps URLs, menu focus return
+
 ### To launch
 - [ ] **P0** Add the real logo to `public/brand/` and configure `site.logo`
 - [ ] **P0** Alex confirms timetable → set `timetable.status = "confirmed"` (and duration if known)

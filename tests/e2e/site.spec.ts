@@ -32,6 +32,57 @@ for (const route of publicRoutes) {
       expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
     });
 
+    test("has 44px tap targets on phones and tablets (outside running text)", async ({ page }) => {
+      for (const width of [390, 768]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(route);
+        const small = await page.$$eval("a, button, summary", (els) =>
+          els
+            .filter((el) => {
+              const box = el.getBoundingClientRect();
+              if (!box.width || !box.height) return false; // hidden
+              if (el.closest("p")) return false; // inline links in text are exempt
+              if (el.classList.contains("sr-only")) return false; // skip link until focused
+              return box.height < 44;
+            })
+            .map((el) => `${el.textContent?.trim().slice(0, 30)} (${Math.round(el.getBoundingClientRect().height)}px)`),
+        );
+        expect(small, `at ${width}px`).toEqual([]);
+      }
+    });
+
+    test("heading levels do not skip", async ({ page }) => {
+      await page.goto(route);
+      const levels = await page.$$eval("h1, h2, h3, h4, h5, h6", (hs) => hs.map((h) => Number(h.tagName[1])));
+      expect(levels[0]).toBe(1);
+      for (let i = 1; i < levels.length; i++) {
+        expect(levels[i] - levels[i - 1], `heading ${i}`).toBeLessThanOrEqual(1);
+      }
+    });
+
+    test("external links are safe and announce new tabs", async ({ page }) => {
+      await page.goto(route);
+      const bad = await page.$$eval("a[href^='http']", (as) =>
+        as
+          .filter(
+            (a) =>
+              a.getAttribute("target") !== "_blank" ||
+              !/noopener/.test(a.getAttribute("rel") ?? "") ||
+              !/opens in a new tab/i.test(a.textContent ?? ""),
+          )
+          .map((a) => a.getAttribute("href")),
+      );
+      expect(bad).toEqual([]);
+    });
+
+    test("in-page anchors point at existing ids", async ({ page }) => {
+      await page.goto(route);
+      const missing = await page.$$eval("a[href^='#']", (as) =>
+        as.map((a) => a.getAttribute("href")!.slice(1)).filter((id) => !document.getElementById(id)),
+      );
+      expect(missing).toEqual([]);
+    });
+
     test("shows no provisional content on a production build", async ({ page }) => {
       await page.goto(route);
       await expect(page.locator("[data-provisional]")).toHaveCount(0);
@@ -79,8 +130,10 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await toggle.click();
   await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Coaching" }).focus();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByRole("button", { name: "Menu" })).toBeFocused();
 
   await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Classes" }).click();
@@ -95,6 +148,20 @@ test("without a booking URL, class CTAs are enquiries, not fake bookings", async
     "href",
     "/contact",
   );
+});
+
+test("cross-page section anchors exist", async ({ page }) => {
+  await page.goto("/coaching");
+  await expect(page.locator("#one-to-one")).toHaveCount(1);
+  await expect(page.locator("#online")).toHaveCount(1);
+});
+
+test("contact, Instagram and directions links point at verified destinations", async ({ page }) => {
+  await page.goto("/contact");
+  const hrefs = await page.$$eval("a[href^='http']", (as) => as.map((a) => a.getAttribute("href")!));
+  expect(hrefs).toContain("https://www.instagram.com/alex.kbells/");
+  const maps = hrefs.find((h) => h.startsWith("https://www.google.com/maps/search/"));
+  expect(maps && decodeURIComponent(maps)).toContain("1A Dunns Wood Road, Cumbernauld, G67 3EN");
 });
 
 test("robots and sitemap are served", async ({ request }) => {
