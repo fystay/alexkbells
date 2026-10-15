@@ -1,6 +1,7 @@
 import { getClassBookingAction, getCoachingEnquiryAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
+import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 interface CtaBandProps {
   title?: string;
@@ -21,7 +22,7 @@ export function CtaBand({
       <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
           <h2 id={headingId} className="font-display text-display text-balance">
-            {title}
+            <KeepHyphens>{title}</KeepHyphens>
           </h2>
           <p className="mt-6 text-lede text-muted-inverse">{body}</p>
         </div>

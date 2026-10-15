@@ -70,7 +70,7 @@ export default function ClassesPage() {
 
       <Location />
       <CtaBand
-        title="Prefer one-to-one?"
+        title="Prefer personal coaching?"
         body="Personal coaching is available face to face in Cumbernauld or online."
       />
     </>

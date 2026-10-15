@@ -14,6 +14,7 @@ import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -143,7 +144,9 @@ function Services() {
             <span className="eyebrow text-muted" aria-hidden="true">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <h3 className="mt-6 font-display text-h3">{service.name}</h3>
+            <h3 className="mt-6 font-display text-h3">
+              <KeepHyphens>{service.name}</KeepHyphens>
+            </h3>
             <p className="mt-3 flex-1 text-muted">{service.summary}</p>
             <Link
               href={service.href}
@@ -253,7 +256,7 @@ function CoachingOptions() {
         {options.map((service) => (
           <article key={service.id} aria-labelledby={`${service.id}-option`} className="flex flex-col">
             <h3 id={`${service.id}-option`} className="font-display text-h3">
-              {service.name}
+              <KeepHyphens>{service.name}</KeepHyphens>
             </h3>
             <p className="mt-3 mb-8 max-w-md text-muted-inverse">{service.summary}</p>
             <div className="mt-auto">

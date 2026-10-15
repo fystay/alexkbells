@@ -9,6 +9,7 @@ import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { KeepHyphens } from "@/components/ui/KeepHyphens";
 
 export const metadata: Metadata = {
   title: "One-to-One & Online Kettlebell Coaching",
@@ -39,7 +40,7 @@ function ServiceDetail({
         <div className="lg:col-span-6">
           <p className={cn("eyebrow", muted)}>{index}</p>
           <h2 id={headingId} className="mt-4 font-display text-h2 text-balance">
-            {service.name}
+            <KeepHyphens>{service.name}</KeepHyphens>
           </h2>
           <p className={cn("mt-6 max-w-xl text-lede", muted)}>{intro}</p>
           <ButtonLink
