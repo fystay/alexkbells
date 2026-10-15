@@ -76,7 +76,7 @@ function Hero() {
               Group classes, one-to-one coaching tailored to you, and online coaching with
               personalised programming, support and progression.
             </p>
-            <div className="mt-10 flex flex-col gap-3 xs:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <ButtonLink href={booking.href} external={booking.external}>
                 {booking.label}
               </ButtonLink>

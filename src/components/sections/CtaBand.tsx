@@ -26,7 +26,7 @@ export function CtaBand({
           </h2>
           <p className="mt-6 text-lede text-muted-inverse">{body}</p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:flex-col xl:flex-row xl:flex-nowrap">
           <ButtonLink href={classes.href} external={classes.external} tone="dark">
             {classes.label}
           </ButtonLink>

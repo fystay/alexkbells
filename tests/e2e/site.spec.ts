@@ -2,7 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { publicRoutes } from "../../src/lib/routes";
 
-const widths = [320, 360, 390, 768, 1024, 1280, 1600];
+// Includes the 414–430px large phones and in-between tablet widths.
+const widths = [320, 360, 375, 390, 414, 430, 480, 540, 600, 640, 700, 768, 900, 1024, 1280, 1600];
 
 for (const route of publicRoutes) {
   test.describe(`route ${route}`, () => {
@@ -21,6 +22,16 @@ for (const route of publicRoutes) {
           () => document.documentElement.scrollWidth - window.innerWidth,
         );
         expect(overflow, `overflow at ${width}px`).toBeLessThanOrEqual(0);
+        // Also catch controls pushed past the edge (even if clipped).
+        const offscreen = await page.$$eval("main a, main button", (els) =>
+          els
+            .filter((el) => {
+              const r = el.getBoundingClientRect();
+              return r.width > 0 && !el.classList.contains("sr-only") && r.right > window.innerWidth + 1;
+            })
+            .map((el) => el.textContent?.trim().slice(0, 30)),
+        );
+        expect(offscreen, `controls past the edge at ${width}px`).toEqual([]);
       }
     });
 

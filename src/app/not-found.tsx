@@ -14,7 +14,7 @@ export default function NotFound() {
       <p className="mt-6 max-w-lg text-lede text-muted">
         That page doesn&apos;t exist. Try the class times or coaching options instead.
       </p>
-      <div className="mt-10 flex flex-col gap-3 xs:flex-row">
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <ButtonLink href="/classes">Class times</ButtonLink>
         <ButtonLink href="/" variant="secondary">
           Home

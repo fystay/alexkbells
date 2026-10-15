@@ -42,6 +42,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Classes meta description no longer promises class times
 - [x] e2e: console/CSP/failed-request check, mobile axe incl. open menu, FAQ keyboard, metadata, JSON-LD, headers, no server env in client JS, video network behaviour
 - [x] DEPLOYMENT.md
+- [x] Fixed: hero buttons overflowed on 416–600 px phones (e.g. iPhone Pro Max); button groups now stack below 640 px and wrap above it; e2e covers 16 widths and controls past the screen edge
 
 ### To launch — owner decisions (Alex)
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
