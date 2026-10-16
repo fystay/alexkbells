@@ -108,6 +108,13 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
           dangerouslySetInnerHTML={{ __html: html }}
         />
+        {/* Phones and tablets: the top of the frame fades from the header's ink
+            into the footage so the header and video read as one block. Not on
+            desktop, where the video sits on paper clear of the header. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[22%] bg-linear-to-b from-ink via-ink/40 to-transparent lg:hidden"
+        />
         {unavailable ? null : (
           <button
             type="button"

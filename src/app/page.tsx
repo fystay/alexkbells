@@ -65,7 +65,11 @@ function Hero() {
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping.
   return (
-    <section aria-labelledby="hero-heading" className="bg-paper">
+    <section aria-labelledby="hero-heading" className="relative bg-paper">
+      {/* Tablets: ink fills the gap under the header (same height as the
+          container's top padding) so header and video join up. Phones have no
+          gap; desktop keeps the video on paper. */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 hidden h-6 bg-ink sm:block lg:hidden" />
       <div className="container-page pt-0 pb-10 sm:pt-6 lg:pt-4 lg:pb-8">
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
           <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
