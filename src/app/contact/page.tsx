@@ -21,6 +21,7 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
+        image={site.pageImages.contact}
         eyebrow="Contact"
         title="Get in touch"
         intro="Ask about group classes, one-to-one coaching or online coaching. The quickest way to reach Alex is a message on Instagram."

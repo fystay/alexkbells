@@ -61,6 +61,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [ ] **P1** Alex checks the standard FAQ answers (class length, kettlebells provided) and, if he likes, writes his own journey story
 - [ ] **P1** Testimonials from regular clients (with permission)
 - [x] Refinement pass (2026-10-16): one primary CTA "Get in touch" → /contact everywhere; booking-flow links, sticky booking bar and "Book…" wording removed from public pages; `/book` unlisted (noindex, out of sitemap) but still working; hero video still under Reduce Motion with poster fallback; visible focus rings on filled buttons; pressed state; compact timetable in the offer card; hero links to all three offers
+- [x] Inner page headers (classes, coaching, contact) get a still from the footage on desktop
 - [ ] **P1** Decide whether the `/book` request flow is ever re-linked, or removed (currently unlisted)
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking

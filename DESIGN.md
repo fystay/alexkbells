@@ -67,7 +67,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `ButtonLink` | `components/ui` | `primary` / `secondary` / `text` × `light` / `dark` tones; min 44–48 px targets; external links announce new tab. Focus ring takes the surface colour (`ink` on light, `paper` on dark) so it shows outside filled buttons |
 | `Section`, `SectionHeading` | `components/ui` | Tone + spacing; heading ids wire `aria-labelledby` |
 | `Provisional` | `components/ui` | Content approval gate |
-| `PageHeader` | `components/sections` | Inner-page h1 block |
+| `PageHeader` | `components/sections` | Inner-page h1 block. Optional `image` (`site.pageImages`): desktop only (lg+), 4:5, four columns on the right, sitting on the header's bottom rule; art-directed `<picture>`: eager and high priority on desktop (it is usually the largest element there), a 1×1 placeholder below lg so phones and tablets download nothing |
 | `Timetable` | `components/sections` | Driven by `content/classes.ts`. `layout="row"` (three across) or `"stack"` (one per row, for narrow columns). Day and time share one line on phones (both layouts) and in `stack`; in the narrow desktop card the part-of-day label is visually hidden (still read by screen readers) |
 | `PriceList` | `components/sections` | Only publishable prices; otherwise "Get in touch for current pricing". `linkContact={false}` where a "Get in touch" button sits right below |
 | `Location`, `Faq`, `CtaBand`, `JsonLd` | `components/sections` | |
@@ -86,6 +86,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 - Configure in `site.photos`; photos render in greyscale to sit within the monochrome system. Revisit if Alex prefers colour.
 - Without photos, layouts are typographic by design (no empty boxes).
 - Training stills (`site.trainingStills`): three sharp frames from the hero reel in the About section, staggered on desktop. Frames showing other gyms' branding are excluded. Replace with proper photography when available.
+- Page header stills (`site.pageImages`): `/coaching` double-bell swing, `/contact` single-bell hold (cut from the hero loop by `scripts/video_stills.py`, which also repairs the caption-removal patch on the swing frame), `/classes` reuses the group front-rack still. Only sharp frames without other gyms' branding; motion-blurred clips and the "APEX" clips are excluded. Replace with proper photography when available.
 - Logo: the supplied artwork is white on black, so the derived PNGs are transparent white (alpha = source luminance) and must sit on **dark surfaces only** (ink header/footer). On a light surface the `Logo` component frames them in an ink tile.
   - Header: monogram mark (36–40 px tall) + the name as written on the artwork, "ALEX.KBELLS" (`site.logo.wordmark`), over "KETTLEBELL COACH" between two short rules, echoing the lockup. Mark only below 360 px and at tablet widths (768–1023 px), where the navigation needs the space; an e2e test checks the header never overlaps.
   - Footer: full lockup, 192–224 px wide.

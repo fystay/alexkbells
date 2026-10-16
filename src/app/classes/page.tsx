@@ -44,6 +44,7 @@ export default function ClassesPage() {
   return (
     <>
       <PageHeader
+        image={site.pageImages.classes}
         eyebrow="Group classes"
         title="Kettlebell classes in Cumbernauld"
         intro={classes.summary}

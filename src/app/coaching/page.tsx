@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
+import { site } from "@/content/site";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
@@ -83,6 +84,7 @@ export default function CoachingPage() {
   return (
     <>
       <PageHeader
+        image={site.pageImages.coaching}
         eyebrow="Personal coaching"
         title="Coaching built around you"
         intro="Train face to face with Alex in Cumbernauld, or follow a personalised programme online."

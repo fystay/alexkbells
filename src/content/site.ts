@@ -83,6 +83,18 @@ export const site = {
     { src: "/images/training/rack.jpg", width: 720, height: 900, alt: "A group holding kettlebells in the front rack position" },
   ] as Photo[],
 
+  /**
+   * Inner page header images (desktop only), cut from the hero loop by
+   * scripts/video_stills.py. Same footage and permission caveat as above.
+   * The classes header reuses the group still; no other group frame in the
+   * loop is sharp and free of other gyms' branding.
+   */
+  pageImages: {
+    classes: { src: "/images/training/rack.jpg", width: 720, height: 900, alt: "A group holding kettlebells in the front rack position" },
+    coaching: { src: "/images/training/double-swing.jpg", width: 720, height: 900, alt: "A double kettlebell swing in a gym" },
+    contact: { src: "/images/training/bell-hold.jpg", width: 720, height: 900, alt: "Holding a kettlebell at chest height in a gym" },
+  } as Record<"classes" | "coaching" | "contact", Photo | null>,
+
   /** Genuine photos of Alex / his coaching only. Empty until supplied. */
   photos: {
     hero: null as Photo | null,
