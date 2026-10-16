@@ -271,6 +271,28 @@ test("header logo, navigation and booking button never overlap", async ({ page }
   }
 });
 
+test("the phone menu closes after any link, including same-page section links", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [from, label, url] of [
+    ["/", "Ways to train", /\/#ways-to-train$/],
+    ["/", "Why kettlebells", /\/#why-kettlebells$/],
+    ["/", "About Alex", /\/#about$/],
+    ["/", "How to book", /\/#how-to-book$/],
+    ["/contact", "Contact", /\/contact$/],
+  ] as const) {
+    await page.goto(from);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(url);
+    await expect(page.getByRole("button", { name: "Menu" }), `${from} → ${label}`).toHaveAttribute("aria-expanded", "false");
+  }
+  // The section the link points at is visible, not hidden behind the panel.
+  await page.goto("/");
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Why kettlebells" }).click();
+  await expect(page.locator("#benefits-heading")).toBeInViewport();
+});
+
 test("the menu answers Alex's four questions, each one tap away", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/contact");

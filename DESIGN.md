@@ -61,7 +61,7 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | Component | File | Notes |
 |---|---|---|
 | `SiteHeader` | `components/layout` | Sticky ink bar; logo, nav, one CTA. Nav = Alex's four questions (Ways to train · Why kettlebells · About Alex · How to book → homepage anchors) from 1280 px; below that a Menu button, which also lists Group classes, One-to-one & online, Online coaching and Contact. All header targets ≥44 px |
-| `DesktopNav` / `MobileNav` | `components/layout/NavLinks.tsx` | `aria-current`; full-height disclosure panel below the header; Esc closes and returns focus to the toggle; closes on navigation |
+| `DesktopNav` / `MobileNav` | `components/layout/NavLinks.tsx` | `aria-current`; full-height disclosure panel below the header; Esc closes and returns focus to the toggle; closes on navigation and on any link tap (same-page section links included) |
 | `SiteFooter` | `components/layout` | Brand, nav, address, verified contact only. Mobile: Explore column sized to content beside Contact + Find us; links ≥44 px below `lg` |
 | `Logo` | `components/layout` | `variant="mark"` (header) or `"lockup"` (footer) from `site.logo`; plain-text name fallback if null |
 | `ButtonLink` | `components/ui` | `primary` / `secondary` / `text` × `light` / `dark` tones; min 44–48 px targets; external links announce new tab. Focus ring takes the surface colour (`ink` on light, `paper` on dark) so it shows outside filled buttons |

@@ -48,7 +48,9 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   const panelId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Close the menu whenever the route changes.
+  // Close the menu whenever the route changes (e.g. back/forward). Links in the
+  // panel also close it on click: a same-page anchor like /#ways-to-train
+  // doesn't change the pathname, so the route check alone leaves it open.
   if (pathname !== lastPath) {
     setLastPath(pathname);
     setOpen(false);
@@ -95,6 +97,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex min-h-14 items-center justify-between font-display text-2xl",
@@ -114,6 +117,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
           </ul>
           <Link
             href={cta.href}
+            onClick={() => setOpen(false)}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
           >
