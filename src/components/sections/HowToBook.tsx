@@ -1,34 +1,24 @@
-import Link from "next/link";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { timetable } from "@/content/classes";
-import { getBookingAction, getOnlineCoachingAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { describeTimetable } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 
 /**
- * "Where and how can I book?" answered in one place: the steps, the booking
- * button, and where and when sessions happen. Wording follows the real
- * booking route, so it never promises an online booking that doesn't exist.
+ * "Where and how can I book?" answered in one place: the steps, the
+ * "Get in touch" button, and where and when sessions happen. Bookings are
+ * arranged by message, so it never promises an online booking.
  */
 export function HowToBook() {
-  const booking = getBookingAction("any");
-  const online = getOnlineCoachingAction();
-  const canBook = booking.kind === "booking";
   const times = isPublishable(timetable.status) ? describeTimetable(timetable.sessions) : null;
 
-  const steps = canBook
-    ? [
-        { title: "Choose how you train", body: "A group class or a one-to-one session." },
-        { title: "Pick a time", body: "Tap the booking button and choose the day and time that suit you." },
-        { title: "Alex confirms your place", body: `He replies by email, then you come along to ${site.location.venue}.` },
-      ]
-    : [
-        { title: "Choose how you train", body: "A group class or a one-to-one session." },
-        { title: "Get in touch", body: `Message Alex on Instagram (${site.social.instagram.handle}) with what you'd like to book.` },
-        { title: "Alex confirms your place", body: `Then you come along to ${site.location.venue}.` },
-      ];
+  const steps = [
+    { title: "Choose how you train", body: "A group class or a one-to-one session." },
+    { title: "Get in touch", body: `Message Alex on Instagram (${site.social.instagram.handle}) with what you'd like to book.` },
+    { title: "Alex confirms your place", body: `Then you come along to ${site.location.venue}.` },
+  ];
 
   return (
     <Section tone="surface" id="how-to-book" labelledBy="how-to-book-heading">
@@ -51,19 +41,9 @@ export function HowToBook() {
               </li>
             ))}
           </ol>
-          <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-8">
-            <ButtonLink href={booking.href} external={booking.external}>
-              {booking.label}
-            </ButtonLink>
-            {online.href !== "/contact" ? (
-              <Link
-                href={online.href}
-                className="inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
-              >
-                Online coaching? Start here <span aria-hidden="true" className="ml-2">→</span>
-              </Link>
-            ) : null}
-          </div>
+          <ButtonLink href={PRIMARY_CTA.href} className="mt-10">
+            {PRIMARY_CTA.label}
+          </ButtonLink>
         </div>
 
         <div className="space-y-10 lg:col-span-5">
@@ -84,7 +64,7 @@ export function HowToBook() {
           <div>
             <h3 className="eyebrow text-muted">When</h3>
             <p className="mt-4 border-t-2 border-ink pt-5 text-lg">
-              {times ?? (canBook ? "Choose a day and time when you book. Alex confirms every place." : "Alex will let you know the current class times.")}
+              {times ?? "Alex will let you know the current class times."}
             </p>
           </div>
         </div>

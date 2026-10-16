@@ -6,6 +6,8 @@ export const metadata: Metadata = pageMetadata({
   title: "Book a Group Class",
   description: "Book a coached group kettlebell class at Media House, Cumbernauld. Alex confirms every booking personally.",
   path: "/book/group-class",
+  // Not linked from the site: bookings are arranged via /contact.
+  noindex: true,
 });
 
 export default function BookGroupClassPage() {

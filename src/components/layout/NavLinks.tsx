@@ -115,7 +115,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
           <Link
             href={cta.href}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink"
+            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
           >
             {cta.label}
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}

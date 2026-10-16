@@ -4,7 +4,7 @@ import { getService } from "@/content/services";
 import { timetable } from "@/content/classes";
 import { site } from "@/content/site";
 import { isPublishable } from "@/lib/publish";
-import { getClassBookingAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -21,12 +21,12 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function ClassesPage() {
-  const booking = getClassBookingAction();
+  const booking = PRIMARY_CTA;
   const classes = getService("group-classes");
   const timesPublished = isPublishable(timetable.status);
   const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;
 
-  // Steps only describe what is confirmed; booking wording follows the real CTA.
+  // Steps only describe what is confirmed. Places are arranged by message.
   const joinSteps = [
     {
       title: "Choose a session",
@@ -34,17 +34,10 @@ export default function ClassesPage() {
         ? "Pick the class time that suits you from the timetable above."
         : "Class times are being finalised. Get in touch to hear about current sessions.",
     },
-    booking.kind === "booking"
-      ? booking.external
-        ? { title: "Book your place", body: "Use the booking button to reserve your place online." }
-        : {
-            title: "Send a booking request",
-            body: "Use the booking button to choose a class and send your request. Alex replies to confirm your place.",
-          }
-      : {
-          title: "Get in touch to book",
-          body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
-        },
+    {
+      title: "Get in touch to book",
+      body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
+    },
     { title: "Come to Media House", body: `Classes take place at ${venue}.` },
   ];
 
@@ -55,10 +48,8 @@ export default function ClassesPage() {
         title="Kettlebell classes in Cumbernauld"
         intro={classes.summary}
       >
-        <ButtonLink href={booking.href} external={booking.external}>
-          {booking.label}
-        </ButtonLink>
-        <ButtonLink href="#book" variant="text" className="self-center">
+        <ButtonLink href={booking.href}>{booking.label}</ButtonLink>
+        <ButtonLink href="#book" variant="text" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
       </PageHeader>
@@ -79,7 +70,7 @@ export default function ClassesPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
-            <ButtonLink href={booking.href} external={booking.external} tone="dark" className="mt-8">
+            <ButtonLink href={booking.href} tone="dark" className="mt-8">
               {booking.label}
             </ButtonLink>
           </div>

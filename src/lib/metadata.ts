@@ -29,18 +29,21 @@ interface PageMetadataInput {
   description: string;
   /** Route path, e.g. "/classes". Resolved against metadataBase. */
   path: string;
+  /** Keep the page out of search results (unlisted routes). */
+  noindex?: boolean;
 }
 
 /**
  * Per-page metadata with a matching canonical URL and social preview,
  * so shared links show the right page title rather than the homepage's.
  */
-export function pageMetadata({ title, description, path }: PageMetadataInput): Metadata {
+export function pageMetadata({ title, description, path, noindex = false }: PageMetadataInput): Metadata {
   const fullTitle = title ? `${title} | ${site.name}` : DEFAULT_TITLE;
   return {
     ...(title ? { title } : {}),
     description,
     alternates: { canonical: path },
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: { ...baseOpenGraph, title: fullTitle, description, url: path },
     twitter: { card: "summary_large_image", title: fullTitle, description, images: [shareImage.url] },
   };

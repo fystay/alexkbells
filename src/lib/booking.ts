@@ -31,8 +31,6 @@ export type EnquiryMode = "send" | "demo" | "unavailable";
 export const ENQUIRY_HREF = "/contact";
 export const BOOK_PAGE_HREF = "/book";
 export const ONLINE_COACHING_HREF = "/online-coaching";
-/** Short label for the header, where space is tight at tablet widths. */
-export const BOOK_SHORT_LABEL = "Book a session";
 
 const LABELS: Record<BookableService | "any", string> = {
   any: "Book your session",
@@ -44,6 +42,19 @@ const PATHS: Record<BookableService | "any", string> = {
   any: BOOK_PAGE_HREF,
   "group-class": "/book/group-class",
   "one-to-one": "/book/one-to-one",
+};
+
+/**
+ * The one primary call to action used across the public site. Bookings are
+ * arranged by messaging Alex (see /contact), so this never depends on the
+ * booking mode and never implies an online booking. The /book flow below is
+ * kept for a future booking route but is not linked from public pages.
+ */
+export const PRIMARY_CTA: CallToAction = {
+  kind: "enquiry",
+  label: "Get in touch",
+  href: ENQUIRY_HREF,
+  external: false,
 };
 
 /** Demonstration availability: opt-in, and impossible on Vercel production. */
@@ -82,7 +93,7 @@ export function bookingConfigWarning(env: Env = process.env): string | null {
     return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
   if (bookingMode(env) !== "unavailable") return null;
-  return "No booking route is configured: \"Book\" buttons fall back to \"Enquire\". Configure the /book request form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
+  return "No booking route is configured: /book shows the Instagram fallback (public buttons always say \"Get in touch\" and link to /contact). Configure the /book request form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
 }
 
 /** The primary "Book" button for a service, or for booking in general. */
@@ -107,8 +118,4 @@ export function getOnlineCoachingAction(env: Env = process.env): CallToAction {
   return onlineEnquiryMode(env) === "unavailable"
     ? { kind: "enquiry", label: "Enquire about coaching", href: ENQUIRY_HREF, external: false }
     : { kind: "enquiry", label: "Explore online coaching", href: ONLINE_COACHING_HREF, external: false };
-}
-
-export function getCoachingEnquiryAction(): CallToAction {
-  return { kind: "enquiry", label: "Enquire about coaching", href: ENQUIRY_HREF, external: false };
 }

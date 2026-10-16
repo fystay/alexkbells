@@ -1,4 +1,5 @@
-import { getBookingAction, getOnlineCoachingAction } from "@/lib/booking";
+import { site } from "@/content/site";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
@@ -11,11 +12,10 @@ interface CtaBandProps {
 
 export function CtaBand({
   title = "Pick up a bell.",
-  body = "Book a group class or a one-to-one session, or get started with online coaching.",
+  body = "Ask Alex about group classes, one-to-one coaching or online coaching.",
   headingId = "cta-heading",
 }: CtaBandProps) {
-  const classes = getBookingAction("any");
-  const coaching = getOnlineCoachingAction();
+  const { instagram } = site.social;
 
   return (
     <Section tone="ink" labelledBy={headingId}>
@@ -27,11 +27,11 @@ export function CtaBand({
           <p className="mt-6 text-lede text-muted-inverse">{body}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:flex-col xl:flex-row xl:flex-nowrap">
-          <ButtonLink href={classes.href} external={classes.external} tone="dark">
-            {classes.label}
+          <ButtonLink href={PRIMARY_CTA.href} tone="dark">
+            {PRIMARY_CTA.label}
           </ButtonLink>
-          <ButtonLink href={coaching.href} tone="dark" variant="secondary">
-            {coaching.label}
+          <ButtonLink href={instagram.url} external tone="dark" variant="secondary">
+            Message on Instagram
           </ButtonLink>
         </div>
       </div>

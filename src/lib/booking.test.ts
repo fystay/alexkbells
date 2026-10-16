@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   ENQUIRY_HREF,
+  PRIMARY_CTA,
   bookingConfigWarning,
   bookingMode,
   getBookingAction,
@@ -16,6 +17,13 @@ const formEnv = {
   BOOKING_NOTIFY_EMAIL: "alex@example.com",
   BOOKING_FROM_EMAIL: "bookings@example.com",
 };
+
+describe("PRIMARY_CTA", () => {
+  it("is always an honest 'Get in touch' link to the contact page", () => {
+    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Get in touch", href: "/contact", external: false });
+    expect(PRIMARY_CTA.label).not.toMatch(/book|pay|checkout/i);
+  });
+});
 
 describe("parseBookingUrl", () => {
   it("accepts https URLs only", () => {

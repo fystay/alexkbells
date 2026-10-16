@@ -22,11 +22,11 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Book your session** + whole video) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and booking buttons) → **Why kettlebells** `#why-kettlebells` (six benefits) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, booking button, address + directions, when) → FAQ → closing CTA. Phones get a sticky booking bar |
-| `/classes` | Booking button + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
+| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Get in touch** + whole video, then links to the three offers) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and a "Get in touch" button each) → **Why kettlebells** `#why-kettlebells` (six benefits) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Get in touch" button, address + directions, when) → FAQ → closing CTA ("Get in touch" + "Message on Instagram") |
+| `/classes` | "Get in touch" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
-| `/book` | "Book your session": guided steps — service (group class or one-to-one) → when → your details. Demo availability calendar on previews; preferred days/times request on production. Falls back to an external link or an Instagram prompt |
+| `/book` | **Unlisted** (not linked, not in the sitemap, noindex); kept for old links. "Book your session": guided steps — service (group class or one-to-one) → when → your details. Demo availability calendar on previews; preferred days/times request on production. Falls back to an external link or an Instagram prompt |
 | `/book/group-class`, `/book/one-to-one` | Same flow, starting at "when" for that service |
 | `/online-coaching` | "Get started with online coaching": goal → training → contact → review & send. Alex replies personally |
 | `/privacy` | Privacy notice: what booking requests and online enquiries collect, where they go (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
@@ -42,7 +42,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 ## Copy rules
 
-- Booking buttons (`getBookingAction` in `src/lib/booking.ts`): "Book your session" (general), "Book your class" (group), "Book a one-to-one", and "Book a session" in the header (space at tablet widths). Shown only when a real booking route exists; otherwise they honestly read "Enquire about classes" / "Get in touch" → /contact. Online coaching uses "Explore online coaching" → /online-coaching.
+- One primary call to action everywhere: **"Get in touch" → /contact** (`PRIMARY_CTA` in `src/lib/booking.ts`), in the header, menu, hero, offers, sections and closing band. Bookings are arranged by messaging Alex on Instagram; never word a button as an online booking, payment or confirmed session. Where several sit together (the three offers), each carries screen-reader context, e.g. "Get in touch about online coaching".
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.

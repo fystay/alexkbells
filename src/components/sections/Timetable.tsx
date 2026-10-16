@@ -36,10 +36,16 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
     <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
       <ul aria-labelledby={labelledBy} className={cn("grid grid-cols-1 gap-px", !stack && "sm:grid-cols-3")}>
         {sessions.map((session) => (
-          <li key={session.id} className={cn("border-t-2 pt-5 pb-6", !stack && "sm:pr-6", line)}>
+          <li key={session.id} className={cn("border-t-2", stack ? "pt-4 pb-5" : "pt-5 pb-6 sm:pr-6", line)}>
             <p className={cn("eyebrow", muted)}>{partOfDay(session.start)}</p>
             {stack ? (
-              <p className="mt-3 font-display text-h2 lg:text-h3">{session.day}</p>
+              // Day and time on one line, so a narrow card stays compact.
+              <p className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4">
+                <span className="font-display text-h2 lg:text-h3">{session.day}</span>
+                <time dateTime={session.start} className="text-2xl font-semibold tabular-nums">
+                  {formatTime(session.start)}
+                </time>
+              </p>
             ) : (
               <p className="mt-3 font-display text-h2">
                 <span aria-hidden="true" className="sm:hidden lg:inline">
@@ -51,9 +57,11 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
                 <span className="sr-only">{session.day}</span>
               </p>
             )}
-            <p className="mt-2 text-2xl font-semibold tabular-nums">
-              <time dateTime={session.start}>{formatTime(session.start)}</time>
-            </p>
+            {stack ? null : (
+              <p className="mt-2 text-2xl font-semibold tabular-nums">
+                <time dateTime={session.start}>{formatTime(session.start)}</time>
+              </p>
+            )}
             {session.durationMinutes ? (
               <p className={cn("mt-1 text-sm", muted)}>{session.durationMinutes} minutes</p>
             ) : null}

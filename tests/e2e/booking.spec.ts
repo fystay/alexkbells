@@ -45,10 +45,9 @@ function firstAvailable(service: "group-class" | "one-to-one") {
 }
 
 test.describe("booking prototype (demo availability)", () => {
-  test("homepage → group class → sample date → clearly labelled prototype outcome", async ({ page, request }) => {
-    await page.goto("/");
-    await page.getByRole("main").getByRole("link", { name: "Book your session" }).first().click();
-    await expect(page).toHaveURL(/\/book$/);
+  test("/book → group class → sample date → clearly labelled prototype outcome", async ({ page, request }) => {
+    // The flow is no longer linked from public pages (bookings go via /contact); open it directly.
+    await page.goto("/book");
     await expect(page.getByRole("note", { name: "Demonstration" })).toContainText("Prototype booking page");
 
     // Step 1: nothing chosen → can't continue.
@@ -98,9 +97,7 @@ test.describe("booking prototype (demo availability)", () => {
   });
 
   test("one-to-one starts at its own availability, different from classes", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("link", { name: "Book a one-to-one" }).first().click();
-    await expect(page).toHaveURL(/\/book\/one-to-one$/);
+    await page.goto("/book/one-to-one");
     await expect(page.getByRole("heading", { name: "Choose a date and time" })).toBeVisible();
     const { window, shown } = firstAvailable("one-to-one");
     await expect(page.locator('[data-status="available"]')).toHaveCount(shown.length);
@@ -201,9 +198,9 @@ test.describe("booking prototype (demo availability)", () => {
 });
 
 test.describe("online coaching onboarding", () => {
-  test("homepage → tailored questions → review → sent to Alex", async ({ page, request }) => {
+  test("site navigation → tailored questions → review → sent to Alex", async ({ page, request }) => {
     await page.goto("/");
-    await page.getByRole("main").getByRole("link", { name: "Explore online coaching" }).first().click();
+    await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Online coaching" }).click();
     await expect(page).toHaveURL(/\/online-coaching$/);
     await expect(page.getByRole("radio", { name: /Get stronger/ })).toBeVisible();
     // Not a calendar booking.

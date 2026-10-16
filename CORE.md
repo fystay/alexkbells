@@ -56,7 +56,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Training stills | C | Three frames from the same reel (`public/images/training/`); same permission caveat as the hero footage |
 | Hero footage | C | Alex's own Instagram reel (supplied 2026-10-15), used for the homepage hero loop. Filmed at several gyms, some visibly not Media House (e.g. "APEX" signage), and shows other people training. Confirm Alex is happy for it to represent his coaching and that people shown are fine appearing on the website |
 | Bio, qualifications, history, testimonials | U | Do not invent |
-| Bookings | — | Previously Setmore; payments cash / bank transfer. Site has a guided `/book` request flow (emails Alex; he confirms by reply) and an `/online-coaching` enquiry, both off until Resend + his inbox are configured. Calendar availability is a labelled prototype only (previews) |
+| Bookings | — | Previously Setmore; payments cash / bank transfer. Bookings are arranged by messaging Alex on Instagram; every public button is "Get in touch" → /contact (2026-10-16). The guided `/book` request flow (emails Alex; he confirms by reply) is kept but unlisted (not linked, not in the sitemap, noindex); `/online-coaching` enquiry is still linked. Both are off until Resend + his inbox are configured. Calendar availability is a labelled prototype only (previews) |
 | Live availability (dates, times, capacity, one-to-one slots, session length) | U | Not connected; nothing invented. Demo data is sample only |
 | Booking-request inbox / Resend account | U | Needed to switch on `/book`; must be Alex's own |
 | Privacy notice | P | `/privacy` drafted 2026-10-15 for booking requests and online enquiries; Alex to review |

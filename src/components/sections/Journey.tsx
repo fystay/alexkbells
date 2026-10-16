@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { journey } from "@/content/journey";
 import type { Photo } from "@/content/types";
-import { getBookingAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
@@ -37,7 +37,6 @@ function PhotoFrame({ photo, label, slot }: { photo: Photo | null; label: string
  */
 export function Journey() {
   if (!isPublishable(journey.status)) return null;
-  const booking = getBookingAction("any");
   const hasPhotos = Boolean(journey.before && journey.after);
   // Confirmed content only shows the photos once both exist; previews show empty slots.
   const showPhotos = hasPhotos || journey.status === "provisional";
@@ -65,8 +64,8 @@ export function Journey() {
               </dl>
             ) : null}
 
-            <ButtonLink href={booking.href} external={booking.external} tone="dark" className="mt-10">
-              {booking.kind === "booking" ? "Start your journey" : booking.label}
+            <ButtonLink href={PRIMARY_CTA.href} tone="dark" className="mt-10">
+              {PRIMARY_CTA.label}
             </ButtonLink>
           </div>
 

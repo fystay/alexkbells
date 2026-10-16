@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { getBookingAction, getClassBookingAction, getOnlineCoachingAction } from "@/lib/booking";
+import { getService } from "@/content/services";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { HowToBook } from "@/components/sections/HowToBook";
@@ -11,7 +12,6 @@ import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroVideo } from "@/components/sections/HeroVideo";
 import { Journey } from "@/components/sections/Journey";
 import { WaysToTrain } from "@/components/sections/WaysToTrain";
-import { MobileBookBar } from "@/components/sections/MobileBookBar";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
@@ -43,9 +43,15 @@ const benefits = [
   },
 ];
 
+// Short labels so the three fit on one line beside the video on desktop.
+const heroLinks = [
+  { id: "group-classes", label: "Group classes" },
+  { id: "one-to-one", label: "One-to-one" },
+  { id: "online-coaching", label: "Online coaching" },
+] as const;
+
 function Hero() {
-  const booking = getBookingAction("any");
-  const online = getOnlineCoachingAction();
+  const booking = PRIMARY_CTA;
   const video = site.heroVideo;
   const intro = `Classes and one-to-one sessions at ${site.location.venue}, or online coaching anywhere.`;
 
@@ -77,7 +83,7 @@ function Hero() {
                 <ButtonLink
                   href={booking.href}
                   external={booking.external}
-                  className="w-full max-sm:bg-paper max-sm:text-ink max-sm:hover:bg-white sm:w-auto"
+                  className="w-full max-sm:bg-paper max-sm:text-ink max-sm:hover:bg-white max-sm:focus-visible:outline-paper sm:w-auto"
                 >
                   {booking.label}
                 </ButtonLink>
@@ -94,14 +100,16 @@ function Hero() {
             ) : null}
           </div>
           <p className="mt-6 max-w-md text-lede text-muted lg:hidden">{intro}</p>
-          <div className="mt-3 flex flex-wrap gap-x-8 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start">
-            <ButtonLink href={online.href} variant="text">
-              {online.label}
-            </ButtonLink>
-            <ButtonLink href="/classes" variant="text">
-              Group classes
-            </ButtonLink>
-          </div>
+          {/* The three offers, each to its own details page. */}
+          <ul aria-label="Ways to train" className="mt-3 flex flex-wrap gap-x-7 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start">
+            {heroLinks.map(({ id, label }) => (
+              <li key={id}>
+                <ButtonLink href={getService(id).href} variant="text">
+                  {label}
+                </ButtonLink>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
@@ -109,7 +117,7 @@ function Hero() {
 }
 
 function Benefits() {
-  const booking = getClassBookingAction();
+  const booking = PRIMARY_CTA;
   return (
     <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
@@ -189,7 +197,6 @@ function About() {
 
 
 export default function HomePage() {
-  const booking = getBookingAction("any");
   return (
     <>
       <Hero />
@@ -201,14 +208,6 @@ export default function HomePage() {
       <HowToBook />
       <Faq />
       <CtaBand />
-      {booking.kind === "booking" ? (
-        <MobileBookBar
-          href={booking.href}
-          label={booking.label}
-          external={booking.external}
-          hideWhenVisible={["section[aria-labelledby=hero-heading]", "#how-to-book", "section[aria-labelledby=cta-heading]", "footer"]}
-        />
-      ) : null}
     </>
   );
 }

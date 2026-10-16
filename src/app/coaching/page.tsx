@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
-import { getBookingAction, getOnlineCoachingAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
@@ -30,7 +30,7 @@ function ServiceDetail({
   tone: "paper" | "ink";
   intro: string;
 }) {
-  const enquiry = service.id === "one-to-one" ? getBookingAction("one-to-one") : getOnlineCoachingAction();
+  const enquiry = PRIMARY_CTA;
   const headingId = `${service.id}-heading`;
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
   const rule = tone === "ink" ? "border-line-inverse" : "border-line";
@@ -46,11 +46,11 @@ function ServiceDetail({
           <p className={cn("mt-6 max-w-xl text-lede", muted)}>{intro}</p>
           <ButtonLink
             href={enquiry.href}
-            external={enquiry.external}
             tone={tone === "ink" ? "dark" : "light"}
             className="mt-10"
           >
             {enquiry.label}
+            <span className="sr-only"> about {service.name.toLowerCase()}</span>
           </ButtonLink>
         </div>
         <div className="space-y-10 lg:col-span-5 lg:col-start-8">
@@ -101,13 +101,13 @@ export default function CoachingPage() {
         service={oneToOne}
         index="01"
         tone="paper"
-        intro="One-to-one kettlebell coaching, face to face and tailored to you as an individual. Book a session, or get in touch to talk through what you want from your training."
+        intro="One-to-one kettlebell coaching, face to face and tailored to you as an individual. Get in touch to arrange a session or talk through what you want from your training."
       />
       <ServiceDetail
         service={online}
         index="02"
         tone="ink"
-        intro="Online coaching with personalised programming, support and progression, so you can train with a plan wherever you are. Start with a few quick questions and Alex will reply personally."
+        intro="Online coaching with personalised programming, support and progression, so you can train with a plan wherever you are. Get in touch to talk through your goals."
       />
 
       <Section tone="surface" spacing="compact" labelledBy="classes-link-heading">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import Link from "next/link";
-import { getBookingAction, getOnlineCoachingAction } from "@/lib/booking";
+import { getOnlineCoachingAction } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -16,7 +16,6 @@ export const metadata: Metadata = pageMetadata({
 
 export default function ContactPage() {
   const { email, phone } = site.contact;
-  const booking = getBookingAction("any");
   const online = getOnlineCoachingAction();
 
   return (
@@ -74,32 +73,14 @@ export default function ContactPage() {
               </dl>
             ) : null}
 
-            {booking.kind === "booking" || online.href !== "/contact" ? (
+            {/* Only when the online enquiry form can actually send. */}
+            {online.href !== "/contact" ? (
               <p className="mt-8 text-muted">
-                {booking.kind === "booking" ? (
-                  <>
-                    Ready to train?{" "}
-                    {booking.external ? (
-                      <a href={booking.href} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline underline-offset-4">
-                        Book online<span className="sr-only"> (opens in a new tab)</span>
-                      </a>
-                    ) : (
-                      <Link href={booking.href} className="font-semibold text-ink underline underline-offset-4">
-                        Book a class or one-to-one
-                      </Link>
-                    )}
-                    .{" "}
-                  </>
-                ) : null}
-                {online.href !== "/contact" ? (
-                  <>
-                    Interested in online coaching?{" "}
-                    <Link href={online.href} className="font-semibold text-ink underline underline-offset-4">
-                      Get started online
-                    </Link>
-                    .
-                  </>
-                ) : null}
+                Interested in online coaching?{" "}
+                <Link href={online.href} className="font-semibold text-ink underline underline-offset-4">
+                  Get started online
+                </Link>
+                .
               </p>
             ) : null}
           </div>

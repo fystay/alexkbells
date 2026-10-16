@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { getService } from "@/content/services";
 import type { Service } from "@/content/types";
-import { getBookingAction, getOnlineCoachingAction, type CallToAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { Section } from "@/components/ui/Section";
@@ -13,12 +12,11 @@ interface Option {
   tagline: string;
   /** Shows the class timetable under the tagline. */
   timetable?: boolean;
-  action: CallToAction;
 }
 
 /**
  * "What I offer": the three ways to train side by side, each with its price
- * and its own booking button. One place to compare and choose.
+ * and the same "Get in touch" button. One place to compare and choose.
  */
 export function WaysToTrain() {
   const options: Option[] = [
@@ -26,20 +24,16 @@ export function WaysToTrain() {
       service: getService("group-classes"),
       tagline: "Coached group sessions at Media House, Cumbernauld. Beginners welcome.",
       timetable: true,
-      action: getBookingAction("group-class"),
     },
     {
       service: getService("one-to-one"),
       tagline: "Face-to-face coaching, built around you.",
-      action: getBookingAction("one-to-one"),
     },
     {
       service: getService("online-coaching"),
       tagline: "Personalised programming and support, wherever you train.",
-      action: getOnlineCoachingAction(),
     },
   ];
-
 
   return (
     <Section tone="ink" id="ways-to-train" labelledBy="ways-heading">
@@ -55,7 +49,7 @@ export function WaysToTrain() {
       </div>
 
       <ul className="mt-12 grid grid-cols-1 border-t border-line-inverse lg:grid-cols-3 lg:border-t-0">
-        {options.map(({ service, tagline, timetable: showTimes, action }, i) => (
+        {options.map(({ service, tagline, timetable: showTimes }, i) => (
           <li
             key={service.id}
             className="flex flex-col border-b border-line-inverse py-10 lg:border-b-0 lg:border-l lg:px-8 lg:py-2 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
@@ -74,16 +68,14 @@ export function WaysToTrain() {
             ) : null}
             <div className="mt-8 lg:mt-auto lg:pt-8">
               <PriceList prices={service.prices} tone="ink" />
-              <div className="mt-6 flex flex-col items-start gap-2">
-                <ButtonLink href={action.href} external={action.external} tone="dark">
-                  {action.label}
+              <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
+                <ButtonLink href={PRIMARY_CTA.href} tone="dark">
+                  {PRIMARY_CTA.label}
+                  <span className="sr-only"> about {service.name.toLowerCase()}</span>
                 </ButtonLink>
-                <Link
-                  href={service.href}
-                  className="inline-flex min-h-11 items-center text-sm font-semibold underline-offset-[6px] hover:underline"
-                >
+                <ButtonLink href={service.href} variant="text" tone="dark">
                   Details<span className="sr-only"> about {service.name.toLowerCase()}</span>
-                </Link>
+                </ButtonLink>
               </div>
             </div>
           </li>

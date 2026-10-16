@@ -1,11 +1,10 @@
-import { BOOK_SHORT_LABEL, getBookingAction } from "@/lib/booking";
+import { PRIMARY_CTA } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Logo } from "./Logo";
 import { DesktopNav, MobileNav } from "./NavLinks";
 
 export function SiteHeader() {
-  const booking = getBookingAction("any");
-  const cta = booking.kind === "booking" ? { ...booking, label: BOOK_SHORT_LABEL } : booking;
+  const cta = PRIMARY_CTA;
 
   return (
     <header className="sticky top-0 z-40 bg-ink text-paper">

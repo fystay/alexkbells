@@ -1,11 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { publicRoutes } from "../../src/lib/routes";
+import { publicRoutes, unlistedRoutes } from "../../src/lib/routes";
 
 // Includes the 414–430px large phones and in-between tablet widths.
 const widths = [320, 360, 375, 390, 414, 430, 480, 540, 600, 640, 700, 768, 900, 1024, 1280, 1600];
 
-for (const route of publicRoutes) {
+// Unlisted routes still work for old links, so they get the same checks.
+for (const route of [...publicRoutes, ...unlistedRoutes]) {
   test.describe(`route ${route}`, () => {
     test("responds, has one h1 and a title", async ({ page }) => {
       const res = await page.goto(route);
@@ -203,16 +204,46 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
 });
 
-test("booking buttons lead to the right step of the on-site booking flow", async ({ page }) => {
-  await page.goto("/classes");
-  const cta = page.getByRole("link", { name: /book your class/i }).first();
-  await expect(cta).toHaveAttribute("href", "/book/group-class");
-  await expect(cta).not.toHaveAttribute("target", "_blank");
-  await page.goto("/coaching");
-  await expect(page.getByRole("link", { name: "Book a one-to-one" })).toHaveAttribute("href", "/book/one-to-one");
-  await expect(page.getByRole("link", { name: /explore online coaching/i }).first()).toHaveAttribute("href", "/online-coaching");
+// This server runs with the booking flow switched on (demo + email), so it
+// proves the public buttons never depend on it.
+test("every primary button says Get in touch and leads to /contact, never to booking", async ({ page }) => {
+  for (const route of publicRoutes) {
+    await page.goto(route);
+    const main = page.locator("main");
+    await expect(main.locator('a[href^="/book"]'), route).toHaveCount(0);
+    await expect(page.getByRole("banner").locator('a[href^="/book"]'), route).toHaveCount(0);
+    await expect(page.locator("footer").locator('a[href^="/book"]'), route).toHaveCount(0);
+    // No call to action is worded as an online booking or payment.
+    const labels = await page.locator("main a, header a").evaluateAll((as) => as.map((a) => a.textContent?.trim() ?? ""));
+    for (const label of labels) expect(label, `${route}: "${label}"`).not.toMatch(/^book\b|book (your|a|online)|pay now|checkout/i);
+  }
   await page.goto("/");
-  await expect(page.getByRole("banner").getByRole("link", { name: /book a session/i })).toHaveAttribute("href", "/book");
+  await expect(page.getByRole("banner").getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Get in touch" }).first()).toHaveAttribute("href", "/contact");
+  // Each offer has its own labelled button.
+  for (const name of ["group classes", "one-to-one coaching", "online coaching"]) {
+    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Get in touch about ${name}` })).toHaveAttribute("href", "/contact");
+  }
+  await page.goto("/classes");
+  await expect(page.getByRole("link", { name: "Get in touch" }).first()).toHaveAttribute("href", "/contact");
+  await page.goto("/coaching");
+  await expect(page.getByRole("link", { name: "Get in touch about one-to-one coaching" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Get in touch about online coaching" })).toHaveAttribute("href", "/contact");
+});
+
+test("the contact page leads to Alex's Instagram", async ({ page }) => {
+  await page.goto("/contact");
+  await expect(page.locator("h1")).toHaveText(/get in touch/i);
+  const ig = page.getByRole("link", { name: /open instagram/i });
+  await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+  await expect(ig).toHaveAttribute("target", "_blank");
+});
+
+test("unlisted booking routes are not indexed", async ({ page }) => {
+  for (const route of unlistedRoutes) {
+    await page.goto(route);
+    await expect(page.locator('meta[name="robots"]'), route).toHaveAttribute("content", /noindex/);
+  }
 });
 
 test("header logo, navigation and booking button never overlap", async ({ page }) => {
@@ -249,11 +280,11 @@ test("the menu answers Alex's four questions, each one tap away", async ({ page 
     await expect(section.getByRole("heading", { level: 2 })).toHaveText(heading);
     await expect(section).toBeInViewport();
   }
-  // "Where and how" gives the address, directions and a booking button together.
+  // "Where and how" gives the address, directions and the contact button together.
   const book = page.locator("#how-to-book");
   await expect(book).toContainText("1A Dunns Wood Road");
   await expect(book.getByRole("link", { name: /get directions/i })).toBeVisible();
-  await expect(book.getByRole("link", { name: /book your session/i })).toBeVisible();
+  await expect(book.getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/contact");
 });
 
 test("cross-page section anchors exist", async ({ page }) => {
@@ -314,9 +345,7 @@ test("hero video loops back to the start instead of stopping on a blank frame", 
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.ended && !v.paused && v.currentTime < 2), { timeout: 5000 }).toBe(true);
 });
 
-test("hero video starts on its own for everyone, even before JavaScript runs", async ({ page, browser, baseURL }) => {
-  // Visitors with Reduce Motion switched on (common on iPhones) see it play too.
-  await page.emulateMedia({ reducedMotion: "reduce" });
+test("hero video starts on its own, even before JavaScript runs", async ({ page, browser, baseURL }) => {
   await page.goto("/");
   const video = page.locator("main video");
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused && v.currentTime > 0)).toBe(true);
@@ -330,6 +359,21 @@ test("hero video starts on its own for everyone, even before JavaScript runs", a
   expect(attrs).toEqual([true, true, true, true]);
   await expect.poll(() => plain.locator("main video").evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
   await noJs.close();
+});
+
+test("with Reduce Motion the hero shows a still frame until the visitor presses play", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const video = page.locator("main video");
+  const play = page.getByRole("button", { name: "Play background video" });
+  await expect(play).toBeVisible();
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  // The poster is painted behind the hidden video.
+  await expect(video).toBeHidden();
+  expect(await video.evaluate((v) => getComputedStyle(v.parentElement!.parentElement!).backgroundImage)).toContain("hero-poster");
+  await play.click();
+  await expect(video).toBeVisible();
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
 });
 
 test("menu open on mobile has no accessibility violations and is keyboard operable", async ({ page }) => {
@@ -473,22 +517,6 @@ for (const [width, height] of [
   });
 }
 
-test("phones get a booking bar once the hero scrolls away, hidden near the closing call to action", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 664 });
-  await page.goto("/");
-  const bar = page.getByTestId("mobile-book-bar");
-  await expect(bar).toHaveAttribute("aria-hidden", "true");
-  await page.locator("#why-kettlebells").scrollIntoViewIfNeeded();
-  await expect(bar).toHaveAttribute("aria-hidden", "false");
-  await expect(bar.getByRole("link")).toBeInViewport();
-  await page.locator("footer").scrollIntoViewIfNeeded();
-  await expect(bar).toHaveAttribute("aria-hidden", "true");
-  // Never on desktop.
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.locator("#ways-heading").scrollIntoViewIfNeeded();
-  await expect(bar).toBeHidden();
-});
-
 test("class pages link to the how-to-join section", async ({ page }) => {
   await page.goto("/classes");
   await expect(page.locator("#book")).toHaveCount(1);
@@ -503,4 +531,5 @@ test("robots and sitemap are served", async ({ request }) => {
   expect(sitemap.status()).toBe(200);
   const body = await sitemap.text();
   for (const route of publicRoutes.filter((r) => r !== "/")) expect(body).toContain(route);
+  for (const route of unlistedRoutes) expect(body).not.toContain(route);
 });
