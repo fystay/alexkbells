@@ -8,7 +8,7 @@ import { Section } from "@/components/ui/Section";
 
 /**
  * "Where and how can I book?" answered in one place: the steps, the
- * "Get in touch" button, and where and when sessions happen. Bookings are
+ * "Start your training" button, and where and when sessions happen. Bookings are
  * arranged by message, so it never promises an online booking.
  */
 export function HowToBook() {

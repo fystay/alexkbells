@@ -206,7 +206,7 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
 
 // This server runs with the booking flow switched on (demo + email), so it
 // proves the public buttons never depend on it.
-test("every primary button says Get in touch and leads to /contact, never to booking", async ({ page }) => {
+test("every primary button says Start your training and leads to /contact, never to booking", async ({ page }) => {
   for (const route of publicRoutes) {
     await page.goto(route);
     const main = page.locator("main");
@@ -218,17 +218,17 @@ test("every primary button says Get in touch and leads to /contact, never to boo
     for (const label of labels) expect(label, `${route}: "${label}"`).not.toMatch(/^book\b|book (your|a|online)|pay now|checkout/i);
   }
   await page.goto("/");
-  await expect(page.getByRole("banner").getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/contact");
-  await expect(page.getByRole("link", { name: "Get in touch" }).first()).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("banner").getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
   // Each offer has its own labelled button.
   for (const name of ["group classes", "one-to-one coaching", "online coaching"]) {
-    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Get in touch about ${name}` })).toHaveAttribute("href", "/contact");
+    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Start your training with ${name}` })).toHaveAttribute("href", "/contact");
   }
   await page.goto("/classes");
-  await expect(page.getByRole("link", { name: "Get in touch" }).first()).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
   await page.goto("/coaching");
-  await expect(page.getByRole("link", { name: "Get in touch about one-to-one coaching" })).toHaveAttribute("href", "/contact");
-  await expect(page.getByRole("link", { name: "Get in touch about online coaching" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Start your training with one-to-one coaching" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Start your training with online coaching" })).toHaveAttribute("href", "/contact");
 });
 
 test("the contact page leads to Alex's Instagram", async ({ page }) => {
@@ -313,7 +313,7 @@ test("the menu answers Alex's four questions, each one tap away", async ({ page 
   const book = page.locator("#how-to-book");
   await expect(book).toContainText("1A Dunns Wood Road");
   await expect(book.getByRole("link", { name: /get directions/i })).toBeVisible();
-  await expect(book.getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/contact");
+  await expect(book.getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/contact");
 });
 
 test("cross-page section anchors exist", async ({ page }) => {
@@ -418,7 +418,7 @@ test("tablets show the whole hero video across the content width, headline and b
     await page.goto("/");
     const video = (await page.locator("main video").boundingBox())!;
     const h1 = (await page.locator("h1").boundingBox())!;
-    const cta = (await page.locator("main section").first().getByRole("link", { name: "Get in touch" }).boundingBox())!;
+    const cta = (await page.locator("main section").first().getByRole("link", { name: "Start your training" }).boundingBox())!;
     expect(video.width, `${width}px`).toBeGreaterThanOrEqual(width - 48 - 1);
     expect(video.y + video.height).toBeLessThanOrEqual(height);
     for (const el of [h1, cta]) {

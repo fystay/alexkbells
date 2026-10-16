@@ -67,7 +67,7 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [ ] **P1** Decide whether the `/book` request flow is ever re-linked, or removed (currently unlisted)
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking
-- [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Only affects the unlisted `/book` pages; public buttons stay "Get in touch" → /contact
+- [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Only affects the unlisted `/book` pages; public buttons stay "Start your training" → /contact
 - [ ] **P0** Alex reviews `/privacy` and agrees to confirm requests by reply
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
 - [ ] **P0** Choose and register the domain

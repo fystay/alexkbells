@@ -52,7 +52,7 @@ const PATHS: Record<BookableService | "any", string> = {
  */
 export const PRIMARY_CTA: CallToAction = {
   kind: "enquiry",
-  label: "Get in touch",
+  label: "Start your training",
   href: ENQUIRY_HREF,
   external: false,
 };
@@ -93,7 +93,7 @@ export function bookingConfigWarning(env: Env = process.env): string | null {
     return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
   if (bookingMode(env) !== "unavailable") return null;
-  return "No booking route is configured: /book shows the Instagram fallback (public buttons always say \"Get in touch\" and link to /contact). Configure the /book request form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
+  return "No booking route is configured: /book shows the Instagram fallback (public buttons always say \"Start your training\" and link to /contact). Configure the /book request form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
 }
 
 /** The primary "Book" button for a service, or for booking in general. */
@@ -107,7 +107,7 @@ export function getBookingAction(service: BookableService | "any" = "any", env: 
   }
   return service === "group-class"
     ? { kind: "enquiry", label: "Enquire about classes", href: ENQUIRY_HREF, external: false }
-    : { kind: "enquiry", label: "Get in touch", href: ENQUIRY_HREF, external: false };
+    : { kind: "enquiry", label: "Start your training", href: ENQUIRY_HREF, external: false };
 }
 
 export function getClassBookingAction(env: Env = process.env): CallToAction {

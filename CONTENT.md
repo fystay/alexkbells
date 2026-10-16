@@ -22,8 +22,8 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Get in touch** + whole video, then links to the three offers) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and a "Get in touch" button each) → **Why kettlebells** `#why-kettlebells` (six benefits, no button: the sections either side carry it) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Get in touch" button, address + directions, when) → FAQ → closing CTA ("Get in touch" + "Message on Instagram") |
-| `/classes` | "Get in touch" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
+| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Start your training** + whole video, then links to the three offers) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and a "Start your training" button each) → **Why kettlebells** `#why-kettlebells` (six benefits, no button: the sections either side carry it) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Start your training" button, address + directions, when) → FAQ → closing CTA ("Start your training" + "Message on Instagram") |
+| `/classes` | "Start your training" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
 | `/book` | **Unlisted** (not linked, not in the sitemap, noindex); kept for old links. "Book your session": guided steps — service (group class or one-to-one) → when → your details. Demo availability calendar on previews; preferred days/times request on production. Falls back to an external link or an Instagram prompt |
@@ -43,7 +43,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 ## Copy rules
 
 - `/contact` puts "Message Alex on Instagram" in its header so the page's one action is in the first screen at every width.
-- One primary call to action everywhere: **"Get in touch" → /contact** (`PRIMARY_CTA` in `src/lib/booking.ts`), in the header, menu, hero, offers, sections and closing band. Bookings are arranged by messaging Alex on Instagram; never word a button as an online booking, payment or confirmed session. Where several sit together (the three offers), each carries screen-reader context, e.g. "Get in touch about online coaching".
+- One primary call to action everywhere: **"Start your training" → /contact** (`PRIMARY_CTA` in `src/lib/booking.ts`), in the header, menu, hero, offers, sections and closing band. Bookings are arranged by messaging Alex on Instagram; never word a button as an online booking, payment or confirmed session. Where several sit together (the three offers), each carries screen-reader context, e.g. "Start your training with online coaching".
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.

@@ -16,7 +16,7 @@ interface Option {
 
 /**
  * "What I offer": the three ways to train side by side, each with its price
- * and the same "Get in touch" button. One place to compare and choose.
+ * and the same "Start your training" button. One place to compare and choose.
  */
 export function WaysToTrain() {
   const options: Option[] = [
@@ -71,7 +71,7 @@ export function WaysToTrain() {
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <ButtonLink href={PRIMARY_CTA.href} tone="dark">
                   {PRIMARY_CTA.label}
-                  <span className="sr-only"> about {service.name.toLowerCase()}</span>
+                  <span className="sr-only"> with {service.name.toLowerCase()}</span>
                 </ButtonLink>
                 <ButtonLink href={service.href} variant="text" tone="dark">
                   Details<span className="sr-only"> about {service.name.toLowerCase()}</span>

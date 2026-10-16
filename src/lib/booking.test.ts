@@ -19,8 +19,8 @@ const formEnv = {
 };
 
 describe("PRIMARY_CTA", () => {
-  it("is always an honest 'Get in touch' link to the contact page", () => {
-    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Get in touch", href: "/contact", external: false });
+  it("is always an honest 'Start your training' link to the contact page", () => {
+    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Start your training", href: "/contact", external: false });
     expect(PRIMARY_CTA.label).not.toMatch(/book|pay|checkout/i);
   });
 });
