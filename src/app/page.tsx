@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { getService } from "@/content/services";
 import { PRIMARY_CTA } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -44,13 +43,6 @@ const benefits = [
   },
 ];
 
-// Short labels so the three fit on one line beside the video on desktop.
-const heroLinks = [
-  { id: "group-classes", label: "Group classes" },
-  { id: "one-to-one", label: "One-to-one" },
-  { id: "online-coaching", label: "Online coaching" },
-] as const;
-
 function Hero() {
   const booking = PRIMARY_CTA;
   const video = site.heroVideo;
@@ -61,7 +53,7 @@ function Hero() {
   // dark fade, so video, headline and button fit the first screen. Phones run
   // it edge to edge (it breaks out of the gutters); tablets keep the gutters
   // and cap its width so the whole frame fits the screen height. The DOM order
-  // (headline, intro, button, video) stays the same. The offer links follow.
+  // (headline, intro, button, video) stays the same.
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping.
   return (
@@ -102,16 +94,6 @@ function Hero() {
               </div>
             ) : null}
           </div>
-          {/* The three offers, each to its own details page. */}
-          <ul aria-label="Ways to train" className="mt-5 flex flex-wrap gap-x-7 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start">
-            {heroLinks.map(({ id, label }) => (
-              <li key={id}>
-                <ButtonLink href={getService(id).href} variant="text">
-                  {label}
-                </ButtonLink>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

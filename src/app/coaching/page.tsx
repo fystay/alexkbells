@@ -51,7 +51,7 @@ function ServiceDetail({
             className="mt-10"
           >
             {enquiry.label}
-            <span className="sr-only"> about {service.name.toLowerCase()}</span>
+            <span className="sr-only"> with {service.name.toLowerCase()}</span>
           </ButtonLink>
         </div>
         <div className="space-y-10 lg:col-span-5 lg:col-start-8">

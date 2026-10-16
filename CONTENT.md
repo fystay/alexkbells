@@ -22,7 +22,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Start your training** + whole video, then links to the three offers) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and a "Start your training" button each) → **Why kettlebells** `#why-kettlebells` (six benefits, no button: the sections either side carry it) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Start your training" button, address + directions, when) → FAQ → closing CTA ("Start your training" + "Message on Instagram") |
+| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Start your training** + whole video) → **What I offer** `#ways-to-train` (group / one-to-one / online with prices and a "Start your training" button each) → **Why kettlebells** `#why-kettlebells` (six benefits, no button: the sections either side carry it) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Start your training" button, address + directions, when) → FAQ → closing CTA ("Start your training" + "Message on Instagram") |
 | `/classes` | "Start your training" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
