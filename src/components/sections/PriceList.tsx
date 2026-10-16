@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Service } from "@/content/types";
@@ -123,12 +123,11 @@ export function WaysToTrain() {
                 // data attributes for the observer
                 data-carousel-item
                 data-index={i}
-                className={`min-w-[85vw] max-w-[85vw] snap-start flex-shrink-0 rounded-sm border border-line-inverse bg-ink px-6 py-8 lg:min-w-0 lg:max-w-none lg:flex lg:flex-col lg:border-0 lg:px-8 lg:py-2 lg:py-2 lg:rounded-none lg:bg-transparent lg:row-span-1 ${
+                className={`min-w-[85vw] max-w-[85vw] snap-start flex-shrink-0 rounded-sm border border-line-inverse bg-ink px-6 py-8 lg:min-w-0 lg:max-w-none lg:flex lg:flex-col lg:border-0 lg:px-8 lg:py-2 lg:rounded-none lg:bg-transparent lg:row-span-1 ${
                   // keep consistent height on mobile so cards don't jump
                   "h-[420px] lg:h-auto"
                 }`}
                 aria-label={`${service.name} option`}
-                data-index={i}
               >
                 <div className="flex h-full flex-col">
                   <div>
