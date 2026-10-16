@@ -8,6 +8,8 @@ interface TimetableProps {
   tone?: "paper" | "ink";
   /** Heading id the list is described by. */
   labelledBy?: string;
+  /** "row": three across from sm (full-width sections). "stack": one per row (narrow columns, e.g. a service card). */
+  layout?: "row" | "stack";
 }
 
 /** Shown in place of the timetable until it is confirmed. */
@@ -24,26 +26,31 @@ export function TimetableFallback({ tone = "paper" }: { tone?: "paper" | "ink" }
   );
 }
 
-export function Timetable({ tone = "paper", labelledBy }: TimetableProps) {
+export function Timetable({ tone = "paper", labelledBy, layout = "row" }: TimetableProps) {
+  const stack = layout === "stack";
   const sessions = sortSessions(timetable.sessions);
   const line = tone === "ink" ? "border-line-inverse" : "border-ink";
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
 
   return (
     <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
-      <ul aria-labelledby={labelledBy} className="grid grid-cols-1 gap-px sm:grid-cols-3">
+      <ul aria-labelledby={labelledBy} className={cn("grid grid-cols-1 gap-px", !stack && "sm:grid-cols-3")}>
         {sessions.map((session) => (
-          <li key={session.id} className={cn("border-t-2 pt-5 pb-6 sm:pr-6", line)}>
+          <li key={session.id} className={cn("border-t-2 pt-5 pb-6", !stack && "sm:pr-6", line)}>
             <p className={cn("eyebrow", muted)}>{partOfDay(session.start)}</p>
-            <p className="mt-3 font-display text-h2">
-              <span aria-hidden="true" className="sm:hidden lg:inline">
-                {session.day}
-              </span>
-              <span aria-hidden="true" className="hidden sm:inline lg:hidden">
-                {shortDay(session.day)}
-              </span>
-              <span className="sr-only">{session.day}</span>
-            </p>
+            {stack ? (
+              <p className="mt-3 font-display text-h2 lg:text-h3">{session.day}</p>
+            ) : (
+              <p className="mt-3 font-display text-h2">
+                <span aria-hidden="true" className="sm:hidden lg:inline">
+                  {session.day}
+                </span>
+                <span aria-hidden="true" className="hidden sm:inline lg:hidden">
+                  {shortDay(session.day)}
+                </span>
+                <span className="sr-only">{session.day}</span>
+              </p>
+            )}
             <p className="mt-2 text-2xl font-semibold tabular-nums">
               <time dateTime={session.start}>{formatTime(session.start)}</time>
             </p>

@@ -68,13 +68,13 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `Section`, `SectionHeading` | `components/ui` | Tone + spacing; heading ids wire `aria-labelledby` |
 | `Provisional` | `components/ui` | Content approval gate |
 | `PageHeader` | `components/sections` | Inner-page h1 block |
-| `Timetable` | `components/sections` | Driven by `content/classes.ts` |
+| `Timetable` | `components/sections` | Driven by `content/classes.ts`. `layout="row"` (three across) or `"stack"` (one per row, for narrow columns) |
 | `PriceList` | `components/sections` | Only publishable prices; otherwise "Get in touch for current pricing" |
 | `Location`, `Faq`, `CtaBand`, `JsonLd` | `components/sections` | |
 | `BookingWizard`, `OnlineOnboarding` | `components/booking` | Step journeys: `Stepper` (bar per step; on phones only the current step is named), one step at a time, `ActionBar` (Back + Continue; sticky at the bottom of the screen below `lg`; Continue disabled with a hint until the step is complete), summary with "Change" links (sticky aside on desktop, one-line list on phones) |
 | `ChoiceGroup` | `components/booking/ui.tsx` | Native radios/checkboxes as square tiles: white with a `muted` border (≥3:1), ink border on hover, solid ink when selected, outline on keyboard focus. `list` rows (≥56 px) or wrapping `chips` (≥48 px) |
 | `AvailabilityCalendar` | `components/booking` | Monday-first month grid in hairline `line` cells (48–56 px tall). Available: bold with a dot; fully booked: muted and struck through; no sessions: muted; selected: solid ink. Times listed beside (desktop) or below (phones). Disabled dates are skipped by arrow keys |
-| `WaysToTrain` | `components/sections` | Ink band: the three services side by side (number, name, one line, price list, own booking button, Details link), then a three-step "Getting started" row |
+| `WaysToTrain` | `components/sections` | Ink band: the three services side by side (number, name, one line, price list, own booking button, Details link). The group card includes the class timetable (`Timetable layout="stack"`: part of day, day in display type, time) |
 | `HowToBook` | `components/sections` | "Where and how to book": three numbered steps (wording follows the real booking route), booking button, then Where (address, directions) and When (published times, or "choose when you book") |
 | `MobileBookBar` | `components/sections` | Phones only: fixed booking bar once the hero scrolls away; hidden while the hero, closing CTA or footer is on screen; `inert` when hidden |
 | `Journey` | `components/sections` | Ink band: eyebrow, display headline and intro beside a before/after pair (4:5 frames, greyscale, paper "Before"/"After" tags), optional big-number highlights, then three numbered chapters. Content in `content/journey.ts`; hidden until confirmed |
