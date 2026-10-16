@@ -234,9 +234,16 @@ test("every primary button says Get in touch and leads to /contact, never to boo
 test("the contact page leads to Alex's Instagram", async ({ page }) => {
   await page.goto("/contact");
   await expect(page.locator("h1")).toHaveText(/get in touch/i);
-  const ig = page.getByRole("link", { name: /open instagram/i });
-  await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
-  await expect(ig).toHaveAttribute("target", "_blank");
+  // The action is in the first screen on phones and desktop.
+  for (const [width, height] of [[390, 844], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/contact");
+    const ig = page.getByRole("link", { name: /message alex on instagram/i });
+    await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+    await expect(ig).toHaveAttribute("target", "_blank");
+    const box = (await ig.boundingBox())!;
+    expect(box.y + box.height, `${width}px`).toBeLessThanOrEqual(height);
+  }
 });
 
 test("unlisted booking routes are not indexed", async ({ page }) => {

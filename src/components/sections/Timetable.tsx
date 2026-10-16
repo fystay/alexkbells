@@ -36,31 +36,33 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
     <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
       <ul aria-labelledby={labelledBy} className={cn("grid grid-cols-1 gap-px", !stack && "sm:grid-cols-3")}>
         {sessions.map((session) => (
-          <li key={session.id} className={cn("border-t-2", stack ? "pt-4 pb-5" : "pt-5 pb-6 sm:pr-6", line)}>
-            <p className={cn("eyebrow", muted)}>{partOfDay(session.start)}</p>
+          <li key={session.id} className={cn("border-t-2", stack ? "pt-4 pb-5 lg:py-4" : "pt-4 pb-5 sm:pt-5 sm:pb-6 sm:pr-6", line)}>
+            {/* In the narrow desktop card the time says enough; the label stays for screen readers. */}
+            <p className={cn("eyebrow", muted, stack && "lg:sr-only")}>{partOfDay(session.start)}</p>
             {stack ? (
               // Day and time on one line, so a narrow card stays compact.
-              <p className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4">
+              <p className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 lg:mt-0">
                 <span className="font-display text-h2 lg:text-h3">{session.day}</span>
                 <time dateTime={session.start} className="text-2xl font-semibold tabular-nums">
                   {formatTime(session.start)}
                 </time>
               </p>
             ) : (
-              <p className="mt-3 font-display text-h2">
-                <span aria-hidden="true" className="sm:hidden lg:inline">
-                  {session.day}
-                </span>
-                <span aria-hidden="true" className="hidden sm:inline lg:hidden">
-                  {shortDay(session.day)}
-                </span>
-                <span className="sr-only">{session.day}</span>
-              </p>
-            )}
-            {stack ? null : (
-              <p className="mt-2 text-2xl font-semibold tabular-nums">
-                <time dateTime={session.start}>{formatTime(session.start)}</time>
-              </p>
+              // Phones: day and time on one line, as in the stacked card. From sm: three columns, time below.
+              <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 sm:mt-3 sm:block">
+                <p className="font-display text-h2">
+                  <span aria-hidden="true" className="sm:hidden lg:inline">
+                    {session.day}
+                  </span>
+                  <span aria-hidden="true" className="hidden sm:inline lg:hidden">
+                    {shortDay(session.day)}
+                  </span>
+                  <span className="sr-only">{session.day}</span>
+                </p>
+                <p className="text-2xl font-semibold tabular-nums sm:mt-2">
+                  <time dateTime={session.start}>{formatTime(session.start)}</time>
+                </p>
+              </div>
             )}
             {session.durationMinutes ? (
               <p className={cn("mt-1 text-sm", muted)}>{session.durationMinutes} minutes</p>

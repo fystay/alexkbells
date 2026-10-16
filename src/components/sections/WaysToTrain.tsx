@@ -67,7 +67,7 @@ export function WaysToTrain() {
               </div>
             ) : null}
             <div className="mt-8 lg:mt-auto lg:pt-8">
-              <PriceList prices={service.prices} tone="ink" />
+              <PriceList prices={service.prices} tone="ink" linkContact={false} />
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <ButtonLink href={PRIMARY_CTA.href} tone="dark">
                   {PRIMARY_CTA.label}

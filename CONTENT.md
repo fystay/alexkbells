@@ -42,6 +42,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 ## Copy rules
 
+- `/contact` puts "Message Alex on Instagram" in its header so the page's one action is in the first screen at every width.
 - One primary call to action everywhere: **"Get in touch" → /contact** (`PRIMARY_CTA` in `src/lib/booking.ts`), in the header, menu, hero, offers, sections and closing band. Bookings are arranged by messaging Alex on Instagram; never word a button as an online booking, payment or confirmed session. Where several sit together (the three offers), each carries screen-reader context, e.g. "Get in touch about online coaching".
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.

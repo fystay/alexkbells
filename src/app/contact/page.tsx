@@ -24,7 +24,16 @@ export default function ContactPage() {
         eyebrow="Contact"
         title="Get in touch"
         intro="Ask about group classes, one-to-one coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
-      />
+      >
+        {/* The page's one action, in the first screen at every width. */}
+        <ButtonLink
+          href={site.social.instagram.url}
+          external
+          className="w-full whitespace-normal text-center sm:w-auto sm:whitespace-nowrap"
+        >
+          Message Alex on Instagram
+        </ButtonLink>
+      </PageHeader>
 
       <Section labelledBy="methods-heading">
         <h2 id="methods-heading" className="sr-only">
@@ -34,7 +43,17 @@ export default function ContactPage() {
           <div className="lg:col-span-7">
             <div id="enquire" className="bg-ink p-8 text-paper sm:p-12">
               <p className="eyebrow text-muted-inverse">Message on Instagram</p>
-              <p className="mt-4 font-display text-h2 break-words">{site.social.instagram.handle}</p>
+              <p className="mt-4 font-display text-h2 break-words">
+                <a
+                  href={site.social.instagram.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center decoration-2 underline-offset-[6px] hover:underline focus-visible:outline-paper"
+                >
+                  {site.social.instagram.handle}
+                  <span className="sr-only"> on Instagram (opens in a new tab)</span>
+                </a>
+              </p>
               <p className="mt-4 max-w-md text-muted-inverse">
                 Send a direct message on Instagram. It helps to include:
               </p>
@@ -43,9 +62,6 @@ export default function ContactPage() {
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>
-              <ButtonLink href={site.social.instagram.url} external tone="dark" className="mt-8">
-                Open Instagram
-              </ButtonLink>
             </div>
 
             {email || phone ? (

@@ -68,8 +68,8 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `Section`, `SectionHeading` | `components/ui` | Tone + spacing; heading ids wire `aria-labelledby` |
 | `Provisional` | `components/ui` | Content approval gate |
 | `PageHeader` | `components/sections` | Inner-page h1 block |
-| `Timetable` | `components/sections` | Driven by `content/classes.ts`. `layout="row"` (three across) or `"stack"` (one per row, for narrow columns). In `stack` the day and time share one line |
-| `PriceList` | `components/sections` | Only publishable prices; otherwise "Get in touch for current pricing" |
+| `Timetable` | `components/sections` | Driven by `content/classes.ts`. `layout="row"` (three across) or `"stack"` (one per row, for narrow columns). Day and time share one line on phones (both layouts) and in `stack`; in the narrow desktop card the part-of-day label is visually hidden (still read by screen readers) |
+| `PriceList` | `components/sections` | Only publishable prices; otherwise "Get in touch for current pricing". `linkContact={false}` where a "Get in touch" button sits right below |
 | `Location`, `Faq`, `CtaBand`, `JsonLd` | `components/sections` | |
 | `BookingWizard`, `OnlineOnboarding` | `components/booking` | Step journeys: `Stepper` (bar per step; on phones only the current step is named), one step at a time, `ActionBar` (Back + Continue; sticky at the bottom of the screen below `lg`; Continue disabled with a hint until the step is complete), summary with "Change" links (sticky aside on desktop, one-line list on phones) |
 | `ChoiceGroup` | `components/booking/ui.tsx` | Native radios/checkboxes as square tiles: white with a `muted` border (≥3:1), ink border on hover, solid ink when selected, outline on keyboard focus. `list` rows (≥56 px) or wrapping `chips` (≥48 px) |
