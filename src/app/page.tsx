@@ -54,14 +54,14 @@ const heroLinks = [
 function Hero() {
   const booking = PRIMARY_CTA;
   const video = site.heroVideo;
-  const intro = `Classes and one-to-one sessions at ${site.location.venue}, or online coaching anywhere.`;
+  const intro = `Expert kettlebell coaching in ${site.location.town}. Build strength, improve technique and move with confidence.`;
 
   // Phones and tablets (<1024px): the video at its full 4:5 frame, never
-  // cropped, with the headline and button over its lower part on a dark fade,
-  // so video, headline and button fit the first screen. Phones run it edge to
-  // edge (it breaks out of the gutters); tablets keep the gutters and cap its
-  // width so the whole frame fits the screen height. The DOM order (headline,
-  // button, video) stays the same. The intro line and the offer links follow.
+  // cropped, with the headline, intro line and button over its lower part on a
+  // dark fade, so video, headline and button fit the first screen. Phones run
+  // it edge to edge (it breaks out of the gutters); tablets keep the gutters
+  // and cap its width so the whole frame fits the screen height. The DOM order
+  // (headline, intro, button, video) stays the same. The offer links follow.
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping.
   return (
@@ -74,16 +74,16 @@ function Hero() {
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
           <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
             {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
-            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/60 via-55% to-transparent px-4 pt-28 pb-4 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent px-4 pt-28 pb-3 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
               <div className="lg:col-span-6 lg:row-start-2">
                 <p className="eyebrow text-paper/85 lg:text-muted">Kettlebell coaching · {site.location.town}</p>
                 <h1 id="hero-heading" className="mt-3 font-display text-display text-balance text-paper sm:mt-4 lg:text-ink lg:text-display-split">
                   <span className="block">Get stronger.</span>
                   <span className="block">Move better.</span>
                 </h1>
-                <p className="mt-5 hidden max-w-md text-lede text-muted lg:block">{intro}</p>
+                <p className="mt-2 max-w-md text-sm text-paper/85 sm:mt-3 sm:text-base lg:mt-5 lg:text-lede lg:text-muted">{intro}</p>
               </div>
-              <div className="mt-4 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
+              <div className="mt-3 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
                 <ButtonLink
                   href={booking.href}
                   external={booking.external}
@@ -103,9 +103,8 @@ function Hero() {
               </div>
             ) : null}
           </div>
-          <p className="mt-6 max-w-md text-lede text-muted lg:hidden">{intro}</p>
           {/* The three offers, each to its own details page. */}
-          <ul aria-label="Ways to train" className="mt-3 flex flex-wrap gap-x-7 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start">
+          <ul aria-label="Ways to train" className="mt-5 flex flex-wrap gap-x-7 lg:col-span-6 lg:row-start-4 lg:mt-3 lg:self-start">
             {heroLinks.map(({ id, label }) => (
               <li key={id}>
                 <ButtonLink href={getService(id).href} variant="text">

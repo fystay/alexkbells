@@ -571,9 +571,12 @@ for (const [width, height] of [
     expect(Math.abs(box.width / box.height - 0.8)).toBeLessThan(0.01);
     expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe("contain");
     expect(box.y + box.height, "bottom of the video").toBeLessThanOrEqual(height);
-    // Headline and button sit on the lower part of the video.
+    // Headline (with the intro line beneath it) and button sit on the lower
+    // part of the video: the button in its lower half, the headline below its
+    // top 40%, since the intro line now takes room under the headline.
+    expect(h1.y).toBeGreaterThan(box.y + box.height * 0.4);
+    expect(cta.y).toBeGreaterThan(box.y + box.height / 2);
     for (const el of [h1, cta]) {
-      expect(el.y).toBeGreaterThan(box.y + box.height / 2);
       expect(el.y + el.height).toBeLessThanOrEqual(box.y + box.height);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
