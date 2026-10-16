@@ -1,131 +1,134 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
-import { mainNav, pageNav } from "@/content/site";
-import { cn } from "@/lib/cn";
-import type { CallToAction } from "@/lib/booking";
+import { useEffect, useRef, useState } from "react";
 
-function isActive(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
+interface HeroVideoProps {
+  sources: { src: string; type: string }[];
+  poster: string;
+  className?: string;
 }
 
-export function DesktopNav() {
-  const pathname = usePathname();
-  return (
-    <nav aria-label="Main" className="hidden xl:block">
-      <ul className="flex items-center gap-7">
-        {mainNav.map((item) => {
-          const active = isActive(pathname, item.href);
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "relative inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
-                  "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
-                  active
-                    ? "text-paper after:scale-x-100"
-                    : "text-muted-inverse after:scale-x-0 hover:text-paper hover:after:scale-x-100",
-                )}
-              >
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
+const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
-export function MobileNav({ cta }: { cta: CallToAction }) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [lastPath, setLastPath] = useState(pathname);
-  const panelId = useId();
-  const buttonRef = useRef<HTMLButtonElement>(null);
+/**
+ * Silent hero footage that starts on its own as soon as the page opens and
+ * loops continuously (Alex's request), except for visitors who ask for
+ * reduced motion: they see the still poster and can press play.
+ * - The <video> is written as HTML so `autoplay muted loop playsinline` are
+ *   in the server-rendered markup: browsers (iOS included) start it before
+ *   any JavaScript runs. React does not render the `muted` attribute, which
+ *   autoplay requires.
+ * - `loop` repeats it natively; the `ended` handler restarts it in any
+ *   browser that stops at the end instead, so it never sits on a blank frame.
+ * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it stays
+ *   paused until they press play again.
+ * - Some devices block autoplay entirely (e.g. iPhone Low Power Mode): the
+ *   poster stays and the play button starts it. If no source can be loaded at
+ *   all, the poster (also painted behind the video) stays and the control is
+ *   removed, since there is nothing to play.
+ * - prefers-reduced-motion: CSS hides the video (showing that poster) from the
+ *   first paint, before JavaScript; on hydration it is paused. Pressing play
+ *   reveals and starts it.
+ */
+export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const userPaused = useRef(false);
+  const [playing, setPlaying] = useState(true);
+  /** Set once the visitor presses play; lifts the reduced-motion still. */
+  const [userPlayed, setUserPlayed] = useState(false);
+  /** No source could be loaded: show the still poster and no play/pause control. */
+  const [unavailable, setUnavailable] = useState(false);
 
-  // Close the menu whenever the route changes (e.g. back/forward). Links in the
-  // panel also close it on click: a same-page anchor like /#ways-to-train
-  // doesn't change the pathname, so the route check alone leaves it open.
-  if (pathname !== lastPath) {
-    setLastPath(pathname);
-    setOpen(false);
-  }
+  const html =
+    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover brightness-[0.82] contrast-[1.15] saturate-50">` +
+    sources.map((s) => `<source src="${escapeAttr(s.src)}" type="${escapeAttr(s.type)}">`).join("") +
+    "</video>";
+
+  const video = () => containerRef.current?.querySelector("video") ?? null;
 
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpen(false);
-      // Return focus to the toggle so keyboard users aren't stranded.
-      buttonRef.current?.focus();
+    const v = containerRef.current?.querySelector("video");
+    if (!v) return;
+    const sync = () => setPlaying(!v.paused);
+    const restart = () => {
+      if (userPaused.current) return;
+      v.currentTime = 0;
+      v.play().catch(sync);
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+    v.muted = true;
+    // Source errors fire on the <source> elements, and may already have
+    // happened before hydration, so check the network state as well.
+    const lastSource = v.querySelector("source:last-of-type");
+    const fail = () => setUnavailable(true);
+    if (v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) fail();
+    lastSource?.addEventListener("error", fail);
+    v.addEventListener("play", sync);
+    v.addEventListener("pause", sync);
+    v.addEventListener("ended", restart);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Autoplay is in the server HTML; stop it and rest on the first frame.
+      userPaused.current = true;
+      v.pause();
+      v.currentTime = 0;
+      sync();
+    } else if (v.paused) {
+      // In case autoplay hasn't started yet (e.g. the page was restored from cache).
+      v.play().catch(sync);
+    }
+    return () => {
+      lastSource?.removeEventListener("error", fail);
+      v.removeEventListener("play", sync);
+      v.removeEventListener("pause", sync);
+      v.removeEventListener("ended", restart);
+    };
+  }, []);
+
+  const toggle = () => {
+    const v = video();
+    if (!v) return;
+    if (v.paused) {
+      userPaused.current = false;
+      setUserPlayed(true);
+      v.play().catch(() => setPlaying(false));
+    } else {
+      userPaused.current = true;
+      v.pause();
+    }
+  };
 
   return (
-    <div className="xl:hidden">
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold uppercase tracking-[0.1em] text-paper"
-      >
-        {open ? "Close" : "Menu"}
-        <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-          {open ? <path d="M4 4l12 12M16 4L4 16" /> : <path d="M2 6h16M2 14h16" />}
-        </svg>
-      </button>
-
+    <div className={className}>
       <div
-        id={panelId}
-        hidden={!open}
-        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line-inverse bg-ink pb-8 sm:h-[calc(100dvh-5rem)]"
+        className="relative aspect-[4/5] w-full overflow-hidden bg-ink bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url("${poster}")` }}
       >
-        <nav aria-label="Main" className="container-page">
-          <ul className="divide-y divide-line-inverse">
-            {[...mainNav, ...pageNav].map((item) => {
-              const active = isActive(pathname, item.href);
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-14 items-center justify-between font-display text-2xl",
-                      active ? "text-paper" : "text-muted-inverse hover:text-paper",
-                    )}
-                  >
-                    {item.label}
-                    {active ? (
-                      <span aria-hidden="true" className="eyebrow text-muted-inverse">
-                        Current
-                      </span>
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <Link
-            href={cta.href}
-            onClick={() => setOpen(false)}
-            {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
+        {/* The video element itself is static HTML; see the comment above. */}
+        <div
+          ref={containerRef}
+          className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+        {/* Phones and tablets: the top of the frame fades from the header's ink
+            into the footage so the header and video read as one block. Not on
+            desktop, where the video sits on paper clear of the header. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[22%] bg-linear-to-b from-ink via-ink/40 to-transparent lg:hidden"
+        />
+        {unavailable ? null : (
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={playing ? "Pause background video" : "Play background video"}
+            className="absolute top-3 right-3 z-20 inline-flex size-11 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink focus-visible:outline-paper lg:top-auto lg:right-4 lg:bottom-4"
           >
-            {cta.label}
-            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
-          </Link>
-        </nav>
+            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
+              {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
 }
+

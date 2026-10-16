@@ -1,126 +1,204 @@
-@import "tailwindcss";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { site } from "@/content/site";
+import { pageMetadata } from "@/lib/metadata";
+import { PRIMARY_CTA } from "@/lib/booking";
+import { cn } from "@/lib/cn";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Section, SectionHeading } from "@/components/ui/Section";
+import { HowToBook } from "@/components/sections/HowToBook";
+import { Faq } from "@/components/sections/Faq";
+import { CtaBand } from "@/components/sections/CtaBand";
+import { HeroVideo } from "@/components/sections/HeroVideo";
+import { Journey } from "@/components/sections/Journey";
+import { WaysToTrain } from "@/components/sections/WaysToTrain";
 
-/*
- * Design tokens — see DESIGN.md. Monochrome only.
- * Measured contrast (WCAG 2.x): ink/paper 17.9:1, muted/paper 6.9:1,
- * muted/surface 6.2:1, muted-inverse/ink 8.0:1, muted-inverse/ink-soft 7.0:1.
- * `line` is decorative only (1.4:1) — never use it for text.
- */
-@theme {
-  --color-ink: #0b0b0b;
-  --color-ink-soft: #1c1c1b;
-  --color-paper: #f6f4ef;
-  --color-white: #ffffff;
-  --color-surface: #ece9e2;
-  --color-line: #d6d2c9;
-  --color-line-inverse: #333331;
-  --color-muted: #57544e;
-  --color-muted-inverse: #a9a59d;
+export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+// Benefits are hedged ("can") and make no promises about specific results.
+const benefits = [
+  {
+    title: "Build strength",
+    body: "Swings, squats, presses and carries work the whole body, and one kettlebell is enough to train them.",
+  },
+  {
+    title: "Improve your fitness",
+    body: "Kettlebell sessions can train strength and conditioning together, so you get fitter as you get stronger.",
+  },
+  {
+    title: "Train with confidence",
+    body: "Learn the key kettlebell movements properly, with a coach watching your technique and helping you progress.",
+  },
+  {
+    title: "Stay consistent",
+    body: "Regular group classes give your week structure, and training alongside others can help you keep showing up.",
+  },
+  {
+    title: "Efficient, full-body sessions",
+    body: "Swings, cleans and presses work many muscles at once, so a focused session goes a long way.",
+  },
+  {
+    title: "Train anywhere",
+    body: "A kettlebell takes up little space, so what you learn works at home, in the gym or away.",
+  },
+];
 
-  /* Fluid type scale (min at 320px, max at ~1280px) */
-  --text-display: clamp(1.875rem, 0.9rem + 5vw, 5.25rem);
-  --text-display--line-height: 0.95;
-  /* Hero headline beside media (lg+): each short sentence on one line. */
-  --text-display-split: clamp(2.5rem, 0.4rem + 3.4vw, 3.75rem);
-  --text-display-split--line-height: 0.95;
-  --text-h1: clamp(1.75rem, 1rem + 3.5vw, 4rem);
-  --text-h1--line-height: 1;
-  --text-h2: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);
-  --text-h2--line-height: 1.05;
-  --text-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --text-h3--line-height: 1.2;
-  --text-lede: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
-  --text-lede--line-height: 1.55;
+function Hero() {
+  const booking = PRIMARY_CTA;
+  const video = site.heroVideo;
+  const intro = `Expert kettlebell coaching in ${site.location.town}. Build strength, improve technique and move with confidence.`;
 
-  --tracking-display: -0.02em;
-  --tracking-eyebrow: 0.16em;
-
-  --breakpoint-2xs: 22.5rem;
-  --breakpoint-xs: 26rem;
-
-  /* Booking steps: a short fade-up so the change of step is noticed. Removed under reduced motion. */
-  --animate-step-in: step-in 220ms cubic-bezier(0.2, 0, 0, 1);
-  @keyframes step-in {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
+  // Phones and tablets (<1024px): the video at its full 4:5 frame, never
+  // cropped, with the headline, intro line and button over its lower part on a
+  // dark fade, so video, headline and button fit the first screen. Phones run
+  // it edge to edge (it breaks out of the gutters); tablets keep the gutters
+  // and cap its width so the whole frame fits the screen height. The DOM order
+  // (headline, intro, button, video) stays the same.
+  // Desktop: text beside the video, which is as large as the first view
+  // allows (up to its half of the grid) without cropping.
+  return (
+    <section aria-labelledby="hero-heading" className="relative bg-paper">
+      {/* Tablets: ink fills the gap under the header (same height as the
+          container's top padding) so header and video join up. Phones have no
+          gap; desktop keeps the video on paper. */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 hidden h-6 bg-ink sm:block lg:hidden" />
+      <div className="container-page pt-0 pb-8 sm:pt-5 sm:pb-8 lg:pt-4 lg:pb-8">
+        <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
+          <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
+            {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent px-4 pt-24 pb-3 sm:px-8 sm:pt-40 sm:pb-8 lg:contents">
+              <div className="lg:col-span-6 lg:row-start-2">
+                <h1 id="hero-heading" className="font-display text-display text-balance text-paper lg:text-ink lg:text-display-split">
+                  <span className="block">Get stronger.</span>
+                  <span className="block">Move better.</span>
+                </h1>
+                <p className="mt-2 max-w-md text-sm text-paper/85 sm:mt-3 sm:text-base lg:mt-5 lg:text-lede lg:text-muted">{intro}</p>
+              </div>
+              <div className="mt-3 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
+                <ButtonLink
+                  href={booking.href}
+                  external={booking.external}
+                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto"
+                >
+                  {booking.label}
+                </ButtonLink>
+              </div>
+            </div>
+            {video ? (
+              <div className="lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:flex lg:items-center lg:justify-end">
+                <HeroVideo
+                  sources={video.sources}
+                  poster={video.poster}
+                  className="w-full lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
+                />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
-@layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-
-  body {
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-size: 1rem;
-    line-height: 1.6;
-    text-rendering: optimizeLegibility;
-  }
-
-  ::selection {
-    background-color: var(--color-ink);
-    color: var(--color-paper);
-  }
-
-  /* Visible focus for every interactive element */
-  :focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 3px;
-  }
-
-  [id] {
-    scroll-margin-top: 6rem;
-  }
+// No button here: "Choose how you train" (just above) and "Where and how to
+// book" (below) carry it, so the call to action isn't repeated every section.
+function Benefits() {
+  return (
+    <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <SectionHeading
+            id="benefits-heading"
+            eyebrow="Why kettlebells"
+            title="Stronger, fitter, more confident"
+            intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
+          />
+        </div>
+        <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
+          {benefits.map((b) => (
+            <li key={b.title} className="border-t border-ink pt-5">
+              <h3 className="text-lg font-bold">{b.title}</h3>
+              <p className="mt-2 text-muted">{b.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  );
 }
 
-@utility font-display {
-  font-weight: 800;
-  font-stretch: 112%;
-  letter-spacing: var(--tracking-display);
-  text-transform: uppercase;
+function About() {
+  const stills = site.trainingStills;
+  const { instagram } = site.social;
+  return (
+    <Section id="about" labelledBy="about-heading">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <div className="lg:col-span-5">
+          <SectionHeading
+            id="about-heading"
+            eyebrow="About Alex"
+            title="Coached by Alex"
+            intro={
+              <p>
+                Alex Robertson is a kettlebell coach based in Cumbernauld, running group classes and
+                one-to-one sessions at {site.location.venue}, and coaching people further afield
+                online.
+              </p>
+            }
+          />
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ButtonLink href={instagram.url} external variant="secondary">
+              Follow {instagram.handle}
+            </ButtonLink>
+            <p className="text-sm text-muted">
+              <span className="font-display text-h3 text-ink">{instagram.followers}</span> followers on Instagram
+            </p>
+          </div>
+        </div>
+        {stills.length > 0 ? (
+          // Phones: a swipeable row of large photos (the next one peeks in), not
+          // three thumbnails. From sm: three across, staggered on desktop. The
+          // row is focusable so keyboard users can scroll it with the arrow keys.
+          <ul
+            className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0"
+            aria-label="From the training"
+            tabIndex={0}
+          >
+            {stills.map((photo, i) => (
+              <li
+                key={photo.src}
+                className={cn("w-[72%] shrink-0 snap-start sm:w-auto", i === 1 ? "lg:mt-16" : i === 2 ? "lg:mt-8" : undefined)}
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  width={photo.width}
+                  height={photo.height}
+                  sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 72vw"
+                  className="aspect-[4/5] w-full object-cover"
+                />
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </Section>
+  );
 }
 
-@utility eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
+export default function HomePage() {
+  return (
+    <>
+      <Hero />
+      {/* Order answers Alex's four questions: what he offers, why kettlebells, who he is, where and how to book. */}
+      <WaysToTrain />
+      <Benefits />
+      <About />
+      <Journey />
+      <HowToBook />
+      <Faq />
+      <CtaBand />
+    </>
+  );
 }
 
-@utility container-page {
-  width: 100%;
-  max-width: 78rem;
-  margin-inline: auto;
-  padding-inline: 1rem;
-  @media (width >= 40rem) {
-    padding-inline: 1.5rem;
-  }
-  @media (width >= 64rem) {
-    padding-inline: 2.5rem;
-  }
-}

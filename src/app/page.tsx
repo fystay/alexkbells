@@ -1,205 +1,61 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import { site } from "@/content/site";
-import { pageMetadata } from "@/lib/metadata";
-import { PRIMARY_CTA } from "@/lib/booking";
+import Link from "next/link";
+import type { Price } from "@/content/types";
+import { Provisional } from "@/components/ui/Provisional";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
-import { ButtonLink } from "@/components/ui/ButtonLink";
-import { Section, SectionHeading } from "@/components/ui/Section";
-import { HowToBook } from "@/components/sections/HowToBook";
-import { Faq } from "@/components/sections/Faq";
-import { CtaBand } from "@/components/sections/CtaBand";
-import { HeroVideo } from "@/components/sections/HeroVideo";
-import { Journey } from "@/components/sections/Journey";
-import { WaysToTrain } from "@/components/sections/WaysToTrain";
 
-export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
-
-// Benefits are hedged ("can") and make no promises about specific results.
-const benefits = [
-  {
-    title: "Build strength",
-    body: "Swings, squats, presses and carries work the whole body, and one kettlebell is enough to train them.",
-  },
-  {
-    title: "Improve your fitness",
-    body: "Kettlebell sessions can train strength and conditioning together, so you get fitter as you get stronger.",
-  },
-  {
-    title: "Train with confidence",
-    body: "Learn the key kettlebell movements properly, with a coach watching your technique and helping you progress.",
-  },
-  {
-    title: "Stay consistent",
-    body: "Regular group classes give your week structure, and training alongside others can help you keep showing up.",
-  },
-  {
-    title: "Efficient, full-body sessions",
-    body: "Swings, cleans and presses work many muscles at once, so a focused session goes a long way.",
-  },
-  {
-    title: "Train anywhere",
-    body: "A kettlebell takes up little space, so what you learn works at home, in the gym or away.",
-  },
-];
-
-function Hero() {
-  const booking = PRIMARY_CTA;
-  const video = site.heroVideo;
-  const intro = `Expert kettlebell coaching in ${site.location.town}. Build strength, improve technique and move with confidence.`;
-
-  // Phones and tablets (<1024px): the video at its full 4:5 frame, never
-  // cropped, with the headline, intro line and button over its lower part on a
-  // dark fade, so video, headline and button fit the first screen. Phones run
-  // it edge to edge (it breaks out of the gutters); tablets keep the gutters
-  // and cap its width so the whole frame fits the screen height. The DOM order
-  // (headline, intro, button, video) stays the same.
-  // Desktop: text beside the video, which is as large as the first view
-  // allows (up to its half of the grid) without cropping.
-  return (
-    <section aria-labelledby="hero-heading" className="relative bg-paper">
-      {/* Tablets: ink fills the gap under the header (same height as the
-          container's top padding) so header and video join up. Phones have no
-          gap; desktop keeps the video on paper. */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 hidden h-6 bg-ink sm:block lg:hidden" />
-      <div className="container-page pt-0 pb-10 sm:pt-6 lg:pt-4 lg:pb-8">
-        <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
-          <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
-            {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
-            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent px-4 pt-28 pb-3 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
-              <div className="lg:col-span-6 lg:row-start-2">
-                <h1 id="hero-heading" className="font-display text-display text-balance text-paper lg:text-ink lg:text-display-split">
-                  <span className="block">Get stronger.</span>
-                  <span className="block">Move better.</span>
-                </h1>
-                <p className="mt-2 max-w-md text-sm text-paper/85 sm:mt-3 sm:text-base lg:mt-5 lg:text-lede lg:text-muted">{intro}</p>
-              </div>
-              <div className="mt-3 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
-                <ButtonLink
-                  href={booking.href}
-                  external={booking.external}
-                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto"
-                >
-                  {booking.label}
-                </ButtonLink>
-              </div>
-            </div>
-            {video ? (
-              <div className="lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:flex lg:items-center lg:justify-end">
-                <HeroVideo
-                  sources={video.sources}
-                  poster={video.poster}
-                  className="w-full lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
-                />
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+interface PriceListProps {
+  prices: Price[];
+  tone?: "paper" | "ink";
+  /** Link "Get in touch" to /contact. Off where a contact button sits right below. */
+  linkContact?: boolean;
 }
 
-// No button here: "Choose how you train" (just above) and "Where and how to
-// book" (below) carry it, so the call to action isn't repeated every section.
-function Benefits() {
-  return (
-    <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <SectionHeading
-            id="benefits-heading"
-            eyebrow="Why kettlebells"
-            title="Stronger, fitter, more confident"
-            intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
-          />
-        </div>
-        <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
-          {benefits.map((b) => (
-            <li key={b.title} className="border-t border-ink pt-5">
-              <h3 className="text-lg font-bold">{b.title}</h3>
-              <p className="mt-2 text-muted">{b.body}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </Section>
-  );
-}
+/**
+ * Shows only publishable prices. When none can be published (e.g. all are
+ * provisional on production) it shows a neutral "get in touch" line instead.
+ */
+export function PriceList({ prices, tone = "paper", linkContact = true }: PriceListProps) {
+  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+  const visible = publishable(prices);
 
-
-function About() {
-  const stills = site.trainingStills;
-  const { instagram } = site.social;
-  return (
-    <Section id="about" labelledBy="about-heading">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
-        <div className="lg:col-span-5">
-          <SectionHeading
-            id="about-heading"
-            eyebrow="About Alex"
-            title="Coached by Alex"
-            intro={
-              <p>
-                Alex Robertson is a kettlebell coach based in Cumbernauld, running group classes and
-                one-to-one sessions at {site.location.venue}, and coaching people further afield
-                online.
-              </p>
-            }
-          />
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ButtonLink href={instagram.url} external variant="secondary">
-              Follow {instagram.handle}
-            </ButtonLink>
-            <p className="text-sm text-muted">
-              <span className="font-display text-h3 text-ink">{instagram.followers}</span> followers on Instagram
-            </p>
-          </div>
-        </div>
-        {stills.length > 0 ? (
-          // Phones: a swipeable row of large photos (the next one peeks in), not
-          // three thumbnails. From sm: three across, staggered on desktop. The
-          // row is focusable so keyboard users can scroll it with the arrow keys.
-          <ul
-            className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:col-span-7"
-            aria-label="From the training"
-            tabIndex={0}
+  if (visible.length === 0) {
+    return (
+      <p className={cn("text-sm", muted)}>
+        {linkContact ? (
+          <Link
+            href="/contact"
+            className={cn("font-semibold underline underline-offset-4", tone === "ink" ? "text-paper" : "text-ink")}
           >
-            {stills.map((photo, i) => (
-              <li
-                key={photo.src}
-                className={cn("w-[72%] shrink-0 snap-start sm:w-auto", i === 1 ? "lg:mt-16" : i === 2 ? "lg:mt-8" : undefined)}
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  width={photo.width}
-                  height={photo.height}
-                  sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 72vw"
-                  className="aspect-[4/5] w-full object-cover"
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </Section>
-  );
-}
+            Get in touch
+          </Link>
+        ) : (
+          <span className={cn("font-semibold", tone === "ink" ? "text-paper" : "text-ink")}>Get in touch</span>
+        )}{" "}
+        for current pricing.
+      </p>
+    );
+  }
 
+  const status = visible.every((p) => p.status === "confirmed") ? "confirmed" : "provisional";
+  const line = tone === "ink" ? "divide-line-inverse border-line-inverse" : "divide-line border-line";
 
-export default function HomePage() {
   return (
-    <>
-      <Hero />
-      {/* Order answers Alex's four questions: what he offers, why kettlebells, who he is, where and how to book. */}
-      <WaysToTrain />
-      <Benefits />
-      <About />
-      <Journey />
-      <HowToBook />
-      <Faq />
-      <CtaBand />
-    </>
+    <Provisional status={status}>
+      <dl className={cn("divide-y border-y", line)}>
+        {visible.map((price) => (
+          <div key={price.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4 gap-y-1 py-4">
+            <dt className={cn("min-w-0 pr-2 text-sm leading-snug", muted)}>{price.label}</dt>
+            <dd className="flex items-end justify-end gap-1 text-left">
+              {price.prefix ? <span className={cn("pb-0.5 text-sm", muted)}>{price.prefix}</span> : null}
+              <span className="text-2xl font-bold tabular-nums leading-none">{formatGbp(price.amountGbp)}</span>
+              <span className={cn("pb-0.5 text-sm", muted)}>{price.unit}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </Provisional>
   );
 }
+

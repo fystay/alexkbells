@@ -1,75 +1,131 @@
+"use client";
+
 import Link from "next/link";
-import { timetable } from "@/content/classes";
-import { Provisional } from "@/components/ui/Provisional";
-import { formatTime, partOfDay, shortDay, sortSessions } from "@/lib/schedule";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import { mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
+import type { CallToAction } from "@/lib/booking";
 
-interface TimetableProps {
-  tone?: "paper" | "ink";
-  /** Heading id the list is described by. */
-  labelledBy?: string;
-  /** "row": three across from sm (full-width sections). "stack": one per row (narrow columns, e.g. a service card). */
-  layout?: "row" | "stack";
+function isActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Shown in place of the timetable until it is confirmed. */
-export function TimetableFallback({ tone = "paper" }: { tone?: "paper" | "ink" }) {
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+export function DesktopNav() {
+  const pathname = usePathname();
   return (
-    <p className={cn("max-w-xl text-lede", muted)}>
-      The class timetable is being finalised.{" "}
-      <Link href="/contact" className={cn("underline underline-offset-4", tone === "ink" ? "text-paper" : "text-ink")}>
-        Get in touch
-      </Link>{" "}
-      for current class times.
-    </p>
-  );
-}
-
-export function Timetable({ tone = "paper", labelledBy, layout = "row" }: TimetableProps) {
-  const stack = layout === "stack";
-  const sessions = sortSessions(timetable.sessions);
-  const line = tone === "ink" ? "border-line-inverse" : "border-ink";
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
-
-  return (
-    <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
-      <ul aria-labelledby={labelledBy} className={cn("grid grid-cols-1 gap-px", !stack && "sm:grid-cols-3")}>
-        {sessions.map((session) => (
-          <li key={session.id} className={cn("border-t-2", stack ? "pt-4 pb-5 lg:py-4" : "pt-4 pb-5 sm:pt-5 sm:pb-6 sm:pr-6", line)}>
-            {/* In the narrow desktop card the time says enough; the label stays for screen readers. */}
-            <p className={cn("eyebrow", muted, stack && "lg:sr-only")}>{partOfDay(session.start)}</p>
-            {stack ? (
-              // Day and time on one line, so a narrow card stays compact.
-              <p className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 lg:mt-0">
-                <span className="font-display text-h2 lg:text-h3">{session.day}</span>
-                <time dateTime={session.start} className="text-2xl font-semibold tabular-nums">
-                  {formatTime(session.start)}
-                </time>
-              </p>
-            ) : (
-              // Phones: day and time on one line, as in the stacked card. From sm: three columns, time below.
-              <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 sm:mt-3 sm:block">
-                <p className="font-display text-h2">
-                  <span aria-hidden="true" className="sm:hidden lg:inline">
-                    {session.day}
-                  </span>
-                  <span aria-hidden="true" className="hidden sm:inline lg:hidden">
-                    {shortDay(session.day)}
-                  </span>
-                  <span className="sr-only">{session.day}</span>
-                </p>
-                <p className="text-2xl font-semibold tabular-nums sm:mt-2">
-                  <time dateTime={session.start}>{formatTime(session.start)}</time>
-                </p>
-              </div>
-            )}
-            {session.durationMinutes ? (
-              <p className={cn("mt-1 text-sm", muted)}>{session.durationMinutes} minutes</p>
-            ) : null}
-          </li>
-        ))}
+    <nav aria-label="Main" className="hidden xl:block">
+      <ul className="flex items-center gap-7">
+        {mainNav.map((item) => {
+          const active = isActive(pathname, item.href);
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "relative inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
+                  active
+                    ? "text-paper after:scale-x-100"
+                    : "text-muted-inverse after:scale-x-0 hover:text-paper hover:after:scale-x-100",
+                )}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
-    </Provisional>
+    </nav>
   );
 }
+
+export function MobileNav({ cta }: { cta: CallToAction }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [lastPath, setLastPath] = useState(pathname);
+  const panelId = useId();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (pathname !== lastPath) {
+      setLastPath(pathname);
+      setOpen(false);
+    }
+  }, [lastPath, pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      buttonRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  return (
+    <div className="xl:hidden">
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold uppercase tracking-[0.1em] text-paper outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper"
+      >
+        {open ? "Close" : "Menu"}
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+          {open ? <path d="M4 4l12 12M16 4L4 16" /> : <path d="M2 6h16M2 14h16" />}
+        </svg>
+      </button>
+
+      <div
+        id={panelId}
+        hidden={!open}
+        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line-inverse bg-ink pb-8 sm:h-[calc(100dvh-5rem)]"
+      >
+        <nav aria-label="Main" className="container-page">
+          <ul className="divide-y divide-line-inverse">
+            {[...mainNav, ...pageNav].map((item) => {
+              const active = isActive(pathname, item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-14 items-center justify-between font-display text-2xl",
+                      active ? "text-paper" : "text-muted-inverse hover:text-paper",
+                    )}
+                  >
+                    {item.label}
+                    {active ? (
+                      <span aria-hidden="true" className="eyebrow text-muted-inverse">
+                        Current
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <Link
+            href={cta.href}
+            onClick={() => setOpen(false)}
+            {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper"
+          >
+            {cta.label}
+            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+          </Link>
+        </nav>
+      </div>
+    </div>
+  );
+}
+

@@ -1,62 +1,98 @@
-import Link from "next/link";
-import type { Price } from "@/content/types";
-import { Provisional } from "@/components/ui/Provisional";
-import { publishable } from "@/lib/publish";
-import { formatGbp } from "@/lib/schedule";
-import { cn } from "@/lib/cn";
+import { site } from "@/content/site";
+import { getService } from "@/content/services";
+import type { Service } from "@/content/types";
+import { PRIMARY_CTA } from "@/lib/booking";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { KeepHyphens } from "@/components/ui/KeepHyphens";
+import { SectionHeading } from "@/components/ui/Section";
+import { PriceList } from "./PriceList";
+import { Timetable } from "./Timetable";
 
-interface PriceListProps {
-  prices: Price[];
-  tone?: "paper" | "ink";
-  /** Link "Get in touch" to /contact. Off where a contact button sits right below. */
-  linkContact?: boolean;
+interface Option {
+  service: Service;
+  tagline: string;
+  /** Shows the class timetable under the tagline. */
+  timetable?: boolean;
 }
 
 /**
- * Shows only publishable prices. When none can be published (e.g. all are
- * provisional on production) it shows a neutral "get in touch" line instead.
+ * "What I offer". One landmark in two bands: the heading on paper, carrying on
+ * from the hero, then the three ways to train side by side on ink, each with
+ * its price and the same "Start your training" button. One place to compare
+ * and choose.
  */
-export function PriceList({ prices, tone = "paper", linkContact = true }: PriceListProps) {
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
-  const visible = publishable(prices);
-
-  if (visible.length === 0) {
-    return (
-      <p className={cn("text-sm", muted)}>
-        {linkContact ? (
-          <Link
-            href="/contact"
-            className={cn("font-semibold underline underline-offset-4", tone === "ink" ? "text-paper" : "text-ink")}
-          >
-            Get in touch
-          </Link>
-        ) : (
-          <span className={cn("font-semibold", tone === "ink" ? "text-paper" : "text-ink")}>Get in touch</span>
-        )}{" "}
-        for current pricing.
-      </p>
-    );
-  }
-
-  const status = visible.every((p) => p.status === "confirmed") ? "confirmed" : "provisional";
-  const line = tone === "ink" ? "divide-line-inverse border-line-inverse" : "divide-line border-line";
+export function WaysToTrain() {
+  const options: Option[] = [
+    {
+      service: getService("group-classes"),
+      tagline: "Coached group sessions at Media House, Cumbernauld. Beginners welcome.",
+      timetable: true,
+    },
+    {
+      service: getService("one-to-one"),
+      tagline: "Face-to-face coaching, built around you.",
+    },
+    {
+      service: getService("online-coaching"),
+      tagline: "Personalised programming and support, wherever you train.",
+    },
+  ];
 
   return (
-    <Provisional status={status}>
-      <dl className={cn("divide-y border-y", line)}>
-        {visible.map((price) => (
-          <div key={price.label} className="flex items-baseline justify-between gap-4 py-4">
-            <dt className={cn("text-sm", muted)}>{price.label}</dt>
-            <dd className="text-right">
-              {price.prefix ? (
-                <span className={cn("mr-1.5 text-sm", muted)}>{price.prefix}</span>
-              ) : null}
-              <span className="text-2xl font-bold tabular-nums">{formatGbp(price.amountGbp)}</span>
-              <span className={cn("ml-1.5 text-sm", muted)}>{price.unit}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </Provisional>
+    <section id="ways-to-train" aria-labelledby="ways-heading">
+      <div className="bg-paper pt-5 pb-10 text-ink sm:pt-7 sm:pb-12 lg:pt-9 lg:pb-16">
+        <div className="container-page">
+          <SectionHeading
+            id="ways-heading"
+            eyebrow="What I offer"
+            title="Choose how you train"
+            intro={`Three ways to train with Alex: coached group classes and one-to-one sessions in ${site.location.town}, or online coaching wherever you are.`}
+          />
+        </div>
+      </div>
+
+      <div className="bg-ink py-10 text-paper sm:py-12 lg:py-16">
+        <div className="container-page">
+          <ul className="grid grid-cols-1 border-t border-line-inverse lg:grid-cols-3 lg:border-t-0">
+            {options.map(({ service, tagline, timetable: showTimes }, i) => (
+              <li
+                key={service.id}
+                className="flex flex-col border-b border-line-inverse py-8 lg:border-b-0 lg:border-l lg:px-8 lg:py-2 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
+              >
+                <p className="eyebrow text-muted-inverse" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-4 font-display text-h3">
+                  <KeepHyphens>{service.name}</KeepHyphens>
+                </h3>
+                <p className="mt-3 text-muted-inverse">{tagline}</p>
+                {showTimes ? (
+                  <div className="mt-5">
+                    <Timetable tone="ink" layout="stack" />
+                  </div>
+                ) : null}
+                <div className="mt-6 lg:mt-auto lg:pt-7">
+                  <PriceList prices={service.prices} tone="ink" linkContact={false} />
+                  <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-x-6 sm:gap-y-2">
+                    <ButtonLink
+                      href={PRIMARY_CTA.href}
+                      tone="dark"
+                      className="w-full sm:w-auto"
+                    >
+                      {PRIMARY_CTA.label}
+                      <span className="sr-only"> with {service.name.toLowerCase()}</span>
+                    </ButtonLink>
+                    <ButtonLink href={service.href} variant="text" tone="dark" className="w-full justify-center sm:w-auto sm:justify-start">
+                      Details<span className="sr-only"> about {service.name.toLowerCase()}</span>
+                    </ButtonLink>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
+
