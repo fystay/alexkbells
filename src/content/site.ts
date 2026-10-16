@@ -122,6 +122,16 @@ export const pageNav = [
   { label: "Contact", href: "/contact" },
 ] as const;
 
+/**
+ * Footer links: the pages, plus "How to book". The footer logo already links
+ * home and the header menu has the homepage sections, so they aren't repeated.
+ */
+export const footerNav = [
+  ...pageNav.filter((item) => item.href !== "/contact"),
+  mainNav[3], // How to book
+  ...pageNav.filter((item) => item.href === "/contact"),
+] as const;
+
 export function formatAddressLines(): string[] {
   const l = site.location;
   return [l.venue, l.street, `${l.town}, ${l.city}`, l.postcode];

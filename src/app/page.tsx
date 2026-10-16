@@ -4,6 +4,7 @@ import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { PRIMARY_CTA } from "@/lib/booking";
+import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { HowToBook } from "@/components/sections/HowToBook";
@@ -55,46 +56,45 @@ function Hero() {
   const video = site.heroVideo;
   const intro = `Classes and one-to-one sessions at ${site.location.venue}, or online coaching anywhere.`;
 
-  // Phones (<640px): the video edge to edge (it breaks out of the page
-  // gutters) at its full 4:5 frame, never cropped, with the headline and
-  // booking button over its lower part on a dark fade, so all of it fits the
-  // first screen. The DOM order (headline, button, video) stays the same.
-  // Tablets: headline, button and the whole video fill the first screen; the
-  // video takes the height left (container query units keep its 4:5 frame).
-  // The intro line and secondary links follow below on both.
+  // Phones and tablets (<1024px): the video at its full 4:5 frame, never
+  // cropped, with the headline and button over its lower part on a dark fade,
+  // so video, headline and button fit the first screen. Phones run it edge to
+  // edge (it breaks out of the gutters); tablets keep the gutters and cap its
+  // width so the whole frame fits the screen height. The DOM order (headline,
+  // button, video) stays the same. The intro line and the offer links follow.
   // Desktop: text beside the video, which is as large as the first view
   // allows (up to its half of the grid) without cropping.
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
-      <div className="container-page pt-0 pb-10 sm:pt-8 lg:pt-4 lg:pb-8">
+      <div className="container-page pt-0 pb-10 sm:pt-6 lg:pt-4 lg:pb-8">
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
-          <div className="relative -mx-4 flex flex-col sm:mx-0 sm:h-[calc(100svh-9rem)] sm:max-h-[64rem] sm:min-h-[30rem] lg:contents">
-            {/* Phones: laid over the bottom of the video. Tablets: above it. Desktop: grid cells. */}
-            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/60 via-55% to-transparent px-4 pt-28 pb-4 sm:static sm:bg-none sm:p-0 lg:contents">
+          <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
+            {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/60 via-55% to-transparent px-4 pt-28 pb-4 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
               <div className="lg:col-span-6 lg:row-start-2">
-                <p className="eyebrow text-paper/85 sm:text-muted">Kettlebell coaching · {site.location.town}</p>
-                <h1 id="hero-heading" className="mt-3 font-display text-display text-balance text-paper sm:mt-4 sm:text-ink lg:text-display-split">
+                <p className="eyebrow text-paper/85 lg:text-muted">Kettlebell coaching · {site.location.town}</p>
+                <h1 id="hero-heading" className="mt-3 font-display text-display text-balance text-paper sm:mt-4 lg:text-ink lg:text-display-split">
                   <span className="block">Get stronger.</span>
                   <span className="block">Move better.</span>
                 </h1>
                 <p className="mt-5 hidden max-w-md text-lede text-muted lg:block">{intro}</p>
               </div>
-              <div className="mt-4 sm:mt-5 lg:col-span-6 lg:row-start-3 lg:mt-8">
+              <div className="mt-4 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
                 <ButtonLink
                   href={booking.href}
                   external={booking.external}
-                  className="w-full max-sm:bg-paper max-sm:text-ink max-sm:hover:bg-white max-sm:focus-visible:outline-paper sm:w-auto"
+                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto"
                 >
                   {booking.label}
                 </ButtonLink>
               </div>
             </div>
             {video ? (
-              <div className="sm:mt-5 sm:min-h-0 sm:flex-1 sm:[container-type:size] lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:flex lg:items-center lg:justify-end lg:[container-type:normal]">
+              <div className="lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:flex lg:items-center lg:justify-end">
                 <HeroVideo
                   sources={video.sources}
                   poster={video.poster}
-                  className="w-full sm:w-[min(100cqw,80cqh)] lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
+                  className="w-full lg:w-[min(100%,calc((100svh-7rem)*0.8),44rem)]"
                 />
               </div>
             ) : null}
@@ -116,8 +116,9 @@ function Hero() {
   );
 }
 
+// No button here: "Choose how you train" (just above) and "Where and how to
+// book" (below) carry it, so the call to action isn't repeated every section.
 function Benefits() {
-  const booking = PRIMARY_CTA;
   return (
     <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
@@ -128,9 +129,6 @@ function Benefits() {
             title="Stronger, fitter, more confident"
             intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
           />
-          <ButtonLink href={booking.href} external={booking.external} className="mt-8">
-            {booking.label}
-          </ButtonLink>
         </div>
         <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
           {benefits.map((b) => (
@@ -175,15 +173,25 @@ function About() {
           </div>
         </div>
         {stills.length > 0 ? (
-          <ul className="grid grid-cols-3 gap-2 sm:gap-4 lg:col-span-7" aria-label="From the training">
+          // Phones: a swipeable row of large photos (the next one peeks in), not
+          // three thumbnails. From sm: three across, staggered on desktop. The
+          // row is focusable so keyboard users can scroll it with the arrow keys.
+          <ul
+            className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:col-span-7"
+            aria-label="From the training"
+            tabIndex={0}
+          >
             {stills.map((photo, i) => (
-              <li key={photo.src} className={i === 1 ? "lg:mt-16" : i === 2 ? "lg:mt-8" : undefined}>
+              <li
+                key={photo.src}
+                className={cn("w-[72%] shrink-0 snap-start sm:w-auto", i === 1 ? "lg:mt-16" : i === 2 ? "lg:mt-8" : undefined)}
+              >
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   width={photo.width}
                   height={photo.height}
-                  sizes="(min-width: 1024px) 18vw, 33vw"
+                  sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 72vw"
                   className="aspect-[4/5] w-full object-cover"
                 />
               </li>

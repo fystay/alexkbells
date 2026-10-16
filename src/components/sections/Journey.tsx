@@ -1,9 +1,7 @@
 import Image from "next/image";
 import { journey } from "@/content/journey";
 import type { Photo } from "@/content/types";
-import { PRIMARY_CTA } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
 import { Section } from "@/components/ui/Section";
 
@@ -64,9 +62,6 @@ export function Journey() {
               </dl>
             ) : null}
 
-            <ButtonLink href={PRIMARY_CTA.href} tone="dark" className="mt-10">
-              {PRIMARY_CTA.label}
-            </ButtonLink>
           </div>
 
           {showPhotos ? (

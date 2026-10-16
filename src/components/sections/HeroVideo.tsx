@@ -22,9 +22,10 @@ const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g,
  *   browser that stops at the end instead, so it never sits on a blank frame.
  * - Visible pause/play control (WCAG 2.2.2). Once a visitor pauses, it stays
  *   paused until they press play again.
- * - Some devices block autoplay entirely (e.g. iPhone Low Power Mode), and a
- *   failed download shows nothing at all: the poster is also painted behind
- *   the video, so a still frame is always there and the play button starts it.
+ * - Some devices block autoplay entirely (e.g. iPhone Low Power Mode): the
+ *   poster stays and the play button starts it. If no source can be loaded at
+ *   all, the poster (also painted behind the video) stays and the control is
+ *   removed, since there is nothing to play.
  * - prefers-reduced-motion: CSS hides the video (showing that poster) from the
  *   first paint, before JavaScript; on hydration it is paused. Pressing play
  *   reveals and starts it.
@@ -35,6 +36,8 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   const [playing, setPlaying] = useState(true);
   /** Set once the visitor presses play; lifts the reduced-motion still. */
   const [userPlayed, setUserPlayed] = useState(false);
+  /** No source could be loaded: show the still poster and no play/pause control. */
+  const [unavailable, setUnavailable] = useState(false);
 
   const html =
     `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-contain">` +
@@ -53,6 +56,12 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
       v.play().catch(sync);
     };
     v.muted = true;
+    // Source errors fire on the <source> elements, and may already have
+    // happened before hydration, so check the network state as well.
+    const lastSource = v.querySelector("source:last-of-type");
+    const fail = () => setUnavailable(true);
+    if (v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) fail();
+    lastSource?.addEventListener("error", fail);
     v.addEventListener("play", sync);
     v.addEventListener("pause", sync);
     v.addEventListener("ended", restart);
@@ -67,6 +76,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
       v.play().catch(sync);
     }
     return () => {
+      lastSource?.removeEventListener("error", fail);
       v.removeEventListener("play", sync);
       v.removeEventListener("pause", sync);
       v.removeEventListener("ended", restart);
@@ -98,16 +108,18 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
           dangerouslySetInnerHTML={{ __html: html }}
         />
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={playing ? "Pause background video" : "Play background video"}
-          className="absolute top-3 right-3 z-20 inline-flex size-11 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink focus-visible:outline-paper sm:top-auto sm:bottom-3"
-        >
-          <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
-            {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}
-          </svg>
-        </button>
+        {unavailable ? null : (
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={playing ? "Pause background video" : "Play background video"}
+            className="absolute top-3 right-3 z-20 inline-flex size-11 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink focus-visible:outline-paper lg:top-auto lg:bottom-3"
+          >
+            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
+              {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );

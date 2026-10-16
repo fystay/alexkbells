@@ -32,8 +32,7 @@ export const journey: Journey = {
   beforeLabel: "Before",
   afterLabel: "Now",
   caption: "Alex, before he started training and today. Both from his own reel.",
-  highlights: [
-    { value: "9.6k", label: "Instagram followers" },
-    { value: "3", label: "Ways to train" },
-  ],
+  // Empty: the follower count is shown in "About Alex" directly above, and
+  // "3 ways to train" said nothing new. Add real milestones from Alex here.
+  highlights: [],
 };

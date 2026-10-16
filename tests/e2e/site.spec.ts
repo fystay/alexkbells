@@ -405,6 +405,40 @@ test("with Reduce Motion the hero shows a still frame until the visitor presses 
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
 });
 
+test("if the hero video can't load, the still stays and the play/pause control is removed", async ({ page }) => {
+  await page.route(/\/media\/hero\.(mp4|webm)/, (route) => route.abort());
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: /background video/ })).toHaveCount(0);
+  expect(await page.locator("main video").evaluate((v) => getComputedStyle(v.parentElement!.parentElement!).backgroundImage)).toContain("hero-poster");
+});
+
+test("tablets show the whole hero video across the content width, headline and button on it", async ({ page }) => {
+  for (const [width, height] of [[768, 1024], [820, 1180]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const video = (await page.locator("main video").boundingBox())!;
+    const h1 = (await page.locator("h1").boundingBox())!;
+    const cta = (await page.locator("main section").first().getByRole("link", { name: "Get in touch" }).boundingBox())!;
+    expect(video.width, `${width}px`).toBeGreaterThanOrEqual(width - 48 - 1);
+    expect(video.y + video.height).toBeLessThanOrEqual(height);
+    for (const el of [h1, cta]) {
+      expect(el.y).toBeGreaterThan(video.y + video.height / 2);
+      expect(el.y + el.height).toBeLessThanOrEqual(video.y + video.height);
+    }
+  }
+});
+
+test("phones get the training photos as a keyboard-scrollable row", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const row = page.getByRole("list", { name: "From the training" });
+  await expect(row).toHaveAttribute("tabindex", "0");
+  expect(await row.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+  await row.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => row.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+});
+
 test("menu open on mobile has no accessibility violations and is keyboard operable", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto("/");
