@@ -79,7 +79,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
           type="button"
           onClick={toggle}
           aria-label={playing ? "Pause background video" : "Play background video"}
-          className="absolute right-3 bottom-3 inline-flex size-11 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink"
+          className="absolute top-3 right-3 z-20 inline-flex size-11 sm:top-auto sm:bottom-3 items-center justify-center bg-ink/75 text-paper transition-colors hover:bg-ink"
         >
           <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
             {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}

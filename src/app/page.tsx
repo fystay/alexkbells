@@ -49,8 +49,10 @@ function Hero() {
   const video = site.heroVideo;
   const intro = `Classes and one-to-one sessions at ${site.location.venue}, or online coaching anywhere.`;
 
-  // Phones (<640px): headline and booking button, then the video edge to edge
-  // (it breaks out of the page gutters) at its full 4:5 frame, never cropped.
+  // Phones (<640px): the video edge to edge (it breaks out of the page
+  // gutters) at its full 4:5 frame, never cropped, with the headline and
+  // booking button over its lower part on a dark fade, so all of it fits the
+  // first screen. The DOM order (headline, button, video) stays the same.
   // Tablets: headline, button and the whole video fill the first screen; the
   // video takes the height left (container query units keep its 4:5 frame).
   // The intro line and secondary links follow below on both.
@@ -58,24 +60,31 @@ function Hero() {
   // allows (up to its half of the grid) without cropping.
   return (
     <section aria-labelledby="hero-heading" className="bg-paper">
-      <div className="container-page pt-4 pb-10 sm:pt-8 lg:pt-4 lg:pb-8">
+      <div className="container-page pt-0 pb-10 sm:pt-8 lg:pt-4 lg:pb-8">
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
-          <div className="flex flex-col sm:h-[calc(100svh-9rem)] sm:max-h-[64rem] sm:min-h-[30rem] lg:contents">
-            <div className="lg:col-span-6 lg:row-start-2">
-              <p className="eyebrow text-muted">Kettlebell coaching · {site.location.town}</p>
-              <h1 id="hero-heading" className="mt-3 font-display text-display text-balance sm:mt-4 lg:text-display-split">
-                <span className="block">Get stronger.</span>
-                <span className="block">Move better.</span>
-              </h1>
-              <p className="mt-5 hidden max-w-md text-lede text-muted lg:block">{intro}</p>
-            </div>
-            <div className="mt-4 sm:mt-5 lg:col-span-6 lg:row-start-3 lg:mt-8">
-              <ButtonLink href={booking.href} external={booking.external} className="w-full sm:w-auto">
-                {booking.label}
-              </ButtonLink>
+          <div className="relative -mx-4 flex flex-col sm:mx-0 sm:h-[calc(100svh-9rem)] sm:max-h-[64rem] sm:min-h-[30rem] lg:contents">
+            {/* Phones: laid over the bottom of the video. Tablets: above it. Desktop: grid cells. */}
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/60 via-55% to-transparent px-4 pt-28 pb-4 sm:static sm:bg-none sm:p-0 lg:contents">
+              <div className="lg:col-span-6 lg:row-start-2">
+                <p className="eyebrow text-paper/85 sm:text-muted">Kettlebell coaching · {site.location.town}</p>
+                <h1 id="hero-heading" className="mt-3 font-display text-display text-balance text-paper sm:mt-4 sm:text-ink lg:text-display-split">
+                  <span className="block">Get stronger.</span>
+                  <span className="block">Move better.</span>
+                </h1>
+                <p className="mt-5 hidden max-w-md text-lede text-muted lg:block">{intro}</p>
+              </div>
+              <div className="mt-4 sm:mt-5 lg:col-span-6 lg:row-start-3 lg:mt-8">
+                <ButtonLink
+                  href={booking.href}
+                  external={booking.external}
+                  className="w-full max-sm:bg-paper max-sm:text-ink max-sm:hover:bg-white sm:w-auto"
+                >
+                  {booking.label}
+                </ButtonLink>
+              </div>
             </div>
             {video ? (
-              <div className="-mx-4 mt-4 sm:mx-0 sm:mt-5 sm:min-h-0 sm:flex-1 sm:[container-type:size] lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:flex lg:items-center lg:justify-end lg:[container-type:normal]">
+              <div className="sm:mt-5 sm:min-h-0 sm:flex-1 sm:[container-type:size] lg:col-span-6 lg:col-start-7 lg:row-span-4 lg:row-start-1 lg:mt-0 lg:flex lg:items-center lg:justify-end lg:[container-type:normal]">
                 <HeroVideo
                   sources={video.sources}
                   poster={video.poster}

@@ -442,29 +442,33 @@ for (const [width, height] of [
   });
 }
 
-// Phones: the video runs edge to edge at its full 4:5 frame, never cropped.
-// The bottom is in the first view on full-height phone screens (and on
-// iPhone Safari once its toolbar collapses as you start to scroll).
-for (const [width, height, wholeInView] of [
-  [430, 932, true],
-  [393, 852, true],
-  [390, 750, true],
-  [390, 664, false],
-  [360, 640, false],
-  [320, 568, false],
+// Phones: the video runs edge to edge at its full 4:5 frame, never cropped,
+// with the headline and booking button over its lower part, so the whole
+// video, headline and button fit the first screen, even with Safari's toolbar.
+for (const [width, height] of [
+  [430, 932],
+  [393, 852],
+  [390, 664],
+  [360, 640],
+  [320, 568],
 ] as const) {
-  test(`hero video runs edge to edge, uncropped, at ${width}x${height}`, async ({ page }) => {
+  test(`hero video runs edge to edge with the headline and button on it at ${width}x${height}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto("/");
-    const cta = await page.locator("main section").first().getByRole("link").first().boundingBox();
     const video = page.locator("main video");
     const box = (await video.boundingBox())!;
-    expect(cta!.y + cta!.height).toBeLessThanOrEqual(height);
+    const h1 = (await page.locator("h1").boundingBox())!;
+    const cta = (await page.locator("main section").first().getByRole("link").first().boundingBox())!;
     expect(box.x).toBe(0);
     expect(box.x + box.width).toBe(width);
     expect(Math.abs(box.width / box.height - 0.8)).toBeLessThan(0.01);
     expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe("contain");
-    if (wholeInView) expect(box.y + box.height).toBeLessThanOrEqual(height);
+    expect(box.y + box.height, "bottom of the video").toBeLessThanOrEqual(height);
+    // Headline and button sit on the lower part of the video.
+    for (const el of [h1, cta]) {
+      expect(el.y).toBeGreaterThan(box.y + box.height / 2);
+      expect(el.y + el.height).toBeLessThanOrEqual(box.y + box.height);
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   });
 }
