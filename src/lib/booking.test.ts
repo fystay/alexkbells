@@ -6,6 +6,7 @@ import {
   bookingMode,
   getBookingAction,
   getClassBookingAction,
+  getPrimaryCta,
   getOnlineCoachingAction,
   isBookingDemoEnabled,
   onlineEnquiryMode,
@@ -22,6 +23,21 @@ describe("PRIMARY_CTA", () => {
   it("is always an honest 'Start your training' link to the contact page", () => {
     expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Start your training", href: "/contact", external: false });
     expect(PRIMARY_CTA.label).not.toMatch(/book|pay|checkout/i);
+  });
+});
+
+describe("getPrimaryCta", () => {
+  it("is PRIMARY_CTA (contact page) on production, local and CI builds", () => {
+    expect(getPrimaryCta({ VERCEL_ENV: "production", BOOKING_DEMO: "true" })).toEqual(PRIMARY_CTA);
+    expect(getPrimaryCta({})).toEqual(PRIMARY_CTA);
+    expect(getPrimaryCta({ BOOKING_DEMO: "true" })).toEqual(PRIMARY_CTA);
+    expect(getPrimaryCta({ VERCEL_ENV: "development" })).toEqual(PRIMARY_CTA);
+  });
+
+  it("opens the booking page, with the same label, on Vercel previews only", () => {
+    const cta = getPrimaryCta({ VERCEL_ENV: "preview" });
+    expect(cta).toMatchObject({ kind: "booking", label: PRIMARY_CTA.label, href: "/book", external: false });
+    expect(cta.label).not.toMatch(/book|pay|checkout/i);
   });
 });
 

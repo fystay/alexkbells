@@ -1,7 +1,7 @@
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Service } from "@/content/types";
-import { PRIMARY_CTA } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { SectionHeading } from "@/components/ui/Section";
@@ -37,6 +37,7 @@ export function WaysToTrain() {
       tagline: "Personalised programming and support, wherever you train.",
     },
   ];
+  const cta = getPrimaryCta();
 
   return (
     <section id="ways-to-train" aria-labelledby="ways-heading">
@@ -74,8 +75,8 @@ export function WaysToTrain() {
                 <div className="mt-8 lg:mt-auto lg:pt-8">
                   <PriceList prices={service.prices} tone="ink" linkContact={false} />
                   <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
-                    <ButtonLink href={PRIMARY_CTA.href} tone="dark">
-                      {PRIMARY_CTA.label}
+                    <ButtonLink href={cta.href} tone="dark">
+                      {cta.label}
                       <span className="sr-only"> with {service.name.toLowerCase()}</span>
                     </ButtonLink>
                     <ButtonLink href={service.href} variant="text" tone="dark">

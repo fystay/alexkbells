@@ -1,10 +1,10 @@
-import { PRIMARY_CTA } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Logo } from "./Logo";
 import { DesktopNav, MobileNav } from "./NavLinks";
 
 export function SiteHeader() {
-  const cta = PRIMARY_CTA;
+  const cta = getPrimaryCta();
 
   return (
     <header className="sticky top-0 z-40 bg-ink text-paper">

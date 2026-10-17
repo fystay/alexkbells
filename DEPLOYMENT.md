@@ -47,8 +47,11 @@ redeploy: pages, including `/book`, are prerendered at build time.
 | `BOOKING_NOTIFY_EMAIL` | Alex's inbox for booking requests | a test inbox | Requests arrive here with Reply-To set to the visitor |
 | `BOOKING_FROM_EMAIL` | e.g. `Alex K Bells <bookings@<verified domain>>` | same | Must be on a domain verified in Resend (needs the domain decision; DNS records with Alex's approval) |
 
-Public buttons always say "Start your training" → /contact, whatever is set here; these
-settings only affect the unlisted `/book` pages. With none of them, `/book` shows
+Public buttons always say "Start your training" and go to /contact, whatever is set here,
+except on Vercel **Preview** deployments, where the same buttons open `/book` so the
+booking prototype can be tried (production, local and CI builds are unaffected). Set
+`BOOKING_DEMO=true` for Preview to see the labelled sample calendar there. These
+settings otherwise only affect the unlisted `/book` pages. With none of them, `/book` shows
 the Instagram prompt and production builds log a warning.
 
 ### Booking request form: what to know

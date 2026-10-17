@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
-import { PRIMARY_CTA } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
@@ -31,7 +31,7 @@ function ServiceDetail({
   tone: "paper" | "ink";
   intro: string;
 }) {
-  const enquiry = PRIMARY_CTA;
+  const enquiry = getPrimaryCta();
   const headingId = `${service.id}-heading`;
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
   const rule = tone === "ink" ? "border-line-inverse" : "border-line";

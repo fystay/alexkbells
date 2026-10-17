@@ -32,6 +32,11 @@ export function isProductionDeployment(env: Env = process.env): boolean {
   return env.VERCEL_ENV === "production";
 }
 
+/** True only on Vercel preview deployments, not on production, local or CI builds (no VERCEL_ENV). */
+export function isPreviewDeployment(env: Env = process.env): boolean {
+  return env.VERCEL_ENV === "preview";
+}
+
 /**
  * Search engines may index this build only when it is the real site:
  * Vercel production, or a local build (no VERCEL_ENV) without preview content.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isIndexable, isProductionDeployment, siteUrl } from "./env";
+import { isIndexable, isPreviewDeployment, isProductionDeployment, siteUrl } from "./env";
 
 describe("siteUrl", () => {
   it("prefers SITE_URL and normalises it to an origin", () => {
@@ -25,6 +25,13 @@ describe("deployment environment", () => {
     expect(isProductionDeployment({ VERCEL_ENV: "production" })).toBe(true);
     expect(isProductionDeployment({ VERCEL_ENV: "preview" })).toBe(false);
     expect(isProductionDeployment({})).toBe(false);
+  });
+
+  it("detects Vercel previews only", () => {
+    expect(isPreviewDeployment({ VERCEL_ENV: "preview" })).toBe(true);
+    expect(isPreviewDeployment({ VERCEL_ENV: "production" })).toBe(false);
+    expect(isPreviewDeployment({ VERCEL_ENV: "development" })).toBe(false);
+    expect(isPreviewDeployment({})).toBe(false);
   });
 
   it("indexes production and plain local builds only", () => {

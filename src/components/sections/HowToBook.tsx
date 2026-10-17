@@ -1,6 +1,6 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { timetable } from "@/content/classes";
-import { PRIMARY_CTA } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { describeTimetable } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -13,6 +13,7 @@ import { Section } from "@/components/ui/Section";
  */
 export function HowToBook() {
   const times = isPublishable(timetable.status) ? describeTimetable(timetable.sessions) : null;
+  const cta = getPrimaryCta();
 
   const steps = [
     { title: "Choose how you train", body: "A group class or a one-to-one session." },
@@ -41,8 +42,8 @@ export function HowToBook() {
               </li>
             ))}
           </ol>
-          <ButtonLink href={PRIMARY_CTA.href} className="mt-10">
-            {PRIMARY_CTA.label}
+          <ButtonLink href={cta.href} className="mt-10">
+            {cta.label}
           </ButtonLink>
         </div>
 

@@ -14,7 +14,7 @@
  *    dressed up as booking, and never a fake booking flow.
  */
 
-import { isProductionDeployment, type Env } from "./env";
+import { isPreviewDeployment, isProductionDeployment, type Env } from "./env";
 import { isBookingFormEnabled } from "./booking-request";
 import type { BookableService } from "./booking-options";
 
@@ -56,6 +56,17 @@ export const PRIMARY_CTA: CallToAction = {
   href: ENQUIRY_HREF,
   external: false,
 };
+
+/**
+ * What pages render for the primary call to action: PRIMARY_CTA everywhere
+ * except Vercel Preview deployments, where the same button opens the booking
+ * page (/book, with its labelled demonstration calendar when BOOKING_DEMO is
+ * on) so Alex and reviewers can try the flow. The label never changes and
+ * never says "book". Production, local and CI builds always get PRIMARY_CTA.
+ */
+export function getPrimaryCta(env: Env = process.env): CallToAction {
+  return isPreviewDeployment(env) ? { ...PRIMARY_CTA, kind: "booking", href: BOOK_PAGE_HREF } : PRIMARY_CTA;
+}
 
 /** Demonstration availability: opt-in, and impossible on Vercel production. */
 export function isBookingDemoEnabled(env: Env = process.env): boolean {

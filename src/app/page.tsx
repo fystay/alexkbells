@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { PRIMARY_CTA } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -44,7 +44,7 @@ const benefits = [
 ];
 
 function Hero() {
-  const booking = PRIMARY_CTA;
+  const booking = getPrimaryCta();
   const video = site.heroVideo;
   const intro = `Expert kettlebell coaching in ${site.location.town}. Build strength, improve technique and move with confidence.`;
 
