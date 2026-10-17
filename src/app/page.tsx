@@ -63,7 +63,8 @@ function Hero() {
           container's top padding) so header and video join up. Phones have no
           gap; desktop keeps the video on paper. */}
       <div aria-hidden="true" className="absolute inset-x-0 top-0 hidden h-6 bg-ink sm:block lg:hidden" />
-      <div className="container-page pt-0 pb-10 sm:pt-6 lg:pt-4 lg:pb-8">
+      {/* Phones: no bottom padding, so the edge-to-edge video runs straight into the ink "What I offer" band. */}
+      <div className="container-page pt-0 pb-0 sm:pt-6 sm:pb-10 lg:pt-4 lg:pb-8">
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
           <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
             {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}

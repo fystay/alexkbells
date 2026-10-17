@@ -23,12 +23,18 @@ for (const route of [...publicRoutes, ...unlistedRoutes, ...coachRoutes]) {
           () => document.documentElement.scrollWidth - window.innerWidth,
         );
         expect(overflow, `overflow at ${width}px`).toBeLessThanOrEqual(0);
-        // Also catch controls pushed past the edge (even if clipped).
+        // Also catch controls pushed past the edge (even if clipped). Controls
+        // inside a sideways-scrolling row (the offers carousel) are reached by
+        // swiping, so they don't count.
         const offscreen = await page.$$eval("main a, main button", (els) =>
           els
             .filter((el) => {
               const r = el.getBoundingClientRect();
-              return r.width > 0 && !el.classList.contains("sr-only") && r.right > window.innerWidth + 1;
+              if (r.width === 0 || el.classList.contains("sr-only") || r.right <= window.innerWidth + 1) return false;
+              for (let p = el.parentElement; p; p = p.parentElement) {
+                if (["auto", "scroll"].includes(getComputedStyle(p).overflowX)) return false;
+              }
+              return true;
             })
             .map((el) => el.textContent?.trim().slice(0, 30)),
         );

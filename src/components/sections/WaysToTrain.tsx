@@ -30,9 +30,10 @@ const cardImages: Record<Service["id"], { photo: Photo | null; position: string 
 };
 
 /**
- * "What I offer". One landmark in two bands: the heading on paper, carrying on
- * from the hero, then the three ways to train on ink, each with a photo, a
- * short description, its price and an Enquire button.
+ * "What I offer". One ink band, heading included, so it reads as a single
+ * block after the paper hero. Each way to train is an open column rather than
+ * a boxed card: a portrait photo with its number and name set over a fade at
+ * the bottom, then a short description, its price and an Enquire button.
  *
  * Below lg the cards are a swipe carousel (one card mostly in view, the next
  * peeking in; dots and arrows); from lg they are three columns. The cards are
@@ -56,50 +57,49 @@ export function WaysToTrain() {
   ];
 
   return (
-    <section id="ways-to-train" aria-labelledby="ways-heading">
-      <div className="bg-paper pt-6 pb-12 text-ink sm:pt-8 sm:pb-16 lg:pt-12 lg:pb-20">
-        <div className="container-page">
-          <SectionHeading
-            id="ways-heading"
-            eyebrow="What I offer"
-            title="Choose how you train"
-            intro={`Three ways to train with Alex: coached group classes and one-to-one sessions in ${site.location.town}, or online coaching wherever you are.`}
-          />
+    <section id="ways-to-train" aria-labelledby="ways-heading" className="bg-ink py-16 text-paper sm:py-20 lg:py-28">
+      <div className="container-page">
+        <div className="grid grid-cols-1 gap-5 border-b border-line-inverse pb-10 sm:pb-12 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-14">
+          <SectionHeading id="ways-heading" tone="ink" eyebrow="What I offer" title="Choose how you train" className="lg:col-span-7" />
+          <p className="max-w-xl text-lede text-muted-inverse lg:col-span-5">
+            Three ways to train with Alex: coached group classes and one-to-one sessions in {site.location.town}, or
+            online coaching wherever you are.
+          </p>
         </div>
-      </div>
 
-      <div className="bg-ink py-12 text-paper sm:py-16 lg:py-20">
-        <div className="container-page">
-          <Carousel
-            label="Ways to train"
-            slideLabels={options.map((o) => o.service.name)}
-            itemClassName="lg:border-l lg:border-line-inverse lg:px-8 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
-          >
+        <div className="mt-10 sm:mt-12 lg:mt-14">
+          <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
             {options.map(({ service, tagline, timetable: showTimes }, i) => {
               const image = cardImages[service.id];
               return (
-                <div
-                  key={service.id}
-                  className="flex w-full flex-col border border-line-inverse bg-ink-soft lg:border-0 lg:bg-transparent"
-                >
-                  {image.photo ? (
-                    <Image
-                      src={image.photo.src}
-                      alt={image.photo.alt}
-                      width={image.photo.width}
-                      height={image.photo.height}
-                      sizes="(min-width: 1024px) 30vw, (min-width: 640px) 24rem, 86vw"
-                      className={cn("aspect-[16/10] w-full object-cover", image.position)}
-                    />
-                  ) : null}
-                  <div className="flex flex-1 flex-col p-5 sm:p-6 lg:px-0 lg:pb-0">
-                    <p className="eyebrow text-muted-inverse" aria-hidden="true">
-                      {String(i + 1).padStart(2, "0")}
-                    </p>
-                    <h3 className="mt-3 font-display text-h3">
-                      <KeepHyphens>{service.name}</KeepHyphens>
-                    </h3>
-                    <p className="mt-2 text-muted-inverse">{tagline}</p>
+                <div key={service.id} className="group flex w-full flex-col">
+                  <div className="relative aspect-square overflow-hidden bg-ink-soft sm:aspect-[4/5]">
+                    {image.photo ? (
+                      <Image
+                        src={image.photo.src}
+                        alt={image.photo.alt}
+                        width={image.photo.width}
+                        height={image.photo.height}
+                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 24rem, 86vw"
+                        className={cn(
+                          "size-full object-cover grayscale motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]",
+                          image.position,
+                        )}
+                      />
+                    ) : null}
+                    {/* Decorative fade so the name reads over any photo. */}
+                    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink via-ink/60 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                      <p className="eyebrow text-paper/70" aria-hidden="true">
+                        {String(i + 1).padStart(2, "0")}
+                      </p>
+                      <h3 className="mt-2 font-display text-h3">
+                        <KeepHyphens>{service.name}</KeepHyphens>
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 flex-col pt-5 sm:pt-6">
+                    <p className="text-muted-inverse">{tagline}</p>
                     {showTimes ? (
                       <div className="mt-4">
                         <Timetable tone="ink" layout="compact" />
