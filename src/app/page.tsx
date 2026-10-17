@@ -47,7 +47,9 @@ const benefits = [
 function Hero() {
   const booking = getPrimaryCta();
   const video = site.heroVideo;
-  const intro = `Expert kettlebell coaching in ${site.location.town}. Build strength, improve technique and move with confidence.`;
+  const intro = `Expert kettlebell coaching in ${site.location.town}.`;
+  // Phones show only the first sentence: under the display headline a small two-line paragraph read as cramped.
+  const introMore = "Build strength, improve technique and move with confidence.";
 
   // Phones and tablets (<1024px): the video at its full 4:5 frame, never
   // cropped, with the headline, intro line and button over its lower part on a
@@ -74,9 +76,12 @@ function Hero() {
                   <span className="block">Get stronger.</span>
                   <span className="block">Move better.</span>
                 </h1>
-                <p className="mt-2 max-w-md text-sm text-paper/85 sm:mt-3 sm:text-base lg:mt-5 lg:text-lede lg:text-muted">{intro}</p>
+                <p className="mt-3 max-w-md text-base text-paper/85 lg:mt-5 lg:text-lede lg:text-muted">
+                  {intro}
+                  <span className="max-sm:hidden"> {introMore}</span>
+                </p>
               </div>
-              <div className="mt-3 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
+              <div className="mt-5 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
                 <ButtonLink
                   href={booking.href}
                   external={booking.external}
