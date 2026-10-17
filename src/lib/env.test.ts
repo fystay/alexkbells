@@ -48,17 +48,17 @@ describe("supabaseConfig", () => {
   const url = "https://sqkpixwvugrxllrxlexs.supabase.co";
 
   it("returns the origin and key when both are set", () => {
-    expect(supabaseConfig({ SUPABASE_URL: `${url}/`, SUPABASE_PUBLISHABLE_KEY: " sb_publishable_x " })).toEqual({
+    expect(supabaseConfig({ SUPABASE_URL: `${url}/`, SUPABASE_SECRET_KEY: " sb_secret_x " })).toEqual({
       url,
-      publishableKey: "sb_publishable_x",
+      secretKey: "sb_secret_x",
     });
   });
 
   it("stays off when either value is missing or the URL is not https", () => {
     expect(supabaseConfig({})).toBeNull();
     expect(supabaseConfig({ SUPABASE_URL: url })).toBeNull();
-    expect(supabaseConfig({ SUPABASE_PUBLISHABLE_KEY: "sb_publishable_x" })).toBeNull();
-    expect(supabaseConfig({ SUPABASE_URL: "http://example.supabase.co", SUPABASE_PUBLISHABLE_KEY: "k" })).toBeNull();
-    expect(supabaseConfig({ SUPABASE_URL: "not a url", SUPABASE_PUBLISHABLE_KEY: "k" })).toBeNull();
+    expect(supabaseConfig({ SUPABASE_SECRET_KEY: "sb_secret_x" })).toBeNull();
+    expect(supabaseConfig({ SUPABASE_URL: "http://example.supabase.co", SUPABASE_SECRET_KEY: "k" })).toBeNull();
+    expect(supabaseConfig({ SUPABASE_URL: "not a url", SUPABASE_SECRET_KEY: "k" })).toBeNull();
   });
 });

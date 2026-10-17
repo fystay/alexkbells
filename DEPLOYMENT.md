@@ -76,7 +76,7 @@ the Instagram prompt and production builds log a warning.
   test inbox, redeploying, and sending a request.
 
 | `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` once a feature uses the database | same | Project `Alexkbells` in the developer's Supabase organisation. Unused by pages today |
-| `SUPABASE_PUBLISHABLE_KEY` | publishable key (`sb_publishable_...`) from the Supabase dashboard | same | Server-only despite being "publishable"; keeps the bundle check simple |
+| `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
 
 `VERCEL_ENV` and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel
 automatically.
