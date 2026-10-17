@@ -62,9 +62,9 @@ export function WaysToTrain() {
   ];
 
   return (
-    <section id="ways-to-train" aria-labelledby="ways-heading" className="bg-ink py-16 text-paper sm:py-20 lg:py-28">
+    <section id="ways-to-train" aria-labelledby="ways-heading" className="bg-ink pt-10 pb-16 text-paper sm:py-20 lg:py-28">
       <div className="container-page">
-        <div className="grid grid-cols-1 gap-5 border-b border-line-inverse pb-10 sm:pb-12 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-14">
+        <div className="grid grid-cols-1 gap-5 border-b border-line-inverse pb-8 sm:pb-12 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-14">
           <SectionHeading id="ways-heading" tone="ink" eyebrow="What I offer" title="Choose how you train" className="lg:col-span-7" />
           <p className="max-w-xl text-lede text-muted-inverse lg:col-span-5">
             Three ways to train with Alex: coached group classes and one-to-one sessions in {site.location.town}, or
@@ -72,7 +72,7 @@ export function WaysToTrain() {
           </p>
         </div>
 
-        <div className="mt-10 sm:mt-12 lg:mt-14">
+        <div className="mt-8 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
             {options.map(({ service, pitch, tagline, timetable: showTimes }, i) => {
               const image = cardImages[service.id];

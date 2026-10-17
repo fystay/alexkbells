@@ -68,7 +68,7 @@ function Hero() {
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-10">
           <div className="relative -mx-4 sm:mx-0 sm:w-[min(100%,calc((100svh-6.5rem)*0.8))] lg:contents">
             {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
-            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent px-4 pt-28 pb-3 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent max-sm:from-ink max-sm:from-10% px-4 pt-28 pb-3 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
               <div className="lg:col-span-6 lg:row-start-2">
                 <h1 id="hero-heading" className="font-display text-display text-balance text-paper lg:text-ink lg:text-display-split">
                   <span className="block">Get stronger.</span>
