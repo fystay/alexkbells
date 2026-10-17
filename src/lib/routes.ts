@@ -14,3 +14,6 @@ export const publicRoutes = [
  * a future booking route; today bookings are arranged via /contact.
  */
 export const unlistedRoutes = ["/book", "/book/group-class", "/book/one-to-one"] as const;
+
+/** Coach sign-in: linked from the footer, but never in the sitemap or indexed. */
+export const coachRoutes = ["/coach/login"] as const;

@@ -15,9 +15,19 @@
 
 No database, auth or payment SDK is installed — none is needed in Phase 1.
 
-**Supabase** (connected 2026-10-17, config only): project `Alexkbells`, ref `sqkpixwvugrxllrxlexs`, region eu-west-1, URL `https://sqkpixwvugrxllrxlexs.supabase.co`. `supabaseConfig()` in `src/lib/env.ts` reads `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (server-only; bypasses RLS) on the server and returns null when either is missing. No page reads from it and `@supabase/supabase-js` is not installed; add it (and justify it here) with the first feature that stores data. Link the CLI with `npx supabase link --project-ref sqkpixwvugrxllrxlexs`. **Caution:** on 2026-10-17 the project's `public` schema already held another app's tables (Prisma-managed `User`, `Listing`, `Booking`, `Review`, PMS and affiliate tables, with rows) — apparently FYStay's. Decide whether to clear it or create a fresh project before any migration from this repo.
+**Supabase** (connected 2026-10-17, config only): project `Alexkbells`, ref `sqkpixwvugrxllrxlexs`, region eu-west-1, URL `https://sqkpixwvugrxllrxlexs.supabase.co`. `supabaseConfig()` in `src/lib/env.ts` reads `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (server-only; bypasses RLS) on the server and returns null when either is missing. Only the coach login uses it (below); `@supabase/supabase-js` is not installed. Link the CLI with `npx supabase link --project-ref sqkpixwvugrxllrxlexs`. **Caution:** on 2026-10-17 the project's `public` schema already held another app's tables (Prisma-managed `User`, `Listing`, `Booking`, `Review`, PMS and affiliate tables, with rows) — apparently FYStay's. Decide whether to clear it or create a fresh project before any migration from this repo.
 
 Next 16 differs from older versions; read `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
+
+### Coach login (2026-10-17)
+
+`/coach/login` signs Alex in with Supabase Auth (email + password), modelled on the coach login of his Lovable site. Plain `fetch` to the Auth REST API with the secret key, on the server only (`lib/coach-auth.ts`), so no SDK and nothing in the browser bundle.
+- Only `COACH_EMAIL` addresses may sign in; any other address gets the "don't match" message without reaching Supabase.
+- Session: two httpOnly, SameSite=Lax cookies scoped to `/coach` (`lib/coach-cookies.ts`): the access token (expires a minute before Supabase's, ≤1 h) and the refresh token (7 days).
+- `src/proxy.ts` (matcher `/coach/:path*`) only refreshes an expired access cookie. Every coach page and Server Action authorises itself with `requireCoach()` (`lib/coach-session.ts`), which checks the token with Supabase on each request.
+- `/coach` is partially prerendered: the static shell plus a `<Suspense>` section that reads the session. It has nothing to manage yet.
+- Not indexed (`noindex`, robots `Disallow: /coach$` and `/coach/`; a bare `/coach` would also block `/coaching`), not in the sitemap; linked from the footer.
+- E2E runs against `tests/e2e/mock-supabase-auth.mjs`.
 
 ## Brand assets
 

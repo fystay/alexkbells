@@ -39,7 +39,9 @@ export type SupabaseConfig = Readonly<{ url: string; secretKey: string }>;
 export function supabaseConfig(env: Env = process.env): SupabaseConfig | null {
   const url = parseOrigin(env.SUPABASE_URL);
   const secretKey = env.SUPABASE_SECRET_KEY?.trim();
-  if (!url || !url.startsWith("https://") || !secretKey) return null;
+  // http only on localhost, for the e2e stand-in (tests/e2e/mock-supabase-auth.mjs).
+  const secure = url?.startsWith("https://") || url?.startsWith("http://localhost:");
+  if (!url || !secure || !secretKey) return null;
   return { url, secretKey };
 }
 

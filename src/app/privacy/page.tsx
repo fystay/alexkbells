@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMetadata({
 
 // Describes what this website actually does. Review with Alex before the
 // booking form goes live (see DEPLOYMENT.md); update if anything changes.
-const LAST_UPDATED = "15 October 2026";
+const LAST_UPDATED = "17 October 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
@@ -69,7 +69,12 @@ const sections: { heading: string; body: React.ReactNode }[] = [
   },
   {
     heading: "Cookies",
-    body: <p>This website does not use analytics, advertising or tracking cookies.</p>,
+    body: (
+      <p>
+        This website does not use analytics, advertising or tracking cookies. The coach login sets
+        two cookies that keep the coach signed in; they are only used on the coach&apos;s pages.
+      </p>
+    ),
   },
   {
     heading: "Your rights",

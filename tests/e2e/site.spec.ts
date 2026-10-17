@@ -1,12 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { publicRoutes, unlistedRoutes } from "../../src/lib/routes";
+import { coachRoutes, publicRoutes, unlistedRoutes } from "../../src/lib/routes";
 
 // Includes the 414–430px large phones and in-between tablet widths.
 const widths = [320, 360, 375, 390, 414, 430, 480, 540, 600, 640, 700, 768, 900, 1024, 1280, 1600];
 
 // Unlisted routes still work for old links, so they get the same checks.
-for (const route of [...publicRoutes, ...unlistedRoutes]) {
+for (const route of [...publicRoutes, ...unlistedRoutes, ...coachRoutes]) {
   test.describe(`route ${route}`, () => {
     test("responds, has one h1 and a title", async ({ page }) => {
       const res = await page.goto(route);

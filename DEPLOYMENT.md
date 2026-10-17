@@ -78,6 +78,14 @@ the Instagram prompt and production builds log a warning.
 | `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` once a feature uses the database | same | Project `Alexkbells` in the developer's Supabase organisation. Unused by pages today |
 | `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
 
+| `COACH_EMAIL` | Alex's login email (comma-separate to allow more than one) | same, or a test account | Turns on `/coach/login` with the two Supabase settings. Only these addresses can sign in |
+
+### Coach login: setup
+
+1. In Supabase (project `Alexkbells`) → Authentication → Users → **Add user**: Alex's email and a strong password (tick "Auto confirm"). Let Alex change it, or send him a password reset.
+2. Authentication → Sign In / Providers: turn **off** "Allow new users to sign up". (The site already ignores any address not in `COACH_EMAIL`; this stops strangers creating accounts at all.)
+3. Set `COACH_EMAIL` in Vercel for Production and Preview, then redeploy.
+
 `VERCEL_ENV` and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel
 automatically.
 

@@ -4,6 +4,7 @@ const port = Number(process.env.E2E_PORT ?? 3200);
 /** Second server: configured as Vercel production, to prove demo data can't appear there. */
 export const productionPort = Number(process.env.E2E_PRODUCTION_PORT ?? 3201);
 export const mockEmailPort = Number(process.env.MOCK_EMAIL_PORT ?? 3299);
+export const mockSupabasePort = Number(process.env.MOCK_SUPABASE_PORT ?? 3298);
 // Optional: point at a preinstalled Chromium (e.g. /opt/pw-browsers/chromium).
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined;
 
@@ -12,6 +13,13 @@ const emailEnv = {
   RESEND_API_URL: `http://localhost:${mockEmailPort}/emails`,
   BOOKING_NOTIFY_EMAIL: "alex-e2e@example.com",
   BOOKING_FROM_EMAIL: "Alex K Bells <bookings-e2e@example.com>",
+};
+
+// Coach login against the Supabase Auth stand-in (tests/e2e/mock-supabase-auth.mjs).
+const coachEnv = {
+  SUPABASE_URL: `http://localhost:${mockSupabasePort}`,
+  SUPABASE_SECRET_KEY: "sb_secret_e2e",
+  COACH_EMAIL: "coach-e2e@example.com",
 };
 
 export default defineConfig({
@@ -30,6 +38,12 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       env: { MOCK_EMAIL_PORT: String(mockEmailPort) },
     },
+    {
+      command: `node tests/e2e/mock-supabase-auth.mjs`,
+      url: `http://localhost:${mockSupabasePort}/`,
+      reuseExistingServer: !process.env.CI,
+      env: { MOCK_SUPABASE_PORT: String(mockSupabasePort) },
+    },
     // Main server: a production build without CONTENT_PREVIEW, with booking
     // demo mode on (as on a Vercel preview) and email wired to the mock.
     {
@@ -37,7 +51,7 @@ export default defineConfig({
       url: `http://localhost:${port}`,
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
-      env: { CONTENT_PREVIEW: "false", BOOKING_DEMO: "true", ...emailEnv },
+      env: { CONTENT_PREVIEW: "false", BOOKING_DEMO: "true", ...emailEnv, ...coachEnv },
     },
     // Vercel-production configuration, with BOOKING_DEMO set by mistake.
     {
