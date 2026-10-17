@@ -11,9 +11,10 @@ interface TimetableProps {
   /**
    * "row": three across from sm (full-width sections). "stack": one per row
    * (narrow columns). "compact": one slim line per session (day left, time
-   * right), for cards that need to stay short.
+   * right), for cards that need to stay short. "mini": the "row" style
+   * (part of day, day, time) scaled down to three small columns for a card.
    */
-  layout?: "row" | "stack" | "compact";
+  layout?: "row" | "stack" | "compact" | "mini";
 }
 
 /** Shown in place of the timetable until it is confirmed. */
@@ -35,6 +36,27 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
   const sessions = sortSessions(timetable.sessions);
   const line = tone === "ink" ? "border-line-inverse" : "border-ink";
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+
+  if (layout === "mini") {
+    return (
+      <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
+        <ul aria-labelledby={labelledBy} className="grid grid-cols-3 gap-3">
+          {sessions.map((session) => (
+            <li key={session.id} className={cn("border-t pt-3", line)}>
+              <p className={cn("eyebrow text-[0.625rem]", muted)}>{partOfDay(session.start)}</p>
+              <p className="mt-1.5 font-display text-xl">
+                <span aria-hidden="true">{shortDay(session.day)}</span>
+                <span className="sr-only">{session.day}</span>
+              </p>
+              <p className="text-sm font-semibold tabular-nums">
+                <time dateTime={session.start}>{formatTime(session.start)}</time>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Provisional>
+    );
+  }
 
   if (layout === "compact") {
     return (

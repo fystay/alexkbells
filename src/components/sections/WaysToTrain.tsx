@@ -1,24 +1,26 @@
 import Image from "next/image";
-import { timetable } from "@/content/classes";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Photo, Service } from "@/content/types";
 import { ENQUIRY_HREF } from "@/lib/booking";
 import { cn } from "@/lib/cn";
-import { isPublishable, publishable } from "@/lib/publish";
-import { formatGbp, shortTimetable } from "@/lib/schedule";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Carousel } from "@/components/ui/Carousel";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { SectionHeading } from "@/components/ui/Section";
 import { Provisional } from "@/components/ui/Provisional";
+import { Timetable } from "./Timetable";
 
 interface Option {
   service: Service;
   /** One short line, open to everybody: no fitness level, frequency or result is promised. */
   pitch: string;
-  /** Small facts under it: where, when or what's included. */
+  /** Small facts under it: where or what's included. */
   details: string;
+  /** Shows the class times as three small columns. */
+  times?: boolean;
 }
 
 /**
@@ -59,12 +61,12 @@ function LeadPrice({ service }: { service: Service }) {
  * the same height so nothing jumps while swiping.
  */
 export function WaysToTrain() {
-  const classTimes = isPublishable(timetable.status) ? `${shortTimetable(timetable.sessions)} · ` : "";
   const options: Option[] = [
     {
       service: getService("group-classes"),
       pitch: "Train together. Every level welcome.",
-      details: `${classTimes}${site.location.venue}`,
+      details: `Coached group sessions · ${site.location.venue}`,
+      times: true,
     },
     {
       service: getService("one-to-one"),
@@ -90,7 +92,7 @@ export function WaysToTrain() {
 
         <div className="mt-8 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
-            {options.map(({ service, pitch, details }, i) => {
+            {options.map(({ service, pitch, details, times }, i) => {
               const image = cardImages[service.id];
               return (
                 <div key={service.id} className="group flex w-full flex-col">
@@ -122,6 +124,11 @@ export function WaysToTrain() {
                   <div className="flex flex-1 flex-col pt-5 sm:pt-6">
                     <p className="text-lg text-paper">{pitch}</p>
                     <p className="mt-1.5 text-sm text-muted-inverse">{details}</p>
+                    {times ? (
+                      <div className="mt-5">
+                        <Timetable tone="ink" layout="mini" />
+                      </div>
+                    ) : null}
                     <div className="mt-auto pt-6">
                       <div className="border-t border-line-inverse pt-5">
                         <LeadPrice service={service} />
