@@ -24,7 +24,8 @@ function PhotoFrame({ photo, label, slot }: { photo: Photo | null; label: string
           <span className="break-all text-xs">public/journey/{slot}.jpg</span>
         </div>
       )}
-      <span className="eyebrow absolute top-3 left-3 bg-paper px-2 py-1 text-ink">{label}</span>
+      {/* Bottom corner: at the top the tag covered his face on phones. */}
+      <span className="eyebrow absolute bottom-3 left-3 bg-paper px-2 py-1 text-ink">{label}</span>
     </div>
   );
 }

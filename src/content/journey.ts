@@ -26,12 +26,13 @@ export const journey: Journey = {
   intro:
     "Alex didn't start out as a coach. His own change came from turning up and getting 1% better every day. Now he helps others do the same: build strength, move better and improve their fitness, in classes, one-to-one and online.",
   chapters: [],
-  // Both from Alex's reel; overlays removed by scripts/journey_photos.py.
+  // Supplied by the project owner 2026-10-17 (sources in assets/journey/),
+  // cropped and graded by scripts/supplied_photos.py.
   before: { src: "/journey/before.jpg", width: 720, height: 900, alt: "Alex before he started kettlebell training" },
   after: { src: "/journey/after.jpg", width: 720, height: 900, alt: "Alex today, lean and muscular after kettlebell training" },
   beforeLabel: "Before",
   afterLabel: "Now",
-  caption: "Alex, before he started training and today. Both from his own reel.",
+  caption: "Alex, before he started training and today.",
   // Empty: the follower count is shown in "About Alex" directly above, and
   // "3 ways to train" said nothing new. Add real milestones from Alex here.
   highlights: [],

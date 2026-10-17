@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { site } from "@/content/site";
+import type { Photo } from "@/content/types";
 import { pageMetadata } from "@/lib/metadata";
 import { getPrimaryCta } from "@/lib/booking";
 import { cn } from "@/lib/cn";
@@ -129,7 +130,8 @@ function Benefits() {
 
 
 function About() {
-  const stills = site.trainingStills;
+  // Alex's portrait leads the row; it stays three photos either way.
+  const stills = [site.photos.about, ...site.trainingStills].filter((p): p is Photo => p !== null).slice(0, 3);
   const { instagram } = site.social;
   return (
     <Section id="about" labelledBy="about-heading">

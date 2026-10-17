@@ -39,6 +39,14 @@ don't need Python.
 Pillow was used because `sharp` (bundled with Next) has no native binary in
 the development container.
 
+### Supplied photos of Alex
+
+`scripts/supplied_photos.py` (Python + Pillow, run manually) crops the
+photos in `assets/journey/` to 4:5 (the before/after pair with matching
+framing), resizes them to 720×900 and applies the hero video's black-and-white
+grade, writing `public/journey/before.jpg`, `after.jpg` and
+`public/images/alex/about.jpg` (committed).
+
 ### Hero video
 
 `scripts/hero_video.py` (Python + OpenCV + numpy + ffmpeg, run manually)

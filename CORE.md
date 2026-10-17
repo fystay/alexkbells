@@ -43,7 +43,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Cancellation / refund rules | U | Do not publish |
 | One-to-one from £35/session; 4 sessions £130/month | C | Confirmed by the project owner 2026-10-15 (figures from the original brief); shown on the site |
 | Online coaching £79/month | C | Confirmed by the project owner 2026-10-15; shown on the site |
-| Alex's journey (story, before/after photos) | C | Published 2026-10-15 at the owner's request: before/after frames from his reel (`scripts/journey_photos.py`), short text written from his reel motto ("1% everyday") and bio. Swap in Alex's own story when supplied |
+| Alex's journey (story, before/after photos) | C | Published 2026-10-15 at the owner's request: before/after photos replaced 2026-10-17 with photos supplied by the project owner as Alex's own (`assets/journey/`, cut by `scripts/supplied_photos.py`; no dates, timeframe or figures given, so none are shown), short text written from his reel motto ("1% everyday") and bio. Swap in Alex's own story when supplied |
 | Coach's name | C | Alex Robertson (Instagram profile, 2026-10-15) |
 | Instagram followers | C | 9,651 on 2026-10-15, shown as "9.6k" (rounded down). Update occasionally |
 | Testimonials / client numbers | U | None supplied; never invent |

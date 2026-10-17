@@ -98,7 +98,13 @@ export const site = {
   /** Genuine photos of Alex / his coaching only. Empty until supplied. */
   photos: {
     hero: null as Photo | null,
-    about: null as Photo | null,
+    // Supplied by the project owner 2026-10-17; cut by scripts/supplied_photos.py.
+    about: {
+      src: "/images/alex/about.jpg",
+      width: 720,
+      height: 900,
+      alt: "Alex standing in the gym among kettlebells",
+    } as Photo | null,
   },
 } as const;
 
