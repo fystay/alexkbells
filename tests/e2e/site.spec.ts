@@ -222,7 +222,7 @@ test("every primary button says Start your training and leads to /contact, never
   await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
   // Each offer has its own labelled button.
   for (const name of ["group classes", "one-to-one coaching", "online coaching"]) {
-    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Start your training with ${name}` })).toHaveAttribute("href", "/contact");
+    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Enquire about ${name}` })).toHaveAttribute("href", "/contact");
   }
   await page.goto("/classes");
   await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
@@ -437,6 +437,70 @@ test("phones get the training photos as a keyboard-scrollable row", async ({ pag
   await row.focus();
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => row.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+});
+
+test("phones swipe through the three offers: the next card peeks, arrows and dots move, nothing overflows", async ({ page }) => {
+  const width = 390;
+  await page.setViewportSize({ width, height: 844 });
+  await page.goto("/");
+  const section = page.locator("#ways-to-train");
+  const list = section.getByRole("list", { name: "Ways to train cards" });
+  const cards = list.locator("> li");
+  await expect(cards).toHaveCount(3);
+  await list.scrollIntoViewIfNeeded();
+  const first = (await cards.nth(0).boundingBox())!;
+  const second = (await cards.nth(1).boundingBox())!;
+  // One card mostly in view (85–90% of the screen), the next peeking in beside it.
+  expect(first.width / width).toBeGreaterThan(0.84);
+  expect(first.width / width).toBeLessThan(0.9);
+  expect(second.x).toBeLessThan(width - 8);
+  expect(second.x).toBeGreaterThan(first.x + first.width);
+  // Same height; an image and an Enquire button on every card.
+  const heights = await cards.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
+  await expect(cards.locator("img")).toHaveCount(3);
+  await expect(cards.getByRole("link", { name: /^Enquire about/ })).toHaveCount(3);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+
+  const prev = section.getByRole("button", { name: "Previous card" });
+  const next = section.getByRole("button", { name: "Next card" });
+  const dot = (n: number) => section.getByRole("button", { name: new RegExp(`, ${n} of 3$`) });
+  await expect(prev).toBeDisabled();
+  await expect(dot(1)).toHaveAttribute("aria-current", "true");
+  for (const control of [prev, next, dot(1), dot(2), dot(3)]) {
+    const box = (await control.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  await next.click();
+  await expect(dot(2)).toHaveAttribute("aria-current", "true");
+  await expect.poll(() => list.evaluate((el) => el.scrollLeft)).toBeGreaterThan(100);
+  await dot(3).click();
+  await expect(dot(3)).toHaveAttribute("aria-current", "true");
+  await expect(next).toBeDisabled();
+  await prev.click();
+  await expect(dot(2)).toHaveAttribute("aria-current", "true");
+
+  // The list is focusable, so the arrow keys scroll it.
+  await dot(1).click();
+  await expect(dot(1)).toHaveAttribute("aria-current", "true");
+  await list.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => list.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+});
+
+test("desktop shows the three offers as a grid, without carousel controls", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const section = page.locator("#ways-to-train");
+  const cards = section.getByRole("list", { name: "Ways to train cards" }).locator("> li");
+  await expect(cards).toHaveCount(3);
+  const boxes = [(await cards.nth(0).boundingBox())!, (await cards.nth(1).boundingBox())!, (await cards.nth(2).boundingBox())!];
+  expect(boxes[1].x).toBeGreaterThanOrEqual(boxes[0].x + boxes[0].width - 1);
+  expect(boxes[2].x).toBeGreaterThanOrEqual(boxes[1].x + boxes[1].width - 1);
+  expect(Math.abs(boxes[0].y - boxes[2].y)).toBeLessThan(1);
+  await expect(section.getByRole("button", { name: "Next card" })).toBeHidden();
+  await expect(section.getByRole("group", { name: "Ways to train" })).not.toHaveAttribute("aria-roledescription", "carousel");
 });
 
 test("menu open on mobile has no accessibility violations and is keyboard operable", async ({ page }) => {

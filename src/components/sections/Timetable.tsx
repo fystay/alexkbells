@@ -8,8 +8,12 @@ interface TimetableProps {
   tone?: "paper" | "ink";
   /** Heading id the list is described by. */
   labelledBy?: string;
-  /** "row": three across from sm (full-width sections). "stack": one per row (narrow columns, e.g. a service card). */
-  layout?: "row" | "stack";
+  /**
+   * "row": three across from sm (full-width sections). "stack": one per row
+   * (narrow columns). "compact": one slim line per session (day left, time
+   * right), for cards that need to stay short.
+   */
+  layout?: "row" | "stack" | "compact";
 }
 
 /** Shown in place of the timetable until it is confirmed. */
@@ -31,6 +35,25 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
   const sessions = sortSessions(timetable.sessions);
   const line = tone === "ink" ? "border-line-inverse" : "border-ink";
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+
+  if (layout === "compact") {
+    return (
+      <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
+        <ul aria-labelledby={labelledBy}>
+          {sessions.map((session) => (
+            <li key={session.id} className={cn("flex items-baseline justify-between gap-4 border-t py-2.5", line)}>
+              <span className="font-semibold">{session.day}</span>
+              <span className="tabular-nums">
+                <span className="sr-only">{partOfDay(session.start)}, </span>
+                <time dateTime={session.start}>{formatTime(session.start)}</time>
+                {session.durationMinutes ? <span className={cn("ml-2 text-sm", muted)}>{session.durationMinutes} min</span> : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Provisional>
+    );
+  }
 
   return (
     <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
