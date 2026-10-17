@@ -1,23 +1,24 @@
 import Image from "next/image";
+import { timetable } from "@/content/classes";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Photo, Service } from "@/content/types";
 import { ENQUIRY_HREF } from "@/lib/booking";
 import { cn } from "@/lib/cn";
+import { isPublishable, publishable } from "@/lib/publish";
+import { formatGbp, shortTimetable } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Carousel } from "@/components/ui/Carousel";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { SectionHeading } from "@/components/ui/Section";
-import { PriceList } from "./PriceList";
-import { Timetable } from "./Timetable";
+import { Provisional } from "@/components/ui/Provisional";
 
 interface Option {
   service: Service;
-  /** One motivating line on who it suits. Every option is open to everybody: no fitness level, frequency or result is promised. */
+  /** One short line, open to everybody: no fitness level, frequency or result is promised. */
   pitch: string;
-  tagline: string;
-  /** Shows the class timetable under the tagline. */
-  timetable?: boolean;
+  /** Small facts under it: where, when or what's included. */
+  details: string;
 }
 
 /**
@@ -31,33 +32,49 @@ const cardImages: Record<Service["id"], { photo: Photo | null; position: string 
   "online-coaching": { photo: site.pageImages.contact, position: "object-[50%_8%]" },
 };
 
+/** The service's first published price on one line, e.g. "From £35 per session". The detail pages list them all. */
+function LeadPrice({ service }: { service: Service }) {
+  const price = publishable(service.prices)[0];
+  if (!price) return <p className="text-muted-inverse">Price on request</p>;
+  return (
+    <Provisional status={price.status}>
+      <p className="flex items-baseline gap-1.5">
+        {price.prefix ? <span className="text-sm text-muted-inverse">{price.prefix}</span> : null}
+        <span className="text-2xl font-bold tabular-nums">{formatGbp(price.amountGbp)}</span>
+        <span className="text-sm text-muted-inverse">{price.unit}</span>
+      </p>
+    </Provisional>
+  );
+}
+
 /**
  * "What I offer". One ink band, heading included, so it reads as a single
  * block after the paper hero. Each way to train is an open column rather than
- * a boxed card: a portrait photo with its number and name set over a fade at
- * the bottom, then a short description, its price and an Enquire button.
+ * a boxed card, kept minimal: a portrait photo with its number and name set
+ * over a fade, one line, one line of small details, the lead price, and
+ * Enquire / Details.
  *
  * Below lg the cards are a swipe carousel (one card mostly in view, the next
  * peeking in; dots and arrows); from lg they are three columns. The cards are
  * the same height so nothing jumps while swiping.
  */
 export function WaysToTrain() {
+  const classTimes = isPublishable(timetable.status) ? `${shortTimetable(timetable.sessions)} · ` : "";
   const options: Option[] = [
     {
       service: getService("group-classes"),
-      pitch: "Feed off the energy of the room and push further together, whatever your starting point.",
-      tagline: "Coached group sessions at Media House, Cumbernauld. Beginners welcome.",
-      timetable: true,
+      pitch: "Train together. Every level welcome.",
+      details: `${classTimes}${site.location.venue}`,
     },
     {
       service: getService("one-to-one"),
-      pitch: "Every rep coached and every session built around you, from your very first swing.",
-      tagline: "Face-to-face sessions with Alex.",
+      pitch: "Every rep coached, built around you.",
+      details: `Face to face with Alex · ${site.location.venue}`,
     },
     {
       service: getService("online-coaching"),
-      pitch: "Your plan, your schedule and Alex in your corner, wherever you train.",
-      tagline: "Personalised programming and support, wherever you train.",
+      pitch: "Your plan, with Alex in your corner.",
+      details: "Personalised programming · Ongoing support",
     },
   ];
 
@@ -66,15 +83,14 @@ export function WaysToTrain() {
       <div className="container-page">
         <div className="grid grid-cols-1 gap-5 border-b border-line-inverse pb-8 sm:pb-12 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-14">
           <SectionHeading id="ways-heading" tone="ink" eyebrow="What I offer" title="Choose how you train" className="lg:col-span-7" />
-          <p className="max-w-xl text-lede text-muted-inverse lg:col-span-5">
-            Three ways to train with Alex: coached group classes and one-to-one sessions in {site.location.town}, or
-            online coaching wherever you are.
+          <p className="max-w-md text-lede text-balance text-muted-inverse lg:col-span-5">
+            In person in {site.location.town}, or online wherever you are.
           </p>
         </div>
 
         <div className="mt-8 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
-            {options.map(({ service, pitch, tagline, timetable: showTimes }, i) => {
+            {options.map(({ service, pitch, details }, i) => {
               const image = cardImages[service.id];
               return (
                 <div key={service.id} className="group flex w-full flex-col">
@@ -104,15 +120,12 @@ export function WaysToTrain() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col pt-5 sm:pt-6">
-                    <p className="text-lg leading-snug font-semibold text-paper">{pitch}</p>
-                    <p className="mt-2 text-muted-inverse">{tagline}</p>
-                    {showTimes ? (
-                      <div className="mt-4">
-                        <Timetable tone="ink" layout="compact" />
-                      </div>
-                    ) : null}
+                    <p className="text-lg text-paper">{pitch}</p>
+                    <p className="mt-1.5 text-sm text-muted-inverse">{details}</p>
                     <div className="mt-auto pt-6">
-                      <PriceList prices={service.prices} tone="ink" linkContact={false} />
+                      <div className="border-t border-line-inverse pt-5">
+                        <LeadPrice service={service} />
+                      </div>
                       <div className="mt-5 flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-x-6">
                         <ButtonLink href={ENQUIRY_HREF} tone="dark" className="w-full lg:w-auto">
                           Enquire<span className="sr-only"> about {service.name.toLowerCase()}</span>

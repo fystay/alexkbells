@@ -54,6 +54,13 @@ export function formatGbp(amount: number): string {
   }).format(amount);
 }
 
+/** One short line, days sharing a time grouped: "Mon & Wed 6:30 pm · Sat 9:00 am". */
+export function shortTimetable(sessions: readonly ClassSession[]): string {
+  const byTime = new Map<TimeOfDay, string[]>();
+  for (const s of sortSessions(sessions)) byTime.set(s.start, [...(byTime.get(s.start) ?? []), shortDay(s.day)]);
+  return [...byTime].map(([time, days]) => `${days.join(" & ")} ${formatTime(time)}`).join(" · ");
+}
+
 /** "Monday at 6:30 pm, Wednesday at 6:30 pm and Saturday at 9:00 am" */
 export function describeTimetable(sessions: readonly ClassSession[]): string {
   const parts = sortSessions(sessions).map((s) => `${s.day} at ${formatTime(s.start)}`);

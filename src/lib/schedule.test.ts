@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ClassSession } from "@/content/types";
-import { describeTimetable, formatGbp, formatTime, partOfDay, sortSessions } from "./schedule";
+import { describeTimetable, formatGbp, formatTime, partOfDay, shortTimetable, sortSessions } from "./schedule";
 
 describe("formatTime", () => {
   it.each([
@@ -67,5 +67,18 @@ describe("formatGbp", () => {
   it("omits pence for whole pounds", () => {
     expect(formatGbp(35)).toBe("£35");
     expect(formatGbp(7.5)).toBe("£7.50");
+  });
+});
+
+describe("shortTimetable", () => {
+  it("groups days that share a time, in weekday order", () => {
+    expect(
+      shortTimetable([
+        { id: "s", day: "Saturday", start: "09:00" },
+        { id: "w", day: "Wednesday", start: "18:30" },
+        { id: "m", day: "Monday", start: "18:30" },
+      ]),
+    ).toBe("Mon & Wed 6:30 pm · Sat 9:00 am");
+    expect(shortTimetable([])).toBe("");
   });
 });
