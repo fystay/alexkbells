@@ -13,6 +13,8 @@ import { Timetable } from "./Timetable";
 
 interface Option {
   service: Service;
+  /** One motivating line on who it suits. Every option is open to everybody: no fitness level, frequency or result is promised. */
+  pitch: string;
   tagline: string;
   /** Shows the class timetable under the tagline. */
   timetable?: boolean;
@@ -43,15 +45,18 @@ export function WaysToTrain() {
   const options: Option[] = [
     {
       service: getService("group-classes"),
+      pitch: "Feed off the energy of the room and push further together, whatever your starting point.",
       tagline: "Coached group sessions at Media House, Cumbernauld. Beginners welcome.",
       timetable: true,
     },
     {
       service: getService("one-to-one"),
-      tagline: "Face-to-face coaching, built around you.",
+      pitch: "Every rep coached and every session built around you, from your very first swing.",
+      tagline: "Face-to-face sessions with Alex.",
     },
     {
       service: getService("online-coaching"),
+      pitch: "Your plan, your schedule and Alex in your corner, wherever you train.",
       tagline: "Personalised programming and support, wherever you train.",
     },
   ];
@@ -69,7 +74,7 @@ export function WaysToTrain() {
 
         <div className="mt-10 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
-            {options.map(({ service, tagline, timetable: showTimes }, i) => {
+            {options.map(({ service, pitch, tagline, timetable: showTimes }, i) => {
               const image = cardImages[service.id];
               return (
                 <div key={service.id} className="group flex w-full flex-col">
@@ -99,7 +104,8 @@ export function WaysToTrain() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col pt-5 sm:pt-6">
-                    <p className="text-muted-inverse">{tagline}</p>
+                    <p className="text-lg leading-snug font-semibold text-paper">{pitch}</p>
+                    <p className="mt-2 text-muted-inverse">{tagline}</p>
                     {showTimes ? (
                       <div className="mt-4">
                         <Timetable tone="ink" layout="compact" />

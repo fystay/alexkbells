@@ -39,7 +39,8 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Brand name, descriptor, venue address | C | From brief |
 | Instagram URL | C | Tracking parameter removed |
 | Class times Mon 18:30, Wed 18:30, Sat 09:00 | C | Confirmed for publication by the project owner 2026-10-15 (times from the original brief); shown across the site and offered as booking choices. Alex to tell us if any session changes |
-| Class duration, capacity, price, equipment, booking requirement | U | Do not publish |
+| Group class price £10 per person | C | Confirmed by the project owner 2026-10-17; shown on the homepage and /classes |
+| Class duration, capacity, equipment, booking requirement | U | Do not publish |
 | Cancellation / refund rules | U | Do not publish |
 | One-to-one from £35/session; 4 sessions £130/month | C | Confirmed by the project owner 2026-10-15 (figures from the original brief); shown on the site |
 | Online coaching £79/month | C | Confirmed by the project owner 2026-10-15; shown on the site |

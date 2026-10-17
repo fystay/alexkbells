@@ -3,7 +3,7 @@ import type { Service } from "./types";
 /**
  * Coaching offers. Descriptions use only previously published wording.
  * Prices confirmed by the project owner on 2026-10-15 (the figures from the
- * original brief). Group class prices have not been supplied.
+ * original brief); the group class price (£10 per person) on 2026-10-17.
  */
 export const services: Service[] = [
   {
@@ -14,7 +14,14 @@ export const services: Service[] = [
     summary:
       "Coached group kettlebell sessions at Media House in Cumbernauld.",
     points: [],
-    prices: [],
+    prices: [
+      {
+        status: "confirmed",
+        label: "Per class",
+        amountGbp: 10,
+        unit: "per person",
+      },
+    ],
   },
   {
     id: "one-to-one",

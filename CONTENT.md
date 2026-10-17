@@ -47,6 +47,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
+- "Choose how you train" (2026-10-17): each option opens with one motivating line in Alex's voice that says it's open to everybody ("whatever your starting point", "from your very first swing", "wherever you train"). No promised frequency, fitness level or results.
 - Benefits: build strength, improve fitness, train with confidence, stay consistent — hedged ("can"), no "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
 
 - Use only verified wording for offers: "tailored to the individual", "personalised programming, support and progression".

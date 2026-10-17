@@ -151,9 +151,9 @@ for (const route of [...publicRoutes, ...unlistedRoutes, ...coachRoutes]) {
     test("shows no provisional content on a production build", async ({ page }) => {
       await page.goto(route);
       await expect(page.locator("[data-provisional]")).toHaveCount(0);
-      // Only the prices confirmed on 2026-10-15 may appear.
+      // Only the prices the project owner confirmed may appear.
       const amounts = (await page.locator("main").innerText()).match(/£\d+/g) ?? [];
-      for (const amount of amounts) expect(["£35", "£130", "£79"]).toContain(amount);
+      for (const amount of amounts) expect(["£10", "£35", "£130", "£79"]).toContain(amount);
       // No unfilled placeholders anywhere.
       await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
     });

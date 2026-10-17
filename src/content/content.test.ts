@@ -7,17 +7,16 @@ import { journey } from "./journey";
 // Guards against accidental publication: anything not yet approved by the
 // client must stay provisional. Update deliberately when Alex confirms.
 describe("content approval state", () => {
-  it("publishes only the prices confirmed on 2026-10-15", () => {
+  it("publishes only the prices confirmed by the project owner", () => {
     const confirmed = services
       .flatMap((s) => s.prices.map((p) => `${s.id}:${p.label}:${p.amountGbp}:${p.status}`))
       .sort();
     expect(confirmed).toEqual([
+      "group-classes:Per class:10:confirmed",
       "one-to-one:Four sessions:130:confirmed",
       "one-to-one:Single session:35:confirmed",
       "online-coaching:Monthly:79:confirmed",
     ]);
-    // No group class price has been supplied.
-    expect(services.find((s) => s.id === "group-classes")?.prices).toEqual([]);
   });
 
   it("publishes the timetable confirmed on 2026-10-15", () => {
