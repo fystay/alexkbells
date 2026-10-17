@@ -15,6 +15,8 @@
 
 No database, auth or payment SDK is installed — none is needed in Phase 1.
 
+**Supabase** (connected 2026-10-17, config only): project `Alexkbells`, ref `sqkpixwvugrxllrxlexs`, region eu-west-1, URL `https://sqkpixwvugrxllrxlexs.supabase.co`. `supabaseConfig()` in `src/lib/env.ts` reads `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` on the server and returns null when either is missing. No page reads from it and `@supabase/supabase-js` is not installed; add it (and justify it here) with the first feature that stores data. Link the CLI with `npx supabase link --project-ref sqkpixwvugrxllrxlexs`. **Caution:** on 2026-10-17 the project's `public` schema already held another app's tables (Prisma-managed `User`, `Listing`, `Booking`, `Review`, PMS and affiliate tables, with rows) — apparently FYStay's. Decide whether to clear it or create a fresh project before any migration from this repo.
+
 Next 16 differs from older versions; read `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
 
 ## Brand assets

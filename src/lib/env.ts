@@ -27,6 +27,21 @@ export function siteUrl(env: Env = process.env): string {
   );
 }
 
+export type SupabaseConfig = Readonly<{ url: string; publishableKey: string }>;
+
+/**
+ * Supabase project "Alexkbells" (ref sqkpixwvugrxllrxlexs, eu-west-1).
+ * Returns null unless SUPABASE_URL is a valid https origin and
+ * SUPABASE_PUBLISHABLE_KEY is set, so features that need the database stay off
+ * until it is configured. Server-only: never expose these with NEXT_PUBLIC_.
+ */
+export function supabaseConfig(env: Env = process.env): SupabaseConfig | null {
+  const url = parseOrigin(env.SUPABASE_URL);
+  const publishableKey = env.SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (!url || !url.startsWith("https://") || !publishableKey) return null;
+  return { url, publishableKey };
+}
+
 /** True only on Vercel production deployments (VERCEL_ENV is set by Vercel). */
 export function isProductionDeployment(env: Env = process.env): boolean {
   return env.VERCEL_ENV === "production";

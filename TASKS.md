@@ -95,6 +95,8 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 Blocked on: provider choice, Square capabilities, class price/capacity/duration, cancellation & refund policy.
 - [ ] Verify Square products enabled on Alex's account and current fees (official docs/dashboard)
 - [ ] Choose option A (hosted) or B (custom) — see ARCHITECTURE.md
+- [x] Supabase project `Alexkbells` connected (env config only; see ARCHITECTURE.md)
+- [ ] Resolve the other app's tables found in the Supabase project's `public` schema (clear or new project) before any migration
 - [ ] If B: Supabase schema + RLS, idempotent booking endpoint, verified webhooks, emails
 - [ ] Tests: last-place race, duplicate requests, payment success/failure/pending, refunds, webhook retries, cross-user access
 - [x] Booking request form with server validation, spam protection, privacy notice (general contact form still not built)

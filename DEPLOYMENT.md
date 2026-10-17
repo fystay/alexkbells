@@ -75,6 +75,9 @@ the Instagram prompt and production builds log a warning.
 - Test it on a preview by setting the three variables for Preview with a
   test inbox, redeploying, and sending a request.
 
+| `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` once a feature uses the database | same | Project `Alexkbells` in the developer's Supabase organisation. Unused by pages today |
+| `SUPABASE_PUBLISHABLE_KEY` | publishable key (`sb_publishable_...`) from the Supabase dashboard | same | Server-only despite being "publishable"; keeps the bundle check simple |
+
 `VERCEL_ENV` and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel
 automatically.
 
