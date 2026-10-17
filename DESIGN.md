@@ -8,7 +8,7 @@ how to use them.
 - Monochrome, editorial, athletic. Confidence comes from type and space, not effects.
 - Rules (lines) and solid black bands structure the page; avoid card grids.
 - Square corners. No pills, gradients, neon, glows, floating widgets or fake badges.
-- Motion is limited to colour and small underline/arrow transitions (≤200 ms), a 220 ms fade-up when a booking step changes (`animate-step-in`; not on the first step at page load), and a slight press on primary buttons. Filled buttons move down 1 px while pressed. All of it is disabled under `prefers-reduced-motion`. The hero video autoplays and loops with a pause button, except under `prefers-reduced-motion`, where it shows the still poster until the visitor presses play.
+- Motion is limited to colour and small underline/arrow transitions (≤200 ms), the hero headline's sheen (`.hero-headline` in `globals.css`: a soft white halo on the video below `lg`, and a band of light that crosses the letters in about 2.5 s every 7 s, graphite on paper on desktop; monochrome, no flashing), a 220 ms fade-up when a booking step changes (`animate-step-in`; not on the first step at page load), and a slight press on primary buttons. Filled buttons move down 1 px while pressed. All of it is disabled under `prefers-reduced-motion`. The hero video autoplays and loops with a pause button, except under `prefers-reduced-motion`, where it shows the still poster until the visitor presses play.
 
 ## Colour
 

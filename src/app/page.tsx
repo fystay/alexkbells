@@ -72,7 +72,7 @@ function Hero() {
             {/* Phones and tablets: laid over the bottom of the video. Desktop: grid cells. */}
             <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-ink/90 via-ink/70 via-65% to-transparent max-sm:from-ink max-sm:from-10% px-4 pt-28 pb-3 sm:px-8 sm:pt-44 sm:pb-8 lg:contents">
               <div className="lg:col-span-6 lg:row-start-2">
-                <h1 id="hero-heading" className="font-display text-display text-balance text-paper lg:text-ink lg:text-display-split">
+                <h1 id="hero-heading" className="hero-headline font-display text-display text-balance lg:text-display-split">
                   <span className="block">Get stronger.</span>
                   <span className="block">Move better.</span>
                 </h1>
