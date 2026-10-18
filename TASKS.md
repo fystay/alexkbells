@@ -67,7 +67,8 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] `/book` live on production (2026-10-18): "Start your training" opens it; group classes pick real timetable dates; requests stored in Supabase and listed in `/coach`
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking
-- [ ] **P0** Make requests visible to Alex: create his Supabase login, turn off public sign-ups, set `COACH_EMAIL` in Vercel (DEPLOYMENT.md → Coach login). Optional: Resend settings so each request is also emailed
+- [x] Coach login set up (2026-10-18) with the developer's account; `COACH_EMAIL` set in Vercel
+- [ ] **P0** At handover: create Alex's Supabase login and change `COACH_EMAIL` to his email; turn off public sign-ups in Supabase. Optional: Resend settings so each request is also emailed
 - [ ] **P1** Remove `BOOKING_DEMO` from Vercel Preview so previews show the real flow (or keep it to demo)
 - [ ] **P1** Capacity per class and holiday weeks, so full/cancelled dates can be shown
 - [ ] **P0** Alex reviews `/privacy` and agrees to confirm requests by reply
