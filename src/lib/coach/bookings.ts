@@ -1,0 +1,148 @@
+import { inList, rpc, select, selectOne, update, type Db, type DbResult } from "./db";
+import type { Attendance, AttendanceStatus, ClassSessionRow, Package, PtSession, PtStatus } from "./types";
+
+/* ------------------------------------------------------------------ classes */
+
+export const ATTENDANCE_STATUSES: readonly AttendanceStatus[] = ["booked", "attended", "no_show", "cancelled"];
+
+/** Class rows (with headcounts) between two dates. Dates without a row have no bookings yet. */
+export function listClassSessions(db: Db, from: string, to: string): Promise<DbResult<ClassSessionRow[]>> {
+  return select<ClassSessionRow>(db, "akb_class_overview", [["class_date", `gte.${from}`], ["class_date", `lte.${to}`], ["order", "starts_at.asc"]]);
+}
+
+export async function getClassSession(db: Db, slot: string, date: string): Promise<DbResult<ClassSessionRow | null>> {
+  const result = await select<ClassSessionRow>(db, "akb_class_overview", [["slot", `eq.${slot}`], ["class_date", `eq.${date}`], ["limit", "1"]]);
+  return result.ok ? { ok: true, data: result.data[0] ?? null } : result;
+}
+
+/** The class row for a timetable date, created if needed. Only call for a date checked with isTimetableClass. */
+export function ensureClassSession(db: Db, args: { slot: string; date: string; startsAt: string; duration: number }): Promise<DbResult<string>> {
+  return rpc<string>(db, "akb_ensure_class_session", { p_slot: args.slot, p_date: args.date, p_starts_at: args.startsAt, p_duration: args.duration });
+}
+
+export async function updateClassSession(db: Db, id: string, patch: { capacity: number | null; notes: string }): Promise<DbResult<null>> {
+  const result = await update(db, "akb_class_sessions", [["id", `eq.${id}`]], { ...patch, updated_at: new Date().toISOString() });
+  return result.ok ? { ok: true, data: null } : result;
+}
+
+export function listAttendance(db: Db, opts: { sessionIds?: string[]; clientId?: string }): Promise<DbResult<Attendance[]>> {
+  const query: [string, string][] = [];
+  if (opts.sessionIds) query.push(["class_session_id", inList(opts.sessionIds)]);
+  if (opts.clientId) query.push(["client_id", `eq.${opts.clientId}`]);
+  query.push(["order", "created_at.asc"], ["limit", "1000"]);
+  return select<Attendance>(db, "akb_class_attendance", query);
+}
+
+export function getAttendance(db: Db, id: string): Promise<DbResult<Attendance | null>> {
+  return selectOne<Attendance>(db, "akb_class_attendance", id);
+}
+
+/** Adds someone to a class and raises the class charge (one transaction). */
+export function addAttendee(
+  db: Db,
+  args: { clientId: string; slot: string; date: string; startsAt: string; duration: number; pricePence: number; description: string; requestId?: string | null },
+): Promise<DbResult<string>> {
+  return rpc<string>(db, "akb_add_attendee", {
+    p_client: args.clientId,
+    p_slot: args.slot,
+    p_date: args.date,
+    p_starts_at: args.startsAt,
+    p_duration: args.duration,
+    p_price_pence: args.pricePence,
+    p_description: args.description,
+    p_request: args.requestId ?? null,
+  });
+}
+
+export function setAttendance(db: Db, id: string, status: AttendanceStatus): Promise<DbResult<null>> {
+  return rpc<null>(db, "akb_set_attendance", { p_attendance: id, p_status: status });
+}
+
+export function classSessionsByIds(db: Db, ids: string[]): Promise<DbResult<ClassSessionRow[]>> {
+  return select<ClassSessionRow>(db, "akb_class_overview", [["id", inList(ids)]]);
+}
+
+/* ------------------------------------------------------------- one-to-one */
+
+export const PT_STATUSES: readonly PtStatus[] = ["scheduled", "attended", "no_show", "cancelled"];
+
+export function listPtSessions(db: Db, opts: { from?: string; to?: string; clientId?: string; status?: PtStatus[]; packageId?: string; order?: "asc" | "desc"; limit?: number } = {}): Promise<DbResult<PtSession[]>> {
+  const query: [string, string][] = [];
+  if (opts.from) query.push(["starts_at", `gte.${opts.from}`]);
+  if (opts.to) query.push(["starts_at", `lt.${opts.to}`]);
+  if (opts.clientId) query.push(["client_id", `eq.${opts.clientId}`]);
+  if (opts.packageId) query.push(["package_id", `eq.${opts.packageId}`]);
+  if (opts.status) query.push(["status", `in.(${opts.status.join(",")})`]);
+  query.push(["order", `starts_at.${opts.order ?? "asc"}`], ["limit", String(opts.limit ?? 500)]);
+  return select<PtSession>(db, "akb_pt_sessions", query);
+}
+
+export function getPtSession(db: Db, id: string): Promise<DbResult<PtSession | null>> {
+  return selectOne<PtSession>(db, "akb_pt_sessions", id);
+}
+
+/** Books a session (and its charge unless it uses a package) in one transaction. */
+export function addPtSession(
+  db: Db,
+  args: { clientId: string; startsAt: string; endsAt: string; pricePence: number | null; packageId: string | null; requested?: string; notes: string; description: string; requestId?: string | null },
+): Promise<DbResult<string>> {
+  return rpc<string>(db, "akb_add_pt_session", {
+    p_client: args.clientId,
+    p_starts_at: args.startsAt,
+    p_ends_at: args.endsAt,
+    p_price_pence: args.pricePence,
+    p_package: args.packageId,
+    p_requested: args.requested ?? "",
+    p_notes: args.notes,
+    p_description: args.description,
+    p_request: args.requestId ?? null,
+  });
+}
+
+export function reschedulePtSession(db: Db, id: string, startsAt: string, endsAt: string): Promise<DbResult<null>> {
+  return rpc<null>(db, "akb_reschedule_pt_session", { p_session: id, p_starts_at: startsAt, p_ends_at: endsAt });
+}
+
+export function setPtStatus(db: Db, id: string, status: PtStatus, reason: string): Promise<DbResult<null>> {
+  return rpc<null>(db, "akb_set_pt_status", { p_session: id, p_status: status, p_reason: reason });
+}
+
+export async function updatePtNotes(db: Db, id: string, notes: string): Promise<DbResult<null>> {
+  const result = await update(db, "akb_pt_sessions", [["id", `eq.${id}`]], { notes, updated_at: new Date().toISOString() });
+  return result.ok ? { ok: true, data: null } : result;
+}
+
+/* ----------------------------------------------------------------- packages */
+
+export function listPackages(db: Db, opts: { clientId?: string; activeOnly?: boolean; ids?: string[] } = {}): Promise<DbResult<Package[]>> {
+  const query: [string, string][] = [];
+  if (opts.clientId) query.push(["client_id", `eq.${opts.clientId}`]);
+  if (opts.activeOnly) query.push(["status", "eq.active"]);
+  if (opts.ids) query.push(["id", inList(opts.ids)]);
+  query.push(["order", "purchased_on.desc"], ["limit", "500"]);
+  return select<Package>(db, "akb_package_balances", query);
+}
+
+export function getPackage(db: Db, id: string): Promise<DbResult<Package | null>> {
+  return selectOne<Package>(db, "akb_package_balances", id);
+}
+
+export function addPackage(
+  db: Db,
+  args: { clientId: string; name: string; sessions: number; pricePence: number; purchasedOn: string; expiresOn: string | null; notes: string },
+): Promise<DbResult<string>> {
+  return rpc<string>(db, "akb_add_package", {
+    p_client: args.clientId,
+    p_name: args.name,
+    p_sessions: args.sessions,
+    p_price_pence: args.pricePence,
+    p_purchased_on: args.purchasedOn,
+    p_expires_on: args.expiresOn,
+    p_notes: args.notes,
+  });
+}
+
+export async function cancelPackage(db: Db, id: string): Promise<DbResult<null>> {
+  const result = await update(db, "akb_packages", [["id", `eq.${id}`]], { status: "cancelled", updated_at: new Date().toISOString() });
+  return result.ok ? { ok: true, data: null } : result;
+}

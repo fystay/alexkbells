@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
+    "@electric-sql/pglite": "^0.5.10",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",

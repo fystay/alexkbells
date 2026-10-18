@@ -4,7 +4,7 @@ Source of truth for the business, goals, constraints and open decisions.
 Values that appear on the website live in code (`src/content/`) — this file
 records *status*, not duplicate values.
 
-Last reviewed: 2026-10-15
+Last reviewed: 2026-10-19
 
 ## Business
 
@@ -62,6 +62,8 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Booking-request inbox / Resend account | U | Needed to switch on `/book`; must be Alex's own |
 | Privacy notice | P | `/privacy` drafted 2026-10-15 for booking requests and online enquiries; Alex to review |
 | Square | P | Account created. Rate quoted as 1.4% + 25p per online card payment — unverified. Enabled products unknown |
+| Coach portal | P | Built 2026-10-19 (requests, clients, classes, one-to-one, online coaching, payments, revenue). Needs its Supabase migration applied with the owner's approval (DEPLOYMENT.md). Manual payments only (cash, bank transfer); no card processing |
+| Data retention for client and payment records | U | Alex to decide; add to `/privacy` |
 | Domain | U | Not chosen |
 | Hosting account | P | Vercel project `alexkbells` exists in the developer's personal Hobby account; Alex's own account (likely Pro for commercial use) recommended before launch — see DEPLOYMENT.md |
 
@@ -77,7 +79,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 1. **Public website** — this release.
 2. **Booking & payments** — after provider, prices, capacity, cancellation policy are confirmed.
 3. **Membership & accounts** — after the membership product is defined.
-4. **Admin & hardening** — only functions Alex actually needs.
+4. **Admin & hardening** — coach portal built 2026-10-19 (see ARCHITECTURE.md → Coach portal).
 
 ## Open decisions
 

@@ -13,7 +13,7 @@
 | Hosting | Vercel | `vercel.json` pins the Next.js framework preset. Static output. Account ownership and plan: see DEPLOYMENT.md |
 | Package manager | npm (lockfile committed) | Node ≥ 22 |
 
-No database, auth or payment SDK is installed — none is needed in Phase 1.
+No database, auth or payment SDK is installed: Supabase is reached with plain `fetch` (Auth and PostgREST). The only database-related package is `@electric-sql/pglite` (devDependency, tests only; see Coach portal → Testing).
 
 **Supabase** (connected 2026-10-17, config only): project `Alexkbells`, ref `sqkpixwvugrxllrxlexs`, region eu-west-1, URL `https://sqkpixwvugrxllrxlexs.supabase.co`. `supabaseConfig()` in `src/lib/env.ts` reads `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (server-only; bypasses RLS) on the server and returns null when either is missing. Used by the coach login and booking request storage (both plain `fetch`, server-only); `@supabase/supabase-js` is not installed. Link the CLI with `npx supabase link --project-ref sqkpixwvugrxllrxlexs`. **Caution:** the project's `public` schema also holds another app's tables (the booking table is prefixed `akb_` to keep clear of them); on 2026-10-17 it held (Prisma-managed `User`, `Listing`, `Booking`, `Review`, PMS and affiliate tables, with rows) — apparently FYStay's. Decide whether to clear it or create a fresh project before any migration from this repo.
 
@@ -28,6 +28,52 @@ Next 16 differs from older versions; read `node_modules/next/dist/docs/` before 
 - `/coach` is partially prerendered: the static shell plus a `<Suspense>` section that reads the session and lists booking requests and enquiries.
 - Not indexed (`noindex`, robots `Disallow: /coach$` and `/coach/`; a bare `/coach` would also block `/coaching`), not in the sitemap; linked from the footer and the phone menu.
 - E2E runs against `tests/e2e/mock-supabase-auth.mjs`.
+
+### Coach portal (2026-10-19)
+
+The coach area grew into a portal for running the business: Dashboard, Requests, Clients, Classes, PT sessions, Online coaching and Finances (`src/app/coach/(portal)/`, a route group so `/coach/login` stays outside it).
+
+**Authentication and authorisation.** The existing coach login is reused, with no second auth system. Every portal page calls `portalContext()` and every Server Action and the CSV route call `actionContext()` (`lib/coach/context.ts`). Both run `requireCoach()`, which checks the session token with Supabase on each request and requires a `COACH_EMAIL` address; an email match alone never grants access. Links are hidden from nobody: protection is the server-side check. Pages render per request behind `<Suspense>`; the portal layout sets `instant = false` because ids in URLs can't be prerendered.
+
+**Data access.** `lib/coach/db.ts` calls PostgREST with the secret key (`apikey` header only), on the server, after `requireCoach()`. Every call returns `{ ok, data } | { ok: false, error }` with kinds `unavailable`, `not-set-up` (migration not applied), `conflict`, `rule` and `invalid`. Pages show "couldn't be loaded" rather than empty data; actions show what to do and say nothing was saved. Logs carry operation, relation and error code only: no row data, messages or keys.
+
+**Schema** (`supabase/migrations/20261019000000_akb_coach_portal.sql`; all tables `akb_`-prefixed, RLS on, no policies, `anon`/`authenticated` revoked, functions executable by `service_role` only):
+
+| Table | Purpose |
+|---|---|
+| `akb_clients` | One record per person: name, email (unique, case-insensitive), phone, Instagram, preferred contact, status `lead/active/paused/former`, admin notes. No health fields |
+| `akb_client_consents`, `akb_follow_ups` | Consent records (privacy notice, photos, marketing; given/withdrawn dates); follow-up actions with due dates |
+| `akb_booking_requests` (existing) | Gains `client_id`, `decided_at`, `decision_note`, `notified_at`, `class_date`, `class_slot`; statuses `new/awaiting/confirmed/declined/cancelled/completed`. Existing rows kept |
+| `akb_class_sessions`, `akb_class_attendance` | A row per timetable class date (created on first use; optional capacity, notes) and one place per person per class (`booked/attended/cancelled/no_show`) |
+| `akb_pt_sessions`, `akb_packages` | One-to-one sessions (start/end, agreed price or a package, `scheduled/attended/no_show/cancelled`); no two non-cancelled sessions may overlap (exclusion constraint). Packages of N sessions |
+| `akb_subscriptions`, `akb_check_ins` | Online coaching plans (monthly price, start/end/renewal, status, check-in interval, next check-in) and check-ins (summary, agreed actions) |
+| `akb_charges`, `akb_payments`, `akb_payment_allocations`, `akb_refunds` | The ledger (below) |
+| `akb_events` | Activity log: decisions, reschedules (old time kept), voids, refunds |
+| Views `akb_charge_balances`, `akb_payment_balances`, `akb_package_balances`, `akb_client_balances`, `akb_class_overview` | Derived totals (`security_invoker`, so as closed as the tables) |
+
+Rules enforced in the database (so no browser or stale page can break them): one client per email; one place per person per class; capacity counted under a row lock; package places counted under a lock (a session holds at most one place, so it can't be deducted twice; cancellations give it back, no-shows don't); no overlapping one-to-ones; one charge per subscription period; payments and refunds can't be edited or deleted (only a payment's status can change to `failed`/`void`, which releases its allocations, logged).
+
+**Atomic operations** (Postgres functions, one transaction each, called as RPC): `akb_confirm_request` (pick or create the client, book the class place or session with its charge, mark confirmed, log), `akb_add_attendee`, `akb_add_pt_session`, `akb_reschedule_pt_session`, `akb_set_pt_status`, `akb_set_attendance` (cancelling also cancels an unpaid charge), `akb_add_package`, `akb_charge_subscription_period`, `akb_record_payment` (idempotent on a per-form key), `akb_allocate_payment`, `akb_record_refund`, `akb_void_charge`, `akb_set_payment_status`.
+
+**Matching returning clients.** A trigger links a new request to the client with the same email (case-insensitive), and a new or edited client picks up earlier requests with their email. A matching phone (last 10 digits) or name is only offered to the coach as a possible match; nothing ambiguous is merged.
+
+**Money definitions** (`lib/coach/revenue.ts`, unit-tested):
+- *Payments received*: payments with status `received` dated in the period, minus refunds dated in the period. Each payment counts once, however it is allocated. Failed and void payments never count.
+- *Revenue by service*: the same, grouped by the service recorded on the payment (cash basis; a refund follows its payment's service).
+- *Outstanding*: charges due on or before today, not cancelled, minus allocations to them. Charges due later are shown separately; unallocated money is shown as credit.
+- *Expected recurring income*: monthly price of active, unended online subscriptions. A forecast, labelled as such, never counted as received.
+- *Package sales*: price of packages sold in the period, the amount collected on them so far, and sessions delivered.
+- GBP only, stored in pence. A refund comes out of a payment's unallocated money first; beyond that it reduces its allocation to a chosen charge, which is owed again unless the coach cancels it.
+
+**Notifications.** The site never messages clients. After a decision, the request page shows a ready-written message (confirmed or declined) with an "Open in email" `mailto:` link and a "Mark as told" button (`notified_at`). New-request emails to Alex (Resend) are unchanged and optional.
+
+**CSV export.** `GET /coach/finances/export?from&to&service`: coach-only, `no-store`, UTF-8 with BOM; cells starting with `= + - @` are prefixed with `'` so names can't run as spreadsheet formulas.
+
+**Payment integration later.** `akb_payments.provider` and `provider_payment_id` (unique) are ready for a provider; its payments would be recorded only from verified webhooks, idempotently. Nothing in the portal claims a payment succeeded unless it was recorded.
+
+**Testing.** `tests/support/postgrest-lite.mjs` runs every migration on PGlite (in-process Postgres 18, WASM) with Supabase's roles and default grants, behind a small PostgREST stand-in (filters, `or`, ordering, inserts with conflict handling, updates, deletes, RPC). The e2e mock (`tests/e2e/mock-supabase-auth.mjs`) and the unit tests (`src/lib/coach/*.test.ts`) both use it, so constraints, triggers and functions are tested for real. Only the HTTP layer is imitated. `@electric-sql/pglite` is a devDependency for this alone; it never ships.
+
+**Applying the migration** (not yet applied to the Supabase project; needs the owner's approval): see DEPLOYMENT.md → Coach portal. It is re-runnable (`if not exists` / `or replace`). Before it is applied, the portal shows "tables aren't set up yet" and the request inbox still works.
 
 ## Brand assets
 
@@ -66,10 +112,11 @@ src/
   components/
     layout/            SiteHeader, NavLinks (client), SiteFooter, Logo
     booking/           BookingPage, BookingWizard, AvailabilityCalendar, OnlineOnboarding, ui (client)
+    coach/             portal forms (client), ui, PortalNav, RevenueChart, LoginForm
     ui/                ButtonLink, Section, Provisional
     sections/          Timetable, PriceList, Location, Faq, CtaBand, PageHeader, JsonLd
   content/             typed business data (single source of truth) + tests
-  lib/                 booking modes, request/enquiry parsing, form validation, publish gate, schedule/format helpers, env, routes
+  lib/                 coach/ (portal data layer, money, time, revenue), booking modes, request/enquiry parsing, form validation, publish gate, schedule/format helpers, env, routes
     availability/      availability interface, dates, demonstration provider
 tests/e2e/             Playwright specs
 ```

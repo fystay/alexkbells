@@ -82,6 +82,18 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 | `Journey` | `components/sections` | Ink band: eyebrow, display headline and intro beside a before/after pair (4:5 frames, greyscale, paper "Before"/"After" tags), optional big-number highlights (currently none: the follower count is in About), then numbered chapters. Content in `content/journey.ts`; hidden until confirmed |
 | `DemoNotice`, `DemoLabel` | `components/booking/ui.tsx` | Dashed ink frame or ink "DEMO" tag for demonstration content. Never on production |
 
+## Coach portal (2026-10-19)
+
+Same tokens and type, tuned for use on a phone between sessions:
+- Section nav under the site header: one line of links that scrolls sideways on phones; the current section has an ink underline and `aria-current="page"`.
+- Page head: eyebrow, `font-display` title, ink rule; main actions sit right under it (full-width-friendly, ≥44 px).
+- Metrics: two columns on phones, four from `lg`; the key figure (money received) is an ink tile. Figures that aren't cash (outstanding, expected recurring) say so in their note.
+- Status is shown as text badges (ink fill for "needs you", outline, muted outline), never by colour alone.
+- Lists become stacked rows on phones; tables only for the ledger, inside a horizontal scroller.
+- Revenue chart: stacked bars per month in ink / muted / muted-inverse / line with a text legend, plus a "Show the figures" table (the bars are decorative).
+- Forms: labelled fields with "(optional)" where optional, hints and errors under the field, an error summary that takes focus, success messages as `role="status"`; destructive actions ask to confirm; values are kept when the server refuses.
+- Empty states say what will appear and how to add it. No dummy figures.
+
 ## Imagery
 
 - Only genuine photos of Alex, his coaching and the venue. No stock, no AI imagery presented as real.

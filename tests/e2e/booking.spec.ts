@@ -355,10 +355,15 @@ test.describe("production configuration", () => {
     await page.getByLabel("Email").fill("coach-e2e@example.com");
     await page.getByLabel("Password").fill("correct-horse");
     await page.getByRole("button", { name: "Sign in" }).click();
-    const requests = page.getByRole("region", { name: "Requests" });
-    await expect(requests).toContainText("Prod Booker");
-    await expect(requests).toContainText(summary);
-    await expect(requests.getByRole("link", { name: "prod@example.com" })).toHaveAttribute("href", "mailto:prod@example.com");
+    await expect(page).toHaveURL(/\/coach$/);
+    await expect(page.getByRole("link", { name: /New request: Prod Booker/ }).first()).toBeVisible();
+    await page.goto(`${PROD}/coach/requests`);
+    const listed = page.getByRole("link", { name: /Prod Booker/ }).first();
+    await expect(listed).toContainText(summary);
+    await listed.click();
+    await expect(page.getByRole("heading", { level: 1, name: "Prod Booker" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "prod@example.com" })).toHaveAttribute("href", "mailto:prod@example.com");
+    await expect(page.getByText("A request is not a booking until you confirm it here.")).toBeVisible();
   });
 
   test("when neither storage nor email accepts a request, it shows an error, not success", async ({ page }) => {

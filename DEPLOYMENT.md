@@ -91,6 +91,19 @@ from previews then land in the same table as production ones).
 `VERCEL_ENV` and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel
 automatically.
 
+### Coach portal: setup (2026-10-19)
+
+The portal uses the same settings as the coach login (`SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `COACH_EMAIL`); no new environment variables. It needs one database migration:
+
+1. **Back up first** (Supabase → Database → Backups, or `pg_dump`). The project also holds another app's tables; the migration touches only `akb_*` objects. On 2026-10-19 `akb_booking_requests` was the only `akb_` table and held no rows.
+2. Apply `supabase/migrations/20261019000000_akb_coach_portal.sql`, either with the CLI (`npx supabase link --project-ref sqkpixwvugrxllrxlexs` then `npx supabase db push`) or by pasting it into the SQL editor. It is safe to run again. It ends with `notify pgrst, 'reload schema'` so the API sees the new tables at once.
+3. Check: Supabase → Advisors (security) shows no new warnings for `akb_*`; `/coach` shows the dashboard instead of "tables aren't set up yet".
+4. Turn off public sign-ups (Authentication → Sign In / Providers) if not done: only `COACH_EMAIL` accounts get in either way, but this stops strangers creating accounts.
+
+**Not applied yet:** this needs the owner's approval, like any production change. Until then the portal shows the set-up message on pages that need the new tables, and requests keep arriving and listing as before.
+
+Data kept: client details, bookings, payments and notes, all in Supabase (EU West). Alex should add retention to the privacy notice (e.g. delete former clients' records after N years; financial records are usually kept six years in the UK). A former client with no bookings or payments can be deleted from their record; anyone with history is kept (set them to Former).
+
 ## Safety built into the code
 
 - Provisional content needs `CONTENT_PREVIEW=true` **and** a non-production

@@ -40,6 +40,8 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 - The calendar's demonstration availability is invented sample data (deliberately on different days from the real timetable) and is always labelled "Demo". It must never be shown on production.
 - No general contact form; `/contact` stays Instagram-first.
 
+Coach portal (`/coach/*`, signed in, never indexed): Dashboard, Requests, Clients, Classes, PT sessions, Online coaching, Finances. Default prices in its forms come from `src/content/services.ts` (class £10, one-to-one £35, four sessions £130, online £79); payment methods from `src/content/payments.ts` (bank transfer, cash). The message to a client after a decision uses the class name, venue and payment line from `src/content/`.
+
 ## Copy rules
 
 - `/contact` puts "Message Alex on Instagram" in its header so the page's one action is in the first screen at every width.

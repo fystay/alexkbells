@@ -1,13 +1,14 @@
 "use server";
 
 import { bookingMode } from "@/lib/booking";
-import { BOOKABLE_SERVICES, BOOKING_EXPERIENCE, labelFor } from "@/lib/booking-options";
+import { BOOKABLE_SERVICES, BOOKING_EXPERIENCE, PREFERRED_DAYS, PREFERRED_TIMES, labelFor, listLabels } from "@/lib/booking-options";
 import {
   bookingEmail,
   describeWhen,
   isBookingFormEnabled,
   parseBookingRequest,
   type BookingField,
+  type BookingRequest,
   type FormState,
 } from "@/lib/booking-request";
 import { publishedClasses } from "@/lib/class-sessions";
@@ -65,7 +66,7 @@ export async function submitBookingRequest(
       email: data.email,
       phone: data.phone,
       message: data.message,
-      details: { experience: labelFor(BOOKING_EXPERIENCE, data.experience) },
+      details: requestDetails(data),
     },
     { ...bookingEmail(data), replyTo: data.email },
   );
@@ -79,4 +80,21 @@ export async function submitBookingRequest(
   }
 
   return { status: "success", message: data.email, errors: {} };
+}
+
+/**
+ * What the coach portal needs besides the summary line: the class date and
+ * timetable slot (so a confirmed request becomes a place on that class), or
+ * the preferred days and times for one-to-one.
+ */
+function requestDetails(data: BookingRequest): Record<string, string> {
+  const details: Record<string, string> = { experience: labelFor(BOOKING_EXPERIENCE, data.experience) };
+  const slot = publishedClasses().find((c) => c.label === data.session);
+  if (data.session && data.classDate && slot) {
+    details.classDate = data.classDate;
+    details.classSlot = slot.id;
+  }
+  if (data.days.length) details.days = listLabels(data.days.map((d) => labelFor(PREFERRED_DAYS, d)));
+  if (data.times.length) details.times = listLabels(data.times.map((t) => labelFor(PREFERRED_TIMES, t)));
+  return details;
 }

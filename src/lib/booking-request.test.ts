@@ -32,8 +32,8 @@ const valid = {
   submissionId: "abc-123",
 };
 const CLASSES = [
-  { label: "Monday 6:30 pm", day: "Monday", start: "18:30", durationMinutes: 60 },
-  { label: "Saturday 10:15 am", day: "Saturday", start: "10:15", durationMinutes: 60 },
+  { id: "mon-evening", label: "Monday 6:30 pm", day: "Monday", start: "18:30", durationMinutes: 60 },
+  { id: "sat-morning", label: "Saturday 10:15 am", day: "Saturday", start: "10:15", durationMinutes: 60 },
 ] as const satisfies PublishedClass[];
 // Real class dates relative to NOW.
 const today = toDateKey(new Date(NOW));

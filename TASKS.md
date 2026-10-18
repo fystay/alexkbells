@@ -108,3 +108,24 @@ Blocked on: provider choice, Square capabilities, class price/capacity/duration,
 
 ## Phase 3 — Membership & accounts (blocked on product definition)
 ## Phase 4 — Admin & hardening (scope with Alex)
+
+See Coach portal below.
+
+## Phase 4 — Coach portal (built 2026-10-19)
+
+### Done
+- [x] Portal sections: Dashboard (metrics, needs attention, revenue), Requests inbox and decisions, Clients (search, filters, profiles with tabs), Classes (list, month calendar, attendees, attendance, capacity), PT sessions (list, calendar, book, reschedule, outcome, cancel), Online coaching (plans, check-ins, renewals, period charges), Finances (period/service filters, by-service totals, 12-month chart, ledger, outstanding, CSV)
+- [x] Migration `20261019000000_akb_coach_portal.sql` with database-enforced rules and atomic functions; RLS on, public roles revoked
+- [x] Manual payments (cash, bank transfer), part payments, allocations, refunds, failed/void status, credit; packages; follow-ups; consent records; activity log
+- [x] Tests: SQL rules on real Postgres (PGlite), revenue/time/money maths, e2e for every workflow, access control, outage, phone layout and axe
+
+### To do
+- [ ] **P0** Owner approves and applies the migration to Supabase (DEPLOYMENT.md → Coach portal), then checks the advisors and `/coach`
+- [ ] **P0** Turn off public sign-ups in Supabase; change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
+- [ ] **P1** Alex adds retention periods for client and financial records to `/privacy`
+- [ ] **P1** Real-device pass of the portal on Alex's phone
+- [ ] **P2** Default class capacity per timetable slot (now set per date); public calendar showing full dates once capacities exist
+- [ ] **P2** Anonymise-on-request for former clients with financial history (now: set to Former)
+- [ ] **P2** Card payments: provider + verified webhooks into `akb_payments` (columns ready)
+- [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
+
