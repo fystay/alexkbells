@@ -22,7 +22,7 @@ const valid = {
   service: "one-to-one",
   days: ["mon", "wed"],
   times: ["evening"],
-  experience: "returning",
+  experience: "warrior",
   name: "Sam Example",
   email: "Sam@Example.com",
   phone: "07700 900123",
@@ -122,7 +122,7 @@ describe("bookingEmail", () => {
     const email = bookingEmail(result.data);
     expect(email.subject).toBe("One-to-one booking request: Sam Example");
     expect(email.text).toContain("Preferred: Mon and Wed · Evening");
-    expect(email.text).toContain("Experience: I've trained with Alex before");
+    expect(email.text).toContain("Experience: WARRIOR MODE");
     expect(email.text).toContain("not a confirmed booking");
   });
 

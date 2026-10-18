@@ -130,7 +130,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
   const [days, setDays] = useState<string[]>([]);
   const [times, setTimes] = useState<string[]>([]);
   // Details
-  const [details, setDetails] = useState<Details>({ experience: "", name: "", email: "", phone: "", message: "" });
+  const [details, setDetails] = useState<Details>({ experience: BOOKING_EXPERIENCE[0].value, name: "", email: "", phone: "", message: "" });
   const [clientErrors, setClientErrors] = useState<FieldErrors>({});
   const [demoDone, setDemoDone] = useState(false);
   const meta = useSubmissionMeta();
@@ -528,7 +528,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                 <PrivacyLine action={demo ? "continuing" : "sending this request"} />
                 <ActionBar
                   onBack={() => setStep(1)}
-                  next={{ label: demo ? "Finish demo" : "Send request", type: "submit", pending }}
+                  next={{ label: demo ? "Finish demo" : "LET'S GET TO WORK", type: "submit", pending }}
                 />
               </form>
             </section>
@@ -561,7 +561,6 @@ function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey;
         {[minutes ? `${minutes === 60 ? "1 hr" : `${minutes} min`}` : "", info.price, "with Alex"].filter(Boolean).join(" · ")}
       </p>
       <p className="mt-3 max-w-xl text-muted">{info.description}</p>
-      <p className="mt-2 text-sm text-muted">{info.payment}</p>
     </div>
   );
 }

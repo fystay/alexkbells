@@ -24,11 +24,11 @@ export function bookableService(value: string): (typeof BOOKABLE_SERVICES)[numbe
   return BOOKABLE_SERVICES.find((s) => s.value === value);
 }
 
-/** One question covers returning clients and newcomers' experience. */
+/** "Your kettlebell experience" (2026-10-18). The first is selected by default. */
 export const BOOKING_EXPERIENCE = [
-  { value: "returning", label: "I've trained with Alex before" },
-  { value: "new", label: "New to kettlebells" },
-  { value: "some", label: "Some kettlebell experience" },
+  { value: "rookie", label: "ROOKIE MODE" },
+  { value: "warrior", label: "WARRIOR MODE" },
+  { value: "beast", label: "BEAST MODE" },
 ] as const;
 export type BookingExperience = (typeof BOOKING_EXPERIENCE)[number]["value"];
 

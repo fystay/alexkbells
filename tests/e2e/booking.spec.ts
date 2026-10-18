@@ -94,8 +94,9 @@ test.describe("booking prototype (demo availability)", () => {
     await page.getByRole("button", { name: "Finish demo" }).click();
     await expect(page.getByText("Enter your name.")).toBeVisible();
     await expect(page.getByText("Enter your email address so Alex can reply.")).toBeVisible();
-    await expect(page.locator("#experience")).toBeFocused();
-    await choose(page, "I've trained with Alex before");
+    await expect(page.getByRole("textbox", { name: "Name" })).toBeFocused();
+    await expect(page.getByRole("radio", { name: "ROOKIE MODE" })).toBeChecked();
+    await choose(page, "WARRIOR MODE");
     await page.getByRole("textbox", { name: "Name" }).fill("Demo Visitor");
     await page.getByRole("textbox", { name: "Email" }).fill("not-an-email");
     await page.getByRole("button", { name: "Finish demo" }).click();
@@ -317,18 +318,19 @@ test.describe("production configuration", () => {
     // The class is described like Alex's own listing.
     await expect(page.getByText("Kettlebell Training ·")).toBeVisible();
     await expect(page.getByText(/1 hr · £10 per person · with Alex/)).toBeVisible();
-    await expect(page.getByText("Pay by bank transfer or cash.")).toBeVisible();
+    await expect(page.getByText("Pay by bank transfer or cash.")).toHaveCount(0);
     await continueButton(page).click();
 
-    await page.getByRole("button", { name: "Send request" }).click();
-    await expect(page.getByText("Choose the option that best describes you.")).toBeVisible();
-    await choose(page, "New to kettlebells");
+    await expect(page.getByRole("radio", { name: "ROOKIE MODE" })).toBeChecked();
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await expect(page.getByText("Enter your name.")).toBeVisible();
+    await choose(page, "BEAST MODE");
     await page.getByRole("textbox", { name: "Name" }).fill("Prod Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("prod@example.com");
     await page.getByRole("button", { name: /add a note/i }).click();
     await page.getByLabel(/^Note/).fill("First class");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "Send request" }).click();
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
 
     const status = page.getByRole("status");
     await expect(status).toContainText("Request sent");
@@ -338,7 +340,7 @@ test.describe("production configuration", () => {
     const year = new Date(`${day.date}T12:00:00`).getFullYear();
     const summary = `${formatLongDate(day.date)} ${year}`;
     const row = (await stored(request)).find((r) => r.name === "Prod Booker");
-    expect(row).toMatchObject({ kind: "booking", service: "Group class", email: "prod@example.com", details: { experience: "New to kettlebells" } });
+    expect(row).toMatchObject({ kind: "booking", service: "Group class", email: "prod@example.com", details: { experience: "BEAST MODE" } });
     expect(row!.summary).toContain(summary);
 
     const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Prod Booker");
@@ -363,11 +365,11 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Mon");
     await continueButton(page).click();
-    await choose(page, "I've trained with Alex before");
+    await choose(page, "WARRIOR MODE");
     await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "Send request" }).click();
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("couldn't be sent");
     await expect(page.getByText("Request sent")).toHaveCount(0);
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue("FAIL-TEST Booker");
@@ -377,11 +379,11 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Tue");
     await continueButton(page).click();
-    await choose(page, "New to kettlebells");
+    await choose(page, "WARRIOR MODE");
     await page.getByRole("textbox", { name: "Name" }).fill("Speedy Bot");
     await page.getByRole("textbox", { name: "Email" }).fill("bot@example.com");
     await page.locator('input[name="startedAt"]').evaluate((el: HTMLInputElement) => (el.value = String(Date.now())));
-    await page.getByRole("button", { name: "Send request" }).click();
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Please wait a few seconds");
     await expect(page.getByText("Request sent")).toHaveCount(0);
     expect((await emails(request)).some((e) => e.payload.subject.includes("Speedy Bot"))).toBe(false);
@@ -392,7 +394,7 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Thu");
     await continueButton(page).click();
-    await choose(page, "New to kettlebells");
+    await choose(page, "WARRIOR MODE");
     await page.getByRole("textbox", { name: "Name" }).fill("Slot Poster");
     await page.getByRole("textbox", { name: "Email" }).fill("slot@example.com");
     await page.locator("form").evaluate((form) => {
@@ -403,7 +405,7 @@ test.describe("production configuration", () => {
       form.appendChild(input);
     });
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "Send request" }).click();
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Demonstration times can't be booked");
   });
 
