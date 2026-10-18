@@ -13,11 +13,16 @@ import { Timetable } from "@/components/sections/Timetable";
 import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
+
+// Read at build time like every booking setting: the request form when it's open, else a message.
+const bookingOpen = getPrimaryCtaFor("group-class").kind === "booking";
 
 export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
-  description:
-    "Group kettlebell classes at Media House, Cumbernauld. Get in touch to join a session.",
+  description: bookingOpen
+    ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
+    : "Group kettlebell classes at Media House, Cumbernauld. Get in touch to join a session.",
   path: "/classes",
 });
 
@@ -27,7 +32,9 @@ export default function ClassesPage() {
   const timesPublished = isPublishable(timetable.status);
   const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;
 
-  // Steps only describe what is confirmed. Places are arranged by message.
+  // Steps only describe what is confirmed. With the booking form open, step 2
+  // is a request (Alex still confirms each place); otherwise a message.
+  const open = booking.kind === "booking";
   const joinSteps = [
     {
       title: "Choose a session",
@@ -35,11 +42,18 @@ export default function ClassesPage() {
         ? "Pick the class time that suits you from the timetable above."
         : "Class times are being finalised. Get in touch to hear about current sessions.",
     },
-    {
-      title: "Get in touch to book",
-      body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
-    },
-    { title: "Come to Media House", body: `Classes take place at ${venue}.` },
+    open
+      ? {
+          title: "Send a booking request",
+          body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose ROOKIE MODE.",
+        }
+      : {
+          title: "Get in touch to book",
+          body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
+        },
+    open
+      ? { title: "Alex confirms your place", body: `Then you come along to ${venue}.` }
+      : { title: "Come to Media House", body: `Classes take place at ${venue}.` },
   ];
 
   return (
@@ -73,6 +87,7 @@ export default function ClassesPage() {
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
             <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
+            {open ? <InstagramAlternative tone="ink" className="mt-4" /> : null}
           </div>
           <ol className="grid grid-cols-1 gap-8 lg:col-span-7">
             {joinSteps.map((step, i) => (

@@ -222,10 +222,9 @@ test("every primary button says Start your training and opens the booking flow",
   await page.goto("/");
   await expect(page.getByRole("banner").getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book");
   await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book");
-  // Each offer has its own labelled button.
-  for (const name of ["group classes", "one-to-one coaching"]) {
-    await expect(page.locator("#ways-to-train").getByRole("link", { name: `Enquire about ${name}` })).toHaveAttribute("href", "/contact");
-  }
+  // Each offer has its own labelled button: in-person services go straight to their booking request.
+  await expect(page.locator("#ways-to-train").getByRole("link", { name: "Request a class (group classes)" })).toHaveAttribute("href", "/book/group-class");
+  await expect(page.locator("#ways-to-train").getByRole("link", { name: "Request a session (one-to-one coaching)" })).toHaveAttribute("href", "/book/one-to-one");
   // Online coaching has its own enquiry form (it can send on this server).
   await expect(page.locator("#ways-to-train").getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching");
   await page.goto("/classes");
@@ -464,11 +463,11 @@ test("phones swipe through the three offers: the next card peeks, arrows and dot
   expect(first.width / width).toBeLessThan(0.9);
   expect(second.x).toBeLessThan(width - 8);
   expect(second.x).toBeGreaterThan(first.x + first.width);
-  // Same height; an image and an Enquire button on every card.
+  // Same height; an image and a main button on every card (booking request or enquiry).
   const heights = await cards.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().height)));
   expect(new Set(heights).size).toBe(1);
   await expect(cards.locator("img")).toHaveCount(3);
-  await expect(cards.getByRole("link", { name: /^Enquire about/ })).toHaveCount(3);
+  await expect(cards.getByRole("link", { name: /^(Request a (class|session)|Enquire about)/ })).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
 
   const prev = section.getByRole("button", { name: "Previous card" });
@@ -728,3 +727,55 @@ test("Facebook is linked next to Instagram in the footer and About Alex, opening
     await expect(fb).toHaveAttribute("rel", /noopener/);
   }
 });
+
+
+/**
+ * Outdated instructions: booking or joining only by Instagram message. Never
+ * allowed while the booking form is open; Instagram may appear only as the
+ * labelled alternative.
+ */
+const INSTAGRAM_ONLY_BOOKING = [
+  /message alex on instagram with the session/i,
+  /on instagram[^.]{0,40}(to book|to join|you'?d like to book|would like to join)/i,
+  /(book|join)[^.]{0,40}(on|via|through|by) (an )?instagram/i,
+  /get in touch to (book|join|arrange a session)/i,
+];
+
+for (const [server, base] of [
+  ["booking demo server", ""],
+  ["production-configured server", `http://localhost:${process.env.E2E_PRODUCTION_PORT ?? 3201}`],
+] as const) {
+  test(`${server}: no page tells visitors to book only through Instagram`, async ({ page }) => {
+    for (const route of ["/", "/classes", "/coaching", "/contact"]) {
+      await page.goto(base + route);
+      const text = await page.locator("main").innerText();
+      for (const pattern of INSTAGRAM_ONLY_BOOKING) expect(text, `${route}: ${pattern}`).not.toMatch(pattern);
+    }
+  });
+
+  test(`${server}: booking CTAs reach the right service, with Instagram as the labelled alternative`, async ({ page }) => {
+    await page.goto(base + "/classes");
+    const join = page.locator("#book");
+    await expect(join.getByRole("heading", { name: "Send a booking request" })).toBeVisible();
+    await expect(join.getByRole("heading", { name: "Alex confirms your place" })).toBeVisible();
+    await expect(join.getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book/group-class");
+    await expect(join.getByRole("link", { name: /Message Alex on Instagram/ })).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+
+    await page.goto(base + "/");
+    const how = page.locator("#how-to-book");
+    await expect(how.getByRole("heading", { name: "Send your request" })).toBeVisible();
+    await expect(how.getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book");
+    await expect(how.getByRole("link", { name: /Message Alex on Instagram/ })).toBeVisible();
+
+    await page.goto(base + "/coaching");
+    await expect(page.locator("#one-to-one")).toContainText("Send a booking request with the days and times that suit you, and Alex confirms your session.");
+    await expect(page.locator("#one-to-one").getByRole("link", { name: /Message Alex on Instagram/ })).toBeVisible();
+    // Online coaching stays an enquiry, with no booking wording.
+    await expect(page.locator("#online").getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching");
+    await expect(page.locator("#online")).not.toContainText(/booking request/i);
+
+    await page.goto(base + "/contact");
+    await expect(page.getByRole("link", { name: "Send a booking request" })).toHaveAttribute("href", "/book");
+    await expect(page.locator("main")).toContainText("Alex confirms your place");
+  });
+}

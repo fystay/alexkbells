@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import Link from "next/link";
-import { getOnlineCoachingAction } from "@/lib/booking";
+import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -17,6 +17,7 @@ export const metadata: Metadata = pageMetadata({
 export default function ContactPage() {
   const { email, phone } = site.contact;
   const online = getOnlineCoachingAction();
+  const booking = getPrimaryCta();
 
   return (
     <>
@@ -114,6 +115,17 @@ export default function ContactPage() {
                   </div>
                 ) : null}
               </dl>
+            ) : null}
+
+            {/* Booking is a request on the website when the form is open; this page is for messaging. */}
+            {booking.kind === "booking" ? (
+              <p className="mt-8 text-muted">
+                Ready to book a group class or a one-to-one session?{" "}
+                <Link href={booking.href} className="font-semibold text-ink underline underline-offset-4">
+                  Send a booking request
+                </Link>{" "}
+                and Alex confirms your place.
+              </p>
             ) : null}
 
             {/* Only when the online enquiry form can actually send. */}

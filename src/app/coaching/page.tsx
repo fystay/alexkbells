@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
 import { getOnlineCoachingAction, getPrimaryCtaFor } from "@/lib/booking";
+import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -56,6 +57,7 @@ function ServiceDetail({
             tone={tone === "ink" ? "dark" : "light"}
             className="mt-10 w-full sm:w-[22rem]"
           />
+          {!online && enquiry.kind === "booking" ? <InstagramAlternative tone={tone} className="mt-4" /> : null}
         </div>
         <div className="space-y-10 lg:col-span-5 lg:col-start-8">
           {service.points.length > 0 ? (
@@ -106,7 +108,11 @@ export default function CoachingPage() {
         service={oneToOne}
         index="01"
         tone="paper"
-        intro="One-to-one kettlebell coaching, face to face and tailored to you as an individual. Get in touch to arrange a session or talk through what you want from your training."
+        intro={
+          getPrimaryCtaFor("one-to-one").kind === "booking"
+            ? "One-to-one kettlebell coaching, face to face and tailored to you as an individual. Send a booking request with the days and times that suit you, and Alex confirms your session."
+            : "One-to-one kettlebell coaching, face to face and tailored to you as an individual. Get in touch to arrange a session or talk through what you want from your training."
+        }
       />
       <ServiceDetail
         service={online}

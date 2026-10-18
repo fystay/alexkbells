@@ -2,7 +2,7 @@ import Image from "next/image";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Photo, Service } from "@/content/types";
-import { ENQUIRY_HREF, getOnlineCoachingAction } from "@/lib/booking";
+import { getOnlineCoachingAction, getPrimaryCtaFor } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
@@ -20,8 +20,12 @@ interface Option {
   pitch: string;
   /** Small facts under it: where or what's included. */
   details: string;
-  /** Where "Enquire" goes; the contact page unless the service has its own enquiry form. */
-  enquireHref: string;
+  /**
+   * The card's main button: a booking request for classes and one-to-one
+   * when the booking form is open (worded as a request: Alex confirms), the
+   * online enquiry form for online coaching, otherwise "Enquire" (/contact).
+   */
+  action: { href: string; label: string };
   /** Shows the class times as three small columns. */
   times?: boolean;
 }
@@ -63,27 +67,33 @@ function LeadPrice({ service }: { service: Service }) {
  * peeking in; dots and arrows); from lg they are three columns. The cards are
  * the same height so nothing jumps while swiping.
  */
+/** Same route as the service's "Start your training" button (getPrimaryCtaFor); "Enquire" when booking is closed. */
+function requestAction(service: "group-class" | "one-to-one", label: string): { href: string; label: string } {
+  const cta = getPrimaryCtaFor(service);
+  return cta.kind === "booking" ? { href: cta.href, label } : { href: cta.href, label: "Enquire" };
+}
+
 export function WaysToTrain() {
   const options: Option[] = [
     {
       service: getService("group-classes"),
       pitch: "Train together. Every level welcome.",
       details: `Coached group sessions · ${site.location.venue}`,
-      enquireHref: ENQUIRY_HREF,
+      action: requestAction("group-class", "Request a class"),
       times: true,
     },
     {
       service: getService("one-to-one"),
       pitch: "Every rep coached, built around you.",
       details: `Face to face with Alex · ${site.location.venue}`,
-      enquireHref: ENQUIRY_HREF,
+      action: requestAction("one-to-one", "Request a session"),
     },
     {
       service: getService("online-coaching"),
       pitch: "Your plan, with Alex in your corner.",
       details: "Personalised programming · Ongoing support",
       // The online enquiry form when it can send, like every other online coaching button.
-      enquireHref: getOnlineCoachingAction().href,
+      action: { href: getOnlineCoachingAction().href, label: "Enquire" },
     },
   ];
 
@@ -99,7 +109,7 @@ export function WaysToTrain() {
 
         <div className="mt-8 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
-            {options.map(({ service, pitch, details, enquireHref, times }, i) => {
+            {options.map(({ service, pitch, details, action, times }, i) => {
               const image = cardImages[service.id];
               return (
                 <div key={service.id} data-reveal style={revealDelay(i)} className="group flex w-full flex-col">
@@ -141,8 +151,9 @@ export function WaysToTrain() {
                         <LeadPrice service={service} />
                       </div>
                       <div className="mt-5 flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-x-6">
-                        <ButtonLink href={enquireHref} tone="dark" className="w-full lg:w-auto">
-                          Enquire<span className="sr-only"> about {service.name.toLowerCase()}</span>
+                        <ButtonLink href={action.href} tone="dark" className="w-full lg:w-auto">
+                          {action.label}
+                          <span className="sr-only">{action.label === "Enquire" ? ` about ${service.name.toLowerCase()}` : ` (${service.name.toLowerCase()})`}</span>
                         </ButtonLink>
                         <ButtonLink href={service.href} variant="text" tone="dark" className="w-full lg:w-auto">
                           Details<span className="sr-only"> about {service.name.toLowerCase()}</span>

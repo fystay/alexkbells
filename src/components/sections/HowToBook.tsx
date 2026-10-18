@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
 import { revealDelay } from "@/lib/reveal";
+import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
 /**
  * "Where and how can I book?" answered in one place: the steps, the
@@ -48,6 +49,7 @@ export function HowToBook() {
             ))}
           </ol>
           <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="light" className="mt-10 w-full sm:w-[22rem]" />
+          {cta.kind === "booking" ? <InstagramAlternative className="mt-4" /> : null}
         </div>
 
         <div className="space-y-10 lg:col-span-5">
