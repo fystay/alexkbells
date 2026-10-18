@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { submitBookingRequest } from "@/app/book/actions";
 import {
@@ -57,6 +58,9 @@ export interface ClassInfo {
   price: string;
 }
 
+/** Each step's #hash in the address bar, so browser Back moves between steps. */
+const STEP_IDS = ["service", "when", "details"] as const;
+
 const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 type Details = { experience: string; name: string; email: string; phone: string; message: string };
@@ -68,12 +72,42 @@ const getServerToday = () => null;
 
 export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
   const demo = mode === "demo";
-  const [step, setStepState] = useState(initialService ? 1 : 0);
+  const initialStep = initialService ? 1 : 0;
+  const [step, setStepState] = useState(initialStep);
   // The first step appears without the fade; later steps fade in so the change is noticed.
   const [moved, setMoved] = useState(false);
-  const setStep = (next: number) => {
+  const router = useRouter();
+  /**
+   * The steps as they sit in the browser history (one entry per step moved
+   * forward, marked by a #hash), so the phone's back gesture and the browser's
+   * Back button return to the previous step instead of leaving the page.
+   */
+  const stack = useRef<number[]>([initialStep]);
+  const showStep = (next: number) => {
     setMoved(true);
     setStepState(next);
+  };
+  const setStep = (next: number) => {
+    if (next > step) {
+      stack.current.push(next);
+      window.history.pushState(null, "", `#${STEP_IDS[next]}`);
+      showStep(next);
+      return;
+    }
+    // Going back: step back through history when the target step is in it.
+    const at = stack.current.lastIndexOf(next);
+    if (at >= 0 && at < stack.current.length - 1) {
+      window.history.go(at - (stack.current.length - 1));
+      return;
+    }
+    stack.current[stack.current.length - 1] = next;
+    window.history.replaceState(null, "", `#${STEP_IDS[next]}`);
+    showStep(next);
+  };
+  /** Back on the first step leaves the wizard: to the page they came from, else home. */
+  const leave = () => {
+    if (window.history.length > 1) window.history.back();
+    else router.push("/");
   };
   const [service, setService] = useState<BookableService | "">(initialService ?? "");
   // Demo availability
@@ -127,6 +161,27 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       live = false;
     };
   }, [demo, service, today]);
+
+  useEffect(() => {
+    const onPop = () => {
+      const id = window.location.hash.slice(1);
+      const target = STEP_IDS.indexOf(id as (typeof STEP_IDS)[number]);
+      // Other in-page links (e.g. the error summary's #email) aren't steps.
+      if (id && target < 0) return;
+      const next = target >= 0 ? target : stack.current[0];
+      const at = stack.current.lastIndexOf(next);
+      if (at >= 0) stack.current.length = at + 1;
+      else stack.current.push(next);
+      setMoved(true);
+      setStepState(next);
+    };
+    // A reload keeps the #step in the address bar but not the answers: start cleanly.
+    if (STEP_IDS.includes(window.location.hash.slice(1) as (typeof STEP_IDS)[number])) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Move focus to the new step's heading so keyboard and screen-reader users follow the change.
   useEffect(() => {
@@ -268,6 +323,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                 </Link>
               </div>
               <ActionBar
+                onBack={leave}
                 next={{ label: "Continue", disabled: !service, onClick: () => setStep(1) }}
                 hint={service ? undefined : "Choose a service to continue."}
               />

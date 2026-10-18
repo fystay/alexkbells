@@ -425,3 +425,35 @@ test.describe("production configuration", () => {
     expect(await loadsDemo(`${PROD}/book/group-class`)).toBe(false);
   });
 });
+
+test.describe("going back in the booking wizard", () => {
+  test("the first step's Back returns to the page you came from", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" }); // straight to /book, no intro
+    await page.goto("/classes");
+    await page.goto("/book");
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page).toHaveURL(/\/classes$/);
+  });
+
+  test("the phone's back gesture (browser Back) goes to the previous step, not off the page", async ({ page }) => {
+    await page.goto("/book");
+    await choose(page, "Group class");
+    await continueButton(page).click();
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+    await expect(page).toHaveURL(/\/book#when$/);
+
+    await page.goBack();
+    await expect(page.getByRole("heading", { name: "Choose a service" })).toBeVisible();
+    await expect(page).toHaveURL(/\/book$/);
+    // The choice is kept.
+    await expect(page.getByRole("radio", { name: /Group class/ })).toBeChecked();
+
+    await page.goForward();
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+
+    // The on-page Back button walks the same history.
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByRole("heading", { name: "Choose a service" })).toBeVisible();
+    await expect(page).toHaveURL(/\/book$/);
+  });
+});
