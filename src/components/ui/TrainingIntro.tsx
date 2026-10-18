@@ -3,9 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { site } from "@/content/site";
-
-/** How long the intro plays before the booking page opens. */
-export const INTRO_MS = 2800;
+import { INTRO_MS } from "./intro-timing";
 
 /** Alex's own words: the hero headline and his reel motto ("1% everyday"). */
 const WORDS = ["Get stronger.", "Move better.", "1% better, every day."];

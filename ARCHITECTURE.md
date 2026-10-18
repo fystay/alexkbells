@@ -74,6 +74,8 @@ src/
 tests/e2e/             Playwright specs
 ```
 
+Lazy loading (2026-10-18): images are `next/image` (lazy below the fold; the hero video and desktop page-header stills load first on purpose). `TrainingIntro` and `AvailabilityCalendar` are `next/dynamic` chunks, fetched on intent (hovering/touching/focusing "Start your training"; choosing a service) rather than with the page.
+
 Client components: `NavLinks.tsx` (menu state), `HeroVideo.tsx`, `StartTraining.tsx` / `TrainingIntro.tsx` (swipe button and booking intro), and the booking journeys in `components/booking/`.
 
 ## Key decisions

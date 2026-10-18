@@ -4,7 +4,16 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { cn } from "@/lib/cn";
-import { INTRO_MS, TrainingIntro } from "./TrainingIntro";
+import dynamic from "next/dynamic";
+import { INTRO_MS } from "./intro-timing";
+
+/**
+ * Lazy: the intro (and its video) only loads once someone heads for the
+ * booking page. It starts loading on intent (touch, hover or focus), so it is
+ * usually ready by the time the swipe or tap completes.
+ */
+const loadIntro = () => import("./TrainingIntro");
+const TrainingIntro = dynamic(() => loadIntro().then((m) => m.TrainingIntro), { ssr: false });
 
 type Tone = "light" | "dark";
 
@@ -95,6 +104,11 @@ export function StartTraining({
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
+  /** Start fetching the intro as soon as someone looks like they're heading for it. */
+  const warm = () => {
+    if (withIntro) void loadIntro();
+  };
+
   const go = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
     onNavigate?.();
@@ -177,6 +191,8 @@ export function StartTraining({
           href={href}
           {...linkProps}
           onClick={onClick}
+          onPointerEnter={warm}
+          onFocus={warm}
           className={cn(
             "group inline-flex min-h-11 items-center justify-between gap-3 p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
             bar[tone],
@@ -204,6 +220,9 @@ export function StartTraining({
         href={href}
         {...linkProps}
         onClick={onClick}
+        onPointerEnter={warm}
+        onPointerDown={warm}
+        onFocus={warm}
         // Otherwise pressing and dragging picks up the link itself (native drag-and-drop) and cancels the swipe.
         draggable={false}
         onDragStart={(e) => e.preventDefault()}

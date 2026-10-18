@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -20,7 +21,6 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
-import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import {
   ActionBar,
   ChoiceGroup,
@@ -35,6 +35,17 @@ import {
   SubmissionMeta,
   useSubmissionMeta,
 } from "./ui";
+
+/** Lazy: the calendar only loads when a date step needs it; choosing a service starts the download. */
+const loadCalendar = () => import("./AvailabilityCalendar");
+const AvailabilityCalendar = dynamic(() => loadCalendar().then((m) => m.AvailabilityCalendar), {
+  ssr: false,
+  loading: () => (
+    <p className="text-muted" role="status">
+      Loading dates…
+    </p>
+  ),
+});
 
 interface BookingWizardProps {
   /**
@@ -215,6 +226,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
   ];
 
   const chooseService = (value: string) => {
+    void loadCalendar();
     setService(value as BookableService);
     setDate(null);
     setSlotId(null);
