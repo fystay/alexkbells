@@ -6,6 +6,7 @@ import { DEFAULT_TITLE, baseOpenGraph } from "@/lib/metadata";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { JsonLd } from "@/components/sections/JsonLd";
+import { REVEAL_SCRIPT } from "@/lib/reveal";
 import "./globals.css";
 
 // One variable family; the width axis gives the expanded display headings.
@@ -37,6 +38,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" className={`${archivo.variable} antialiased`}>
+      <head>
+        {/* Scroll reveal: switched on before first paint; see lib/reveal.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"

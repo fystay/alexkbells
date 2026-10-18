@@ -63,7 +63,7 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
   return (
-    <div className={cn("max-w-3xl", className)}>
+    <div data-reveal className={cn("max-w-3xl", className)}>
       {eyebrow ? <p className={cn("eyebrow mb-4", muted)}>{eyebrow}</p> : null}
       <Heading
         id={id}

@@ -45,6 +45,8 @@ for (const route of [...publicRoutes, ...coachRoutes]) {
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(route);
+        // Let in-view scroll reveals finish (0.7 s + stagger): mid-fade text is briefly translucent.
+        await page.waitForTimeout(1300);
         const results = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
           .analyze();
@@ -675,4 +677,30 @@ test("the desktop header marks the section you're in", async ({ page }) => {
   await page.goto("/#about");
   await expect(page.getByRole("banner").getByRole("link", { name: "About Alex" })).toHaveAttribute("aria-current", "location");
   await expect(page.getByRole("banner").locator('[aria-current="location"]:visible')).toHaveCount(1);
+});
+
+test.describe("scroll reveal", () => {
+  test("content below the fold fades in when scrolled to", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const faq = page.locator("#main li[data-reveal]").last();
+    await expect(faq).not.toHaveAttribute("data-revealed", "");
+    expect(await faq.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+    await faq.scrollIntoViewIfNeeded();
+    await expect(faq).toHaveAttribute("data-revealed", "");
+    await expect.poll(() => faq.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+  });
+
+  test("is off with reduced motion and without JavaScript", async ({ page, browser, baseURL }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    expect(await page.evaluate(() => document.documentElement.hasAttribute("data-reveal-ready"))).toBe(false);
+    expect(await page.locator("#main li[data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+    const noJs = await context.newPage();
+    await noJs.goto("/");
+    expect(await noJs.locator("#main li[data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    await context.close();
+  });
 });

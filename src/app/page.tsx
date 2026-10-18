@@ -14,6 +14,7 @@ import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroVideo } from "@/components/sections/HeroVideo";
 import { Journey } from "@/components/sections/Journey";
 import { WaysToTrain } from "@/components/sections/WaysToTrain";
+import { revealDelay } from "@/lib/reveal";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
@@ -106,7 +107,7 @@ function Benefits() {
         </div>
         <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:gap-x-8 sm:gap-y-10 lg:col-span-7">
           {benefits.map((b, i) => (
-            <li key={b.title} className="border-t border-line pt-4 sm:pt-5">
+            <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-line pt-4 sm:pt-5">
               <p className="eyebrow text-muted" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
@@ -162,6 +163,8 @@ function About() {
             {stills.map((photo, i) => (
               <li
                 key={photo.src}
+                data-reveal
+                style={revealDelay(i)}
                 className={cn("w-[72%] shrink-0 snap-start sm:w-auto", i === 1 ? "lg:mt-16" : i === 2 ? "lg:mt-8" : undefined)}
               >
                 <Image

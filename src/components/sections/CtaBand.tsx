@@ -36,13 +36,13 @@ export function CtaBand({ title = "Pick up a bell.", body, headingId = "cta-head
   return (
     <Section tone="ink" labelledBy={headingId}>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end lg:gap-16">
-        <div className="lg:col-span-6">
+        <div data-reveal className="lg:col-span-6">
           <h2 id={headingId} className="font-display text-display text-balance">
             <KeepHyphens>{title}</KeepHyphens>
           </h2>
           {body ? <p className="mt-6 max-w-xl text-lede text-muted-inverse">{body}</p> : null}
         </div>
-        <div className="lg:col-span-6">
+        <div data-reveal className="lg:col-span-6">
           {facts.length > 0 ? (
             <dl aria-label="Group classes" className={cn("grid border-y border-line-inverse", COLS[facts.length] ?? "grid-cols-2")}>
               {facts.map((f, i) => (

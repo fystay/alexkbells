@@ -6,6 +6,7 @@ import { describeTimetable } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
+import { revealDelay } from "@/lib/reveal";
 
 /**
  * "Where and how can I book?" answered in one place: the steps, the
@@ -35,7 +36,7 @@ export function HowToBook() {
           </h2>
           <ol className="mt-10 space-y-7">
             {steps.map((step, i) => (
-              <li key={step.title} className="grid grid-cols-[3rem_1fr] gap-x-4 border-t border-ink pt-5">
+              <li key={step.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[3rem_1fr] gap-x-4 border-t border-ink pt-5">
                 <span className="font-display text-h3 leading-none" aria-hidden="true">
                   {i + 1}
                 </span>

@@ -66,7 +66,7 @@ export function Journey() {
           </div>
 
           {showPhotos ? (
-            <figure className="lg:col-span-7">
+            <figure data-reveal className="lg:col-span-7">
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <PhotoFrame photo={journey.before} label={journey.beforeLabel} slot="before" />
                 <PhotoFrame photo={journey.after} label={journey.afterLabel} slot="after" />

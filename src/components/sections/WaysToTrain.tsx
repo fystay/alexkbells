@@ -12,6 +12,7 @@ import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { SectionHeading } from "@/components/ui/Section";
 import { Provisional } from "@/components/ui/Provisional";
 import { Timetable } from "./Timetable";
+import { revealDelay } from "@/lib/reveal";
 
 interface Option {
   service: Service;
@@ -95,7 +96,7 @@ export function WaysToTrain() {
             {options.map(({ service, pitch, details, times }, i) => {
               const image = cardImages[service.id];
               return (
-                <div key={service.id} className="group flex w-full flex-col">
+                <div key={service.id} data-reveal style={revealDelay(i)} className="group flex w-full flex-col">
                   <div className="relative aspect-square overflow-hidden bg-ink-soft sm:aspect-[4/5]">
                     {image.photo ? (
                       <Image

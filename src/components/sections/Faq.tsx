@@ -2,6 +2,7 @@ import { faq } from "@/content/faq";
 import { publishable } from "@/lib/publish";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Provisional } from "@/components/ui/Provisional";
+import { revealDelay } from "@/lib/reveal";
 
 /** Native <details> so it works without JavaScript and with keyboards. */
 export function Faq({ headingId = "faq-heading" }: { headingId?: string }) {
@@ -16,8 +17,8 @@ export function Faq({ headingId = "faq-heading" }: { headingId?: string }) {
         </div>
         <div className="lg:col-span-8">
           <ul className="border-t border-ink">
-            {items.map((item) => (
-              <li key={item.id} className="border-b border-line">
+            {items.map((item, i) => (
+              <li key={item.id} data-reveal style={revealDelay(i)} className="border-b border-line">
                 <Provisional status={item.status}>
                   <details className="group">
                     <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">

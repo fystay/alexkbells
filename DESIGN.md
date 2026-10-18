@@ -8,7 +8,7 @@ how to use them.
 - Monochrome, editorial, athletic. Confidence comes from type and space, not effects.
 - Rules (lines) and solid black bands structure the page; avoid card grids.
 - Square corners. No pills, gradients, neon, glows, floating widgets or fake badges.
-- Motion is limited to colour and small underline/arrow transitions (≤200 ms), the "Start your training" intro (`TrainingIntro`, 2.8 s, skippable, never under reduced motion), the hero headline's sheen (`.hero-headline` in `globals.css`: a soft white halo on the video below `lg`, and a band of light that crosses the letters in about 2.5 s every 7 s, graphite on paper on desktop; monochrome, no flashing), a 220 ms fade-up when a booking step changes (`animate-step-in`; not on the first step at page load), and a slight press on primary buttons. Filled buttons move down 1 px while pressed. All of it is disabled under `prefers-reduced-motion`. The hero video autoplays and loops with a pause button, except under `prefers-reduced-motion`, where it shows the still poster until the visitor presses play.
+- Motion is limited to colour and small underline/arrow transitions (≤200 ms), scroll reveal (`data-reveal`, see below), the "Start your training" intro (`TrainingIntro`, 2.8 s, skippable, never under reduced motion), the hero headline's sheen (`.hero-headline` in `globals.css`: a soft white halo on the video below `lg`, and a band of light that crosses the letters in about 2.5 s every 7 s, graphite on paper on desktop; monochrome, no flashing), a 220 ms fade-up when a booking step changes (`animate-step-in`; not on the first step at page load), and a slight press on primary buttons. Filled buttons move down 1 px while pressed. All of it is disabled under `prefers-reduced-motion`. The hero video autoplays and loops with a pause button, except under `prefers-reduced-motion`, where it shows the still poster until the visitor presses play.
 
 ## Colour
 
@@ -102,3 +102,11 @@ Display sizes were tuned so the longest word ("CUMBERNAULD") fits at 320 px.
 - Touch targets ≥ 44 px on phones and tablets (enforced in e2e at 390 and 768 px); inline links in running text are exempt. Native `<details>` for FAQ.
 - Repeated "Find out more" links carry screen-reader-only context ("about online coaching").
 - Test: axe (automated in e2e), keyboard pass, 320 px reflow, 200% zoom.
+
+## Scroll reveal (foundation, 2026-10-18)
+
+- Add `data-reveal` to any element and it fades up 24 px over 0.7 s the first time 12% of it enters the viewport (8% above the bottom edge). Stagger lists with `style={revealDelay(i)}` (80 ms apart, capped at 6) from `src/lib/reveal.ts`.
+- Switched on by a tiny inline script in `<head>` (`REVEAL_SCRIPT`) before first paint: no flash, no dependence on React. Off, so content simply shows, under reduced motion, without IntersectionObserver or without JavaScript.
+- Applied to: every `SectionHeading`, the "Why kettlebells" points, the offer cards, About stills, the journey photos, How-to-book steps, FAQ items and the closing band. Not used on the hero (first view and LCP) or on buttons and form controls.
+- Put it on wrappers, not on elements with their own transform transitions.
+
