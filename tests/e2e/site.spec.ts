@@ -248,6 +248,13 @@ test("the contact page leads to Alex's Instagram", async ({ page }) => {
   }
 });
 
+test("the Instagram card links straight to Alex's profile for updates", async ({ page }) => {
+  await page.goto("/contact");
+  const follow = page.locator("#enquire").getByRole("link", { name: /follow @alex\.kbells for updates/i });
+  await expect(follow).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+  await expect(follow).toHaveAttribute("target", "_blank");
+});
+
 test("header logo, navigation and booking button never overlap", async ({ page }) => {
   for (const width of [320, 360, 390, 768, 900, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: 800 });

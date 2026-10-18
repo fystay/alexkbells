@@ -63,6 +63,20 @@ export default function ContactPage() {
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>
+              {/* A plain, always-visible link to the profile for class news and updates. */}
+              <div className="mt-8 border-t border-paper/20 pt-6">
+                <ButtonLink
+                  href={site.social.instagram.url}
+                  external
+                  tone="dark"
+                  variant="secondary"
+                  className="w-full py-3 sm:w-auto"
+                >
+                  <span className="whitespace-normal text-center">
+                    Follow {site.social.instagram.handle} for updates
+                  </span>
+                </ButtonLink>
+              </div>
             </div>
 
             {email || phone ? (
