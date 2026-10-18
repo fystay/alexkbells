@@ -49,7 +49,9 @@ export default function ClassesPage() {
         title="Kettlebell classes in Cumbernauld"
         intro={classes.summary}
       >
-        <ButtonLink href={booking.href}>{booking.label}</ButtonLink>
+        <ButtonLink href={booking.href} variant="action" className="sm:min-w-80">
+          {booking.label}
+        </ButtonLink>
         <ButtonLink href="#book" variant="text" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
@@ -71,7 +73,7 @@ export default function ClassesPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
-            <ButtonLink href={booking.href} tone="dark" className="mt-8">
+            <ButtonLink href={booking.href} tone="dark" variant="action" className="mt-8 w-full sm:w-auto sm:min-w-80">
               {booking.label}
             </ButtonLink>
           </div>

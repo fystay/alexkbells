@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ClassSession } from "@/content/types";
-import { describeTimetable, formatGbp, formatTime, partOfDay, sortSessions } from "./schedule";
+import { describeTimetable, formatGbp, formatTime, groupedSessions, partOfDay, sortSessions } from "./schedule";
 
 describe("formatTime", () => {
   it.each([
@@ -67,5 +67,20 @@ describe("formatGbp", () => {
   it("omits pence for whole pounds", () => {
     expect(formatGbp(35)).toBe("£35");
     expect(formatGbp(7.5)).toBe("£7.50");
+  });
+});
+
+describe("groupedSessions", () => {
+  it("groups days that share a time, in weekday order", () => {
+    expect(
+      groupedSessions([
+        { id: "s", day: "Saturday", start: "10:15" },
+        { id: "w", day: "Wednesday", start: "18:30" },
+        { id: "m", day: "Monday", start: "18:30" },
+      ]),
+    ).toEqual([
+      { days: "Mon & Wed", time: "6:30 pm" },
+      { days: "Sat", time: "10:15 am" },
+    ]);
   });
 });

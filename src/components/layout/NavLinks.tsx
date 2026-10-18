@@ -15,7 +15,7 @@ export function DesktopNav() {
   const pathname = usePathname();
   return (
     <nav aria-label="Main" className="hidden xl:block">
-      <ul className="flex items-center gap-7">
+      <ul className="flex items-center gap-5 2xl:gap-7">
         {mainNav.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -24,7 +24,7 @@ export function DesktopNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "relative inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
                   "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
                   active
                     ? "text-paper after:scale-x-100"
@@ -119,9 +119,15 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             href={cta.href}
             onClick={() => setOpen(false)}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
+            className="group mt-6 flex min-h-14 items-center justify-between gap-4 bg-paper p-1 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
           >
-            {cta.label}
+            <span className="pl-4">{cta.label}</span>
+            {/* Same split button as everywhere else: the arrow in an inverse square. */}
+            <span aria-hidden="true" className="flex w-12 items-center justify-center self-stretch bg-ink text-paper">
+              <svg viewBox="0 0 16 16" className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M1 8h13M9 3l5 5-5 5" />
+              </svg>
+            </span>
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
           </Link>
           <Link

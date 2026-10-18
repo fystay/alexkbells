@@ -48,7 +48,8 @@ function ServiceDetail({
           <ButtonLink
             href={enquiry.href}
             tone={tone === "ink" ? "dark" : "light"}
-            className="mt-10"
+            variant="action"
+            className="mt-10 w-full sm:w-auto sm:min-w-80"
           >
             {enquiry.label}
             <span className="sr-only"> with {service.name.toLowerCase()}</span>

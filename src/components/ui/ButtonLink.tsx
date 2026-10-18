@@ -2,7 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "text";
+/**
+ * "action": the split "Start your training" button (2026-10-18): a filled bar
+ * with the label, and the arrow in an inverse square at its right end.
+ */
+type Variant = "primary" | "secondary" | "text" | "action";
 type Tone = "light" | "dark";
 
 interface ButtonLinkProps {
@@ -13,10 +17,12 @@ interface ButtonLinkProps {
   tone?: Tone;
   external?: boolean;
   className?: string;
+  /** "action" only: extra classes for the arrow square (e.g. responsive tone overrides). */
+  arrowClassName?: string;
 }
 
 const base =
-  "group inline-flex items-center justify-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-[color,background-color,border-color,text-decoration-color] duration-200";
+  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-[color,background-color,border-color,text-decoration-color] duration-200";
 
 // The focus ring takes the surface's text colour, not the button's, so it
 // stays visible outside a filled button; it is not transitioned, so it shows
@@ -32,12 +38,20 @@ const styles: Record<Tone, Record<Variant, string>> = {
     primary: `min-h-12 px-6 bg-ink text-paper hover:bg-ink-soft ${press}`,
     secondary: `min-h-12 px-6 border border-ink text-ink hover:bg-ink hover:text-paper ${press}`,
     text: "min-h-11 text-ink underline-offset-[6px] decoration-1 hover:underline",
+    action: `min-h-14 bg-ink text-paper hover:bg-ink-soft ${press}`,
   },
   dark: {
     primary: `min-h-12 px-6 bg-paper text-ink hover:bg-white ${press}`,
     secondary: `min-h-12 px-6 border border-paper/70 text-paper hover:bg-paper hover:text-ink ${press}`,
     text: "min-h-11 text-paper underline-offset-[6px] decoration-1 hover:underline",
+    action: `min-h-14 bg-paper text-ink hover:bg-white ${press}`,
   },
+};
+
+/** The arrow square of an "action" button: the inverse of its bar. */
+const actionArrow: Record<Tone, string> = {
+  light: "bg-paper text-ink",
+  dark: "bg-ink text-paper",
 };
 
 function Arrow() {
@@ -62,14 +76,27 @@ export function ButtonLink({
   tone = "light",
   external = false,
   className,
+  arrowClassName,
 }: ButtonLinkProps) {
-  const classes = cn(base, styles[tone][variant], ring[tone], className);
+  const action = variant === "action";
+  const classes = cn(base, styles[tone][variant], ring[tone], action ? "justify-between gap-4 p-1" : "justify-center", className);
+  const content = action ? (
+    <>
+      <span className="flex-1 pl-4 text-left sm:pl-5">{children}</span>
+      <span
+        aria-hidden="true"
+        className={cn("flex w-12 shrink-0 items-center justify-center self-stretch", actionArrow[tone], arrowClassName)}
+      >
+        <Arrow />
+      </span>
+    </>
+  ) : null;
 
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
-        {children}
-        <Arrow />
+        {action ? content : children}
+        {action ? null : <Arrow />}
         <span className="sr-only">(opens in a new tab)</span>
       </a>
     );
@@ -77,8 +104,8 @@ export function ButtonLink({
 
   return (
     <Link href={href} className={classes}>
-      {children}
-      <Arrow />
+      {action ? content : children}
+      {action ? null : <Arrow />}
     </Link>
   );
 }

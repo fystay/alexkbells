@@ -61,6 +61,13 @@ export function formatGbp(amount: number): string {
   }).format(amount);
 }
 
+/** Days sharing a start time, in weekday order: [{ days: "Mon & Wed", time: "6:30 pm" }, { days: "Sat", time: "10:15 am" }]. */
+export function groupedSessions(sessions: readonly ClassSession[]): { days: string; time: string }[] {
+  const byTime = new Map<TimeOfDay, string[]>();
+  for (const s of sortSessions(sessions)) byTime.set(s.start, [...(byTime.get(s.start) ?? []), shortDay(s.day)]);
+  return [...byTime].map(([time, days]) => ({ days: days.join(" & "), time: formatTime(time) }));
+}
+
 /** "Monday at 6:30 pm, Wednesday at 6:30 pm and Saturday at 9:00 am" */
 export function describeTimetable(sessions: readonly ClassSession[]): string {
   const parts = sortSessions(sessions).map((s) => `${s.day} at ${formatTime(s.start)}`);

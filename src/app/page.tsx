@@ -66,7 +66,9 @@ function Hero() {
                 <ButtonLink
                   href={booking.href}
                   external={booking.external}
-                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto"
+                  variant="action"
+                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto sm:min-w-80"
+                  arrowClassName="max-lg:bg-ink max-lg:text-paper"
                 >
                   {booking.label}
                 </ButtonLink>

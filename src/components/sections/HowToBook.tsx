@@ -45,7 +45,7 @@ export function HowToBook() {
               </li>
             ))}
           </ol>
-          <ButtonLink href={cta.href} className="mt-10">
+          <ButtonLink href={cta.href} variant="action" className="mt-10 w-full sm:w-auto sm:min-w-80">
             {cta.label}
           </ButtonLink>
         </div>
