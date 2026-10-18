@@ -50,8 +50,9 @@ function LeadPrice({ service }: { service: Service }) {
 }
 
 /**
- * "What I offer". One ink band, heading included, so it reads as a single
- * block after the paper hero. Each way to train is an open column rather than
+ * "What I offer". One band, heading included: ink after the paper hero on
+ * tablets and desktop, and paper on phones, where the hero is the dark
+ * edge-to-edge video, so the page always alternates black and white. Each way to train is an open column rather than
  * a boxed card, kept minimal: a portrait photo with its number and name set
  * over a fade, one line, one line of small details, the lead price, and
  * Enquire / Details.
@@ -81,7 +82,11 @@ export function WaysToTrain() {
   ];
 
   return (
-    <section id="ways-to-train" aria-labelledby="ways-heading" className="bg-ink pt-10 pb-16 text-paper sm:py-20 lg:py-28">
+    <section id="ways-to-train" aria-labelledby="ways-heading" className={cn(
+        "bg-ink pt-12 pb-16 text-paper sm:py-20 lg:py-28",
+        // Phones: light band. Ink-only tokens inside (muted text, hairlines, the class times) flip to their paper twins.
+        "max-sm:bg-paper max-sm:text-ink max-sm:[&_.border-line-inverse]:border-line max-sm:[&_.text-muted-inverse]:text-muted",
+      )}>
       <div className="container-page">
         <div className="grid grid-cols-1 gap-5 border-b border-line-inverse pb-8 sm:pb-12 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-14">
           <SectionHeading id="ways-heading" tone="ink" eyebrow="What I offer" title="Choose how you train" className="lg:col-span-7" />
@@ -91,7 +96,7 @@ export function WaysToTrain() {
         </div>
 
         <div className="mt-8 sm:mt-12 lg:mt-14">
-          <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
+          <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)} lightOnPhones>
             {options.map(({ service, pitch, details, times }, i) => {
               const image = cardImages[service.id];
               return (
@@ -112,7 +117,7 @@ export function WaysToTrain() {
                     ) : null}
                     {/* Decorative fade so the name reads over any photo. */}
                     <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink via-ink/60 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                    <div className="absolute inset-x-0 bottom-0 p-5 text-paper sm:p-6">
                       <p className="eyebrow text-paper/70" aria-hidden="true">
                         {String(i + 1).padStart(2, "0")}
                       </p>
@@ -122,7 +127,7 @@ export function WaysToTrain() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col pt-5 sm:pt-6">
-                    <p className="text-lg text-paper">{pitch}</p>
+                    <p className="text-lg text-paper max-sm:text-ink">{pitch}</p>
                     <p className="mt-1.5 text-sm text-muted-inverse">{details}</p>
                     {times ? (
                       <div className="mt-5">
@@ -134,10 +139,19 @@ export function WaysToTrain() {
                         <LeadPrice service={service} />
                       </div>
                       <div className="mt-5 flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-x-6">
-                        <ButtonLink href={ENQUIRY_HREF} tone="dark" className="w-full lg:w-auto">
+                        <ButtonLink
+                          href={ENQUIRY_HREF}
+                          tone="dark"
+                          className="w-full max-sm:bg-ink max-sm:text-paper max-sm:hover:bg-ink-soft max-sm:focus-visible:outline-ink lg:w-auto"
+                        >
                           Enquire<span className="sr-only"> about {service.name.toLowerCase()}</span>
                         </ButtonLink>
-                        <ButtonLink href={service.href} variant="text" tone="dark" className="w-full lg:w-auto">
+                        <ButtonLink
+                          href={service.href}
+                          variant="text"
+                          tone="dark"
+                          className="w-full max-sm:text-ink max-sm:focus-visible:outline-ink lg:w-auto"
+                        >
                           Details<span className="sr-only"> about {service.name.toLowerCase()}</span>
                         </ButtonLink>
                       </div>
