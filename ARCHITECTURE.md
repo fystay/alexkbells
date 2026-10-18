@@ -26,7 +26,7 @@ Next 16 differs from older versions; read `node_modules/next/dist/docs/` before 
 - Session: two httpOnly, SameSite=Lax cookies scoped to `/coach` (`lib/coach-cookies.ts`): the access token (expires a minute before Supabase's, ≤1 h) and the refresh token (7 days).
 - `src/proxy.ts` (matcher `/coach/:path*`) only refreshes an expired access cookie. Every coach page and Server Action authorises itself with `requireCoach()` (`lib/coach-session.ts`), which checks the token with Supabase on each request.
 - `/coach` is partially prerendered: the static shell plus a `<Suspense>` section that reads the session and lists booking requests and enquiries.
-- Not indexed (`noindex`, robots `Disallow: /coach$` and `/coach/`; a bare `/coach` would also block `/coaching`), not in the sitemap; linked from the footer.
+- Not indexed (`noindex`, robots `Disallow: /coach$` and `/coach/`; a bare `/coach` would also block `/coaching`), not in the sitemap; linked from the footer and the phone menu.
 - E2E runs against `tests/e2e/mock-supabase-auth.mjs`.
 
 ## Brand assets

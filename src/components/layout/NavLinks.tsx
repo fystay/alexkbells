@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { mainNav, pageNav } from "@/content/site";
+import { coachLoginNav, mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
 
@@ -123,6 +123,14 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
           >
             {cta.label}
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+          </Link>
+          <Link
+            href={coachLoginNav.href}
+            onClick={() => setOpen(false)}
+            aria-current={isActive(pathname, coachLoginNav.href) ? "page" : undefined}
+            className="mt-4 flex min-h-12 items-center justify-center border border-line-inverse px-6 text-sm font-semibold uppercase tracking-[0.08em] text-muted-inverse transition-colors hover:border-paper hover:text-paper"
+          >
+            {coachLoginNav.label}
           </Link>
         </nav>
       </div>

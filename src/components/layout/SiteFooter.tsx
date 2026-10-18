@@ -100,9 +100,6 @@ export function SiteFooter() {
             <Link href="/privacy" className="inline-flex min-h-11 items-center underline underline-offset-4 hover:no-underline">
               Privacy notice
             </Link>
-            <Link href="/coach/login" className="inline-flex min-h-11 items-center underline underline-offset-4 hover:no-underline">
-              Coach login
-            </Link>
           </p>
         </div>
       </div>

@@ -128,6 +128,9 @@ export const pageNav = [
   { label: "Contact", href: "/contact" },
 ] as const;
 
+/** Alex's sign-in: last in the phone menu and the footer, like his previous site. */
+export const coachLoginNav = { label: "Coach login", href: "/coach/login" } as const;
+
 /**
  * Footer links: the pages, plus "How to book". The footer logo already links
  * home and the header menu has the homepage sections, so they aren't repeated.
@@ -136,6 +139,7 @@ export const footerNav = [
   ...pageNav.filter((item) => item.href !== "/contact"),
   mainNav[3], // How to book
   ...pageNav.filter((item) => item.href === "/contact"),
+  coachLoginNav,
 ] as const;
 
 export function formatAddressLines(): string[] {
