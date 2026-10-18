@@ -10,8 +10,6 @@ interface CarouselProps {
   slideLabels: string[];
   /** Extra classes for every slide's <li> (e.g. desktop dividers). */
   itemClassName?: string;
-  /** Controls drawn for a paper background below `sm` (the band is ink from `sm`). */
-  lightOnPhones?: boolean;
   /** The slides. Each child is wrapped in its own <li>. */
   children: ReactNode;
 }
@@ -35,9 +33,6 @@ function targetFor(list: HTMLUListElement, index: number): number {
 const arrowButton =
   "inline-flex size-11 items-center justify-center border border-paper/70 text-paper transition-colors hover:bg-paper hover:text-ink focus-visible:outline-paper disabled:border-line-inverse disabled:text-paper/30 disabled:hover:bg-transparent disabled:hover:text-paper/30";
 
-const arrowOnPaper =
-  "max-sm:border-ink/70 max-sm:text-ink max-sm:hover:bg-ink max-sm:hover:text-paper max-sm:focus-visible:outline-ink max-sm:disabled:border-line max-sm:disabled:text-ink/30 max-sm:disabled:hover:bg-transparent max-sm:disabled:hover:text-ink/30";
-
 /**
  * Swipe carousel for the dark "Choose how you train" band.
  *
@@ -51,7 +46,7 @@ const arrowOnPaper =
  * - The list breaks out of the page gutters to the screen edge and scrolls
  *   inside itself, so the page never scrolls sideways.
  */
-export function Carousel({ label, slideLabels, itemClassName, lightOnPhones = false, children }: CarouselProps) {
+export function Carousel({ label, slideLabels, itemClassName, children }: CarouselProps) {
   const listRef = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
   /** False when everything fits (desktop grid): no controls, no carousel semantics. */
@@ -130,7 +125,7 @@ export function Carousel({ label, slideLabels, itemClassName, lightOnPhones = fa
       </ul>
 
       <div className={cn("mt-6 items-center justify-center gap-1 lg:hidden", scrollable ? "flex" : "hidden")}>
-        <button type="button" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Previous card" className={cn(arrowButton, lightOnPhones && arrowOnPaper)}>
+        <button type="button" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Previous card" className={arrowButton}>
           <Chevron direction="left" />
         </button>
         <div className="flex items-center">
@@ -141,20 +136,19 @@ export function Carousel({ label, slideLabels, itemClassName, lightOnPhones = fa
               onClick={() => goTo(i)}
               aria-label={`${slideLabels[i] ?? `Card ${i + 1}`}, ${i + 1} of ${count}`}
               aria-current={i === active ? "true" : undefined}
-              className={cn("inline-flex size-11 items-center justify-center focus-visible:outline-paper", lightOnPhones && "max-sm:focus-visible:outline-ink")}
+              className="inline-flex size-11 items-center justify-center focus-visible:outline-paper"
             >
               <span
                 aria-hidden="true"
                 className={cn(
                   "block h-2.5 rounded-full transition-[width,background-color] duration-200",
                   i === active ? "w-6 bg-paper" : "w-2.5 bg-paper/45",
-                  lightOnPhones && (i === active ? "max-sm:bg-ink" : "max-sm:bg-ink/35"),
                 )}
               />
             </button>
           ))}
         </div>
-        <button type="button" onClick={() => goTo(active + 1)} disabled={active >= count - 1} aria-label="Next card" className={cn(arrowButton, lightOnPhones && arrowOnPaper)}>
+        <button type="button" onClick={() => goTo(active + 1)} disabled={active >= count - 1} aria-label="Next card" className={arrowButton}>
           <Chevron direction="right" />
         </button>
       </div>

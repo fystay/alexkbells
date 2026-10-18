@@ -114,8 +114,8 @@ export const site = {
  * Each jumps to that section of the homepage.
  */
 export const mainNav = [
-  { label: "Ways to train", href: "/#ways-to-train" },
   { label: "Why kettlebells", href: "/#why-kettlebells" },
+  { label: "Ways to train", href: "/#ways-to-train" },
   { label: "About Alex", href: "/#about" },
   { label: "How to book", href: "/#how-to-book" },
 ] as const;

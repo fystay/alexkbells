@@ -200,9 +200,9 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      {/* Order answers Alex's four questions: what he offers, why kettlebells, who he is, where and how to book. */}
-      <WaysToTrain />
+      {/* Order answers Alex's four questions: why kettlebells, what he offers, who he is, where and how to book. */}
       <Benefits />
+      <WaysToTrain />
       <About />
       <Journey />
       <HowToBook />
