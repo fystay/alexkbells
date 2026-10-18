@@ -164,7 +164,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
               );
             })}
           </ul>
-          {/* The original plain button (restored 2026-10-18 at the owner's request), not the split/swipe style used on the pages. */}
+          {/* The original plain button (restored 2026-10-18 at the owner's request), not the split style used on the pages. */}
           <Link
             href={cta.href}
             onClick={() => setOpen(false)}
