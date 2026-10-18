@@ -134,6 +134,9 @@ See Coach portal below.
 - [ ] **P1** Real-device pass of the portal on Alex's phone
 - [ ] **P2** Default class capacity per timetable slot (now set per date); public calendar showing full dates once capacities exist
 - [ ] **P2** Anonymise-on-request for former clients with financial history (now: set to Former)
-- [ ] **P2** Card payments: provider + verified webhooks into `akb_payments` (columns ready)
+- [x] Square card payments built (2026-10-21): payment links per charge, signed webhooks re-read from Square, duplicate-event table, idempotent ledger functions, refunds mirrored from Square, daily reconciliation, sandbox/production guard (code + migration `20261021000000_akb_square.sql`, not applied)
+- [ ] **P0** Before any Sandbox test: separate Supabase project/branch for the test deployment (previews share production's database)
+- [ ] **P1** Owner: Square Developer Console app, Sandbox credentials + webhook subscription; run the Sandbox test plan (DEPLOYMENT.md → Square); then live credentials
+- [ ] **P2** Delete a cancelled charge's payment link at Square automatically (today: Dashboard)
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 

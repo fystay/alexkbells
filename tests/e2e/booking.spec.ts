@@ -406,6 +406,19 @@ test.describe("production configuration", () => {
     await expect(page.locator("dt", { hasText: "Email alert" }).locator("xpath=following-sibling::dd")).toContainText("Not sent yet (1 try)");
   });
 
+  test("Square endpoints are off until Square is configured, and never accept unsigned calls", async ({ request }) => {
+    const hook = await request.post(`${PROD}/api/square/webhook`, {
+      data: { type: "payment.updated", event_id: "evt-e2e", data: { type: "payment", id: "PAY-E2E" } },
+      headers: { "x-square-hmacsha256-signature": "forged" },
+    });
+    expect(hook.status()).toBe(404);
+    expect(await hook.json()).toEqual({ error: "not-configured" });
+    expect((await request.get(`${PROD}/api/square/webhook`)).status()).toBe(405);
+    expect((await request.get(`${PROD}/api/cron/square-reconcile`)).status()).toBe(401);
+    const cron = await request.get(`${PROD}/api/cron/square-reconcile`, { headers: { authorization: "Bearer e2e-cron-secret-0123456789" } });
+    expect(await cron.json()).toEqual({ skipped: "not-configured" });
+  });
+
   test("the alert retry endpoint needs the cron secret and returns counts only", async ({ request }) => {
     for (const authorization of [undefined, "Bearer wrong-secret-0123456789", "e2e-cron-secret-0123456789"]) {
       const res = await request.get(`${PROD}/api/cron/request-alerts`, { headers: authorization ? { authorization } : {} });

@@ -118,6 +118,27 @@ Retries: a transient failure (no answer, 429, 5xx) is retried once straight away
 
 Data kept: client details, bookings, payments and notes, all in Supabase (EU West). Alex should add retention to the privacy notice (e.g. delete former clients' records after N years; financial records are usually kept six years in the UK). A former client with no bookings or payments can be deleted from their record; anyone with history is kept (set them to Former).
 
+### Square card payments (2026-10-21, not live; needs the owner)
+
+Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.
+
+| Variable | Where | Notes |
+|---|---|---|
+| `SQUARE_ENVIRONMENT` | `sandbox` on the test deployment; `production` on Vercel Production only | Any other value, or a mismatch with the deployment, keeps Square off |
+| `SQUARE_ACCESS_TOKEN` | Sensitive. Sandbox token for testing; the live token only in Production | Square Developer Console → the app → Credentials. Server only |
+| `SQUARE_LOCATION_ID` | Alex's location (Sandbox has its own test location) | Square Dashboard → Locations, or Developer Console |
+| `SQUARE_WEBHOOK_SIGNATURE_KEY` | Sensitive, per subscription | Developer Console → Webhooks → the subscription |
+| `SQUARE_WEBHOOK_URL` | Exactly the subscription's notification URL, e.g. `https://alexkbells.vercel.app/api/square/webhook` | Part of what Square signs; must match character for character |
+| `CRON_SECRET` | Already needed for alerts | Also authorises `/api/cron/square-reconcile` |
+
+Owner steps (Square account holder):
+1. Square Developer Console: create (or open) the application; confirm **Online Checkout / payment links** are available on Alex's account and the current UK card fee.
+2. Sandbox first: note the Sandbox access token and Sandbox location id; add a Sandbox webhook subscription for `payment.created`, `payment.updated`, `refund.created`, `refund.updated` pointing at the test deployment's `/api/square/webhook`.
+3. **Use a separate Supabase project or branch for the test deployment** (previews currently share production's database): set that deployment's `SUPABASE_URL`/`SUPABASE_SECRET_KEY` to it and apply all migrations there. Otherwise test payments land in Alex's live ledger (marked `square_sandbox`, but still shown).
+4. Apply `20261020000000_akb_payment_functions.sql`, then `20261021000000_akb_square.sql` (adds two tables and replaces three functions; no row changes).
+5. Sandbox test plan (no real money): create a card link for a test charge; pay it with Square's documented Sandbox test card; check the charge shows paid and the payment says "Card (Square test)"; send the same webhook again from the Console (no second payment); refund in the Sandbox Dashboard (refund appears once, charge owed again); a declined test card (nothing recorded, link still open); a forged call to the webhook URL (403).
+6. Only after that passes: live token, live location, live webhook subscription to the production URL, `SQUARE_ENVIRONMENT=production` in Production, redeploy.
+
 ## Safety built into the code
 
 - Provisional content needs `CONTENT_PREVIEW=true` **and** a non-production

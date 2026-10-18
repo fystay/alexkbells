@@ -105,4 +105,7 @@ export const RULE_MESSAGES: Record<string, string> = {
   subscription_ended: "The subscription has ended.",
   no_price: "Set a price first.",
   invalid_status: "That status isn't allowed.",
+  provider_managed: "This was a Square card payment. Refund it in the Square Dashboard; the refund then shows here automatically.",
+  currency_mismatch: "Square reported a currency other than GBP, so it wasn't recorded.",
+  invalid_environment: "Square isn't set up correctly for this site.",
 };
