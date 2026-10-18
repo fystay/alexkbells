@@ -72,15 +72,13 @@ export function getPrimaryCta(env: Env = process.env): CallToAction {
 
 /**
  * The same "Start your training" button on a service's own page: straight
- * into that service's booking step when /book is open (online coaching goes
- * to its enquiry page instead), else the contact page.
+ * into that service's booking step when /book is open, else the contact
+ * page. Online coaching is an enquiry, not a booking: see
+ * getOnlineCoachingAction.
  */
-export function getPrimaryCtaFor(service: BookableService | "online", env: Env = process.env): CallToAction {
+export function getPrimaryCtaFor(service: BookableService, env: Env = process.env): CallToAction {
   const cta = getPrimaryCta(env);
   if (cta.href !== BOOK_PAGE_HREF) return cta;
-  if (service === "online") {
-    return onlineEnquiryMode(env) === "unavailable" ? PRIMARY_CTA : { ...PRIMARY_CTA, href: ONLINE_COACHING_HREF };
-  }
   return { ...cta, href: PATHS[service] };
 }
 
@@ -141,8 +139,13 @@ export function getClassBookingAction(env: Env = process.env): CallToAction {
   return getBookingAction("group-class", env);
 }
 
+/**
+ * Every "online coaching" button on the site. Online coaching is always an
+ * enquiry (Alex replies personally; nothing is signed up for or paid), so the
+ * label says so. It opens the enquiry form when that can be completed, and
+ * otherwise the contact page, which points to Instagram.
+ */
 export function getOnlineCoachingAction(env: Env = process.env): CallToAction {
-  return onlineEnquiryMode(env) === "unavailable"
-    ? { kind: "enquiry", label: "Enquire about coaching", href: ENQUIRY_HREF, external: false }
-    : { kind: "enquiry", label: "Explore online coaching", href: ONLINE_COACHING_HREF, external: false };
+  const href = onlineEnquiryMode(env) === "unavailable" ? ENQUIRY_HREF : ONLINE_COACHING_HREF;
+  return { kind: "enquiry", label: "Enquire about online coaching", href, external: false };
 }

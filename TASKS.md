@@ -63,7 +63,8 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Refinement pass (2026-10-16): one primary CTA "Get in touch" → /contact everywhere; booking-flow links, sticky booking bar and "Book…" wording removed from public pages; `/book` unlisted (noindex, out of sitemap) but still working; hero video still under Reduce Motion with poster fallback; visible focus rings on filled buttons; pressed state; compact timetable in the offer card; hero links to all three offers
 - [x] Inner page headers (classes, coaching, contact) get a still from the footage on desktop
 - [x] UI pass (2026-10-16): fewer repeated CTAs, no duplicate stats, tablet hero overlay, swipeable photos on phones, shorter footer, no video control when the video fails
-- [ ] **P0** Build the online coaching page (owner's plan); `/online-coaching` left as is until then
+- [x] Online coaching journey made consistent (2026-10-19): one "Enquire about online coaching" call to action everywhere, the page worded as an enquiry (not a sign-up), Instagram stated as the route when the form can't send
+- [ ] **P1** Online coaching details page (owner's plan: what a month includes, check-in rhythm) when Alex supplies the content
 - [x] `/book` live on production (2026-10-18): "Start your training" opens it; group classes pick real timetable dates; requests stored in Supabase and listed in `/coach`
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking

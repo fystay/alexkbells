@@ -6,9 +6,9 @@ import { OnlineOnboarding } from "@/components/booking/OnlineOnboarding";
 import { DemoNotice, InstagramFallback } from "@/components/booking/ui";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Get Started with Online Coaching",
+  title: "Online Coaching Enquiry",
   description:
-    "Tell Alex about your goals and training in a few quick questions. He reviews every enquiry and replies personally.",
+    "Ask about online kettlebell coaching: tell Alex about your goals and training in a few quick questions. He reads every enquiry and replies personally.",
   path: "/online-coaching",
 });
 
@@ -28,18 +28,24 @@ export default function OnlineCoachingPage() {
           <header className="lg:col-span-5">
             <p className="eyebrow text-muted">Online coaching</p>
             <h1 id="online-heading" className="mt-3 font-display text-h2 text-balance">
-              Get started with online coaching
+              Ask about online coaching
             </h1>
             <p className="mt-4 text-lede text-muted">
-              Personalised kettlebell programming with ongoing support, wherever you train. Start with a few quick
-              questions. It isn&apos;t a sign-up and there&apos;s no payment.
+              Personalised kettlebell programming with ongoing support, wherever you train.{" "}
+              {mode === "unavailable"
+                ? "For now, online coaching enquiries happen on Instagram."
+                : "Answer a few quick questions and Alex replies personally."}
+            </p>
+            <p className="mt-3 text-sm text-muted">
+              This is an enquiry, not a sign-up: nothing is booked and there&apos;s nothing to pay.
             </p>
           </header>
           <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
             {mode === "unavailable" ? (
               <InstagramFallback>
-                Online enquiries aren&apos;t open on the website yet. Send Alex a message on Instagram (
-                {site.social.instagram.handle}) to talk about online coaching.
+                Online coaching enquiries happen on Instagram for now. Send Alex a message (
+                {site.social.instagram.handle}) with your goal and your training experience, and he&apos;ll reply
+                personally.
               </InstagramFallback>
             ) : (
               <>

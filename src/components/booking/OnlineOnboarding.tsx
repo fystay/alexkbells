@@ -136,7 +136,7 @@ export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
           </h2>
           <p className="mt-5 max-w-xl text-lede text-muted-inverse">
             {demo
-              ? "This was a demonstration, so your answers weren't sent. Once email is switched on, they go straight to Alex."
+              ? "This was a demonstration, so your answers weren't sent. Once sending is switched on, they go straight to Alex."
               : `Alex will read your answers and get back to you${
                   a.contactMethod === "phone" ? " by phone" : a.contactMethod === "instagram" ? " on Instagram" : ""
                 }${a.contactMethod === "email" ? ` at ${serverState.message}` : ""} to talk through your training.`}

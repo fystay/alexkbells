@@ -47,7 +47,6 @@ describe("getPrimaryCta", () => {
     const env = { VERCEL_ENV: "production", ...supabase };
     expect(getPrimaryCtaFor("group-class", env).href).toBe("/book/group-class");
     expect(getPrimaryCtaFor("one-to-one", env).href).toBe("/book/one-to-one");
-    expect(getPrimaryCtaFor("online", env).href).toBe("/online-coaching");
     expect(getPrimaryCtaFor("group-class", {}).href).toBe("/contact");
   });
 
@@ -126,6 +125,9 @@ describe("getOnlineCoachingAction", () => {
   it("links to the onboarding journey only when it can be completed", () => {
     expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching");
     expect(getOnlineCoachingAction({}).href).toBe(ENQUIRY_HREF);
+    // Always worded as an enquiry, never as signing up or starting.
+    expect(getOnlineCoachingAction(formEnv).label).toBe("Enquire about online coaching");
+    expect(getOnlineCoachingAction({}).label).toBe("Enquire about online coaching");
   });
 });
 

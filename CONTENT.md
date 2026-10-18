@@ -28,7 +28,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
 | `/book` | **Public** since 2026-10-18 (linked by "Start your training", in the sitemap, indexed). "Book your session": guided steps — service (group class or one-to-one) → when → your details. Group classes pick a real date from the confirmed timetable and see the class set out like Alex's listing (date, 1 hr, £10 per person, description); one-to-one picks preferred days/times. `/book/group-class` and `/book/one-to-one` start at step 2. Previews with `BOOKING_DEMO=true` show the labelled sample calendar instead |
 | `/book/group-class`, `/book/one-to-one` | Same flow, starting at "when" for that service |
-| `/online-coaching` | "Get started with online coaching": goal → training → contact → review & send. Alex replies personally |
+| `/online-coaching` | "Ask about online coaching" (2026-10-19; was "Get started…"): an **enquiry**, stated on the page as "not a sign-up: nothing is booked and there's nothing to pay". Goal → training → contact → review & send; stored for the coach portal (Requests) and/or emailed; Alex replies personally. If sending isn't configured the page says enquiries happen on Instagram for now and links there |
 | `/privacy` | Privacy notice: what booking requests and online enquiries collect, where they go (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
 
 **Trade-offs taken**
@@ -45,7 +45,7 @@ Coach portal (`/coach/*`, signed in, never indexed): Dashboard, Requests, Client
 ## Copy rules
 
 - `/contact` puts "Message Alex on Instagram" in its header so the page's one action is in the first screen at every width.
-- One primary call to action everywhere: **"Start your training"** (`getPrimaryCta()` in `src/lib/booking.ts`). Since 2026-10-18 it opens `/book` wherever booking works (production included); `/classes` and `/coaching` send it straight to that service's step (`getPrimaryCtaFor`, online coaching → `/online-coaching`). Without any booking route it falls back to `/contact`. "Enquire about …" buttons on the offer cards still go to `/contact`.
+- One primary call to action everywhere: **"Start your training"** (`getPrimaryCta()` in `src/lib/booking.ts`). Since 2026-10-18 it opens `/book` wherever booking works (production included); `/classes` and `/coaching` send it straight to that service's step (`getPrimaryCtaFor`). Without any booking route it falls back to `/contact`. Online coaching is never "Start your training": every online button reads **"Enquire about online coaching"** (`getOnlineCoachingAction()`) and opens `/online-coaching` when it can send, else `/contact` (Instagram). The group and one-to-one "Enquire about …" buttons on the offer cards go to `/contact`.
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience": ROOKIE MODE (selected by default), WARRIOR MODE or BEAST MODE, with no subtitles. The submit button reads "LET'S GET TO WORK". No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.

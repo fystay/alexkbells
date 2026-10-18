@@ -221,6 +221,10 @@ test.describe("online coaching onboarding", () => {
     await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Online coaching" }).click();
     await expect(page).toHaveURL(/\/online-coaching$/);
     await expect(page.getByRole("radio", { name: /Get stronger/ })).toBeVisible();
+    // Worded as an enquiry, never as signing up.
+    await expect(page.getByRole("heading", { level: 1, name: "Ask about online coaching" })).toBeVisible();
+    await expect(page.getByText("This is an enquiry, not a sign-up: nothing is booked and there's nothing to pay.")).toBeVisible();
+    await expect(page.locator("main")).not.toContainText(/get started|sign up|join now/i);
     // Not a calendar booking.
     await expect(page.getByTestId("calendar-grid")).toHaveCount(0);
 

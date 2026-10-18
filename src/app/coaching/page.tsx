@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
-import { getPrimaryCtaFor } from "@/lib/booking";
+import { getOnlineCoachingAction, getPrimaryCtaFor } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -32,7 +32,9 @@ function ServiceDetail({
   tone: "paper" | "ink";
   intro: string;
 }) {
-  const enquiry = getPrimaryCtaFor(service.id === "online-coaching" ? "online" : "one-to-one");
+  const online = service.id === "online-coaching";
+  // One-to-one books a session; online coaching is an enquiry Alex replies to.
+  const enquiry = online ? getOnlineCoachingAction() : getPrimaryCtaFor("one-to-one");
   const headingId = `${service.id}-heading`;
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
   const rule = tone === "ink" ? "border-line-inverse" : "border-line";
@@ -49,7 +51,7 @@ function ServiceDetail({
           <StartTraining
             href={enquiry.href}
             label={enquiry.label}
-            srSuffix={` with ${service.name.toLowerCase()}`}
+            srSuffix={online ? undefined : ` with ${service.name.toLowerCase()}`}
             external={enquiry.external}
             tone={tone === "ink" ? "dark" : "light"}
             className="mt-10 w-full sm:w-[22rem]"
@@ -110,7 +112,7 @@ export default function CoachingPage() {
         service={online}
         index="02"
         tone="ink"
-        intro="Online coaching with personalised programming, support and progression, so you can train with a plan wherever you are. Get in touch to talk through your goals."
+        intro="Online coaching with personalised programming, support and progression, so you can train with a plan wherever you are. Tell Alex about your goals and he'll reply personally to talk it through."
       />
 
       <Section tone="surface" spacing="compact" labelledBy="classes-link-heading">

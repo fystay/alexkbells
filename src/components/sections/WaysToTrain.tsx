@@ -2,7 +2,7 @@ import Image from "next/image";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import type { Photo, Service } from "@/content/types";
-import { ENQUIRY_HREF } from "@/lib/booking";
+import { ENQUIRY_HREF, getOnlineCoachingAction } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
@@ -20,6 +20,8 @@ interface Option {
   pitch: string;
   /** Small facts under it: where or what's included. */
   details: string;
+  /** Where "Enquire" goes; the contact page unless the service has its own enquiry form. */
+  enquireHref: string;
   /** Shows the class times as three small columns. */
   times?: boolean;
 }
@@ -67,17 +69,21 @@ export function WaysToTrain() {
       service: getService("group-classes"),
       pitch: "Train together. Every level welcome.",
       details: `Coached group sessions · ${site.location.venue}`,
+      enquireHref: ENQUIRY_HREF,
       times: true,
     },
     {
       service: getService("one-to-one"),
       pitch: "Every rep coached, built around you.",
       details: `Face to face with Alex · ${site.location.venue}`,
+      enquireHref: ENQUIRY_HREF,
     },
     {
       service: getService("online-coaching"),
       pitch: "Your plan, with Alex in your corner.",
       details: "Personalised programming · Ongoing support",
+      // The online enquiry form when it can send, like every other online coaching button.
+      enquireHref: getOnlineCoachingAction().href,
     },
   ];
 
@@ -93,7 +99,7 @@ export function WaysToTrain() {
 
         <div className="mt-8 sm:mt-12 lg:mt-14">
           <Carousel label="Ways to train" slideLabels={options.map((o) => o.service.name)}>
-            {options.map(({ service, pitch, details, times }, i) => {
+            {options.map(({ service, pitch, details, enquireHref, times }, i) => {
               const image = cardImages[service.id];
               return (
                 <div key={service.id} data-reveal style={revealDelay(i)} className="group flex w-full flex-col">
@@ -135,7 +141,7 @@ export function WaysToTrain() {
                         <LeadPrice service={service} />
                       </div>
                       <div className="mt-5 flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-x-6">
-                        <ButtonLink href={ENQUIRY_HREF} tone="dark" className="w-full lg:w-auto">
+                        <ButtonLink href={enquireHref} tone="dark" className="w-full lg:w-auto">
                           Enquire<span className="sr-only"> about {service.name.toLowerCase()}</span>
                         </ButtonLink>
                         <ButtonLink href={service.href} variant="text" tone="dark" className="w-full lg:w-auto">

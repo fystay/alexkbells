@@ -223,14 +223,18 @@ test("every primary button says Start your training and opens the booking flow",
   await expect(page.getByRole("banner").getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book");
   await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book");
   // Each offer has its own labelled button.
-  for (const name of ["group classes", "one-to-one coaching", "online coaching"]) {
+  for (const name of ["group classes", "one-to-one coaching"]) {
     await expect(page.locator("#ways-to-train").getByRole("link", { name: `Enquire about ${name}` })).toHaveAttribute("href", "/contact");
   }
+  // Online coaching has its own enquiry form (it can send on this server).
+  await expect(page.locator("#ways-to-train").getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching");
   await page.goto("/classes");
   await expect(page.locator("main").getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book/group-class");
   await page.goto("/coaching");
   await expect(page.getByRole("link", { name: "Start your training with one-to-one coaching" })).toHaveAttribute("href", "/book/one-to-one");
-  await expect(page.getByRole("link", { name: "Start your training with online coaching" })).toHaveAttribute("href", "/online-coaching");
+  // Online coaching is an enquiry, never worded as signing up or starting.
+  await expect(page.getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching");
+  await expect(page.getByRole("link", { name: "Start your training with online coaching" })).toHaveCount(0);
 });
 
 test("the contact page leads to Alex's Instagram", async ({ page }) => {

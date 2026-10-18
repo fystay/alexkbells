@@ -107,9 +107,9 @@ export default function ContactPage() {
             {/* Only when the online enquiry form can actually send. */}
             {online.href !== "/contact" ? (
               <p className="mt-8 text-muted">
-                Interested in online coaching?{" "}
+                Interested in online coaching? Answer a few quick questions and Alex replies personally:{" "}
                 <Link href={online.href} className="font-semibold text-ink underline underline-offset-4">
-                  Get started online
+                  enquire about online coaching
                 </Link>
                 .
               </p>
