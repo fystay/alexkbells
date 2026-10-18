@@ -332,6 +332,9 @@ test("contact, Instagram and directions links point at verified destinations", a
   await page.goto("/contact");
   const hrefs = await page.$$eval("a[href^='http']", (as) => as.map((a) => a.getAttribute("href")!));
   expect(hrefs).toContain("https://www.instagram.com/alex.kbells/");
+  // Alex's Facebook page: the stable page URL, never the share link with its tracking.
+  expect(hrefs).toContain("https://www.facebook.com/profile.php?id=61589486540520");
+  expect(hrefs.some((h) => /facebook\.com\/share|mibextid/.test(h))).toBe(false);
   const maps = hrefs.find((h) => h.startsWith("https://www.google.com/maps/search/"));
   expect(maps && decodeURIComponent(maps)).toContain("1A Dunns Wood Road, Cumbernauld, G67 3EN");
 });
@@ -539,7 +542,7 @@ test("business structured data is valid JSON with the verified address only", as
   const data = JSON.parse(raw ?? "{}");
   expect(data["@type"]).toBe("LocalBusiness");
   expect(data.address.postalCode).toBe("G67 3EN");
-  expect(data.sameAs).toEqual(["https://www.instagram.com/alex.kbells/"]);
+  expect(data.sameAs).toEqual(["https://www.instagram.com/alex.kbells/", "https://www.facebook.com/profile.php?id=61589486540520"]);
   // Nothing unconfirmed: no prices, hours, ratings or phone numbers.
   for (const key of ["priceRange", "openingHours", "openingHoursSpecification", "aggregateRating", "telephone"]) {
     expect(data[key], key).toBeUndefined();
@@ -714,4 +717,14 @@ test.describe("scroll reveal", () => {
     expect(await noJs.locator("#main li[data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
     await context.close();
   });
+});
+
+test("Facebook is linked next to Instagram in the footer and About Alex, opening safely in a new tab", async ({ page }) => {
+  await page.goto("/");
+  for (const scope of [page.getByRole("contentinfo"), page.locator("#about")]) {
+    const fb = scope.getByRole("link", { name: /Facebook/ });
+    await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");
+    await expect(fb).toHaveAttribute("target", "_blank");
+    await expect(fb).toHaveAttribute("rel", /noopener/);
+  }
 });

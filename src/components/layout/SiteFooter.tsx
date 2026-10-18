@@ -50,6 +50,17 @@ export function SiteFooter() {
                   <span className="sr-only"> {site.social.instagram.handle} (opens in a new tab)</span>
                 </a>
               </li>
+              <li>
+                <a
+                  href={site.social.facebook.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={footerLink}
+                >
+                  Facebook
+                  <span className="sr-only"> {site.social.facebook.name} (opens in a new tab)</span>
+                </a>
+              </li>
               {email ? (
                 <li>
                   <a href={`mailto:${email}`} className={`${footerLink} break-all`}>

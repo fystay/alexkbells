@@ -54,6 +54,15 @@ export const site = {
       /** From his profile on 2026-10-15 (9,651). Update occasionally; never round up. */
       followers: "9.6k",
     },
+    /**
+     * Alex's Facebook page "Alex.kbells", supplied by the project owner
+     * 2026-10-18 (share link → page id 61589486540520; the page links back to
+     * @alex.kbells). The stable page URL, without the share link's tracking.
+     */
+    facebook: {
+      name: "Alex.kbells",
+      url: "https://www.facebook.com/profile.php?id=61589486540520",
+    },
   },
 
   /**

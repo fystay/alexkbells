@@ -59,7 +59,10 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] "Alex's journey" section built with slots for his story and before/after photos
 - [x] Journey published with before/after from his reel, 9.6k followers; standard FAQ answers added
 - [ ] **P1** Alex checks the standard FAQ answers (class length, kettlebells provided) and, if he likes, writes his own journey story
-- [ ] **P1** Testimonials from regular clients (with permission)
+- [ ] **P1** Testimonials from regular clients (with permission). Audit 2026-10-18: none on the site and none readable on Instagram/Facebook without logging in. Ask Alex for 3–5 quotes (first name or initials, which service, written permission and date), or screenshots of public comments he has permission to reuse
+- [ ] **P1** Coaching qualifications / insurance for About Alex (only what Alex can evidence)
+- [ ] **P2** 3 Instagram post links (one per service: class, one-to-one, online) for lightweight preview cards linking to the originals: no embedded feed
+- [x] Facebook page linked (footer, About Alex, /contact, JSON-LD), 2026-10-18
 - [x] Refinement pass (2026-10-16): one primary CTA "Get in touch" → /contact everywhere; booking-flow links, sticky booking bar and "Book…" wording removed from public pages; `/book` unlisted (noindex, out of sitemap) but still working; hero video still under Reduce Motion with poster fallback; visible focus rings on filled buttons; pressed state; compact timetable in the offer card; hero links to all three offers
 - [x] Inner page headers (classes, coaching, contact) get a still from the footage on desktop
 - [x] UI pass (2026-10-16): fewer repeated CTAs, no duplicate stats, tablet hero overlay, swipeable photos on phones, shorter footer, no video control when the video fails

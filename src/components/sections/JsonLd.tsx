@@ -15,7 +15,7 @@ export function JsonLd() {
     url: siteUrl(),
     // Generated from the supplied logo (src/app/icon.png, dark square).
     ...(site.logo ? { logo: `${siteUrl()}/icon.png` } : {}),
-    sameAs: [site.social.instagram.url],
+    sameAs: [site.social.instagram.url, site.social.facebook.url],
     address: {
       "@type": "PostalAddress",
       streetAddress: `${l.venue}, ${l.street}`,

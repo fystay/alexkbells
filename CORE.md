@@ -37,7 +37,8 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Item | Status | Notes |
 |---|---|---|
 | Brand name, descriptor, venue address | C | From brief |
-| Instagram URL | C | Tracking parameter removed |
+| Instagram URL | C | Tracking parameter removed. On 2026-10-18 the profile could not be read without logging in (login wall), so posts, captions and comments were not audited |
+| Facebook page | C | "Alex.kbells", Glasgow; supplied by the project owner 2026-10-18 as Alex's official profile. Share link resolves to page id 61589486540520, which links back to @alex.kbells. Public preview: 1,456 followers, 300 talking about this (2026-10-18). Posts, reviews and recommendations are behind a login wall and were not audited. Linked in the footer, About Alex, /contact and JSON-LD `sameAs` |
 | Class times Mon 18:30, Wed 18:30, Sat 10:15, each 60 minutes | C | Mon/Wed confirmed 2026-10-15; Saturday moved to 10:15–11:15 and the 60-minute length confirmed by the project owner 2026-10-17 (from Alex's own class listing). Shown across the site and as real dates in the booking calendar |
 | Group class: "Kettlebell Training", £10 per person, description from Alex's listing | C | Confirmed by the project owner 2026-10-17; shown on the homepage and /classes |
 | Class duration, capacity, equipment, booking requirement | U | Do not publish |

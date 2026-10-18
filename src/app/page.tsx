@@ -149,6 +149,14 @@ function About() {
             <p className="text-sm text-muted">
               <span className="font-display text-h3 text-ink">{instagram.followers}</span> followers on Instagram
             </p>
+            <a
+              href={site.social.facebook.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:no-underline"
+            >
+              Also on Facebook<span className="sr-only"> ({site.social.facebook.name}, opens in a new tab)</span>
+            </a>
           </div>
         </div>
         {stills.length > 0 ? (

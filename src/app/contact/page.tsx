@@ -78,6 +78,18 @@ export default function ContactPage() {
                 </ButtonLink>
               </div>
             </div>
+            <p className="mt-6 text-muted">
+              Also on Facebook:{" "}
+              <a
+                href={site.social.facebook.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center font-semibold text-ink underline underline-offset-4 hover:no-underline"
+              >
+                {site.social.facebook.name}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </p>
 
             {email || phone ? (
               <dl className="mt-10 divide-y divide-line border-y border-line">
