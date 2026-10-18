@@ -1,5 +1,5 @@
 import { getPrimaryCta } from "@/lib/booking";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Logo } from "./Logo";
 import { DesktopNav, MobileNav } from "./NavLinks";
 
@@ -13,9 +13,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-6 lg:gap-8">
           <DesktopNav />
           <div className="hidden md:block">
-            <ButtonLink href={cta.href} external={cta.external} tone="dark" variant="action" className="min-h-11 gap-3" arrowClassName="w-9">
-              {cta.label}
-            </ButtonLink>
+            <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" variant="button" />
           </div>
           <MobileNav cta={cta} />
         </div>

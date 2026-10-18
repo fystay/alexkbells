@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { coachLoginNav, mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
+import { StartTraining } from "@/components/ui/StartTraining";
 import type { CallToAction } from "@/lib/booking";
 
 function isActive(pathname: string, href: string): boolean {
@@ -115,21 +116,16 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
               );
             })}
           </ul>
-          <Link
+          <StartTraining
             href={cta.href}
-            onClick={() => setOpen(false)}
-            {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="group mt-6 flex min-h-14 items-center justify-between gap-4 bg-paper p-1 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
-          >
-            <span className="pl-4">{cta.label}</span>
-            {/* Same split button as everywhere else: the arrow in an inverse square. */}
-            <span aria-hidden="true" className="flex w-12 items-center justify-center self-stretch bg-ink text-paper">
-              <svg viewBox="0 0 16 16" className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M1 8h13M9 3l5 5-5 5" />
-              </svg>
-            </span>
-            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
-          </Link>
+            label={cta.label}
+            external={cta.external}
+            tone="dark"
+            variant="button"
+            className="mt-6 flex min-h-14"
+            handleClassName="w-12"
+            onNavigate={() => setOpen(false)}
+          />
           <Link
             href={coachLoginNav.href}
             onClick={() => setOpen(false)}

@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import { getPrimaryCta } from "@/lib/booking";
 import { isPublishable, publishable } from "@/lib/publish";
 import { formatGbp, groupedSessions } from "@/lib/schedule";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
 import { KeepHyphens } from "@/components/ui/KeepHyphens";
 import { cn } from "@/lib/cn";
@@ -53,9 +53,7 @@ export function CtaBand({ title = "Pick up a bell.", body, headingId = "cta-head
               ))}
             </dl>
           ) : null}
-          <ButtonLink href={cta.href} external={cta.external} tone="dark" variant="action" className="mt-7 w-full">
-            {cta.label}
-          </ButtonLink>
+          <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" className="mt-7 w-full" />
           <a
             href={instagram.url}
             target="_blank"

@@ -6,6 +6,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { getPrimaryCta } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { HowToBook } from "@/components/sections/HowToBook";
 import { Faq } from "@/components/sections/Faq";
@@ -63,15 +64,14 @@ function Hero() {
                 </p>
               </div>
               <div className="mt-5 sm:mt-6 lg:col-span-6 lg:row-start-3 lg:mt-8">
-                <ButtonLink
+                <StartTraining
                   href={booking.href}
+                  label={booking.label}
                   external={booking.external}
-                  variant="action"
-                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:hover:bg-white max-lg:focus-visible:outline-paper sm:w-auto sm:min-w-80"
-                  arrowClassName="max-lg:bg-ink max-lg:text-paper"
-                >
-                  {booking.label}
-                </ButtonLink>
+                  tone="light"
+                  className="w-full max-lg:bg-paper max-lg:text-ink max-lg:focus-visible:outline-paper sm:w-[22rem]"
+                  handleClassName="max-lg:bg-ink max-lg:text-paper"
+                />
               </div>
             </div>
             {video ? (

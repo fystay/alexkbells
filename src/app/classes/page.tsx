@@ -6,6 +6,7 @@ import { site } from "@/content/site";
 import { isPublishable } from "@/lib/publish";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Timetable } from "@/components/sections/Timetable";
@@ -49,9 +50,7 @@ export default function ClassesPage() {
         title="Kettlebell classes in Cumbernauld"
         intro={classes.summary}
       >
-        <ButtonLink href={booking.href} variant="action" className="sm:min-w-80">
-          {booking.label}
-        </ButtonLink>
+        <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="light" className="w-full sm:w-[22rem]" />
         <ButtonLink href="#book" variant="text" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
@@ -73,9 +72,7 @@ export default function ClassesPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
-            <ButtonLink href={booking.href} tone="dark" variant="action" className="mt-8 w-full sm:w-auto sm:min-w-80">
-              {booking.label}
-            </ButtonLink>
+            <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
           </div>
           <ol className="grid grid-cols-1 gap-8 lg:col-span-7">
             {joinSteps.map((step, i) => (

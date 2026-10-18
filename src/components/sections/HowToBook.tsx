@@ -4,6 +4,7 @@ import { getPrimaryCta } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { describeTimetable } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
 
 /**
@@ -45,9 +46,7 @@ export function HowToBook() {
               </li>
             ))}
           </ol>
-          <ButtonLink href={cta.href} variant="action" className="mt-10 w-full sm:w-auto sm:min-w-80">
-            {cta.label}
-          </ButtonLink>
+          <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="light" className="mt-10 w-full sm:w-[22rem]" />
         </div>
 
         <div className="space-y-10 lg:col-span-5">

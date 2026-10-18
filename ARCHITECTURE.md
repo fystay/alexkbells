@@ -74,7 +74,7 @@ src/
 tests/e2e/             Playwright specs
 ```
 
-Client components: `NavLinks.tsx` (menu state), `HeroVideo.tsx`, and the booking journeys in `components/booking/`.
+Client components: `NavLinks.tsx` (menu state), `HeroVideo.tsx`, `StartTraining.tsx` / `TrainingIntro.tsx` (swipe button and booking intro), and the booking journeys in `components/booking/`.
 
 ## Key decisions
 

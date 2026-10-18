@@ -7,6 +7,7 @@ import { getService } from "@/content/services";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -45,15 +46,14 @@ function ServiceDetail({
             <KeepHyphens>{service.name}</KeepHyphens>
           </h2>
           <p className={cn("mt-6 max-w-xl text-lede", muted)}>{intro}</p>
-          <ButtonLink
+          <StartTraining
             href={enquiry.href}
+            label={enquiry.label}
+            srSuffix={` with ${service.name.toLowerCase()}`}
+            external={enquiry.external}
             tone={tone === "ink" ? "dark" : "light"}
-            variant="action"
-            className="mt-10 w-full sm:w-auto sm:min-w-80"
-          >
-            {enquiry.label}
-            <span className="sr-only"> with {service.name.toLowerCase()}</span>
-          </ButtonLink>
+            className="mt-10 w-full sm:w-[22rem]"
+          />
         </div>
         <div className="space-y-10 lg:col-span-5 lg:col-start-8">
           {service.points.length > 0 ? (
