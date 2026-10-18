@@ -1,27 +1,29 @@
 "use server";
 
 import { bookingMode } from "@/lib/booking";
+import { BOOKABLE_SERVICES, BOOKING_EXPERIENCE, labelFor } from "@/lib/booking-options";
 import {
-  bookingDeliveryConfig,
   bookingEmail,
+  describeWhen,
+  isBookingFormEnabled,
   parseBookingRequest,
   type BookingField,
   type FormState,
 } from "@/lib/booking-request";
-import { publishedSessionLabels } from "@/lib/class-sessions";
-import { idempotencyKey, sendEmail } from "@/lib/send-email";
+import { publishedClasses } from "@/lib/class-sessions";
+import { deliverRequest } from "@/lib/deliver-request";
+import { idempotencyKey } from "@/lib/send-email";
 
 /**
- * Validates a booking request on the server and emails it to Alex.
- * Reports success only when the email provider has accepted the message.
- * Never runs for demonstration availability. Nothing is stored.
+ * Validates a booking request on the server and gets it to Alex: stored in
+ * Supabase for the coach area and/or emailed. Reports success only once one
+ * of those has accepted it. Never runs for demonstration availability.
  */
 export async function submitBookingRequest(
   _previous: FormState<BookingField>,
   formData: FormData,
 ): Promise<FormState<BookingField>> {
-  const config = bookingDeliveryConfig();
-  if (!config || bookingMode() !== "request") {
+  if (!isBookingFormEnabled() || bookingMode() !== "request") {
     return {
       status: "error",
       message: "Online booking requests aren't available right now. Please message Alex on Instagram to book.",
@@ -29,7 +31,7 @@ export async function submitBookingRequest(
     };
   }
 
-  const parsed = parseBookingRequest(formData, { sessions: publishedSessionLabels() });
+  const parsed = parseBookingRequest(formData, { classes: publishedClasses() });
   if (parsed.kind === "demo") {
     return { status: "error", message: "Demonstration times can't be booked.", errors: {} };
   }
@@ -42,24 +44,33 @@ export async function submitBookingRequest(
   }
 
   const { data } = parsed;
-  const result = await sendEmail(config, {
-    ...bookingEmail(data),
-    replyTo: data.email,
-    idempotencyKey: await idempotencyKey([
-      data.submissionId,
-      data.service,
-      data.email,
-      data.name,
-      data.session,
-      data.days.join(","),
-      data.times.join(","),
-      data.message,
-    ]),
-  });
+  const key = await idempotencyKey([
+    data.submissionId,
+    data.service,
+    data.email,
+    data.name,
+    data.session,
+    data.classDate,
+    data.days.join(","),
+    data.times.join(","),
+    data.message,
+  ]);
+  const delivered = await deliverRequest(
+    {
+      idempotencyKey: key,
+      kind: "booking",
+      service: labelFor(BOOKABLE_SERVICES, data.service),
+      summary: describeWhen(data),
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      message: data.message,
+      details: { experience: labelFor(BOOKING_EXPERIENCE, data.experience) },
+    },
+    { ...bookingEmail(data), replyTo: data.email },
+  );
 
-  if (!result.ok) {
-    // No personal data in logs.
-    console.error(`Booking request email failed (status ${result.status ?? "network error"})`);
+  if (!delivered) {
     return {
       status: "error",
       message: "Sorry, your request couldn't be sent. Please try again, or message Alex on Instagram.",

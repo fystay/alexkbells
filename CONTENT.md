@@ -26,7 +26,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 | `/classes` | "Start your training" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
-| `/book` | **Unlisted** (not linked, not in the sitemap, noindex); kept for old links. "Book your session": guided steps — service (group class or one-to-one) → when → your details. Demo availability calendar on previews; preferred days/times request on production. Falls back to an external link or an Instagram prompt |
+| `/book` | **Public** since 2026-10-18 (linked by "Start your training", in the sitemap, indexed). "Book your session": guided steps — service (group class or one-to-one) → when → your details. Group classes pick a real date from the confirmed timetable and see the class set out like Alex's listing (date, 1 hr, £10 per person, description, "Pay by bank transfer or cash."); one-to-one picks preferred days/times. `/book/group-class` and `/book/one-to-one` start at step 2. Previews with `BOOKING_DEMO=true` show the labelled sample calendar instead |
 | `/book/group-class`, `/book/one-to-one` | Same flow, starting at "when" for that service |
 | `/online-coaching` | "Get started with online coaching": goal → training → contact → review & send. Alex replies personally |
 | `/privacy` | Privacy notice: what booking requests and online enquiries collect, where they go (Vercel, Resend, Alex's inbox), rights, ICO. **Alex to review** |
@@ -36,14 +36,14 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 - `/one-to-one` and `/online-coaching` were merged into `/coaching` with anchors: with the verified information available each would be a few sentences. Split them once there is enough real content (session format, programme examples, photos).
 - `/about` is a homepage section only. Without a verified bio, qualifications or photos a standalone page would be thin. Add `/about` once Alex supplies these.
 - Membership is omitted entirely until defined.
-- Booking is a **request**, not instant booking: there is no live availability, capacity or confirmed timetable, so Alex confirms each place by reply. Class times are offered as choices only once the timetable is confirmed; until then visitors pick the days and times of day that suit them.
+- Booking is a **request**, not instant booking: capacity is unknown, so Alex confirms each place. Copy says "request" and "Alex confirms every place personally"; the outcome says "Your place is booked once he confirms".
 - The calendar's demonstration availability is invented sample data (deliberately on different days from the real timetable) and is always labelled "Demo". It must never be shown on production.
 - No general contact form; `/contact` stays Instagram-first.
 
 ## Copy rules
 
 - `/contact` puts "Message Alex on Instagram" in its header so the page's one action is in the first screen at every width.
-- One primary call to action everywhere: **"Start your training" → /contact** (`PRIMARY_CTA` in `src/lib/booking.ts`; pages render `getPrimaryCta()`, which on Vercel previews only sends the same button to `/book` so the booking prototype can be tried), in the header, menu, hero, offers, sections and closing band. Bookings are arranged by messaging Alex on Instagram; never word a button as an online booking, payment or confirmed session. Where several sit together (the three offers), each carries screen-reader context, e.g. "Start your training with online coaching".
+- One primary call to action everywhere: **"Start your training"** (`getPrimaryCta()` in `src/lib/booking.ts`). Since 2026-10-18 it opens `/book` wherever booking works (production included); `/classes` and `/coaching` send it straight to that service's step (`getPrimaryCtaFor`, online coaching → `/online-coaching`). Without any booking route it falls back to `/contact`. "Enquire about …" buttons on the offer cards still go to `/contact`.
 - Request copy says "request" and "Alex will reply to confirm" — never "booked" or "confirmed". The demo outcome says "No booking has been made". Optional notes ask visitors not to include medical details; no form asks about health.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
@@ -73,7 +73,7 @@ Regenerate all derived logo files with `python3 scripts/brand_assets.py` (needs 
 ## Questions for Alex (client approval required)
 
 Classes
-1. Confirm Mon 18:30, Wed 18:30, Sat 09:00 — every week? From what date?
+1. Mon 18:30, Wed 18:30, Sat 10:15 (60 min) confirmed 2026-10-17 — any weeks off (holidays)?
 2. Class duration? Maximum capacity?
 3. Price per class (drop-in / packs)?
 4. Is advance booking required? Can people turn up?

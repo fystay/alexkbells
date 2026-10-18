@@ -7,6 +7,7 @@ import {
   getBookingAction,
   getClassBookingAction,
   getPrimaryCta,
+  getPrimaryCtaFor,
   getOnlineCoachingAction,
   isBookingDemoEnabled,
   onlineEnquiryMode,
@@ -27,17 +28,31 @@ describe("PRIMARY_CTA", () => {
 });
 
 describe("getPrimaryCta", () => {
-  it("is PRIMARY_CTA (contact page) on production, local and CI builds", () => {
+  const supabase = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_SECRET_KEY: "sb_secret_x" };
+
+  it("opens the booking page on production once booking works, keeping the same label", () => {
+    const cta = getPrimaryCta({ VERCEL_ENV: "production", ...supabase });
+    expect(cta).toMatchObject({ kind: "booking", label: PRIMARY_CTA.label, href: "/book", external: false });
+    expect(cta.label).not.toMatch(/book|pay|checkout/i);
+  });
+
+  it("is PRIMARY_CTA (contact page) where booking can't work", () => {
+    // BOOKING_DEMO is ignored on production, so nothing can take a booking there.
     expect(getPrimaryCta({ VERCEL_ENV: "production", BOOKING_DEMO: "true" })).toEqual(PRIMARY_CTA);
     expect(getPrimaryCta({})).toEqual(PRIMARY_CTA);
-    expect(getPrimaryCta({ BOOKING_DEMO: "true" })).toEqual(PRIMARY_CTA);
     expect(getPrimaryCta({ VERCEL_ENV: "development" })).toEqual(PRIMARY_CTA);
   });
 
-  it("opens the booking page, with the same label, on Vercel previews only", () => {
-    const cta = getPrimaryCta({ VERCEL_ENV: "preview" });
-    expect(cta).toMatchObject({ kind: "booking", label: PRIMARY_CTA.label, href: "/book", external: false });
-    expect(cta.label).not.toMatch(/book|pay|checkout/i);
+  it("goes straight to a service's booking step on its own page", () => {
+    const env = { VERCEL_ENV: "production", ...supabase };
+    expect(getPrimaryCtaFor("group-class", env).href).toBe("/book/group-class");
+    expect(getPrimaryCtaFor("one-to-one", env).href).toBe("/book/one-to-one");
+    expect(getPrimaryCtaFor("online", env).href).toBe("/online-coaching");
+    expect(getPrimaryCtaFor("group-class", {}).href).toBe("/contact");
+  });
+
+  it("always opens the booking page on Vercel previews", () => {
+    expect(getPrimaryCta({ VERCEL_ENV: "preview" })).toMatchObject({ kind: "booking", href: "/book" });
   });
 });
 

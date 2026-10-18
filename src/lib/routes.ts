@@ -6,14 +6,10 @@ export const publicRoutes = [
   "/contact",
   "/online-coaching",
   "/privacy",
+  "/book",
+  "/book/group-class",
+  "/book/one-to-one",
 ] as const;
-
-/**
- * Routes that still work (e.g. for old links) but are not linked from the
- * site, listed in the sitemap or indexed. The /book request flow is kept for
- * a future booking route; today bookings are arranged via /contact.
- */
-export const unlistedRoutes = ["/book", "/book/group-class", "/book/one-to-one"] as const;
 
 /** Coach sign-in: linked from the footer, but never in the sitemap or indexed. */
 export const coachRoutes = ["/coach/login"] as const;

@@ -1,9 +1,13 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { bookingMode, parseBookingUrl } from "@/lib/booking";
 import type { BookableService } from "@/lib/booking-options";
-import { publishedSessionLabels } from "@/lib/class-sessions";
+import { groupClass } from "@/content/classes";
+import { getService } from "@/content/services";
+import { publishedClasses } from "@/lib/class-sessions";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { BookingWizard } from "./BookingWizard";
+import { BookingWizard, type ClassInfo } from "./BookingWizard";
 import { DemoNotice, InstagramFallback } from "./ui";
 
 interface BookingPageProps {
@@ -16,13 +20,16 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
   const mode = bookingMode();
   const external = mode === "external" ? parseBookingUrl(process.env.BOOKING_URL) : null;
 
+  const price = publishable(getService("group-classes").prices)[0];
+  const classInfo: ClassInfo = { ...groupClass, price: price ? `${formatGbp(price.amountGbp)} ${price.unit}` : "" };
+
   const intro =
     mode === "demo"
       ? initialService
         ? "Choose a date and time."
         : "Choose a service, then a date and time."
       : mode === "request"
-        ? `${initialService ? "Tell Alex when suits you." : "Choose a service and when suits you."} Alex confirms every booking personally by email.`
+        ? `${initialService ? "Choose when suits you." : "Choose a service, then when suits you."} Alex confirms every place personally.`
         : "Group classes and one-to-one coaching at Media House, Cumbernauld.";
 
   return (
@@ -60,7 +67,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
                   Booking needs JavaScript. You can also message Alex on Instagram ({site.social.instagram.handle}).
                 </p>
               </noscript>
-              <BookingWizard mode={mode} initialService={initialService} sessions={publishedSessionLabels()} />
+              <BookingWizard mode={mode} initialService={initialService} classes={publishedClasses()} classInfo={classInfo} />
             </>
           ) : (
             <div className="max-w-2xl">

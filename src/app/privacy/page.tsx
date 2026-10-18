@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMetadata({
 
 // Describes what this website actually does. Review with Alex before the
 // booking form goes live (see DEPLOYMENT.md); update if anything changes.
-const LAST_UPDATED = "17 October 2026";
+const LAST_UPDATED = "18 October 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
@@ -35,7 +35,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         When you send a booking request we receive your name, email address, phone number (if you
-        give one), the service and times you choose, your kettlebell experience and any note you
+        give one), the service and class date or times you choose, your kettlebell experience and any note you
         write. When you send an online coaching enquiry we receive your answers (your goal,
         experience and where you train), your name, email address, how you&apos;d like to be
         contacted and the phone number or Instagram username you give for that. We don&apos;t ask
@@ -56,8 +56,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Where it goes",
     body: (
       <p>
-        The website does not store what you send. It is sent by email to Alex using our email provider
-        (Resend), which handles it on our behalf. The website is hosted by Vercel, which processes
+        What you send is stored in our database (Supabase, hosted in the EU, Ireland) so Alex can see
+        it in his password-protected coach area, and may also be sent to him by email using our email
+        provider (Resend). These providers handle it on our behalf. The website is hosted by Vercel, which processes
         standard technical information such as IP addresses to deliver and protect the site. These
         providers may process data outside the UK under appropriate safeguards.
       </p>

@@ -1,12 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { coachRoutes, publicRoutes, unlistedRoutes } from "../../src/lib/routes";
+import { coachRoutes, publicRoutes } from "../../src/lib/routes";
 
 // Includes the 414–430px large phones and in-between tablet widths.
 const widths = [320, 360, 375, 390, 414, 430, 480, 540, 600, 640, 700, 768, 900, 1024, 1280, 1600];
 
-// Unlisted routes still work for old links, so they get the same checks.
-for (const route of [...publicRoutes, ...unlistedRoutes, ...coachRoutes]) {
+for (const route of [...publicRoutes, ...coachRoutes]) {
   test.describe(`route ${route}`, () => {
     test("responds, has one h1 and a title", async ({ page }) => {
       const res = await page.goto(route);
@@ -210,31 +209,26 @@ test("mobile menu opens, navigates, closes with Escape", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
 });
 
-// This server runs with the booking flow switched on (demo + email), so it
-// proves the public buttons never depend on it.
-test("every primary button says Start your training and leads to /contact, never to booking", async ({ page }) => {
+// This server runs with the booking flow switched on, so "Start your training" opens it.
+test("every primary button says Start your training and opens the booking flow", async ({ page }) => {
   for (const route of publicRoutes) {
     await page.goto(route);
-    const main = page.locator("main");
-    await expect(main.locator('a[href^="/book"]'), route).toHaveCount(0);
-    await expect(page.getByRole("banner").locator('a[href^="/book"]'), route).toHaveCount(0);
-    await expect(page.locator("footer").locator('a[href^="/book"]'), route).toHaveCount(0);
     // No call to action is worded as an online booking or payment.
     const labels = await page.locator("main a, header a").evaluateAll((as) => as.map((a) => a.textContent?.trim() ?? ""));
     for (const label of labels) expect(label, `${route}: "${label}"`).not.toMatch(/^book\b|book (your|a|online)|pay now|checkout/i);
   }
   await page.goto("/");
-  await expect(page.getByRole("banner").getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/contact");
-  await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("banner").getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book");
+  await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book");
   // Each offer has its own labelled button.
   for (const name of ["group classes", "one-to-one coaching", "online coaching"]) {
     await expect(page.locator("#ways-to-train").getByRole("link", { name: `Enquire about ${name}` })).toHaveAttribute("href", "/contact");
   }
   await page.goto("/classes");
-  await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/contact");
+  await expect(page.locator("main").getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book/group-class");
   await page.goto("/coaching");
-  await expect(page.getByRole("link", { name: "Start your training with one-to-one coaching" })).toHaveAttribute("href", "/contact");
-  await expect(page.getByRole("link", { name: "Start your training with online coaching" })).toHaveAttribute("href", "/contact");
+  await expect(page.getByRole("link", { name: "Start your training with one-to-one coaching" })).toHaveAttribute("href", "/book/one-to-one");
+  await expect(page.getByRole("link", { name: "Start your training with online coaching" })).toHaveAttribute("href", "/online-coaching");
 });
 
 test("the contact page leads to Alex's Instagram", async ({ page }) => {
@@ -249,13 +243,6 @@ test("the contact page leads to Alex's Instagram", async ({ page }) => {
     await expect(ig).toHaveAttribute("target", "_blank");
     const box = (await ig.boundingBox())!;
     expect(box.y + box.height, `${width}px`).toBeLessThanOrEqual(height);
-  }
-});
-
-test("unlisted booking routes are not indexed", async ({ page }) => {
-  for (const route of unlistedRoutes) {
-    await page.goto(route);
-    await expect(page.locator('meta[name="robots"]'), route).toHaveAttribute("content", /noindex/);
   }
 });
 
@@ -319,7 +306,7 @@ test("the menu answers Alex's four questions, each one tap away", async ({ page 
   const book = page.locator("#how-to-book");
   await expect(book).toContainText("1A Dunns Wood Road");
   await expect(book.getByRole("link", { name: /get directions/i })).toBeVisible();
-  await expect(book.getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/contact");
+  await expect(book.getByRole("link", { name: "Start your training" })).toHaveAttribute("href", "/book");
 });
 
 test("cross-page section anchors exist", async ({ page }) => {
@@ -667,5 +654,4 @@ test("robots and sitemap are served", async ({ request }) => {
   expect(sitemap.status()).toBe(200);
   const body = await sitemap.text();
   for (const route of publicRoutes.filter((r) => r !== "/")) expect(body).toContain(route);
-  for (const route of unlistedRoutes) expect(body).not.toContain(route);
 });

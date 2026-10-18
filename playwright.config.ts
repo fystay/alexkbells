@@ -59,7 +59,7 @@ export default defineConfig({
       url: `http://localhost:${productionPort}`,
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
-      env: { NEXT_DIST_DIR: ".next-e2e-production", VERCEL_ENV: "production", BOOKING_DEMO: "true", CONTENT_PREVIEW: "true", ...emailEnv },
+      env: { NEXT_DIST_DIR: ".next-e2e-production", VERCEL_ENV: "production", BOOKING_DEMO: "true", CONTENT_PREVIEW: "true", ...emailEnv, ...coachEnv },
     },
   ],
 });

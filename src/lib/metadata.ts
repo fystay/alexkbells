@@ -29,7 +29,7 @@ interface PageMetadataInput {
   description: string;
   /** Route path, e.g. "/classes". Resolved against metadataBase. */
   path: string;
-  /** Keep the page out of search results (unlisted routes). */
+  /** Keep the page out of search results (e.g. the coach area). */
   noindex?: boolean;
 }
 

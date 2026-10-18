@@ -111,9 +111,11 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
           <li className="flex items-center gap-2">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-ink" /> Available
           </li>
-          <li className="flex items-center gap-2">
-            <span aria-hidden="true" className="line-through">21</span> Fully booked
-          </li>
+          {avail.days.some((d) => dayStatus(d) === "full") ? (
+            <li className="flex items-center gap-2">
+              <span aria-hidden="true" className="line-through">21</span> Fully booked
+            </li>
+          ) : null}
           <li className="flex items-center gap-2">
             <span aria-hidden="true" className="size-3 bg-ink" /> Selected
           </li>

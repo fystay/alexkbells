@@ -43,42 +43,44 @@ redeploy: pages, including `/book`, are prerendered at build time.
 | `CONTENT_PREVIEW` | **do not set** | `true` | Shows provisional prices/times with an orange review frame. Ignored on production even if set by mistake |
 | `BOOKING_URL` | Alex's external booking page (https), only if he chooses a hosted provider | optional, to test | Set → "Book" buttons open it in a new tab; takes priority over everything else |
 | `BOOKING_DEMO` | **do not set** (ignored anyway) | `true` to demo the booking calendar to Alex | Shows labelled sample availability on `/book`; nothing is booked or sent. Ignored when `VERCEL_ENV=production` |
-| `RESEND_API_KEY` | **Launch blocker** (unless `BOOKING_URL` is used): API key from Alex's own Resend account, "sending access" only | a separate test key, optional | Mark as Sensitive in Vercel. With the two settings below, turns on the `/book` request form and points "Book your class" buttons at it |
+| `RESEND_API_KEY` | Optional since requests are stored in Supabase: API key from Alex's own Resend account, "sending access" only | a separate test key, optional | Mark as Sensitive in Vercel. With the two settings below, also emails each request to Alex |
 | `BOOKING_NOTIFY_EMAIL` | Alex's inbox for booking requests | a test inbox | Requests arrive here with Reply-To set to the visitor |
 | `BOOKING_FROM_EMAIL` | e.g. `Alex K Bells <bookings@<verified domain>>` | same | Must be on a domain verified in Resend (needs the domain decision; DNS records with Alex's approval) |
+| `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` — **set** | same — **set** | Project `Alexkbells` in the developer's Supabase organisation. Turns on booking requests (stored) and the coach login |
+| `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
+| `COACH_EMAIL` | Alex's login email (comma-separate to allow more than one) | same, or a test account | Turns on `/coach/login` with the two Supabase settings. Only these addresses can sign in |
 
-Public buttons always say "Start your training" and go to /contact, whatever is set here,
-except on Vercel **Preview** deployments, where the same buttons open `/book` so the
-booking prototype can be tried (production, local and CI builds are unaffected). Set
-`BOOKING_DEMO=true` for Preview to see the labelled sample calendar there. These
-settings otherwise only affect the unlisted `/book` pages. With none of them, `/book` shows
-the Instagram prompt and production builds log a warning.
+"Start your training" opens `/book` whenever booking works: on production that is the
+case as soon as `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are set (they are, since
+2026-10-17), and Vercel **Preview** always opens it. With no booking route at all
+it falls back to /contact, `/book` shows the Instagram prompt and production builds
+log a warning. **On Preview, `BOOKING_DEMO=true` takes priority** and shows the
+labelled sample calendar; delete it from Preview to try the real flow there (requests
+from previews then land in the same table as production ones).
 
-### Booking request form: what to know
+### Booking requests: what to know (live on production from 2026-10-18)
 
-- `/book` sends Alex an **email request**, not a confirmed booking: visitors
-  choose a service and the days/times that suit them (or a class time once
-  the timetable is confirmed). There is no live availability or capacity
-  check, so the site says Alex will reply to confirm, and only reports
-  success once Resend has accepted the email. If sending fails, the visitor
-  sees an error and is pointed to Instagram. `/online-coaching` enquiries use
-  the same settings and inbox.
-- The calendar seen on previews with `BOOKING_DEMO=true` is a prototype for
-  Alex to try; production never shows it. Real date-and-time booking needs a
-  booking provider or backend (ARCHITECTURE.md → Guided booking).
-- Nothing is stored by the site. Personal data passes through Vercel and
-  Resend and lands in Alex's inbox, as described on `/privacy`. **Alex must
-  review the privacy notice** (who's responsible, retention) before launch.
+- `/book` takes **requests**, not confirmed bookings. Group classes: a real
+  date from the confirmed timetable (next four weeks); one-to-one: preferred
+  days and times. Capacity is unknown, so Alex confirms each place.
+- Each request is **stored in Supabase** (`akb_booking_requests`, EU West) and
+  listed in the coach area (`/coach`, after the coach login). If the Resend
+  settings are also set, it is emailed to Alex too. Success is shown only when
+  at least one of those accepted it; otherwise the visitor sees an error and is
+  pointed to Instagram. `/online-coaching` enquiries work the same way.
+- Without `COACH_EMAIL` and Alex's Supabase login (see Coach login below),
+  requests are stored but **nobody can see them on the site**: set those up
+  before relying on it.
+- Personal data is stored in Supabase and passes through Vercel (and Resend
+  if set), as described on `/privacy`. **Alex must review the privacy notice**
+  (who's responsible, retention) and decide how long requests are kept.
 - Spam protection: hidden honeypot field plus a minimum fill time (3 s).
   Duplicate submissions share an idempotency key, so a double-click sends
-  one email. No CAPTCHA (keeps the CSP first-party); add one if spam appears.
-- Test it on a preview by setting the three variables for Preview with a
-  test inbox, redeploying, and sending a request.
+  one email and stores one row. No CAPTCHA (keeps the CSP first-party); add one if spam appears.
+- To test email delivery too, set the three Resend variables (a test inbox for
+  Preview), redeploy and send a request.
 
-| `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` once a feature uses the database | same | Project `Alexkbells` in the developer's Supabase organisation. Unused by pages today |
-| `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
 
-| `COACH_EMAIL` | Alex's login email (comma-separate to allow more than one) | same, or a test account | Turns on `/coach/login` with the two Supabase settings. Only these addresses can sign in |
 
 ### Coach login: setup
 

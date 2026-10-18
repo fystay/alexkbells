@@ -13,9 +13,11 @@ import {
 } from "@/lib/booking-options";
 import { describePreferences, initialFormState, type BookingField, type FieldErrors, type FormState } from "@/lib/booking-request";
 import { emailError, messageError, nameError, phoneError } from "@/lib/form-validation";
-import { formatLongDate, formatShortDate, toDateKey, type DateKey } from "@/lib/availability/dates";
+import { formatLongDate, formatShortDate, fromDateKey, toDateKey, weekdayIndex, type DateKey } from "@/lib/availability/dates";
+import { classAvailability } from "@/lib/availability/timetable";
 import type { AvailabilityWindow } from "@/lib/availability/types";
-import { formatTime } from "@/lib/schedule";
+import type { PublishedClass } from "@/lib/class-sessions";
+import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
 import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import {
@@ -36,13 +38,26 @@ import {
 interface BookingWizardProps {
   /**
    * "demo": labelled sample availability; nothing is sent or booked.
-   * "request": no live availability yet; a request is emailed to Alex.
+   * "request": group classes show real dates from the confirmed timetable,
+   * one-to-one asks for preferred days; the request reaches Alex, who confirms.
    */
   mode: "demo" | "request";
   initialService?: BookableService;
-  /** Confirmed class times (request mode); empty → preferred days/times. */
-  sessions: string[];
+  /** Confirmed weekly classes (request mode); empty → preferred days/times. */
+  classes: PublishedClass[];
+  /** Shown once a class date is chosen, like Alex's own class listing. */
+  classInfo: ClassInfo;
 }
+
+export interface ClassInfo {
+  name: string;
+  description: string;
+  payment: string;
+  /** e.g. "£10 per person"; empty when no price can be published. */
+  price: string;
+}
+
+const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 type Details = { experience: string; name: string; email: string; phone: string; message: string };
 
@@ -51,7 +66,7 @@ const subscribe = () => () => {};
 const getToday = () => toDateKey(new Date());
 const getServerToday = () => null;
 
-export function BookingWizard({ mode, initialService, sessions }: BookingWizardProps) {
+export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
   const demo = mode === "demo";
   const [step, setStepState] = useState(initialService ? 1 : 0);
   // The first step appears without the fade; later steps fade in so the change is noticed.
@@ -67,7 +82,6 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
   const [date, setDate] = useState<DateKey | null>(null);
   const [slotId, setSlotId] = useState<string | null>(null);
   // Request preferences
-  const [session, setSession] = useState("");
   const [days, setDays] = useState<string[]>([]);
   const [times, setTimes] = useState<string[]>([]);
   // Details
@@ -81,10 +95,22 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
   const summaryRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
 
-  const usesSessions = !demo && service === "group-class" && sessions.length > 0;
+  // Group classes in request mode: real dates from the confirmed timetable.
+  const usesSessions = !demo && service === "group-class" && classes.length > 0;
+  const calendar = demo || usesSessions;
   const availabilityKey = `${service}:${today}`;
-  const avail = demo && loaded?.key === availabilityKey ? loaded.window : null;
+  const avail = demo
+    ? loaded?.key === availabilityKey
+      ? loaded.window
+      : null
+    : usesSessions && today
+      ? classAvailability(classes, today)
+      : null;
   const chosenSlot = avail?.days.find((d) => d.date === date)?.slots.find((s) => s.id === slotId && s.available) ?? null;
+  const chosenClass =
+    usesSessions && date && chosenSlot
+      ? (classes.find((c) => c.start === chosenSlot.time && c.day === WEEKDAY_NAMES[weekdayIndex(date)]) ?? null)
+      : null;
 
   const done = demo ? demoDone : serverState.status === "success";
 
@@ -118,20 +144,18 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
   const serviceLabel = service ? labelFor(BOOKABLE_SERVICES, service) : "";
   const noun = service === "group-class" ? "class" : "session";
 
-  const whenComplete = demo ? chosenSlot !== null : usesSessions ? session !== "" : days.length > 0;
-  const whenText = demo
+  const whenComplete = demo ? chosenSlot !== null : usesSessions ? chosenClass !== null : days.length > 0;
+  const whenText = calendar
     ? chosenSlot && date
       ? `${formatShortDate(date)} · ${formatTime(chosenSlot.time)}`
       : ""
-    : usesSessions
-      ? session
-      : days.length > 0
-        ? describePreferences(days, times)
-        : "";
+    : days.length > 0
+      ? describePreferences(days, times)
+      : "";
 
   const steps = [
     { id: "service", label: "Service" },
-    { id: "when", label: demo ? "Date & time" : "When" },
+    { id: "when", label: calendar ? "Date & time" : "When" },
     { id: "details", label: "Details" },
   ];
 
@@ -139,7 +163,6 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
     setService(value as BookableService);
     setDate(null);
     setSlotId(null);
-    setSession("");
   };
 
   const toggle = (list: string[], value: string, checked: boolean) =>
@@ -178,7 +201,7 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
         headingRef={headingRef}
         service={serviceLabel}
         when={whenText}
-        longWhen={demo && date && chosenSlot ? `${formatLongDate(date)} at ${formatTime(chosenSlot.time)}` : whenText}
+        longWhen={calendar && date && chosenSlot ? `${formatLongDate(date)} at ${formatTime(chosenSlot.time)}` : whenText}
         email={demo ? details.email.trim() : serverState.message}
         onRestart={reset}
       />
@@ -193,7 +216,7 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
       demo={demo}
       rows={[
         { label: "Service", value: serviceLabel, step: 0 },
-        { label: demo ? "Date & time" : "When", value: whenText, step: 1 },
+        { label: calendar ? "Date & time" : "When", value: whenText, step: 1 },
       ]}
       currentStep={step}
       onEdit={setStep}
@@ -211,7 +234,7 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
               demo={demo}
               items={[
                 { label: "Service", value: serviceLabel, step: 0 },
-                ...(step > 1 ? [{ label: demo ? "Date & time" : "When", value: whenText, step: 1 }] : []),
+                ...(step > 1 ? [{ label: calendar ? "Date & time" : "When", value: whenText, step: 1 }] : []),
               ]}
               onEdit={setStep}
             />
@@ -259,18 +282,18 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
                   demo
                     ? undefined
                     : usesSessions
-                      ? "Choose the class you'd like to join. Alex will confirm your place."
-                      : "Live availability isn't online yet. Tell Alex when suits you and he'll reply with a confirmed time."
+                      ? "Pick a date. Alex confirms every place personally."
+                      : "Tell Alex when suits you and he'll reply with a confirmed time."
                 }
               >
                 <span id="step-heading">
-                  {demo ? (service === "group-class" ? "Choose a class" : "Choose a date and time") : "When suits you?"}
+                  {calendar ? (service === "group-class" ? "Choose a class" : "Choose a date and time") : "When suits you?"}
                 </span>
               </StepHeading>
               <div className="mt-6 space-y-8">
-                {demo ? (
+                {calendar ? (
                   <>
-                    <DemoLabel>Sample availability, not Alex&apos;s real timetable. Nothing is booked.</DemoLabel>
+                    {demo ? <DemoLabel>Sample availability, not Alex&apos;s real timetable. Nothing is booked.</DemoLabel> : null}
                     {avail ? (
                       <AvailabilityCalendar
                         window={avail}
@@ -291,19 +314,11 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
                       />
                     ) : (
                       <p className="text-muted" role="status">
-                        Loading availability…
+                        Loading {demo ? "availability" : "class dates"}…
                       </p>
                     )}
+                    {chosenClass && date ? <ClassDetails info={classInfo} date={date} session={chosenClass} /> : null}
                   </>
-                ) : usesSessions ? (
-                  <ChoiceGroup
-                    type="radio"
-                    name="session"
-                    legend="Class time"
-                    options={sessions.map((s) => ({ value: s, label: s }))}
-                    value={session}
-                    onChange={setSession}
-                  />
                 ) : (
                   <>
                     <ChoiceGroup
@@ -336,13 +351,11 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
                 hint={
                   whenComplete
                     ? undefined
-                    : demo
+                    : calendar
                       ? date
                         ? "Choose a time to continue."
                         : "Choose a date to continue."
-                      : usesSessions
-                        ? "Choose a class to continue."
-                        : "Choose at least one day to continue."
+                      : "Choose at least one day to continue."
                 }
               />
             </section>
@@ -434,7 +447,12 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
 
                 {/* The visitor's choices from earlier steps travel with the details. */}
                 <input type="hidden" name="service" value={service} />
-                {usesSessions ? <input type="hidden" name="session" value={session} /> : null}
+                {chosenClass && date ? (
+                  <>
+                    <input type="hidden" name="session" value={chosenClass.label} />
+                    <input type="hidden" name="classDate" value={date} />
+                  </>
+                ) : null}
                 {!demo && !usesSessions ? days.map((d) => <input key={d} type="hidden" name="days" value={d} />) : null}
                 {!demo && !usesSessions ? times.map((t) => <input key={t} type="hidden" name="times" value={t} />) : null}
                 <SubmissionMeta meta={meta} />
@@ -453,6 +471,29 @@ export function BookingWizard({ mode, initialService, sessions }: BookingWizardP
       <aside aria-label={demo ? "Your selection (demonstration)" : "Your booking request"} className="hidden lg:col-span-4 lg:block">
         <div className="sticky top-28">{summary}</div>
       </aside>
+    </div>
+  );
+}
+
+/** The chosen class, set out like Alex's own class listing. */
+function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey; session: PublishedClass }) {
+  const minutes = session.durationMinutes;
+  const end = minutes ? `–${formatTime(addMinutes(session.start, minutes))}` : "";
+  const year = fromDateKey(date).getFullYear();
+  return (
+    <div aria-live="polite" className="border-t border-ink pt-5">
+      <p className="eyebrow text-muted">
+        {formatLongDate(date)} {year} · {formatTime(session.start)}
+        {end}
+      </p>
+      <p className="mt-2 font-display text-h3">
+        {info.name} · {session.day} class
+      </p>
+      <p className="mt-1 text-sm font-semibold">
+        {[minutes ? `${minutes === 60 ? "1 hr" : `${minutes} min`}` : "", info.price, "with Alex"].filter(Boolean).join(" · ")}
+      </p>
+      <p className="mt-3 max-w-xl text-muted">{info.description}</p>
+      <p className="mt-2 text-sm text-muted">{info.payment}</p>
     </div>
   );
 }

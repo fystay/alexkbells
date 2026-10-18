@@ -1,4 +1,4 @@
-import type { Env } from "./env";
+import { supabaseConfig, type Env } from "./env";
 import {
   BOOKABLE_SERVICES,
   BOOKING_EXPERIENCE,
@@ -12,16 +12,19 @@ import {
   type PreferredTime,
 } from "./booking-options";
 import { emailError, isValidEmail, messageError, nameError, phoneError, singleLine } from "./form-validation";
+import { formatLongDate, fromDateKey, toDateKey, type DateKey } from "./availability/dates";
+import { isClassDate } from "./availability/timetable";
+import type { PublishedClass } from "./class-sessions";
 
 /**
  * Booking requests from /book: server-side validation, spam checks, the
  * email Alex receives, and whether delivery is configured. Pure functions so
  * they can be unit-tested without a server.
  *
- * A request is not a confirmed booking: no live availability is connected,
- * so visitors choose a confirmed class time (once the timetable is
- * published) or their preferred days and times, and Alex confirms by reply.
- * Success is only reported once the email provider has accepted the email.
+ * A request is not a confirmed booking: no capacity is known, so visitors
+ * choose a real class date from the confirmed timetable (group classes) or
+ * their preferred days and times (one-to-one), and Alex confirms. Success is
+ * only reported once the request has been stored or emailed.
  */
 
 /** Anything with FormData's `get`/`getAll` — keeps the parsers testable. */
@@ -58,8 +61,10 @@ export function submissionId(source: FieldSource): string {
 
 export interface BookingRequest {
   service: BookableService;
-  /** A confirmed class time, when the timetable is published. */
+  /** A confirmed class time, e.g. "Saturday 10:15 am", when the timetable is published. */
   session: string;
+  /** The class date chosen for that session, e.g. "2026-10-24". */
+  classDate: DateKey | "";
   days: PreferredDay[];
   times: PreferredTime[];
   experience: BookingExperience;
@@ -82,13 +87,13 @@ export type ParseResult<T, F extends string> =
 
 export interface BookingParseOptions {
   now?: number;
-  /** Confirmed class times offered for group classes; empty → preferences. */
-  sessions?: readonly string[];
+  /** Confirmed classes offered for group classes; empty → preferences. */
+  classes?: readonly PublishedClass[];
 }
 
 export function parseBookingRequest(
   source: FieldSource,
-  { now = Date.now(), sessions = [] }: BookingParseOptions = {},
+  { now = Date.now(), classes = [] }: BookingParseOptions = {},
 ): ParseResult<BookingRequest, BookingField> {
   if (isSpam(source, now)) return { kind: "spam" };
   if (text(source, "slot") !== "") return { kind: "demo" };
@@ -96,6 +101,7 @@ export function parseBookingRequest(
   const errors: FieldErrors = {};
   const service = text(source, "service");
   const session = singleLine(text(source, "session"));
+  const classDate = text(source, "classDate");
   const days = values(source, "days").filter((d): d is PreferredDay => PREFERRED_DAYS.some((o) => o.value === d));
   const times = values(source, "times").filter((t): t is PreferredTime => PREFERRED_TIMES.some((o) => o.value === t));
   const experience = text(source, "experience");
@@ -105,9 +111,10 @@ export function parseBookingRequest(
   const message = text(source, "message").replace(/\r\n?/g, "\n");
 
   if (!BOOKABLE_SERVICES.some((s) => s.value === service)) errors.service = "Choose a group class or a one-to-one session.";
-  const usesSessions = service === "group-class" && sessions.length > 0;
+  const usesSessions = service === "group-class" && classes.length > 0;
   if (usesSessions) {
-    if (!sessions.includes(session)) errors.when = "Choose a class time.";
+    const chosen = classes.find((c) => c.label === session);
+    if (!chosen || !isClassDate(classDate, chosen, toDateKey(new Date(now)))) errors.when = "Choose a class date and time.";
   } else if (days.length === 0) {
     errors.when = "Choose at least one day that suits you.";
   }
@@ -122,6 +129,7 @@ export function parseBookingRequest(
     data: {
       service: service as BookableService,
       session: usesSessions ? session : "",
+      classDate: usesSessions ? classDate : "",
       days: usesSessions ? [] : days,
       times: usesSessions ? [] : times,
       experience: experience as BookingExperience,
@@ -141,6 +149,19 @@ export function describePreferences(days: readonly string[], times: readonly str
   return `${dayText} · ${timeText}`;
 }
 
+/** "Saturday 24 October 2026, 10:15 am" for a class request; "" otherwise. */
+export function describeClass(data: Pick<BookingRequest, "session" | "classDate">): string {
+  if (!data.session || !data.classDate) return data.session;
+  const year = fromDateKey(data.classDate).getFullYear();
+  const time = data.session.split(" ").slice(1).join(" ");
+  return `${formatLongDate(data.classDate)} ${year}, ${time}`;
+}
+
+/** What the visitor asked for, in one line. */
+export function describeWhen(data: Pick<BookingRequest, "session" | "classDate" | "days" | "times">): string {
+  return data.session ? describeClass(data) : describePreferences(data.days, data.times);
+}
+
 /** The email Alex receives. Plain text: nothing from the visitor is rendered as HTML. */
 export function bookingEmail(data: BookingRequest): { subject: string; text: string } {
   const service = labelFor(BOOKABLE_SERVICES, data.service);
@@ -148,7 +169,7 @@ export function bookingEmail(data: BookingRequest): { subject: string; text: str
     `New ${service.toLowerCase()} booking request from the website.`,
     "",
     `Service: ${service}`,
-    data.session ? `Class: ${data.session}` : `Preferred: ${describePreferences(data.days, data.times)}`,
+    data.session ? `Class: ${describeClass(data)}` : `Preferred: ${describePreferences(data.days, data.times)}`,
     `Experience: ${labelFor(BOOKING_EXPERIENCE, data.experience)}`,
     `Name: ${data.name}`,
     `Email: ${data.email}`,
@@ -202,8 +223,9 @@ export function bookingDeliveryConfig(env: Env = process.env): BookingDeliveryCo
   return { apiKey, to, from, endpoint };
 }
 
+/** Requests can reach Alex: stored in Supabase, emailed via Resend, or both. */
 export function isBookingFormEnabled(env: Env = process.env): boolean {
-  return bookingDeliveryConfig(env) !== null;
+  return supabaseConfig(env) !== null || bookingDeliveryConfig(env) !== null;
 }
 
 /** State shared between a server action and its form (useActionState). */

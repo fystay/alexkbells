@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import Link from "next/link";
 import type { Service } from "@/content/types";
 import { getService } from "@/content/services";
-import { getPrimaryCta } from "@/lib/booking";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
@@ -31,7 +31,7 @@ function ServiceDetail({
   tone: "paper" | "ink";
   intro: string;
 }) {
-  const enquiry = getPrimaryCta();
+  const enquiry = getPrimaryCtaFor(service.id === "online-coaching" ? "online" : "one-to-one");
   const headingId = `${service.id}-heading`;
   const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
   const rule = tone === "ink" ? "border-line-inverse" : "border-line";

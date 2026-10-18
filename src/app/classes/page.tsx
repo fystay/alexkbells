@@ -4,7 +4,7 @@ import { getService } from "@/content/services";
 import { timetable } from "@/content/classes";
 import { site } from "@/content/site";
 import { isPublishable } from "@/lib/publish";
-import { getPrimaryCta } from "@/lib/booking";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -21,7 +21,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function ClassesPage() {
-  const booking = getPrimaryCta();
+  const booking = getPrimaryCtaFor("group-class");
   const classes = getService("group-classes");
   const timesPublished = isPublishable(timetable.status);
   const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;

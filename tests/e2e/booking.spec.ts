@@ -2,6 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { demoAvailability } from "../../src/lib/availability/demo";
 import { formatLongDate, toDateKey } from "../../src/lib/availability/dates";
+import { classAvailability } from "../../src/lib/availability/timetable";
+import { timetable } from "../../src/content/classes";
 import { dayStatus } from "../../src/lib/availability/types";
 
 /**
@@ -12,6 +14,21 @@ import { dayStatus } from "../../src/lib/availability/types";
  */
 const PROD = `http://localhost:${process.env.E2E_PRODUCTION_PORT ?? 3201}`;
 const MOCK = `http://localhost:${process.env.MOCK_EMAIL_PORT ?? 3299}`;
+const SUPABASE = `http://localhost:${process.env.MOCK_SUPABASE_PORT ?? 3298}`;
+
+interface StoredRow {
+  idempotency_key: string;
+  kind: string;
+  service: string;
+  summary: string;
+  name: string;
+  email: string;
+  details: Record<string, string>;
+}
+
+async function stored(request: APIRequestContext): Promise<StoredRow[]> {
+  return (await (await request.get(`${SUPABASE}/stored`)).json()) as StoredRow[];
+}
 
 interface RecordedEmail {
   headers: { authorization?: string; idempotencyKey?: string };
@@ -271,20 +288,36 @@ test.describe("production configuration", () => {
       const text = await page.locator("body").innerText();
       expect(text).not.toMatch(/\bdemo\b|demonstration|sample availability|prototype/i);
       expect(text).not.toMatch(/awaiting confirmation/i);
-      await expect(page.getByTestId("calendar-grid")).toHaveCount(0);
     });
   }
 
-  test("a group class request is emailed to Alex as a request, not a booking", async ({ page, request }) => {
+  test("the primary button opens the booking page", async ({ page }) => {
+    await page.goto(PROD);
+    await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book");
+    const sitemap = await (await page.request.get(`${PROD}/sitemap.xml`)).text();
+    expect(sitemap).toContain("/book/group-class");
+    await page.goto(`${PROD}/book`);
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  });
+
+  test("a group class request uses a real class date, is stored for the coach area and emailed", async ({ page, request }) => {
     await page.goto(`${PROD}/book/group-class`);
-    await expect(page.getByRole("heading", { name: "When suits you?" })).toBeVisible();
-    // The confirmed weekly class times are offered as choices.
-    await expect(page.getByText("Choose the class you'd like to join")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+    await expect(page.getByText("Pick a date. Alex confirms every place personally.")).toBeVisible();
     await expect(continueButton(page)).toBeDisabled();
-    for (const time of ["Monday 6:30 pm", "Wednesday 6:30 pm", "Saturday 9:00 am"]) {
-      await expect(page.getByRole("radio", { name: time })).toBeVisible();
-    }
-    await choose(page, "Wednesday 6:30 pm");
+
+    // Only real class dates from the confirmed timetable can be chosen.
+    const window = classAvailability(timetable.sessions, toDateKey(new Date()));
+    const day = window.days[0];
+    const shown = window.days.filter((d) => d.date.slice(0, 7) === day.date.slice(0, 7));
+    await expect(page.locator('[data-status="available"]')).toHaveCount(shown.length);
+    await pickDate(page, `${formatLongDate(day.date)}, available`);
+    await page.locator("#times label").first().click();
+
+    // The class is described like Alex's own listing.
+    await expect(page.getByText("Kettlebell Training ·")).toBeVisible();
+    await expect(page.getByText(/1 hr · £10 per person · with Alex/)).toBeVisible();
+    await expect(page.getByText("Pay by bank transfer or cash.")).toBeVisible();
     await continueButton(page).click();
 
     await page.getByRole("button", { name: "Send request" }).click();
@@ -302,15 +335,31 @@ test.describe("production configuration", () => {
     await expect(status).toContainText("prod@example.com");
     await expect(status).toContainText("booked once he confirms");
 
+    const year = new Date(`${day.date}T12:00:00`).getFullYear();
+    const summary = `${formatLongDate(day.date)} ${year}`;
+    const row = (await stored(request)).find((r) => r.name === "Prod Booker");
+    expect(row).toMatchObject({ kind: "booking", service: "Group class", email: "prod@example.com", details: { experience: "New to kettlebells" } });
+    expect(row!.summary).toContain(summary);
+
     const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Prod Booker");
     expect(sent).toBeDefined();
     expect(sent!.payload.to).toEqual(["alex-e2e@example.com"]);
-    expect(sent!.payload.text).toContain("Class: Wednesday 6:30 pm");
+    expect(sent!.payload.text).toContain(`Class: ${summary}`);
     expect(sent!.payload.text).toContain("not a confirmed booking");
-    expect(sent!.headers.idempotencyKey).toMatch(/^booking-request\/[0-9a-f]{64}$/);
+    expect(sent!.headers.idempotencyKey).toBe(row!.idempotency_key);
+
+    // Alex sees it in the coach area.
+    await page.goto(`${PROD}/coach/login`);
+    await page.getByLabel("Email").fill("coach-e2e@example.com");
+    await page.getByLabel("Password").fill("correct-horse");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    const requests = page.getByRole("region", { name: "Requests" });
+    await expect(requests).toContainText("Prod Booker");
+    await expect(requests).toContainText(summary);
+    await expect(requests.getByRole("link", { name: "prod@example.com" })).toHaveAttribute("href", "mailto:prod@example.com");
   });
 
-  test("an email-service failure shows an error, not success", async ({ page }) => {
+  test("when neither storage nor email accepts a request, it shows an error, not success", async ({ page }) => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Mon");
     await continueButton(page).click();

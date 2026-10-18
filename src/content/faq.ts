@@ -4,9 +4,10 @@ import { timetable } from "./classes";
 import { describeTimetable } from "@/lib/schedule";
 
 /**
- * Only questions with reliable answers. "beginners", "bring", "length" and
+ * Only questions with reliable answers. "beginners", "bring" and
  * "first-session" use industry-standard answers at the project owner's
- * request (2026-10-15); Alex should check them, especially class length.
+ * request (2026-10-15); Alex should check them. Class length (60 minutes)
+ * confirmed 2026-10-17.
  * Cancellations and capacity stay unanswered until Alex supplies them.
  */
 export const faq: FaqItem[] = [
@@ -47,7 +48,7 @@ export const faq: FaqItem[] = [
   {
     id: "length",
     question: "How long is a class?",
-    answer: "Around 45 minutes, including a warm-up.",
+    answer: "60 minutes, including a warm-up.",
     status: "confirmed",
   },
   {

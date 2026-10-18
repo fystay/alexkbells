@@ -8,8 +8,9 @@ import { Section } from "@/components/ui/Section";
 
 /**
  * "Where and how can I book?" answered in one place: the steps, the
- * "Start your training" button, and where and when sessions happen. Bookings are
- * arranged by message, so it never promises an online booking.
+ * "Start your training" button, and where and when sessions happen. When the
+ * booking flow is open, step 2 is the request form; otherwise a message.
+ * Either way Alex confirms each place, so it never promises an instant booking.
  */
 export function HowToBook() {
   const times = isPublishable(timetable.status) ? describeTimetable(timetable.sessions) : null;
@@ -17,7 +18,9 @@ export function HowToBook() {
 
   const steps = [
     { title: "Choose how you train", body: "A group class or a one-to-one session." },
-    { title: "Get in touch", body: `Message Alex on Instagram (${site.social.instagram.handle}) with what you'd like to book.` },
+    cta.kind === "booking"
+      ? { title: "Send your request", body: "Pick a class date, or the days that suit you for one-to-one, and send it in a minute." }
+      : { title: "Get in touch", body: `Message Alex on Instagram (${site.social.instagram.handle}) with what you'd like to book.` },
     { title: "Alex confirms your place", body: `Then you come along to ${site.location.venue}.` },
   ];
 

@@ -21,7 +21,8 @@ describe("content approval state", () => {
 
   it("publishes the timetable confirmed on 2026-10-15", () => {
     expect(timetable.status).toBe("confirmed");
-    expect(timetable.sessions.map((s) => `${s.day} ${s.start}`)).toEqual(["Monday 18:30", "Wednesday 18:30", "Saturday 09:00"]);
+    expect(timetable.sessions.map((s) => `${s.day} ${s.start}`)).toEqual(["Monday 18:30", "Wednesday 18:30", "Saturday 10:15"]);
+    expect(timetable.sessions.every((s) => s.durationMinutes === 60)).toBe(true);
   });
 
   it("derives the timetable FAQ status from the timetable", () => {

@@ -24,6 +24,13 @@ export function formatTime(time: TimeOfDay): string {
   return `${h12}:${String(minutes).padStart(2, "0")} ${period}`;
 }
 
+/** "18:30" + 60 -> "19:30" (same day). */
+export function addMinutes(time: TimeOfDay, minutes: number): TimeOfDay {
+  const { hours, minutes: m } = parseTime(time);
+  const total = (hours * 60 + m + minutes) % (24 * 60);
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}` as TimeOfDay;
+}
+
 export function shortDay(day: Weekday): string {
   return day.slice(0, 3);
 }

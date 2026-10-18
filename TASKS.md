@@ -64,10 +64,12 @@ Priority: P0 blocks launch · P1 before/at launch · P2 later.
 - [x] Inner page headers (classes, coaching, contact) get a still from the footage on desktop
 - [x] UI pass (2026-10-16): fewer repeated CTAs, no duplicate stats, tablet hero overlay, swipeable photos on phones, shorter footer, no video control when the video fails
 - [ ] **P0** Build the online coaching page (owner's plan); `/online-coaching` left as is until then
-- [ ] **P1** Decide whether the `/book` request flow is ever re-linked, or removed (currently unlisted)
+- [x] `/book` live on production (2026-10-18): "Start your training" opens it; group classes pick real timetable dates; requests stored in Supabase and listed in `/coach`
 - [ ] **P0** Alex tries the booking prototype on a preview (`BOOKING_DEMO=true`) and confirms the flow
 - [ ] **P1** Choose how real availability will work (hosted provider vs custom) before live date-and-time booking — see ARCHITECTURE.md → Guided booking
-- [ ] **P0** **Turn on booking**: Alex's Resend account + verified sending domain, then `RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL` in Vercel (or an external `BOOKING_URL`). Only affects the unlisted `/book` pages; public buttons stay "Start your training" → /contact
+- [ ] **P0** Make requests visible to Alex: create his Supabase login, turn off public sign-ups, set `COACH_EMAIL` in Vercel (DEPLOYMENT.md → Coach login). Optional: Resend settings so each request is also emailed
+- [ ] **P1** Remove `BOOKING_DEMO` from Vercel Preview so previews show the real flow (or keep it to demo)
+- [ ] **P1** Capacity per class and holiday weeks, so full/cancelled dates can be shown
 - [ ] **P0** Alex reviews `/privacy` and agrees to confirm requests by reply
 - [ ] **P0** Account ownership: Vercel (plan suitable for commercial use), GitHub repo, domain — DEPLOYMENT.md
 - [ ] **P0** Choose and register the domain

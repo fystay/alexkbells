@@ -7,6 +7,8 @@ import {
   isBookingFormEnabled,
   parseBookingRequest,
 } from "./booking-request";
+import { addDays, formatLongDate, fromDateKey, toDateKey, weekdayIndex } from "./availability/dates";
+import type { PublishedClass } from "./class-sessions";
 
 const NOW = 1_800_000_000_000;
 const form = (fields: Record<string, string | string[]>) => {
@@ -29,7 +31,16 @@ const valid = {
   startedAt: String(NOW - 20_000),
   submissionId: "abc-123",
 };
-const SESSIONS = ["Monday 6:30 pm", "Saturday 9:00 am"];
+const CLASSES = [
+  { label: "Monday 6:30 pm", day: "Monday", start: "18:30", durationMinutes: 60 },
+  { label: "Saturday 10:15 am", day: "Saturday", start: "10:15", durationMinutes: 60 },
+] as const satisfies PublishedClass[];
+// Real class dates relative to NOW.
+const today = toDateKey(new Date(NOW));
+const nextDate = (weekday: number) => {
+  for (let i = 1; i <= 7; i++) if (weekdayIndex(addDays(today, i)) === weekday) return addDays(today, i);
+  throw new Error("unreachable");
+};
 
 describe("parseBookingRequest", () => {
   it("accepts a preference request and normalises it", () => {
@@ -49,11 +60,22 @@ describe("parseBookingRequest", () => {
     expect(result.kind === "invalid" && result.errors.when).toBeTruthy();
   });
 
-  it("requires a published class time for group classes once the timetable is confirmed", () => {
+  it("requires a real upcoming class date for group classes once the timetable is confirmed", () => {
     const groupForm = { ...valid, service: "group-class", days: [], times: [] };
-    expect(parseBookingRequest(form({ ...groupForm, session: "Monday 6:30 pm" }), { now: NOW, sessions: SESSIONS }).kind).toBe("valid");
-    const invented = parseBookingRequest(form({ ...groupForm, session: "Tuesday 5:00 am" }), { now: NOW, sessions: SESSIONS });
-    expect(invented.kind === "invalid" && invented.errors.when).toBeTruthy();
+    const opts = { now: NOW, classes: CLASSES };
+    const monday = nextDate(0);
+    expect(parseBookingRequest(form({ ...groupForm, session: "Monday 6:30 pm", classDate: monday }), opts).kind).toBe("valid");
+    for (const bad of [
+      { session: "Tuesday 5:00 am", classDate: monday }, // not a class
+      { session: "Monday 6:30 pm", classDate: nextDate(1) }, // wrong weekday
+      { session: "Monday 6:30 pm", classDate: addDays(monday, -14) }, // in the past
+      { session: "Monday 6:30 pm", classDate: addDays(monday, 70) }, // beyond the window
+      { session: "Monday 6:30 pm", classDate: "2026-02-31" }, // not a date
+      { session: "Monday 6:30 pm", classDate: "" },
+    ]) {
+      const result = parseBookingRequest(form({ ...groupForm, ...bad }), opts);
+      expect(result.kind === "invalid" && result.errors.when, JSON.stringify(bad)).toBeTruthy();
+    }
   });
 
   it("ignores unknown day and time values", () => {
@@ -104,13 +126,15 @@ describe("bookingEmail", () => {
     expect(email.text).toContain("not a confirmed booking");
   });
 
-  it("names the class time when one was chosen", () => {
-    const result = parseBookingRequest(form({ ...valid, service: "group-class", session: "Saturday 9:00 am", days: [] }), {
-      now: NOW,
-      sessions: SESSIONS,
-    });
+  it("names the class date and time when one was chosen", () => {
+    const saturday = nextDate(5);
+    const result = parseBookingRequest(
+      form({ ...valid, service: "group-class", session: "Saturday 10:15 am", classDate: saturday, days: [] }),
+      { now: NOW, classes: CLASSES },
+    );
     if (result.kind !== "valid") throw new Error("expected valid");
-    expect(bookingEmail(result.data).text).toContain("Class: Saturday 9:00 am");
+    const year = fromDateKey(saturday).getFullYear();
+    expect(bookingEmail(result.data).text).toContain(`Class: ${formatLongDate(saturday)} ${year}, 10:15 am`);
   });
 });
 
@@ -134,6 +158,10 @@ describe("bookingDeliveryConfig", () => {
     expect(isBookingFormEnabled({ ...env, BOOKING_NOTIFY_EMAIL: "not-an-email" })).toBe(false);
     expect(isBookingFormEnabled({ ...env, BOOKING_FROM_EMAIL: "Alex <nope>" })).toBe(false);
     expect(isBookingFormEnabled({})).toBe(false);
+  });
+
+  it("is also enabled by Supabase storage alone", () => {
+    expect(isBookingFormEnabled({ SUPABASE_URL: "https://ref.supabase.co", SUPABASE_SECRET_KEY: "sb_secret_x" })).toBe(true);
   });
 
   it("only allows endpoint overrides that are https or localhost", () => {

@@ -58,14 +58,30 @@ export const PRIMARY_CTA: CallToAction = {
 };
 
 /**
- * What pages render for the primary call to action: PRIMARY_CTA everywhere
- * except Vercel Preview deployments, where the same button opens the booking
- * page (/book, with its labelled demonstration calendar when BOOKING_DEMO is
- * on) so Alex and reviewers can try the flow. The label never changes and
- * never says "book". Production, local and CI builds always get PRIMARY_CTA.
+ * What pages render for the primary call to action. Since 2026-10-18 the
+ * button opens the booking page (/book) wherever booking works (a booking
+ * URL, the request flow, or the labelled demo), production included, and on
+ * every Vercel Preview so the flow can be tried. Otherwise it is PRIMARY_CTA
+ * (/contact). The label never changes and never says "book".
  */
 export function getPrimaryCta(env: Env = process.env): CallToAction {
-  return isPreviewDeployment(env) ? { ...PRIMARY_CTA, kind: "booking", href: BOOK_PAGE_HREF } : PRIMARY_CTA;
+  return bookingMode(env) !== "unavailable" || isPreviewDeployment(env)
+    ? { ...PRIMARY_CTA, kind: "booking", href: BOOK_PAGE_HREF }
+    : PRIMARY_CTA;
+}
+
+/**
+ * The same "Start your training" button on a service's own page: straight
+ * into that service's booking step when /book is open (online coaching goes
+ * to its enquiry page instead), else the contact page.
+ */
+export function getPrimaryCtaFor(service: BookableService | "online", env: Env = process.env): CallToAction {
+  const cta = getPrimaryCta(env);
+  if (cta.href !== BOOK_PAGE_HREF) return cta;
+  if (service === "online") {
+    return onlineEnquiryMode(env) === "unavailable" ? PRIMARY_CTA : { ...PRIMARY_CTA, href: ONLINE_COACHING_HREF };
+  }
+  return { ...cta, href: PATHS[service] };
 }
 
 /** Demonstration availability: opt-in, and impossible on Vercel production. */
@@ -104,7 +120,7 @@ export function bookingConfigWarning(env: Env = process.env): string | null {
     return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
   if (bookingMode(env) !== "unavailable") return null;
-  return "No booking route is configured: /book shows the Instagram fallback (public buttons always say \"Start your training\" and link to /contact). Configure the /book request form (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL) or set BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
+  return "No booking route is configured: \"Start your training\" links to /contact and /book shows the Instagram fallback. Set SUPABASE_URL and SUPABASE_SECRET_KEY (requests stored for the coach area), the Resend settings (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL), or BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
 }
 
 /** The primary "Book" button for a service, or for booking in general. */
