@@ -7,8 +7,8 @@
 -- after requireCoach()) can read or write. Functions are not executable by
 -- the public roles either.
 --
--- Idempotent where Postgres allows it (IF NOT EXISTS / OR REPLACE / DROP …
--- IF EXISTS), so re-running it is harmless. Existing booking requests are kept:
+-- Idempotent (IF NOT EXISTS / OR REPLACE, including CREATE OR REPLACE TRIGGER,
+-- Postgres 14+), so re-running it is harmless. Existing booking requests are kept:
 -- only columns are added and the status list is widened.
 --
 -- Money is stored in pence (integers), currency GBP.
@@ -105,9 +105,30 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_request_before_insert on public.akb_booking_requests;
-create trigger akb_request_before_insert before insert on public.akb_booking_requests
+create or replace trigger akb_request_before_insert before insert on public.akb_booking_requests
   for each row execute function public.akb_request_before_insert();
+
+-- Requests stored before this migration: copy their class date and slot the
+-- same way as the trigger (a bad date is skipped, not an error). Only rows not
+-- filled yet, so re-running changes nothing.
+do $$
+declare
+  r record;
+begin
+  for r in
+    select id, details ->> 'classDate' as d from public.akb_booking_requests
+    where class_date is null and (details ->> 'classDate') ~ '^\d{4}-\d{2}-\d{2}$'
+  loop
+    begin
+      update public.akb_booking_requests set class_date = r.d::date where id = r.id;
+    exception when others then
+      null;
+    end;
+  end loop;
+end $$;
+update public.akb_booking_requests
+  set class_slot = left(details ->> 'classSlot', 40)
+  where class_slot is null and details ? 'classSlot';
 
 -- A client added (or given an email) later picks up their earlier requests.
 create or replace function public.akb_client_link_requests() returns trigger
@@ -120,8 +141,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_client_link_requests on public.akb_clients;
-create trigger akb_client_link_requests after insert or update of email on public.akb_clients
+create or replace trigger akb_client_link_requests after insert or update of email on public.akb_clients
   for each row execute function public.akb_client_link_requests();
 
 -- ---------------------------------------------------------------------------
@@ -194,8 +214,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_attendance_capacity on public.akb_class_attendance;
-create trigger akb_attendance_capacity before insert or update of status, class_session_id on public.akb_class_attendance
+create or replace trigger akb_attendance_capacity before insert or update of status, class_session_id on public.akb_class_attendance
   for each row execute function public.akb_attendance_capacity();
 
 -- ---------------------------------------------------------------------------
@@ -264,8 +283,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_pt_package_balance on public.akb_pt_sessions;
-create trigger akb_pt_package_balance before insert or update of package_id, status, client_id on public.akb_pt_sessions
+create or replace trigger akb_pt_package_balance before insert or update of package_id, status, client_id on public.akb_pt_sessions
   for each row execute function public.akb_pt_package_balance();
 
 -- ---------------------------------------------------------------------------
@@ -313,8 +331,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_check_in_schedule on public.akb_check_ins;
-create trigger akb_check_in_schedule after insert on public.akb_check_ins
+create or replace trigger akb_check_in_schedule after insert on public.akb_check_ins
   for each row execute function public.akb_check_in_schedule();
 
 -- ---------------------------------------------------------------------------
@@ -421,8 +438,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_allocation_rules on public.akb_payment_allocations;
-create trigger akb_allocation_rules before insert or update on public.akb_payment_allocations
+create or replace trigger akb_allocation_rules before insert or update on public.akb_payment_allocations
   for each row execute function public.akb_allocation_rules();
 
 create or replace function public.akb_refund_rules() returns trigger
@@ -442,8 +458,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_refund_rules on public.akb_refunds;
-create trigger akb_refund_rules before insert or update on public.akb_refunds
+create or replace trigger akb_refund_rules before insert or update on public.akb_refunds
   for each row execute function public.akb_refund_rules();
 
 -- Financial history is kept: payments and refunds are never edited in place
@@ -459,8 +474,7 @@ begin
   return new;
 end $$;
 
-drop trigger if exists akb_payments_immutable on public.akb_payments;
-create trigger akb_payments_immutable before update or delete on public.akb_payments
+create or replace trigger akb_payments_immutable before update or delete on public.akb_payments
   for each row execute function public.akb_payments_immutable();
 
 create or replace function public.akb_refunds_immutable() returns trigger
@@ -469,8 +483,7 @@ begin
   raise exception 'akb:ledger_immutable' using errcode = 'P0001';
 end $$;
 
-drop trigger if exists akb_refunds_immutable on public.akb_refunds;
-create trigger akb_refunds_immutable before update or delete on public.akb_refunds
+create or replace trigger akb_refunds_immutable before update or delete on public.akb_refunds
   for each row execute function public.akb_refunds_immutable();
 
 -- ---------------------------------------------------------------------------

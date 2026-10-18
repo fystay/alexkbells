@@ -120,7 +120,8 @@ See Coach portal below.
 - [x] Tests: SQL rules on real Postgres (PGlite), revenue/time/money maths, e2e for every workflow, access control, outage, phone layout and axe
 
 ### To do
-- [ ] **P0** Owner approves and applies the migration to Supabase (DEPLOYMENT.md → Coach portal), then checks the advisors and `/coach`
+- [x] Migration applied to Supabase 2026-10-18 (all but three functions; DEPLOYMENT.md → Coach portal)
+- [ ] **P0** Run the remaining three functions in the Supabase SQL Editor (DEPLOYMENT.md → Coach portal)
 - [ ] **P0** Turn off public sign-ups in Supabase; change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
 - [ ] **P1** Alex adds retention periods for client and financial records to `/privacy`
 - [ ] **P1** Real-device pass of the portal on Alex's phone
