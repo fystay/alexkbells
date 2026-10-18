@@ -49,3 +49,24 @@ export async function idempotencyKey(parts: string[]): Promise<string> {
   const hex = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
   return `booking-request/${hex}`;
 }
+
+/** Worth trying again: no answer, rate-limited, or a provider error. */
+export function isRetryable(result: SendResult): boolean {
+  return !result.ok && (result.status === null || result.status === 429 || result.status >= 500);
+}
+
+/**
+ * One quick second attempt for a transient failure, with the same
+ * idempotency key, so the provider sends the message at most once.
+ */
+export async function sendEmailWithRetry(
+  config: BookingDeliveryConfig,
+  email: OutgoingEmail,
+  fetchImpl: typeof fetch = fetch,
+  delayMs = 1000,
+): Promise<SendResult> {
+  const first = await sendEmail(config, email, fetchImpl);
+  if (!isRetryable(first)) return first;
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+  return sendEmail(config, email, fetchImpl);
+}

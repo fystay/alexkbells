@@ -13,6 +13,8 @@ const emailEnv = {
   RESEND_API_URL: `http://localhost:${mockEmailPort}/emails`,
   BOOKING_NOTIFY_EMAIL: "alex-e2e@example.com",
   BOOKING_FROM_EMAIL: "Alex K Bells <bookings-e2e@example.com>",
+  // Authorises GET /api/cron/request-alerts (tests/e2e/booking.spec.ts).
+  CRON_SECRET: "e2e-cron-secret-0123456789",
 };
 
 // Coach login against the Supabase Auth stand-in (tests/e2e/mock-supabase-auth.mjs).

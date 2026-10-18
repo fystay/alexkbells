@@ -4,11 +4,19 @@ import { createServer } from "node:http";
 
 const port = Number(process.env.MOCK_EMAIL_PORT ?? 3299);
 const received = [];
+// Attempts the mock refused (outage), for checking retries.
+const refused = [];
+// Like Resend: a repeated idempotency key it already accepted is answered but not sent again.
+const acceptedKeys = new Set();
 
 createServer((req, res) => {
   if (req.method === "GET" && req.url === "/requests") {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify(received));
+  }
+  if (req.method === "GET" && req.url === "/refused") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify(refused));
   }
   if (req.method === "GET" && req.url === "/") {
     res.writeHead(200);
@@ -24,6 +32,18 @@ createServer((req, res) => {
         res.writeHead(500, { "Content-Type": "application/json" });
         return res.end('{"message":"simulated failure"}');
       }
+      // EMAIL-DOWN: the email provider is down while the database is fine.
+      if (payload.subject?.includes("EMAIL-DOWN")) {
+        refused.push({ idempotencyKey: req.headers["idempotency-key"], subject: payload.subject });
+        res.writeHead(503, { "Content-Type": "application/json" });
+        return res.end('{"message":"simulated outage"}');
+      }
+      const key = req.headers["idempotency-key"];
+      if (key && acceptedKeys.has(key)) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        return res.end('{"id":"test-email"}');
+      }
+      if (key) acceptedKeys.add(key);
       received.push({ headers: { authorization: req.headers.authorization, idempotencyKey: req.headers["idempotency-key"] }, payload });
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end('{"id":"test-email"}');

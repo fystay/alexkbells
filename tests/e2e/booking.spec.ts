@@ -368,6 +368,55 @@ test.describe("production configuration", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Prod Booker" })).toBeVisible();
     await expect(page.getByRole("link", { name: "prod@example.com" })).toHaveAttribute("href", "mailto:prod@example.com");
     await expect(page.getByText("A request is not a booking until you confirm it here.")).toBeVisible();
+    // The email alert to Alex is recorded as sent.
+    await expect(page.locator("dt", { hasText: "Email alert" }).locator("xpath=following-sibling::dd")).toContainText(/^Sent /);
+  });
+
+  test("when the email provider is down, the request is still stored, flagged and retried without duplicates", async ({ page, request }) => {
+    await page.goto(`${PROD}/book/one-to-one`);
+    await choose(page, "Wed");
+    await continueButton(page).click();
+    await choose(page, "WARRIOR MODE");
+    await page.getByRole("textbox", { name: "Name" }).fill("EMAIL-DOWN Booker");
+    await page.getByRole("textbox", { name: "Email" }).fill("email-down@example.com");
+    await page.waitForTimeout(3100);
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    // Stored, so the visitor is told it was sent; nothing claims a confirmed booking.
+    await expect(page.getByRole("status")).toContainText("Request sent");
+    await expect(page.getByRole("status")).toContainText("booked once he confirms");
+
+    const row = (await stored(request)).find((r) => r.name === "EMAIL-DOWN Booker") as (StoredRow & Record<string, unknown>) | undefined;
+    expect(row).toMatchObject({ kind: "booking", service: "One-to-one", alert_status: "failed", alert_attempts: 1, alert_error: "http-503" });
+    expect(String(row!.alert_subject)).toBe("One-to-one booking request: EMAIL-DOWN Booker");
+    // One quick retry, with the same idempotency key, and no email delivered.
+    const refused = (await (await request.get(`${MOCK}/refused`)).json()) as { idempotencyKey: string; subject: string }[];
+    const attempts = refused.filter((r) => r.subject.includes("EMAIL-DOWN Booker"));
+    expect(attempts).toHaveLength(2);
+    expect(new Set(attempts.map((a) => a.idempotencyKey))).toEqual(new Set([row!.idempotency_key]));
+    expect((await emails(request)).some((e) => e.payload.subject.includes("EMAIL-DOWN"))).toBe(false);
+
+    // Alex sees it in the coach area, flagged.
+    await page.goto(`${PROD}/coach/login`);
+    await page.getByLabel("Email").fill("coach-e2e@example.com");
+    await page.getByLabel("Password").fill("correct-horse");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/coach$/);
+    await page.goto(`${PROD}/coach/requests`);
+    await page.getByRole("link", { name: /EMAIL-DOWN Booker/ }).first().click();
+    await expect(page.locator("dt", { hasText: "Email alert" }).locator("xpath=following-sibling::dd")).toContainText("Not sent yet (1 try)");
+  });
+
+  test("the alert retry endpoint needs the cron secret and returns counts only", async ({ request }) => {
+    for (const authorization of [undefined, "Bearer wrong-secret-0123456789", "e2e-cron-secret-0123456789"]) {
+      const res = await request.get(`${PROD}/api/cron/request-alerts`, { headers: authorization ? { authorization } : {} });
+      expect(res.status(), String(authorization)).toBe(401);
+    }
+    const ok = await request.get(`${PROD}/api/cron/request-alerts`, { headers: { authorization: "Bearer e2e-cron-secret-0123456789" } });
+    expect(ok.status()).toBe(200);
+    expect(ok.headers()["cache-control"]).toContain("no-store");
+    const body = (await ok.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["failed", "found", "ok", "sent"]);
+    expect(body.ok).toBe(true);
   });
 
   test("when neither storage nor email accepts a request, it shows an error, not success", async ({ page }) => {

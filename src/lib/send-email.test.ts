@@ -40,3 +40,16 @@ describe("idempotencyKey", () => {
     expect(a.length).toBeLessThanOrEqual(256);
   });
 });
+
+describe("sendEmailWithRetry", () => {
+  it("tries once more, with the same key, only for transient failures", async () => {
+    const { sendEmailWithRetry } = await import("./send-email");
+    for (const [first, calls] of [[500, 2], [429, 2], [422, 1], [401, 1]] as const) {
+      const fetchImpl = vi.fn(async () => new Response("{}", { status: fetchImpl.mock.calls.length === 1 ? first : 200 }));
+      await sendEmailWithRetry(config, email, fetchImpl as unknown as typeof fetch, 0);
+      expect(fetchImpl, String(first)).toHaveBeenCalledTimes(calls);
+      const keys = fetchImpl.mock.calls.map((c) => ((c as unknown as [string, RequestInit])[1].headers as Record<string, string>)["Idempotency-Key"]);
+      expect(new Set(keys)).toEqual(new Set(["k"]));
+    }
+  });
+});

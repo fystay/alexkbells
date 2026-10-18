@@ -93,6 +93,7 @@ async function RequestView({ params, searchParams }: { params: PageProps<"/coach
               ...(request.decided_at ? ([["Decided", formatStamp(request.decided_at)]] as [string, string][]) : []),
               ...(request.decision_note ? ([["Note", <span key="n" className="whitespace-pre-line">{request.decision_note}</span>]] as [string, React.ReactNode][]) : []),
               ...(request.notified_at ? ([["Told", formatStamp(request.notified_at)]] as [string, string][]) : []),
+              ...(request.alert_status ? ([["Email alert", alertLabel(request)]] as [string, string][]) : []),
             ]}
           />
         </Panel>
@@ -361,4 +362,11 @@ async function Tell({ request }: { request: BookingRequest }) {
       </div>
     </Panel>
   );
+}
+
+/** The email alert the site sent you about this request. */
+function alertLabel(request: Pick<BookingRequest, "alert_status" | "alert_sent_at" | "alert_attempts">): string {
+  if (request.alert_status === "sent") return request.alert_sent_at ? `Sent ${formatStamp(request.alert_sent_at)}` : "Sent";
+  const tries = request.alert_attempts ?? 1;
+  return `Not sent yet (${tries} ${tries === 1 ? "try" : "tries"}). The request is safe here; the site keeps trying for up to a day.`;
 }

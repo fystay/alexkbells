@@ -68,6 +68,10 @@ export interface BookingRequest {
   notified_at: string | null;
   class_date: string | null;
   class_slot: string | null;
+  /** Email alert to the coach (optional: absent until 20261020000100_akb_request_alerts.sql is applied). */
+  alert_status?: "sent" | "failed" | null;
+  alert_sent_at?: string | null;
+  alert_attempts?: number;
 }
 
 export interface ClassSessionRow {
