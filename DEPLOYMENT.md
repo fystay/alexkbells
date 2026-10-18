@@ -124,7 +124,7 @@ Built and tested against a Square stand-in only. **Not verified against Square S
 
 | Variable | Where | Notes |
 |---|---|---|
-| `SQUARE_ENVIRONMENT` | `sandbox` on the test deployment; `production` on Vercel Production only | Any other value, or a mismatch with the deployment, keeps Square off |
+| `SQUARE_ENVIRONMENT` | `sandbox` only in the local test environment (`.env.local`); `production` on Vercel Production only | Any other value, or a mismatch with the deployment, keeps Square off |
 | `SQUARE_ACCESS_TOKEN` | Sensitive. Sandbox token for testing; the live token only in Production | Square Developer Console → the app → Credentials. Server only |
 | `SQUARE_LOCATION_ID` | Alex's location (Sandbox has its own test location) | Square Dashboard → Locations, or Developer Console |
 | `SQUARE_WEBHOOK_SIGNATURE_KEY` | Sensitive, per subscription | Developer Console → Webhooks → the subscription |
@@ -133,33 +133,36 @@ Built and tested against a Square stand-in only. **Not verified against Square S
 
 Owner steps (Square account holder):
 1. Square Developer Console: create (or open) the application; confirm **Online Checkout / payment links** are available on Alex's account and the current UK card fee.
-2. Sandbox first: note the Sandbox access token and Sandbox location id; add a Sandbox webhook subscription for `payment.created`, `payment.updated`, `refund.created`, `refund.updated` pointing at the test deployment's `/api/square/webhook`.
-3. **Use the isolated test database** (next section) for the test deployment, never the live project. Sandbox mode refuses to start against the live project, and the live database refuses Sandbox records (see the safeguard below).
+2. Sandbox first: note the Sandbox access token and Sandbox location id; add a Sandbox webhook subscription for `payment.created`, `payment.updated`, `refund.created`, `refund.updated` pointing at the local tunnel URL (next section).
+3. **Use the local test environment** (next section), never the live project. Sandbox mode refuses to start against the live project, and the live database refuses Sandbox records (see the safeguard below).
 4. On the **test** database only: apply all five migrations in order, then mark it: `insert into public.akb_database_role (role) values ('test');`. (Production later gets the same migrations and **no** marker.)
 5. Sandbox test plan (no real money): create a card link for a test charge; pay it with Square's documented Sandbox test card; check the charge shows paid and the payment says "Card (Square test)"; send the same webhook again from the Console (no second payment); refund in the Sandbox Dashboard (refund appears once, charge owed again); a declined test card (nothing recorded, link still open); a forged call to the webhook URL (403).
 6. Only after that passes: live token, live location, live webhook subscription to the production URL, `SQUARE_ENVIRONMENT=production` in Production, redeploy.
 
-### Isolated Supabase test environment for Square Sandbox (checked 2026-10-21, nothing created)
+### Square Sandbox test environment: local Supabase + HTTPS tunnel (decided 2026-10-21)
 
-Found: organisation **FYStay** (`ctsrlwsdyptkdxpkssjh`) is on the **Free** plan with two active projects, `FYStay` (`wzatjhyfwtmxdxfmurkm`, another app) and `Alexkbells` (`sqkpixwvugrxllrxlexs`, live), and no branches. All Vercel previews use the live project today.
+The owner's constraint: use the existing `Alexkbells` project in the FYStay account, no new Supabase account or project, no extra cost, live database untouched. Checked on the live project (read-only):
 
-| Option | Cost (Supabase docs, USD) | Works now? | Notes |
-|---|---|---|---|
-| **A. New free project in a separate Free organisation owned by Alex's own Supabase account** (recommended) | $0 | Yes, once Alex has an account | The free limit is 2 active projects *per Owner/Admin across all organisations*, and this account already has 2, so it must be another person's quota. Fully separate database, Auth and keys. Pauses after 7 days of low activity (resume from the dashboard). Fits the planned handover of accounts to Alex |
-| B. Third project in FYStay | $0 quoted, but **blocked** on Free (limit reached) | No | Possible only by pausing the FYStay app's project (affects that app; not recommended) or upgrading |
-| C. Upgrade FYStay to Pro + new project | $25/month plan + ~$10/month per extra Micro project, $10 compute credit/month → about $35–45/month for 2–3 projects | After upgrade | Affects billing for both apps in the organisation; no pausing |
-| D. Pro + a preview branch of `Alexkbells` | $25/month plan + $0.01344/hour per branch (~$10/month if left on; not covered by credits or the spend cap) | After upgrade | Branches copy the schema, not data; also needs the Supabase↔Vercel branching integration |
-| E. Local Supabase (CLI + Docker) on a developer machine | $0 | Yes | Isolated, but Square needs a public HTTPS webhook URL, so a tunnel (e.g. cloudflared) is required; not a shared environment |
+- **No isolated database is available inside it on the Free plan.** Branching needs Pro ($25/month plus about $0.01344/hour per branch). The project has one Postgres database (`postgres`).
+- **A separate schema is not isolation.** It would share the instance, the one secret key (`service_role` bypasses RLS in every schema), Auth users, backups and restores, project-wide event triggers (e.g. `ensure_rls`), API settings and the 500 MB Free disk with the live data. Our migrations also name `public.` throughout. A mistake would reach live records.
+- A second database on the same instance isn't reachable through the API (PostgREST/Auth serve `postgres` only), and shares everything else.
 
-Configuration for the test deployment (option A):
-1. Alex (or whoever owns it) creates the project in **eu-west-1**, then shares: project URL, and a **secret** key (Settings → API Keys). Turn off public sign-ups there too; create one coach test user if the portal is to be used.
-2. Apply all migrations in filename order (SQL Editor, or `npx supabase link --project-ref <test ref>` + `npx supabase db push`), then run the marker statement above. They are self-contained: no extensions, no other app's tables.
-3. Vercel: create a Git branch only for Sandbox testing (e.g. `square-sandbox`) and add **branch-specific Preview** variables for it only (Settings → Environment Variables → Preview → that branch): `SUPABASE_URL` and `SUPABASE_SECRET_KEY` of the test project, `COACH_EMAIL`, `CRON_SECRET`, and the five `SQUARE_*` Sandbox values. Other previews keep their current settings and never get Square.
-4. Square Developer Console (Sandbox): webhook subscription pointing at that branch's stable URL, `https://alexkbells-git-square-sandbox-fystay1.vercel.app/api/square/webhook`. Vercel Deployment Protection must let Square's POST through (Protection Bypass for Automation, or protection off for that branch), or the webhook gets the login page.
+**Setup: Supabase running locally (Docker), the site running locally in Sandbox mode, and an HTTPS tunnel that forwards only Square's webhook.** $0, nothing in the hosted project changes. Verified in a cloud container on 2026-10-21 with Supabase CLI 2.121.0: all five migrations apply in order; with no marker, Sandbox records are refused through the real API; the server key can't set the marker; the publishable key can't read portal tables or run the payment functions; after marking `test`, Sandbox records are accepted and live ones refused; the site's webhook rejects a forged signature (403), records a signed event, calls Square's Sandbox API (401 with a placeholder token, so 500 for redelivery) and logs no secrets; the gateway passes only the webhook through. **A real Sandbox payment has not been made**: that needs the owner's Sandbox credentials.
+
+Steps (on the developer's machine; nothing here touches production):
+1. Install Docker and Node 24. Bind published ports to localhost so the local database (password `postgres`) isn't reachable from the network: Docker → daemon settings `{"ip": "127.0.0.1"}` (Docker Desktop: Settings → Docker Engine), restart Docker.
+2. In a copy of the repo: `npx supabase@2.121.0 init` (creates `supabase/config.toml`, not committed), then `npx supabase@2.121.0 start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,supavisor,mailpit,postgres-meta`. It applies `supabase/migrations/` and prints the local API URL and keys (fixed development keys, not secrets).
+3. Mark it as a test database: `docker exec -i supabase_db_<folder> psql -U postgres -c "insert into public.akb_database_role (role) values ('test');"`.
+4. Create a coach login: Supabase local Auth (`http://localhost:54321`, e.g. the CLI's Studio or the Auth admin API) with an email you then put in `COACH_EMAIL`.
+5. Start a tunnel to the gateway port and note its HTTPS URL, e.g. Cloudflare quick tunnel `cloudflared tunnel --url http://127.0.0.1:3401` (free, no account; the `trycloudflare.com` URL changes each run) or an ngrok free static domain (free account). Your webhook URL is `<tunnel URL>/api/square/webhook`.
+6. `.env.local` (ignored by Git; never commit): `SUPABASE_URL=http://localhost:54321`, `SUPABASE_SECRET_KEY=<local secret key>`, `COACH_EMAIL=<step 4>`, `CRON_SECRET=<32+ random chars>`, `SQUARE_ENVIRONMENT=sandbox`, `SQUARE_ACCESS_TOKEN=<Sandbox token>`, `SQUARE_LOCATION_ID=<Sandbox location>`, `SQUARE_WEBHOOK_SIGNATURE_KEY=<from the subscription>`, `SQUARE_WEBHOOK_URL=<step 5 URL, exactly>`. Do not set `VERCEL_ENV` or `SQUARE_API_URL`.
+7. `npm run build && npx next start -p 3400`, and in another terminal `node scripts/square-webhook-gateway.mjs` (127.0.0.1:3401 → 3400; only `POST /api/square/webhook`, raw body and signature unchanged, 64 KB limit; everything else 404, so the coach area and cron endpoints aren't exposed).
+8. Square Developer Console → Sandbox → Webhooks: subscription to the step 5 URL for `payment.created`, `payment.updated`, `refund.created`, `refund.updated`; copy its signature key into step 6. If the tunnel URL changes, update both the subscription and `SQUARE_WEBHOOK_URL`, then restart the site.
+9. Run the Sandbox test plan (above) at `http://localhost:3400/coach`. Stop afterwards: `npx supabase stop --no-backup`, stop the tunnel, delete `.env.local`.
 
 **Safeguards against test money in the live ledger** (`20261021000000_akb_square.sql`, `lib/square/config.ts`):
 - Database: `akb_database_role` marker. No row = production. Triggers on `akb_square_payment_links`, `akb_square_events` and `akb_payments` refuse Sandbox records unless the database is marked `test`, and refuse live Square records in a `test` database, whichever route writes them (app, RPC or SQL Editor). The app's server role can read the marker but not set it; anon/authenticated can't see it.
-- App: `SQUARE_ENVIRONMENT=sandbox` is ignored on Vercel production and whenever `SUPABASE_URL` is the live project (`PRODUCTION_SUPABASE_REF`), so the webhook returns 404 and no link can be created.
+- App: `SQUARE_ENVIRONMENT=sandbox` is ignored on Vercel production and whenever `SUPABASE_URL` is the live project (`PRODUCTION_SUPABASE_REF`), so the webhook returns 404 and no link can be created. Sandbox variables are never added to Vercel.
 - Never run the marker statement on the live project. If the live database ever moves (handover), update `PRODUCTION_SUPABASE_REF`; the database guard still holds regardless.
 
 ## Safety built into the code

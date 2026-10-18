@@ -136,7 +136,8 @@ See Coach portal below.
 - [ ] **P2** Anonymise-on-request for former clients with financial history (now: set to Former)
 - [x] Square card payments built (2026-10-21): payment links per charge, signed webhooks re-read from Square, duplicate-event table, idempotent ledger functions, refunds mirrored from Square, daily reconciliation, sandbox/production guard (code + migration `20261021000000_akb_square.sql`, not applied)
 - [x] Test-environment options and costs checked; database + app safeguards against Sandbox records in the live database (2026-10-21)
-- [ ] **P0** Before any Sandbox test: owner chooses an isolated test database (recommended: free project in Alex's own Supabase organisation), applies the migrations there and marks it `test`; branch-scoped Preview env in Vercel (DEPLOYMENT.md → Isolated Supabase test environment)
+- [x] Sandbox test environment decided: local Supabase + HTTPS tunnel + webhook-only gateway; verified locally without Square credentials (2026-10-21)
+- [ ] **P0** Owner: Square Sandbox access token, location id and webhook subscription; run the local setup and Sandbox test plan (DEPLOYMENT.md → Square Sandbox test environment)
 - [ ] **P1** Owner: Square Developer Console app, Sandbox credentials + webhook subscription; run the Sandbox test plan (DEPLOYMENT.md → Square); then live credentials
 - [ ] **P2** Delete a cancelled charge's payment link at Square automatically (today: Dashboard)
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
