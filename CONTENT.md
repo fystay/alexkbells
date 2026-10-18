@@ -22,7 +22,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 
 | Route | Purpose |
 |---|---|
-| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Start your training** + whole video) → **Why kettlebells** `#why-kettlebells` (six benefits, no button: the sections either side carry it; moved above the offers 2026-10-18 at the owner's request) → **What I offer** `#ways-to-train` (group / one-to-one / online as photo cards with prices, an "Enquire" button and a Details link each; a swipe carousel on phones and tablets, three columns on desktop) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Start your training" button, address + directions, when) → FAQ → closing CTA ("Start your training" + "Message on Instagram") |
+| `/` | Answers Alex's four questions in order, each linked from the top menu: hero (**Start your training** + whole video) → **Why kettlebells** `#why-kettlebells` (four numbered benefits in a 2 × 2 grid, one short line each, no button: the sections either side carry it; moved above the offers 2026-10-18 at the owner's request) → **What I offer** `#ways-to-train` (group / one-to-one / online as photo cards with prices, an "Enquire" button and a Details link each; a swipe carousel on phones and tablets, three columns on desktop) → **About Alex** `#about` (+ training stills, 9.6k followers) and his journey → **Where and how to book** `#how-to-book` (3 steps, "Start your training" button, address + directions, when) → FAQ → closing CTA ("Start your training" + "Message on Instagram") |
 | `/classes` | "Start your training" + "How to join", timetable (`#timetable`), 3-step how to join (`#book`), location |
 | `/coaching` | One-to-one (`#one-to-one`) and online (`#online`) |
 | `/contact` | Instagram (primary), email/phone when supplied, address, directions |
@@ -48,7 +48,7 @@ Every customer-critical item has `status: "confirmed" | "provisional"`.
 - One question, "Your kettlebell experience", covers returning clients ("I've trained with Alex before") and newcomers, so returning clients answer it in one tap. No accounts or stored profiles; browsers autofill name, email and phone.
 - Hero copy does not name Media House: much of the hero footage was filmed at other gyms.
 - "Choose how you train" (2026-10-17, minimal): intro "In person in Cumbernauld, or online wherever you are." Each option has one short line, open to everybody ("Train together. Every level welcome." / "Every rep coached, built around you." / "Your plan, with Alex in your corner."), one line of facts, and its lead price. No promised frequency, fitness level or results.
-- Benefits: build strength, improve fitness, train with confidence, stay consistent — hedged ("can"), no "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
+- Benefits (pared to four 2026-10-18; the old six repeated each other): Build strength · Get fitter · Move well · Train anywhere, one short line each. No "expert" claims (qualifications unconfirmed), no weight-loss or transformation promises.
 
 - Use only verified wording for offers: "tailored to the individual", "personalised programming, support and progression".
 - Benefits copy is hedged ("can build") and makes no medical or results claims.

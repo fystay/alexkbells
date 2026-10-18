@@ -16,32 +16,13 @@ import { WaysToTrain } from "@/components/sections/WaysToTrain";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
-// Benefits are hedged ("can") and make no promises about specific results.
+// Benefits are hedged and make no promises about specific results. Four short
+// points (2026-10-18): the earlier six repeated each other and read as a list.
 const benefits = [
-  {
-    title: "Build strength",
-    body: "Swings, squats, presses and carries work the whole body, and one kettlebell is enough to train them.",
-  },
-  {
-    title: "Improve your fitness",
-    body: "Kettlebell sessions can train strength and conditioning together, so you get fitter as you get stronger.",
-  },
-  {
-    title: "Train with confidence",
-    body: "Learn the key kettlebell movements properly, with a coach watching your technique and helping you progress.",
-  },
-  {
-    title: "Stay consistent",
-    body: "Regular group classes give your week structure, and training alongside others can help you keep showing up.",
-  },
-  {
-    title: "Efficient, full-body sessions",
-    body: "Swings, cleans and presses work many muscles at once, so a focused session goes a long way.",
-  },
-  {
-    title: "Train anywhere",
-    body: "A kettlebell takes up little space, so what you learn works at home, in the gym or away.",
-  },
+  { title: "Build strength", body: "Swings, squats and presses work the whole body." },
+  { title: "Get fitter", body: "Train strength and conditioning in the same session." },
+  { title: "Move well", body: "Learn the key lifts with a coach on your technique." },
+  { title: "Train anywhere", body: "One kettlebell. At home, in the gym or away." },
 ];
 
 function Hero() {
@@ -107,25 +88,28 @@ function Hero() {
   );
 }
 
-// No button here: "Choose how you train" (just above) and "Where and how to
-// book" (below) carry it, so the call to action isn't repeated every section.
+// No button here: the hero (above) and "Choose how you train" (below) carry it.
+// Minimal: four numbered points in a 2 × 2 grid with hairlines, not a long list.
 function Benefits() {
   return (
     <Section tone="surface" id="why-kettlebells" labelledBy="benefits-heading">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 lg:items-end">
         <div className="lg:col-span-5">
           <SectionHeading
             id="benefits-heading"
             eyebrow="Why kettlebells"
             title="Stronger, fitter, more confident"
-            intro="Kettlebells are a simple tool that trains the whole body. Good coaching helps you get the most from them."
+            intro="One simple tool that trains the whole body. Good coaching gets the most from it."
           />
         </div>
-        <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-7">
-          {benefits.map((b) => (
-            <li key={b.title} className="border-t border-ink pt-5">
-              <h3 className="text-lg font-bold">{b.title}</h3>
-              <p className="mt-2 text-muted">{b.body}</p>
+        <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:gap-x-8 sm:gap-y-10 lg:col-span-7">
+          {benefits.map((b, i) => (
+            <li key={b.title} className="border-t border-line pt-4 sm:pt-5">
+              <p className="eyebrow text-muted" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-3 font-display text-base sm:text-lg">{b.title}</h3>
+              <p className="mt-1.5 text-sm text-muted sm:text-base">{b.body}</p>
             </li>
           ))}
         </ul>
