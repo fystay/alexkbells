@@ -5,25 +5,73 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { coachLoginNav, mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
-import { StartTraining } from "@/components/ui/StartTraining";
 import type { CallToAction } from "@/lib/booking";
 
-function isActive(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
+/** Homepage sections linked from the menu ("/#ways-to-train" → "ways-to-train"). */
+const SECTION_IDS = mainNav.map((item) => item.href.slice(2));
+
+/**
+ * The homepage section being read: the last menu section whose top has passed
+ * 35% of the way down the screen. Null above the first (the hero) and on
+ * other pages.
+ */
+function useCurrentSection(pathname: string): string | null {
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => {
+    if (pathname !== "/") return;
+    let frame = 0;
+    const update = () => {
+      const line = window.innerHeight * 0.35;
+      let found: string | null = null;
+      for (const id of SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const { top, bottom } = el.getBoundingClientRect();
+        if (top <= line && bottom > line) found = id;
+      }
+      setCurrent(found);
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    window.addEventListener("hashchange", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("hashchange", onScroll);
+    };
+  }, [pathname]);
+  return pathname === "/" ? current : null;
+}
+
+/**
+ * aria-current for a menu link: "location" for the homepage section being
+ * read, "page" for the page you're on.
+ */
+function currentFor(pathname: string, section: string | null, href: string): "location" | "page" | undefined {
+  if (href.startsWith("/#")) return section === href.slice(2) ? "location" : undefined;
+  return pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined;
 }
 
 export function DesktopNav() {
   const pathname = usePathname();
+  const section = useCurrentSection(pathname);
   return (
     <nav aria-label="Main" className="hidden xl:block">
       <ul className="flex items-center gap-5 2xl:gap-7">
         {mainNav.map((item) => {
-          const active = isActive(pathname, item.href);
+          const current = currentFor(pathname, section, item.href);
+          const active = Boolean(current);
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                aria-current={active ? "page" : undefined}
+                aria-current={current}
                 className={cn(
                   "relative inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
                   "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
@@ -44,6 +92,7 @@ export function DesktopNav() {
 
 export function MobileNav({ cta }: { cta: CallToAction }) {
   const pathname = usePathname();
+  const section = useCurrentSection(pathname);
   const [open, setOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
   const panelId = useId();
@@ -93,43 +142,42 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
         <nav aria-label="Main" className="container-page">
           <ul className="divide-y divide-line-inverse">
             {[...mainNav, ...pageNav].map((item) => {
-              const active = isActive(pathname, item.href);
+              const current = currentFor(pathname, section, item.href);
+              const active = Boolean(current);
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    aria-current={active ? "page" : undefined}
+                    aria-current={current}
                     className={cn(
-                      "flex min-h-14 items-center justify-between font-display text-2xl",
+                      "relative flex min-h-14 items-center justify-between font-display text-2xl transition-colors",
                       active ? "text-paper" : "text-muted-inverse hover:text-paper",
                     )}
                   >
+                    {/* A bar in the gutter marks where you are. */}
+                    {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-paper sm:-left-6" /> : null}
                     {item.label}
-                    {active ? (
-                      <span aria-hidden="true" className="eyebrow text-muted-inverse">
-                        Current
-                      </span>
-                    ) : null}
+                    {active ? <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-paper" /> : null}
                   </Link>
                 </li>
               );
             })}
           </ul>
-          <StartTraining
+          {/* The original plain button (restored 2026-10-18 at the owner's request), not the split/swipe style used on the pages. */}
+          <Link
             href={cta.href}
-            label={cta.label}
-            external={cta.external}
-            tone="dark"
-            variant="button"
-            className="mt-6 flex min-h-14"
-            handleClassName="w-12"
-            onNavigate={() => setOpen(false)}
-          />
+            onClick={() => setOpen(false)}
+            {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
+          >
+            {cta.label}
+            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+          </Link>
           <Link
             href={coachLoginNav.href}
             onClick={() => setOpen(false)}
-            aria-current={isActive(pathname, coachLoginNav.href) ? "page" : undefined}
+            aria-current={currentFor(pathname, null, coachLoginNav.href)}
             className="mt-4 flex min-h-12 items-center justify-center border border-line-inverse px-6 text-sm font-semibold uppercase tracking-[0.08em] text-muted-inverse transition-colors hover:border-paper hover:text-paper"
           >
             {coachLoginNav.label}

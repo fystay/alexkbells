@@ -655,3 +655,24 @@ test("robots and sitemap are served", async ({ request }) => {
   const body = await sitemap.text();
   for (const route of publicRoutes.filter((r) => r !== "/")) expect(body).toContain(route);
 });
+
+test("the menu shows which homepage section you're in", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Ways to train" }).click();
+  await expect(page.locator("#ways-to-train")).toBeInViewport();
+  await menu.click();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await expect(nav.getByRole("link", { name: /^Ways to train/ })).toHaveAttribute("aria-current", "location");
+  await expect(nav.locator('[aria-current="location"]')).toHaveCount(1);
+});
+
+test("the desktop header marks the section you're in", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/#about");
+  await expect(page.getByRole("banner").getByRole("link", { name: "About Alex" })).toHaveAttribute("aria-current", "location");
+  await expect(page.getByRole("banner").locator('[aria-current="location"]:visible')).toHaveCount(1);
+});
