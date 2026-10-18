@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import { usesProductionDatabase, type Env } from "../env";
 
 /**
  * Square settings, server only (never NEXT_PUBLIC_). Square stays off unless
@@ -6,7 +6,9 @@ import type { Env } from "../env";
  * - "production" (real money) only on Vercel production;
  * - "sandbox" (test money) everywhere else, never on Vercel production.
  * So a preview or local build can't take a real payment, and production can't
- * be pointed at test credentials by mistake.
+ * be pointed at test credentials by mistake. Sandbox also refuses to run
+ * against the live Supabase project, so test money can't reach the live
+ * ledger; the database refuses it too (akb_database_role, 20261021000000).
  */
 
 export type SquareEnvironment = "sandbox" | "production";
@@ -36,7 +38,7 @@ function environment(env: Env): SquareEnvironment | null {
   const raw = env.SQUARE_ENVIRONMENT?.trim();
   const isProductionDeployment = env.VERCEL_ENV === "production";
   if (raw === "production") return isProductionDeployment ? "production" : null;
-  if (raw === "sandbox") return isProductionDeployment ? null : "sandbox";
+  if (raw === "sandbox") return isProductionDeployment || usesProductionDatabase(env) ? null : "sandbox";
   return null;
 }
 

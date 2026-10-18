@@ -29,6 +29,20 @@ export function siteUrl(env: Env = process.env): string {
 
 export type SupabaseConfig = Readonly<{ url: string; secretKey: string }>;
 
+/** The live Supabase project's ref. Test-only features (Square Sandbox) refuse to run against it. */
+export const PRODUCTION_SUPABASE_REF = "sqkpixwvugrxllrxlexs";
+
+/** True when SUPABASE_URL points at the live project (or can't be read, to fail safe). */
+export function usesProductionDatabase(env: Env = process.env): boolean {
+  const raw = env.SUPABASE_URL?.trim();
+  if (!raw) return false;
+  try {
+    return new URL(raw).hostname.split(".")[0] === PRODUCTION_SUPABASE_REF;
+  } catch {
+    return true;
+  }
+}
+
 /**
  * Supabase project "Alexkbells" (ref sqkpixwvugrxllrxlexs, eu-west-1).
  * Returns null unless SUPABASE_URL is a valid https origin and

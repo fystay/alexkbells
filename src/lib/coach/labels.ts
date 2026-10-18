@@ -108,4 +108,6 @@ export const RULE_MESSAGES: Record<string, string> = {
   provider_managed: "This was a Square card payment. Refund it in the Square Dashboard; the refund then shows here automatically.",
   currency_mismatch: "Square reported a currency other than GBP, so it wasn't recorded.",
   invalid_environment: "Square isn't set up correctly for this site.",
+  sandbox_in_production: "Square test payments can't be recorded in the live database.",
+  live_in_test: "Live Square payments can't be recorded in a test database.",
 };

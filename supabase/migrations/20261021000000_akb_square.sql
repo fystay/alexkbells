@@ -7,12 +7,63 @@
 -- in the Square Dashboard and mirrored the same way. Nothing a browser sends or
 -- a redirect shows ever records a payment.
 --
--- Run after 20261020000000_akb_payment_functions.sql. Adds two tables and
+-- Run after 20261020000000_akb_payment_functions.sql. Adds a database-role
+-- marker (Sandbox records are refused unless the database is marked 'test'),
+-- two tables, and
 -- replaces akb_record_refund, akb_set_payment_status and akb_void_charge with
 -- versions that keep Square-managed payments in step with Square. Creates,
 -- changes or deletes no existing rows. One transaction; safe to run again.
 
 begin;
+
+-- ---------------------------------------------------------------------------
+-- Which kind of database this is, so Sandbox (test) money can never enter the
+-- live ledger and live money can never land in a test database.
+--
+-- No row (the default, and what production keeps) = 'production': Sandbox
+-- payment links, events and payments are refused. A test database is marked
+-- once, by its owner, in the SQL Editor (never by a migration or the app):
+--   insert into public.akb_database_role (role) values ('test');
+-- The site's server role can read the marker but not change it.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.akb_database_role (
+  only_row boolean primary key default true check (only_row),
+  role text not null check (role in ('production', 'test')),
+  set_at timestamptz not null default now()
+);
+alter table public.akb_database_role enable row level security;
+revoke all on public.akb_database_role from public, anon, authenticated, service_role;
+grant select on public.akb_database_role to service_role;
+-- RLS on with no policies: anon/authenticated get nothing; service_role (which bypasses RLS) may only read.
+
+create or replace function public.akb_database_role() returns text
+language sql stable set search_path = public as $$
+  select coalesce((select role from public.akb_database_role where only_row), 'production');
+$$;
+
+-- Refuses a Square record whose environment doesn't match the database.
+create or replace function public.akb_square_environment_guard() returns trigger
+language plpgsql set search_path = public as $$
+declare
+  env text;
+begin
+  if tg_table_name = 'akb_payments' then
+    env := case new.provider when 'square_sandbox' then 'sandbox' when 'square' then 'production' else null end;
+  else
+    env := new.environment;
+  end if;
+  if env = 'sandbox' and public.akb_database_role() <> 'test' then
+    raise exception 'akb:sandbox_in_production' using errcode = 'P0001';
+  end if;
+  if env = 'production' and public.akb_database_role() <> 'production' then
+    raise exception 'akb:live_in_test' using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+
+create or replace trigger akb_payments_square_environment before insert or update of provider on public.akb_payments
+  for each row execute function public.akb_square_environment_guard();
 
 -- One Square payment link per attempt to collect a charge. At most one link
 -- per charge is live (creating/open) at a time.
@@ -51,6 +102,11 @@ create table if not exists public.akb_square_events (
   outcome text not null default '' check (char_length(outcome) <= 60)
 );
 create index if not exists akb_square_events_unprocessed_idx on public.akb_square_events (received_at) where processed_at is null;
+
+create or replace trigger akb_square_payment_links_environment before insert or update of environment on public.akb_square_payment_links
+  for each row execute function public.akb_square_environment_guard();
+create or replace trigger akb_square_events_environment before insert or update of environment on public.akb_square_events
+  for each row execute function public.akb_square_environment_guard();
 
 -- Square payments are recorded with provider 'square' (live) or
 -- 'square_sandbox' (test), so test money is always distinguishable.

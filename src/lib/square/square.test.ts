@@ -105,6 +105,8 @@ const outstanding = async (charge: string) => {
 
 beforeAll(async () => {
   ({ db, sql } = await testDb());
+  // What the owner runs once on the isolated test database (DEPLOYMENT.md → Square).
+  await sql("insert into akb_database_role (role) values ('test')");
 }, 60_000);
 
 afterEach(() => vi.restoreAllMocks());
@@ -145,6 +147,14 @@ describe("configuration", () => {
     expect(squareConfig({ ...full, SQUARE_ENVIRONMENT: "sandbox", VERCEL_ENV: "preview" })).toMatchObject({ environment: "sandbox", baseUrl: "https://connect.squareupsandbox.com" });
     expect(squareConfig({ ...full, SQUARE_ENVIRONMENT: "sandbox", VERCEL_ENV: "production" })).toBeNull();
     expect(squareConfig({ ...full, SQUARE_ENVIRONMENT: "Production", VERCEL_ENV: "production" })).toBeNull();
+  });
+
+  it("refuses Sandbox against the live Supabase project", () => {
+    const sandbox = { ...full, SQUARE_ENVIRONMENT: "sandbox", VERCEL_ENV: "preview" };
+    expect(squareConfig({ ...sandbox, SUPABASE_URL: "https://sqkpixwvugrxllrxlexs.supabase.co" })).toBeNull();
+    expect(squareWebhookConfig({ ...sandbox, SUPABASE_URL: "https://sqkpixwvugrxllrxlexs.supabase.co" })).toBeNull();
+    expect(squareConfig({ ...sandbox, SUPABASE_URL: "not a url" })).toBeNull();
+    expect(squareConfig({ ...sandbox, SUPABASE_URL: "https://abcdefghijklmnopqrst.supabase.co" })).toMatchObject({ environment: "sandbox" });
   });
 
   it("allows the localhost API stand-in only outside Vercel", () => {
