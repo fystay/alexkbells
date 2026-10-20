@@ -28,7 +28,7 @@ const square: Record<Tone, string> = {
 };
 
 /**
- * "Start your training": a plain link straight to the booking page (or
+ * The main call to action ("Book now"; "Get in touch" when nothing can be booked): a plain link straight to the booking page (or
  * wherever the call to action points). A tap, click or Enter goes there at
  * once: no swipe and no intro screen (removed 2026-10-21 at the owner's
  * request). Works without JavaScript.

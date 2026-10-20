@@ -45,7 +45,7 @@ export default function ClassesPage() {
     open
       ? {
           title: "Send a booking request",
-          body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose ROOKIE MODE.",
+          body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose Beginner.",
         }
       : {
           title: "Get in touch to book",

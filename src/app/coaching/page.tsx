@@ -52,7 +52,7 @@ function ServiceDetail({
           <StartTraining
             href={enquiry.href}
             label={enquiry.label}
-            srSuffix={online ? undefined : ` with ${service.name.toLowerCase()}`}
+            srSuffix={online ? undefined : ` (${service.name.toLowerCase()})`}
             external={enquiry.external}
             tone={tone === "ink" ? "dark" : "light"}
             className="mt-10 w-full sm:w-[22rem]"

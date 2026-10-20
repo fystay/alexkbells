@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /**
- * "action": the split "Start your training" button (2026-10-18): a filled bar
+ * "action": the split "Book now" button (2026-10-18; "Start your training" until 2026-10-20): a filled bar
  * with the label, and the arrow in an inverse square at its right end.
  */
 type Variant = "primary" | "secondary" | "text" | "action";

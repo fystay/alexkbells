@@ -20,7 +20,7 @@ interface CtaBandProps {
 /**
  * Closing call to action (option A, 2026-10-18): the headline, the facts
  * people want right before they decide (class times and the class price,
- * from the confirmed timetable and prices), one split "Start your training"
+ * from the confirmed timetable and prices), one split "Book now"
  * button, and Instagram as a quieter text link.
  */
 export function CtaBand({ title = "Pick up a bell.", body, headingId = "cta-heading" }: CtaBandProps) {

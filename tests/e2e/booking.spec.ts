@@ -95,8 +95,8 @@ test.describe("booking prototype (demo availability)", () => {
     await expect(page.getByText("Enter your name.")).toBeVisible();
     await expect(page.getByText("Enter your email address so Alex can reply.")).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Name" })).toBeFocused();
-    await expect(page.getByRole("radio", { name: "ROOKIE MODE" })).toBeChecked();
-    await choose(page, "WARRIOR MODE");
+    await expect(page.getByRole("radio", { name: "Beginner" })).toBeChecked();
+    await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("Demo Visitor");
     await page.getByRole("textbox", { name: "Email" }).fill("not-an-email");
     await page.getByRole("button", { name: "Finish demo" }).click();
@@ -298,7 +298,7 @@ test.describe("production configuration", () => {
 
   test("the primary button opens the booking page", async ({ page }) => {
     await page.goto(PROD);
-    await expect(page.getByRole("link", { name: "Start your training" }).first()).toHaveAttribute("href", "/book");
+    await expect(page.getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book");
     const sitemap = await (await page.request.get(`${PROD}/sitemap.xml`)).text();
     expect(sitemap).toContain("/book/group-class");
     await page.goto(`${PROD}/book`);
@@ -325,10 +325,10 @@ test.describe("production configuration", () => {
     await expect(page.getByText("Pay by bank transfer or cash.")).toHaveCount(0);
     await continueButton(page).click();
 
-    await expect(page.getByRole("radio", { name: "ROOKIE MODE" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Beginner" })).toBeChecked();
     await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
     await expect(page.getByText("Enter your name.")).toBeVisible();
-    await choose(page, "BEAST MODE");
+    await choose(page, "Advanced");
     await page.getByRole("textbox", { name: "Name" }).fill("Prod Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("prod@example.com");
     await page.getByRole("button", { name: /add a note/i }).click();
@@ -344,7 +344,7 @@ test.describe("production configuration", () => {
     const year = new Date(`${day.date}T12:00:00`).getFullYear();
     const summary = `${formatLongDate(day.date)} ${year}`;
     const row = (await stored(request)).find((r) => r.name === "Prod Booker");
-    expect(row).toMatchObject({ kind: "booking", service: "Group class", email: "prod@example.com", details: { experience: "BEAST MODE" } });
+    expect(row).toMatchObject({ kind: "booking", service: "Group class", email: "prod@example.com", details: { experience: "Advanced" } });
     expect(row!.summary).toContain(summary);
 
     const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Prod Booker");
@@ -376,7 +376,7 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Wed");
     await continueButton(page).click();
-    await choose(page, "WARRIOR MODE");
+    await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("EMAIL-DOWN Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("email-down@example.com");
     await page.waitForTimeout(3100);
@@ -436,7 +436,7 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Mon");
     await continueButton(page).click();
-    await choose(page, "WARRIOR MODE");
+    await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
     await page.waitForTimeout(3100);
@@ -450,7 +450,7 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Tue");
     await continueButton(page).click();
-    await choose(page, "WARRIOR MODE");
+    await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("Speedy Bot");
     await page.getByRole("textbox", { name: "Email" }).fill("bot@example.com");
     await page.locator('input[name="startedAt"]').evaluate((el: HTMLInputElement) => (el.value = String(Date.now())));
@@ -465,7 +465,7 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/book/one-to-one`);
     await choose(page, "Thu");
     await continueButton(page).click();
-    await choose(page, "WARRIOR MODE");
+    await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("Slot Poster");
     await page.getByRole("textbox", { name: "Email" }).fill("slot@example.com");
     await page.locator("form").evaluate((form) => {

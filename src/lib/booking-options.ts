@@ -25,10 +25,15 @@ export function bookableService(value: string): (typeof BOOKABLE_SERVICES)[numbe
 }
 
 /** "Your kettlebell experience" (2026-10-18). The first is selected by default. */
+/**
+ * Labels changed 2026-10-20 at the owner's request (were ROOKIE / WARRIOR /
+ * BEAST MODE). The submitted values stay the same, so a form opened before the
+ * change still sends; requests stored earlier keep the old wording.
+ */
 export const BOOKING_EXPERIENCE = [
-  { value: "rookie", label: "ROOKIE MODE" },
-  { value: "warrior", label: "WARRIOR MODE" },
-  { value: "beast", label: "BEAST MODE" },
+  { value: "rookie", label: "Beginner" },
+  { value: "warrior", label: "Intermediate" },
+  { value: "beast", label: "Advanced" },
 ] as const;
 export type BookingExperience = (typeof BOOKING_EXPERIENCE)[number]["value"];
 

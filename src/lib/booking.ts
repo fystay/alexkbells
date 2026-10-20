@@ -52,7 +52,7 @@ const PATHS: Record<BookableService | "any", string> = {
  */
 export const PRIMARY_CTA: CallToAction = {
   kind: "enquiry",
-  label: "Start your training",
+  label: "Get in touch",
   href: ENQUIRY_HREF,
   external: false,
 };
@@ -61,17 +61,20 @@ export const PRIMARY_CTA: CallToAction = {
  * What pages render for the primary call to action. Since 2026-10-18 the
  * button opens the booking page (/book) wherever booking works (a booking
  * URL, the request flow, or the labelled demo), production included, and on
- * every Vercel Preview so the flow can be tried. Otherwise it is PRIMARY_CTA
- * (/contact). The label never changes and never says "book".
+ * every Vercel Preview so the flow can be tried, labelled "Book now" (owner's
+ * wording, 2026-10-20; previously "Start your training"). Otherwise it is
+ * PRIMARY_CTA: "Get in touch" to /contact, never "book" where nothing can be booked.
  */
+export const BOOK_NOW_LABEL = "Book now";
+
 export function getPrimaryCta(env: Env = process.env): CallToAction {
   return bookingMode(env) !== "unavailable" || isPreviewDeployment(env)
-    ? { ...PRIMARY_CTA, kind: "booking", href: BOOK_PAGE_HREF }
+    ? { ...PRIMARY_CTA, kind: "booking", label: BOOK_NOW_LABEL, href: BOOK_PAGE_HREF }
     : PRIMARY_CTA;
 }
 
 /**
- * The same "Start your training" button on a service's own page: straight
+ * The same "Book now" button on a service's own page: straight
  * into that service's booking step when /book is open, else the contact
  * page. Online coaching is an enquiry, not a booking: see
  * getOnlineCoachingAction.
@@ -118,7 +121,7 @@ export function bookingConfigWarning(env: Env = process.env): string | null {
     return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
   if (bookingMode(env) !== "unavailable") return null;
-  return "No booking route is configured: \"Start your training\" links to /contact and /book shows the Instagram fallback. Set SUPABASE_URL and SUPABASE_SECRET_KEY (requests stored for the coach area), the Resend settings (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL), or BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
+  return "No booking route is configured: the main button says \"Get in touch\" and links to /contact and /book shows the Instagram fallback. Set SUPABASE_URL and SUPABASE_SECRET_KEY (requests stored for the coach area), the Resend settings (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL), or BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
 }
 
 /** The primary "Book" button for a service, or for booking in general. */
@@ -132,7 +135,7 @@ export function getBookingAction(service: BookableService | "any" = "any", env: 
   }
   return service === "group-class"
     ? { kind: "enquiry", label: "Enquire about classes", href: ENQUIRY_HREF, external: false }
-    : { kind: "enquiry", label: "Start your training", href: ENQUIRY_HREF, external: false };
+    : { kind: "enquiry", label: "Get in touch", href: ENQUIRY_HREF, external: false };
 }
 
 export function getClassBookingAction(env: Env = process.env): CallToAction {

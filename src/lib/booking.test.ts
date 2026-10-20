@@ -21,8 +21,8 @@ const formEnv = {
 };
 
 describe("PRIMARY_CTA", () => {
-  it("is always an honest 'Start your training' link to the contact page", () => {
-    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Start your training", href: "/contact", external: false });
+  it("is an honest 'Get in touch' link to the contact page, for when nothing can be booked", () => {
+    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Get in touch", href: "/contact", external: false });
     expect(PRIMARY_CTA.label).not.toMatch(/book|pay|checkout/i);
   });
 });
@@ -30,10 +30,12 @@ describe("PRIMARY_CTA", () => {
 describe("getPrimaryCta", () => {
   const supabase = { SUPABASE_URL: "https://ref.supabase.co", SUPABASE_SECRET_KEY: "sb_secret_x" };
 
-  it("opens the booking page on production once booking works, keeping the same label", () => {
+  it("says Book now and opens the booking page on production once booking works", () => {
     const cta = getPrimaryCta({ VERCEL_ENV: "production", ...supabase });
-    expect(cta).toMatchObject({ kind: "booking", label: PRIMARY_CTA.label, href: "/book", external: false });
-    expect(cta.label).not.toMatch(/book|pay|checkout/i);
+    expect(cta).toEqual({ kind: "booking", label: "Book now", href: "/book", external: false });
+    expect(cta.label).not.toMatch(/pay|checkout/i);
+    // Every service page uses the same words.
+    expect(getPrimaryCtaFor("one-to-one", { VERCEL_ENV: "production", ...supabase }).label).toBe("Book now");
   });
 
   it("is PRIMARY_CTA (contact page) where booking can't work", () => {

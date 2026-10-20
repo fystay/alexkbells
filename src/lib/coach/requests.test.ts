@@ -29,7 +29,7 @@ async function submit(person: { name: string; email: string; phone?: string }, d
       email: person.email,
       phone: person.phone ?? "",
       message: "",
-      details: { experience: "ROOKIE MODE", ...details },
+      details: { experience: "Beginner", ...details },
     },
     db.fetchImpl,
   );
@@ -45,7 +45,7 @@ describe("booking requests", () => {
   it("arrive as new, with the class date and slot copied from the details", async () => {
     const r = await submit({ name: "Ria New", email: "ria@example.com" }, { classDate: "2026-10-24", classSlot: "sat-morning" });
     expect(r).toMatchObject({ status: "new", client_id: null, class_date: "2026-10-24", class_slot: "sat-morning" });
-    expect(requestDetails(r)).toMatchObject({ experience: "ROOKIE MODE", classDate: "2026-10-24", classSlot: "sat-morning" });
+    expect(requestDetails(r)).toMatchObject({ experience: "Beginner", classDate: "2026-10-24", classSlot: "sat-morning" });
   });
 
   it("confirming creates one client, books the class and charges it, all at once", async () => {

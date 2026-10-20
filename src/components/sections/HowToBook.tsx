@@ -11,7 +11,7 @@ import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
 /**
  * "Where and how can I book?" answered in one place: the steps, the
- * "Start your training" button, and where and when sessions happen. When the
+ * "Book now" button, and where and when sessions happen. When the
  * booking flow is open, step 2 is the request form; otherwise a message.
  * Either way Alex confirms each place, so it never promises an instant booking.
  */

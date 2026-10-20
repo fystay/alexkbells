@@ -122,7 +122,7 @@ describe("bookingEmail", () => {
     const email = bookingEmail(result.data);
     expect(email.subject).toBe("One-to-one booking request: Sam Example");
     expect(email.text).toContain("Preferred: Mon and Wed · Evening");
-    expect(email.text).toContain("Experience: WARRIOR MODE");
+    expect(email.text).toContain("Experience: Intermediate");
     expect(email.text).toContain("not a confirmed booking");
   });
 

@@ -51,7 +51,7 @@ redeploy: pages, including `/book`, are prerendered at build time.
 | `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
 | `COACH_EMAIL` | **set 2026-10-18** to the developer's account (Supabase user created the same day); change to Alex's email at handover (comma-separate to allow more than one) | same — **set** | Turns on `/coach/login` with the two Supabase settings. Only these addresses can sign in |
 
-"Start your training" opens `/book` whenever booking works: on production that is the
+"Book now" opens `/book` whenever booking works: on production that is the
 case as soon as `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are set (they are, since
 2026-10-17), and Vercel **Preview** always opens it. With no booking route at all
 it falls back to /contact, `/book` shows the Instagram prompt and production builds

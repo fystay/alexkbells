@@ -67,7 +67,7 @@ function LeadPrice({ service }: { service: Service }) {
  * peeking in; dots and arrows); from lg they are three columns. The cards are
  * the same height so nothing jumps while swiping.
  */
-/** Same route as the service's "Start your training" button (getPrimaryCtaFor); "Enquire" when booking is closed. */
+/** Same route as the service's "Book now" button (getPrimaryCtaFor); "Enquire" when booking is closed. */
 function requestAction(service: "group-class" | "one-to-one", label: string): { href: string; label: string } {
   const cta = getPrimaryCtaFor(service);
   return cta.kind === "booking" ? { href: cta.href, label } : { href: cta.href, label: "Enquire" };
