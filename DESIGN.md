@@ -11,6 +11,8 @@ Reference: two "dark minimalism" interiors; palette black #000000, warm cream #F
 - **The one cream moment:** the highlighted membership card (Dedicated, "Best value") is cream with black text; its button is black.
 - **Light theme kept for tools:** `/book*`, `/online-coaching/enquire` and the coach area stay on cream with white fields (forms need them); the header and footer are black throughout. Those pages set their own `bg-paper`; only the public marketing, contact, privacy and 404 pages use `NightPage`.
 - `Section`, `SectionHeading`, `PriceList`, `Timetable`, `Steps`, `InstagramAlternative`, `Faq`, `Location`, `CtaBand`, `PageHeader` are dark-only (no `tone` prop except `Section` plain/raised).
+- **Hero (checked against the owner's request, 2026-10-21):** one rounded picture (the owner's film, or a still until it is supplied) with the words beside it on desktop and beneath it on phones, so no text sits on the footage and its colours stay as filmed (no black-and-white). Phones: picture, headline, "Book now" all in the first screen. The header is solid black with a hairline.
+- **Home is deliberately short:** hero, one statement, the coach and before-and-after (in colour), three numbered rows for the services, a compact memberships table with the savings, closing call to action. Full membership cards (and their buttons) live on `/memberships`. Three images in `main`, enforced by e2e.
 
 ## Kettlebell Club redesign (2026-10-21, later) — supersedes the dark-first notes below
 

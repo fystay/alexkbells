@@ -37,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-GB" className={`${archivo.variable} antialiased`}>
+    <html lang="en-GB" className={`${archivo.variable} antialiased`} suppressHydrationWarning>
       <head>
         {/* Scroll reveal: switched on before first paint; see lib/reveal.ts. */}
         <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />

@@ -8,42 +8,42 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { HeroVideo } from "./HeroVideo";
 
 /**
- * Cinematic opening: the owner's film (content/media.ts) fills the first
- * screen, or, until it is supplied, the hero photograph does. A dark fade
- * keeps the cream text readable on any footage, and the text sits low so the
- * picture keeps the space above it. The video player is positioned over the
- * photograph so the layout is identical either way.
+ * Clean opening: one rounded picture (the owner's film from content/media.ts,
+ * or a still until it is supplied) and the words beside or beneath it, so
+ * nothing sits on top of the footage and its colours stay as filmed. On
+ * phones the picture comes first, then the headline and the button, all in
+ * the first screen. DOM order is text first so the heading leads for screen readers.
  */
 export function Hero() {
   const cta = getPrimaryCta();
   return (
-    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden text-paper">
-      <div className="relative h-[calc(100svh-4rem)] min-h-[32rem] max-h-[56rem] sm:h-[calc(100svh-5rem)]">
-        {heroVideo ? (
-          <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} className="absolute inset-0" />
-        ) : (
-          <PhotoFrame photo={images.hero} sizes="100vw" priority square className="absolute inset-0" />
-        )}
-        {/* The picture melts into the page: dark at the top (under the header) and at the foot (into the next section). */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 via-40% to-ink/30 sm:via-ink/40" />
-
-        <div className="container-page relative flex h-full flex-col justify-end pb-10 sm:pb-14 lg:pb-16">
-          <p className="eyebrow text-paper/80">
+    <section aria-labelledby="hero-heading" className="pt-4 pb-16 sm:pt-6 sm:pb-24 lg:pb-28">
+      <div className="container-page flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-14">
+        <div className="order-2 mt-6 lg:order-1 lg:col-span-5 lg:mt-0">
+          <p className="eyebrow hidden text-muted-inverse sm:block">
             {site.name} {site.descriptor} · Cumbernauld, Glasgow
           </p>
-          <h1 id="hero-heading" className="mt-4 max-w-4xl font-display text-h1 text-balance">
+          <h1 id="hero-heading" className="font-display text-h1 text-balance sm:mt-5 lg:text-h2">
             Built through movement.
-            <span className="block text-paper/70">Defined by discipline.</span>
+            <span className="block text-muted-inverse">Defined by discipline.</span>
           </h1>
-          <p className="mt-5 max-w-lg text-lede text-paper/85">
+          <p className="mt-4 max-w-md text-lede text-muted-inverse sm:mt-6">
             Kettlebell classes, flexible memberships and personal coaching, built around good technique and a club that shows up.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" className="w-full sm:w-72" />
+          <div className="mt-6 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:items-center">
+            <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" className="w-full sm:w-64" />
             <ButtonLink href="/memberships" tone="dark" variant="secondary" className="w-full sm:w-auto">
               View memberships
             </ButtonLink>
           </div>
+        </div>
+
+        <div className="relative order-1 h-[min(24rem,32svh)] min-h-[13rem] overflow-hidden rounded-3xl bg-ink-soft sm:h-[26rem] lg:order-2 lg:col-span-7 lg:h-[min(36rem,calc(100svh-9rem))]">
+          {heroVideo ? (
+            <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} className="absolute inset-0" />
+          ) : (
+            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 58vw, 100vw" priority square className="absolute inset-0" />
+          )}
         </div>
       </div>
     </section>

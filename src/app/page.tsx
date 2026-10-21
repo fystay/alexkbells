@@ -7,7 +7,7 @@ import { FindYourTraining } from "@/components/home/FindYourTraining";
 import { Hero } from "@/components/home/Hero";
 import { Statement } from "@/components/home/Statement";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { MembershipSection } from "@/components/memberships/MembershipSection";
+import { MembershipSummary } from "@/components/memberships/MembershipSummary";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
@@ -18,7 +18,7 @@ export default function HomePage() {
       <Statement />
       <CoachStory />
       <FindYourTraining />
-      <MembershipSection />
+      <MembershipSummary />
       <CtaBand />
     </NightPage>
   );

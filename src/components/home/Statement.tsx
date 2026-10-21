@@ -1,30 +1,19 @@
-import { pillars } from "@/content/about";
+import { site } from "@/content/site";
 import { Section } from "@/components/ui/Section";
-import { revealDelay } from "@/lib/reveal";
 
-/** What the club is, in one paragraph and three words. Type only: no imagery. */
+/** What the club is: one heading, one paragraph, three words. Type only. */
 export function Statement() {
   return (
-    <Section id="the-club" labelledBy="club-heading">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-        <div data-reveal className="lg:col-span-6">
-          <p className="eyebrow mb-4 text-muted-inverse">The club</p>
-          <h2 id="club-heading" className="font-display text-h2 text-balance">
-            Strength is built through consistency.
-          </h2>
-          <p className="mt-6 max-w-xl text-lede text-muted-inverse">
-            RAENG is a kettlebell club in Cumbernauld, Glasgow. We train with purpose, learn good technique and build strength
-            together, class after class.
-          </p>
-        </div>
-        <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-6 lg:gap-6">
-          {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-5">
-              <h3 className="font-display text-h3">{p.title}</h3>
-              <p className="mt-3 text-sm text-muted-inverse">{p.body}</p>
-            </li>
-          ))}
-        </ul>
+    <Section id="the-club" labelledBy="club-heading" spacing="compact">
+      <div data-reveal className="max-w-3xl">
+        <p className="eyebrow mb-5 text-muted-inverse">{site.themes.join(" · ")}</p>
+        <h2 id="club-heading" className="font-display text-h2 text-balance">
+          Strength is built through consistency.
+        </h2>
+        <p className="mt-6 max-w-xl text-lede text-muted-inverse">
+          RAENG is a kettlebell club in Cumbernauld, Glasgow. We train with purpose, learn good technique and build strength
+          together, class after class.
+        </p>
       </div>
     </Section>
   );
