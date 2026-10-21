@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <NightPage>
+    <SitePage>
     <div className="container-page py-24 sm:py-32">
       <p className="eyebrow text-muted-inverse">404</p>
       <h1 className="mt-4 font-display text-h1">Page not found</h1>
@@ -23,6 +23,6 @@ export default function NotFound() {
         </ButtonLink>
       </div>
     </div>
-    </NightPage>
+    </SitePage>
   );
 }

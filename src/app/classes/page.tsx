@@ -11,7 +11,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Timetable } from "@/components/sections/Timetable";
@@ -71,7 +71,7 @@ export default function ClassesPage() {
   ];
 
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader
         image={images.classes}
         eyebrow="Classes"
@@ -126,6 +126,6 @@ export default function ClassesPage() {
       <Location />
       <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
       <CtaBand body="Prefer personal coaching? Train face to face or online." />
-    </NightPage>
+    </SitePage>
   );
 }

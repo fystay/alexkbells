@@ -10,11 +10,11 @@ export function SiteFooter() {
   const { email, phone } = site.contact;
 
   return (
-    <footer className="border-t border-line-inverse bg-ink text-paper">
+    <footer className="theme-cream border-t border-line-inverse bg-ink text-paper">
       {/* Mobile: brand, then Explore (sized to its links) | Contact + Find us. */}
       <div className="container-page grid grid-cols-[auto_minmax(0,1fr)] gap-x-12 gap-y-10 sm:gap-x-20 py-14 sm:py-16 lg:grid-cols-12 lg:gap-8">
         <div className="col-span-2 lg:order-1 lg:col-span-5">
-          <Logo variant="lockup" tone="dark" />
+          <Logo variant="lockup" tone="light" />
           <p className="mt-5 max-w-sm text-sm text-muted-inverse">
             Kettlebell classes in Cumbernauld, Glasgow, with flexible memberships, plus 1:1
             and online coaching.

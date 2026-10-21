@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { site } from "@/content/site";
 import { Section } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
@@ -96,7 +96,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
 
 export default function PrivacyPage() {
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader eyebrow="Privacy" title="Privacy notice" intro={`Last updated ${LAST_UPDATED}.`} />
       <Section labelledBy="privacy-heading">
         <h2 id="privacy-heading" className="sr-only">
@@ -111,6 +111,6 @@ export default function PrivacyPage() {
           ))}
         </div>
       </Section>
-    </NightPage>
+    </SitePage>
   );
 }

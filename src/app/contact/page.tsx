@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
@@ -21,7 +21,7 @@ export default function ContactPage() {
   const booking = getPrimaryCta();
 
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader
         eyebrow="Contact"
         title="Get in touch"
@@ -156,6 +156,6 @@ export default function ContactPage() {
           </div>
         </div>
       </Section>
-    </NightPage>
+    </SitePage>
   );
 }

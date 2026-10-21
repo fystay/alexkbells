@@ -6,7 +6,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -45,7 +45,7 @@ export default function CoachingPage() {
   ];
 
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader
         eyebrow="1:1 Coaching"
         title="Coaching built around you"
@@ -129,6 +129,6 @@ export default function CoachingPage() {
 
       <Location />
       <CtaBand />
-    </NightPage>
+    </SitePage>
   );
 }

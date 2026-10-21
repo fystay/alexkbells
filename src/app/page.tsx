@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { CoachStory } from "@/components/home/CoachStory";
@@ -13,13 +13,13 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 
 export default function HomePage() {
   return (
-    <NightPage>
+    <SitePage>
       <Hero />
       <Statement />
       <CoachStory />
       <FindYourTraining />
       <MembershipSummary />
       <CtaBand />
-    </NightPage>
+    </SitePage>
   );
 }

@@ -5,7 +5,7 @@ import { getService } from "@/content/services";
 import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -38,7 +38,7 @@ export default function OnlineCoachingPage() {
   ];
 
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader
         eyebrow="Online coaching"
         title="Coaching that goes where you train"
@@ -98,6 +98,6 @@ export default function OnlineCoachingPage() {
       </Section>
 
       <CtaBand />
-    </NightPage>
+    </SitePage>
   );
 }

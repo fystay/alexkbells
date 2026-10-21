@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { NightPage } from "@/components/ui/NightPage";
+import { SitePage } from "@/components/ui/SitePage";
 import { CoachStory } from "@/components/home/CoachStory";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Location } from "@/components/sections/Location";
@@ -30,7 +30,7 @@ export default function AboutPage() {
   const story = aboutStory && isPublishable(aboutStory.status) ? aboutStory : null;
 
   return (
-    <NightPage>
+    <SitePage>
       <PageHeader
         eyebrow="About RAENG"
         title="Strength is built through consistency."
@@ -101,6 +101,6 @@ export default function AboutPage() {
 
       <Location />
       <CtaBand body="Come and train with us." />
-    </NightPage>
+    </SitePage>
   );
 }

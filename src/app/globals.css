@@ -150,24 +150,34 @@
 }
 
 /*
- * The public pages are one continuous dark surface (components/ui/NightPage):
- * black at the top, drifting through faint cream-tinted blacks and back to
- * black at the footer, with two soft lamp-like glows. Sections sit directly
- * on it, with no hard edges, so the page reads as a single smooth space.
+ * The public pages (and the header and footer) are one continuous light
+ * surface, like the logo: warm cream drifting to white and back, black type,
+ * muted grey for secondary text. Components are written with role-based
+ * classes (text-paper = main text, text-muted-inverse = secondary text,
+ * bg-ink = the surface, bg-paper = black fills), and this scope maps those
+ * roles onto the cream theme. The booking pages and coach area sit outside it
+ * and use the default light tokens directly, so they match.
  */
-.night-surface {
+.theme-cream {
+  --color-ink: #faf9f4; /* the page surface: warm cream */
+  --color-ink-soft: #f1f0eb; /* grey 5% over cream */
+  --color-paper: #000000; /* main text, fills and buttons: black */
+  --color-muted-inverse: #6b6b6b; /* secondary text: muted grey (5.1:1 on cream) */
+  --color-line-inverse: #dcdbd6; /* hairlines: grey 22% over cream */
   color: var(--color-paper);
-  background-color: var(--color-ink);
-  background-image:
-    radial-gradient(62rem 40rem at 88% 6%, rgb(250 249 244 / 0.07), transparent 62%),
-    radial-gradient(54rem 38rem at 2% 46%, rgb(250 249 244 / 0.045), transparent 62%),
-    radial-gradient(60rem 40rem at 95% 78%, rgb(250 249 244 / 0.05), transparent 62%),
-    linear-gradient(180deg, #000000 0%, #0b0b0a 28%, #131312 52%, #0b0b0a 78%, #000000 100%);
 }
 
-/* A large, faint ring: the only ornament, echoing the round piece in the reference. */
+.site-surface {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(60rem 38rem at 92% 4%, rgb(107 107 107 / 0.06), transparent 62%),
+    radial-gradient(52rem 36rem at 0% 52%, rgb(255 255 255 / 0.9), transparent 62%),
+    linear-gradient(180deg, #faf9f4 0%, #ffffff 38%, #faf9f4 66%, #f3f2ed 100%);
+}
+
+/* A large, faint ring: the only ornament. */
 .night-ring {
-  border: 1px solid rgb(250 249 244 / 0.09);
+  border: 1px solid rgb(107 107 107 / 0.18);
   border-radius: 9999px;
-  background: radial-gradient(closest-side, rgb(250 249 244 / 0.05), transparent 72%);
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.7), transparent 72%);
 }
