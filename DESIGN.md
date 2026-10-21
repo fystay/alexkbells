@@ -3,6 +3,15 @@
 Tokens are defined once in `src/app/globals.css` (`@theme`). This file explains
 how to use them.
 
+## Dark minimalism (2026-10-21, latest) — supersedes the cream-led notes below
+
+Reference: two "dark minimalism" interiors; palette black #000000, warm cream #FAF9F4, white #FFFFFF, muted grey #6B6B6B (tokens in `globals.css`, exact hex). Every other colour is a blend of those four (cream tints over black for surfaces, lines and secondary text); the grey itself is 3.9:1 on black, so on dark it is used for lines/large type and body secondary text uses a cream blend (`muted-inverse`, 9:1).
+- **One continuous surface:** public pages are wrapped in `NightPage` (`.night-surface`): black at the top, drifting through faint cream-tinted blacks, with soft lamp-like glows, back to black at the footer. Sections have no background of their own (`Section` tone `plain`) or a feathered tint (`raised`, a vertical gradient that fades in and out), so there are no hard seams. No cream bands any more.
+- **Shapes and type:** rounded-3xl glass cards (`bg-paper/[0.03–0.04]`, hairline `line-inverse`), pill buttons on dark (cream fill, black arrow circle), medium-weight expanded uppercase headings (`font-display` now weight 500), wide-tracked eyebrows. One ornament: a large faint ring behind the closing headline (`.night-ring`).
+- **The one cream moment:** the highlighted membership card (Dedicated, "Best value") is cream with black text; its button is black.
+- **Light theme kept for tools:** `/book*`, `/online-coaching/enquire` and the coach area stay on cream with white fields (forms need them); the header and footer are black throughout. Those pages set their own `bg-paper`; only the public marketing, contact, privacy and 404 pages use `NightPage`.
+- `Section`, `SectionHeading`, `PriceList`, `Timetable`, `Steps`, `InstagramAlternative`, `Faq`, `Location`, `CtaBand`, `PageHeader` are dark-only (no `tone` prop except `Section` plain/raised).
+
 ## Kettlebell Club redesign (2026-10-21, later) — supersedes the dark-first notes below
 
 - **Palette (four colours):** black (`ink`: header, footer, hero fade, contrast bands, the highlighted plan), warm cream (`paper`: the main surface), white (`white` section tone: the memberships section and one band on About), muted grey (`surface`/`muted`/`line`: secondary text, dividers, the pay-as-you-go card). No other colours.

@@ -5,6 +5,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { NightPage } from "@/components/ui/NightPage";
 import { CoachStory } from "@/components/home/CoachStory";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Location } from "@/components/sections/Location";
@@ -29,7 +30,7 @@ export default function AboutPage() {
   const story = aboutStory && isPublishable(aboutStory.status) ? aboutStory : null;
 
   return (
-    <>
+    <NightPage>
       <PageHeader
         eyebrow="About RAENG"
         title="Strength is built through consistency."
@@ -41,12 +42,12 @@ export default function AboutPage() {
       </PageHeader>
 
       {story ? (
-        <Section tone="surface" id="story" labelledBy="story-heading">
+        <Section id="story" labelledBy="story-heading">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <SectionHeading id="story-heading" eyebrow="Our story" title={story.title} />
             </div>
-            <div className="max-w-2xl space-y-5 text-lede text-muted lg:col-span-7">
+            <div className="max-w-2xl space-y-5 text-lede text-muted-inverse lg:col-span-7">
               {story.paragraphs.map((text) => (
                 <p key={text}>{text}</p>
               ))}
@@ -55,7 +56,7 @@ export default function AboutPage() {
         </Section>
       ) : null}
 
-      <Section tone="paper" id="values" labelledBy="values-heading">
+      <Section id="values" labelledBy="values-heading">
         <SectionHeading
           id="values-heading"
           eyebrow="What we stand for"
@@ -64,12 +65,12 @@ export default function AboutPage() {
         />
         <ol className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3">
           {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-ink pt-4">
-              <p className="eyebrow text-muted" aria-hidden="true">
+            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
+              <p className="eyebrow text-muted-inverse" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-3 font-display text-h2">{p.title}</h3>
-              <p className="mt-3 text-muted">{p.body}</p>
+              <p className="mt-3 text-muted-inverse">{p.body}</p>
             </li>
           ))}
         </ol>
@@ -77,7 +78,7 @@ export default function AboutPage() {
 
       <CoachStory />
 
-      <Section tone="white" id="kettlebells" labelledBy="kettlebells-heading">
+      <Section id="kettlebells" labelledBy="kettlebells-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading
@@ -89,9 +90,9 @@ export default function AboutPage() {
           </div>
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-7">
             {kettlebell.map((b, i) => (
-              <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-ink pt-4">
+              <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
                 <h3 className="font-display text-h3">{b.title}</h3>
-                <p className="mt-2 text-muted">{b.body}</p>
+                <p className="mt-2 text-muted-inverse">{b.body}</p>
               </li>
             ))}
           </ul>
@@ -100,6 +101,6 @@ export default function AboutPage() {
 
       <Location />
       <CtaBand body="Come and train with us." />
-    </>
+    </NightPage>
   );
 }

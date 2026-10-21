@@ -24,10 +24,10 @@ export function coachDetails() {
 function Frame({ photo, label }: { photo: Photo; label: string }) {
   return (
     <figure className="relative">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-ink-soft">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-ink-soft">
         <Image src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 28vw, 50vw" className="object-cover" />
       </div>
-      <figcaption className="eyebrow absolute bottom-3 left-3 bg-paper px-2 py-1 text-ink">{label}</figcaption>
+      <figcaption className="eyebrow absolute bottom-4 left-4 rounded-full bg-ink/70 px-3 py-1.5 text-paper backdrop-blur">{label}</figcaption>
     </figure>
   );
 }
@@ -44,7 +44,7 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
 
   return (
     <Provisional status={showJourney ? journey.status : "confirmed"}>
-      <Section tone="ink" id="coach" labelledBy="coach-heading">
+      <Section tone="raised" id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
           <div className="lg:col-span-6">
             <p className="eyebrow mb-4 text-muted-inverse">Meet your coach</p>

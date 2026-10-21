@@ -21,7 +21,7 @@ interface PhotoFrameProps {
 export function PhotoFrame({ photo, sizes, className, priority = false, square = false }: PhotoFrameProps) {
   // `className` may position the frame (e.g. "absolute inset-0"), so the image sits in an inner box that always fills it.
   return (
-    <div className={cn("overflow-hidden bg-ink-soft", !square && "rounded-xl", className)}>
+    <div className={cn("overflow-hidden bg-ink-soft", !square && "rounded-3xl", className)}>
       <div className="relative size-full">
         <Image
           src={photo.src}

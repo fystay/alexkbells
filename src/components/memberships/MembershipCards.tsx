@@ -10,12 +10,12 @@ const payg = getService("group-classes").prices[0];
 
 /** Pay-as-you-go against membership as two bars, so the saving reads before any number is read. Decorative: the figures are in the text. */
 function SavingBar({ price, payAsYouGo, dark }: { price: number; payAsYouGo: number; dark: boolean }) {
-  const track = dark ? "bg-paper/20" : "bg-line";
-  const fill = dark ? "bg-paper" : "bg-ink";
+  const track = dark ? "bg-ink/15" : "bg-paper/15";
+  const fill = dark ? "bg-ink" : "bg-paper";
   return (
     <div aria-hidden="true" className="mt-4 space-y-1.5">
-      <div className={cn("h-1.5 w-full", track)} />
-      <div className={cn("h-1.5", fill)} style={{ width: `${Math.round((price / payAsYouGo) * 100)}%` }} />
+      <div className={cn("h-1 w-full rounded-full", track)} />
+      <div className={cn("h-1 rounded-full", fill)} style={{ width: `${Math.round((price / payAsYouGo) * 100)}%` }} />
     </div>
   );
 }
@@ -23,14 +23,15 @@ function SavingBar({ price, payAsYouGo, dark }: { price: number; payAsYouGo: num
 function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
   const f = planFigures(plan, payg.amountGbp);
   const action = getMembershipAction(plan.name);
+  // The highlighted plan is the one cream card on the dark page; the rest are barely-there glass.
   const dark = Boolean(plan.highlight);
-  const muted = dark ? "text-paper/70" : "text-muted";
+  const muted = dark ? "text-ink/65" : "text-muted-inverse";
 
   return (
     <li
       data-reveal
       style={revealDelay(index)}
-      className={cn("flex flex-col p-6 sm:p-7", dark ? "bg-ink text-paper" : "border border-line bg-paper")}
+      className={cn("flex flex-col rounded-3xl p-7 sm:p-8", dark ? "bg-paper text-ink" : "border border-line-inverse bg-paper/[0.04]")}
     >
       {/* Every card reserves this line so the names align; only the highlighted plan has text in it. */}
       <p className={cn("eyebrow h-4 text-[0.6875rem]", muted)}>{plan.highlight ?? ""}</p>
@@ -42,10 +43,10 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
       <p className="mt-2 font-semibold">{plan.credits} class credits</p>
       <p className={cn("text-sm", muted)}>per {BILLING_WEEKS}-week period</p>
 
-      <dl className={cn("mt-6 border-t pt-5", dark ? "border-paper/25" : "border-line")}>
+      <dl className={cn("mt-6 border-t pt-5", dark ? "border-ink/15" : "border-line-inverse")}>
         <div className="flex items-baseline justify-between gap-3">
           <dt className={cn("text-sm", muted)}>Cost per class</dt>
-          <dd className="font-bold tabular-nums">{formatPenceShort(f.perClassPence)}</dd>
+          <dd className="font-medium tabular-nums">{formatPenceShort(f.perClassPence)}</dd>
         </div>
         <div className="mt-3 flex items-baseline justify-between gap-3">
           <dt className={cn("text-sm", muted)}>Pay as you go</dt>
@@ -62,9 +63,9 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
       <ButtonLink
         href={action.href}
         external={action.external}
-        tone={dark ? "dark" : "light"}
+        tone={dark ? "light" : "dark"}
         variant="primary"
-        className="mt-6 w-full"
+        className="mt-6 w-full rounded-full"
       >
         {action.kind === "enquiry" ? "Enquire" : "Join"}
         <span className="sr-only">{action.kind === "enquiry" ? ` about ${plan.name}` : ` ${plan.name}`}</span>
@@ -77,16 +78,16 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
 function PayAsYouGoCard({ index }: { index: number }) {
   const action = getPrimaryCtaFor("group-class");
   return (
-    <li data-reveal style={revealDelay(index)} className="flex flex-col border border-line bg-surface p-6 sm:p-7">
+    <li data-reveal style={revealDelay(index)} className="flex flex-col rounded-3xl border border-line-inverse p-7 sm:p-8">
       <h3 className="font-display text-h3">Pay as you go</h3>
       <p className="mt-5">
         <span className="font-display text-4xl tabular-nums">£{payg.amountGbp}</span>
-        <span className="ml-2 text-sm text-muted">per class</span>
+        <span className="ml-2 text-sm text-muted-inverse">per class</span>
       </p>
       <p className="mt-2 font-semibold">Individual classes</p>
-      <p className="text-sm text-muted">No membership credit allowance.</p>
+      <p className="text-sm text-muted-inverse">No membership credit allowance.</p>
       <div className="flex-1" />
-      <ButtonLink href={action.href} external={action.external} variant="secondary" className="mt-6 w-full whitespace-normal text-center">
+      <ButtonLink href={action.href} external={action.external} tone="dark" variant="secondary" className="mt-6 w-full whitespace-normal text-center">
         {action.label}
       </ButtonLink>
     </li>

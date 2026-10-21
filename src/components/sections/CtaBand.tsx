@@ -17,8 +17,6 @@ interface CtaBandProps {
   titleSecondary?: string;
   body?: string;
   headingId?: string;
-  /** The band's surface. Black by default; cream where the section above is dark. */
-  tone?: "paper" | "ink";
 }
 
 /**
@@ -32,7 +30,6 @@ export function CtaBand({
   titleSecondary = "Build with discipline.",
   body,
   headingId = "cta-heading",
-  tone = "ink",
 }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCta();
@@ -42,16 +39,17 @@ export function CtaBand({
     ...times.map((t) => ({ label: t.days, value: t.time })),
     ...(price ? [{ label: "Class", value: formatGbp(price.amountGbp) }] : []),
   ];
-  const dark = tone === "ink";
-  const muted = dark ? "text-muted-inverse" : "text-muted";
-  const rule = dark ? "border-line-inverse" : "border-ink";
+  const muted = "text-muted-inverse";
+  const rule = "border-line-inverse";
 
   return (
-    <Section tone={tone} labelledBy={headingId}>
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end lg:gap-16">
+    <Section labelledBy={headingId} className="relative overflow-hidden">
+      {/* One large, faint ring behind the headline: decoration only. */}
+      <div aria-hidden="true" className="night-ring pointer-events-none absolute -top-40 -left-40 size-[34rem] sm:size-[44rem]" />
+      <div className="relative grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end lg:gap-16">
         <div data-reveal className="lg:col-span-7">
           <p className={cn("eyebrow mb-5", muted)}>{site.themes.join(" · ")}</p>
-          <h2 id={headingId} className="font-display text-display text-balance">
+          <h2 id={headingId} className="font-display text-h1 text-balance">
             <KeepHyphens>{title}</KeepHyphens>
             {titleSecondary ? <span className={cn("mt-1 block", muted)}>{titleSecondary}</span> : null}
           </h2>
@@ -68,17 +66,17 @@ export function CtaBand({
               ))}
             </dl>
           ) : null}
-          <StartTraining href={cta.href} label={cta.label} external={cta.external} tone={dark ? "dark" : "light"} className="mt-7 w-full" />
+          <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" className="mt-7 w-full" />
           <a
             href={instagram.url}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
               "group mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em]",
-              dark ? "focus-visible:outline-paper" : "focus-visible:outline-ink",
+              "focus-visible:outline-paper",
             )}
           >
-            <span className={cn("underline underline-offset-[6px]", dark ? "decoration-muted-inverse group-hover:decoration-paper" : "decoration-muted group-hover:decoration-ink")}>
+            <span className={cn("underline underline-offset-[6px]", "decoration-muted-inverse group-hover:decoration-paper")}>
               Message on Instagram
             </span>
             <span aria-hidden="true">↗</span>

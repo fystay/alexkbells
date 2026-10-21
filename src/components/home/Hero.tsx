@@ -17,14 +17,15 @@ import { HeroVideo } from "./HeroVideo";
 export function Hero() {
   const cta = getPrimaryCta();
   return (
-    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden bg-ink text-paper">
-      <div className="relative h-[calc(100svh-4rem)] min-h-[32rem] max-h-[60rem] sm:h-[calc(100svh-5rem)]">
+    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden text-paper">
+      <div className="relative h-[calc(100svh-4rem)] min-h-[32rem] max-h-[56rem] sm:h-[calc(100svh-5rem)]">
         {heroVideo ? (
           <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} className="absolute inset-0" />
         ) : (
           <PhotoFrame photo={images.hero} sizes="100vw" priority square className="absolute inset-0" />
         )}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 via-45% to-ink/10 sm:via-ink/40" />
+        {/* The picture melts into the page: dark at the top (under the header) and at the foot (into the next section). */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 via-40% to-ink/30 sm:via-ink/40" />
 
         <div className="container-page relative flex h-full flex-col justify-end pb-10 sm:pb-14 lg:pb-16">
           <p className="eyebrow text-paper/80">

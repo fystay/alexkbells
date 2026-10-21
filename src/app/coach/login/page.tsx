@@ -16,6 +16,8 @@ export default function CoachLoginPage() {
   const enabled = coachLoginConfig() !== null;
 
   return (
+    // The coach area stays on the light cream theme (forms need white fields).
+    <div className="bg-paper text-ink">
     <Section labelledBy="coach-login-heading">
       <div className="max-w-md">
         <p className="eyebrow text-muted">Coach login</p>
@@ -28,5 +30,6 @@ export default function CoachLoginPage() {
         <p className="mt-10 text-muted">This login is for the coach only.</p>
       </div>
     </Section>
+    </div>
   );
 }

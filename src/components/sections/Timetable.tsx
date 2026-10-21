@@ -5,7 +5,6 @@ import { formatTime, partOfDay, shortDay, sortSessions } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
 
 interface TimetableProps {
-  tone?: "paper" | "ink";
   /** Heading id the list is described by. */
   labelledBy?: string;
   /**
@@ -18,12 +17,12 @@ interface TimetableProps {
 }
 
 /** Shown in place of the timetable until it is confirmed. */
-export function TimetableFallback({ tone = "paper" }: { tone?: "paper" | "ink" }) {
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+export function TimetableFallback() {
+  const muted = "text-muted-inverse";
   return (
     <p className={cn("max-w-xl text-lede", muted)}>
       The class timetable is being finalised.{" "}
-      <Link href="/contact" className={cn("underline underline-offset-4", tone === "ink" ? "text-paper" : "text-ink")}>
+      <Link href="/contact" className="text-paper underline underline-offset-4">
         Get in touch
       </Link>{" "}
       for current class times.
@@ -31,15 +30,15 @@ export function TimetableFallback({ tone = "paper" }: { tone?: "paper" | "ink" }
   );
 }
 
-export function Timetable({ tone = "paper", labelledBy, layout = "row" }: TimetableProps) {
+export function Timetable({ labelledBy, layout = "row" }: TimetableProps) {
   const stack = layout === "stack";
   const sessions = sortSessions(timetable.sessions);
-  const line = tone === "ink" ? "border-line-inverse" : "border-ink";
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+  const line = "border-line-inverse";
+  const muted = "text-muted-inverse";
 
   if (layout === "mini") {
     return (
-      <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
+      <Provisional status={timetable.status} fallback={<TimetableFallback />}>
         <ul aria-labelledby={labelledBy} className="grid grid-cols-3 gap-3">
           {sessions.map((session) => (
             <li key={session.id} className={cn("border-t pt-3", line)}>
@@ -60,7 +59,7 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
 
   if (layout === "compact") {
     return (
-      <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
+      <Provisional status={timetable.status} fallback={<TimetableFallback />}>
         <ul aria-labelledby={labelledBy}>
           {sessions.map((session) => (
             <li key={session.id} className={cn("flex items-baseline justify-between gap-4 border-t py-2.5", line)}>
@@ -78,7 +77,7 @@ export function Timetable({ tone = "paper", labelledBy, layout = "row" }: Timeta
   }
 
   return (
-    <Provisional status={timetable.status} fallback={<TimetableFallback tone={tone} />}>
+    <Provisional status={timetable.status} fallback={<TimetableFallback />}>
       <ul aria-labelledby={labelledBy} className={cn("grid grid-cols-1 gap-px", !stack && "sm:grid-cols-3")}>
         {sessions.map((session) => (
           <li key={session.id} className={cn("border-t-2", stack ? "pt-4 pb-5 lg:py-4" : "pt-4 pb-5 sm:pt-5 sm:pb-6 sm:pr-6", line)}>

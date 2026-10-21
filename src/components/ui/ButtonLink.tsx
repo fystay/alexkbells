@@ -41,17 +41,17 @@ const styles: Record<Tone, Record<Variant, string>> = {
     action: `min-h-14 bg-ink text-paper hover:bg-ink-soft ${press}`,
   },
   dark: {
-    primary: `min-h-12 px-6 bg-paper text-ink hover:bg-white ${press}`,
-    secondary: `min-h-12 px-6 border border-paper/70 text-paper hover:bg-paper hover:text-ink ${press}`,
+    primary: `min-h-12 px-6 rounded-full bg-paper text-ink hover:bg-white ${press}`,
+    secondary: `min-h-12 px-6 rounded-full border border-paper/40 text-paper hover:border-paper hover:bg-paper hover:text-ink ${press}`,
     text: "min-h-11 text-paper underline-offset-[6px] decoration-1 hover:underline",
-    action: `min-h-14 bg-paper text-ink hover:bg-white ${press}`,
+    action: `min-h-14 rounded-full bg-paper text-ink hover:bg-white ${press}`,
   },
 };
 
 /** The arrow square of an "action" button: the inverse of its bar. */
 const actionArrow: Record<Tone, string> = {
   light: "bg-paper text-ink",
-  dark: "bg-ink text-paper",
+  dark: "rounded-full bg-ink text-paper",
 };
 
 function Arrow() {

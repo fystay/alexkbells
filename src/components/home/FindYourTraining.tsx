@@ -40,35 +40,35 @@ const options: Option[] = [
 /** The three services, as plain type on hairlines: no pictures, so the page stays quiet. */
 export function FindYourTraining() {
   return (
-    <Section tone="paper" id="find-your-training" labelledBy="training-heading">
+    <Section id="find-your-training" labelledBy="training-heading">
       <SectionHeading id="training-heading" eyebrow="Ways to train" title="Find your training" intro="Choose the format that fits how you want to work." />
-      <ul className="mt-12 grid grid-cols-1 gap-12 lg:mt-16 lg:grid-cols-3 lg:gap-10">
+      <ul className="mt-12 grid grid-cols-1 gap-12 lg:mt-16 xl:grid-cols-3 xl:gap-8">
         {options.map((o, i) => {
           const price = publishable(o.service.prices)[0];
           return (
-            <li key={o.service.id} data-reveal style={revealDelay(i)} className="flex flex-col border-t-2 border-ink pt-5">
-              <p className="eyebrow text-muted">
+            <li key={o.service.id} data-reveal style={revealDelay(i)} className="flex flex-col rounded-3xl border border-line-inverse bg-paper/[0.03] p-7 sm:p-8">
+              <p className="eyebrow text-muted-inverse">
                 <span aria-hidden="true">{String(i + 1).padStart(2, "0")} · </span>
                 {o.kind}
               </p>
               <h3 className="mt-3 font-display text-h2">{o.service.name}</h3>
-              <p className="mt-4 flex-1 text-muted">{o.description}</p>
+              <p className="mt-4 flex-1 text-muted-inverse">{o.description}</p>
               {price ? (
-                <p className="mt-5 text-sm text-muted">
+                <p className="mt-5 text-sm text-muted-inverse">
                   {price.prefix ? `${price.prefix} ` : ""}
-                  <span className="text-lg font-bold text-ink tabular-nums">{formatGbp(price.amountGbp)}</span> {price.unit}
+                  <span className="text-lg font-medium text-paper tabular-nums">{formatGbp(price.amountGbp)}</span> {price.unit}
                 </p>
               ) : null}
-              <ButtonLink href={o.service.href} variant="secondary" className="mt-6 w-full sm:w-auto sm:self-start">
+              <ButtonLink href={o.service.href} tone="dark" variant="secondary" className="mt-6 w-full sm:w-auto sm:self-start">
                 {o.cta}
               </ButtonLink>
             </li>
           );
         })}
       </ul>
-      <p className="mt-10 text-muted">
+      <p className="mt-10 text-muted-inverse">
         Training more than once a week?{" "}
-        <Link href="/memberships" className="font-semibold text-ink underline underline-offset-4 hover:no-underline">
+        <Link href="/memberships" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
           Compare class memberships
         </Link>
         .

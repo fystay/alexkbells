@@ -6,6 +6,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { NightPage } from "@/components/ui/NightPage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -44,7 +45,7 @@ export default function CoachingPage() {
   ];
 
   return (
-    <>
+    <NightPage>
       <PageHeader
         eyebrow="1:1 Coaching"
         title="Coaching built around you"
@@ -72,23 +73,23 @@ export default function CoachingPage() {
           </div>
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-7">
             {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-ink pt-4">
+              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
                 <h3 className="font-display text-h3">{f.title}</h3>
-                <p className="mt-3 text-muted">{f.body}</p>
+                <p className="mt-3 text-muted-inverse">{f.body}</p>
               </li>
             ))}
           </ul>
         </div>
       </Section>
 
-      <Section tone="ink" id="how-it-works" labelledBy="how-heading">
+      <Section id="how-it-works" labelledBy="how-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading
               id="how-heading"
               eyebrow="How it works"
               title="From first message to first session"
-              tone="ink"
+             
             />
             <StartTraining
               href={booking.href}
@@ -98,9 +99,9 @@ export default function CoachingPage() {
               tone="dark"
               className="mt-8 w-full sm:w-[22rem]"
             />
-            {open ? <InstagramAlternative tone="ink" className="mt-4" /> : null}
+            {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
-          <Steps steps={steps} tone="ink" className="lg:col-span-7" />
+          <Steps steps={steps} className="lg:col-span-7" />
         </div>
       </Section>
 
@@ -111,13 +112,13 @@ export default function CoachingPage() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <PriceList prices={service.prices} />
-            <p className="mt-6 text-muted">
+            <p className="mt-6 text-muted-inverse">
               Prefer to train in a group?{" "}
-              <Link href="/classes" className="font-semibold text-ink underline underline-offset-4 hover:no-underline">
+              <Link href="/classes" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
                 See group classes
               </Link>
               . Further from Cumbernauld?{" "}
-              <Link href="/online-coaching" className="font-semibold text-ink underline underline-offset-4 hover:no-underline">
+              <Link href="/online-coaching" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
                 See online coaching
               </Link>
               .
@@ -128,6 +129,6 @@ export default function CoachingPage() {
 
       <Location />
       <CtaBand />
-    </>
+    </NightPage>
   );
 }

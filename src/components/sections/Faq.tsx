@@ -12,13 +12,13 @@ export function Faq({ headingId = "faq-heading", ids }: { headingId?: string; id
   if (items.length === 0) return null;
 
   return (
-    <Section tone="ink" labelledBy={headingId}>
+    <Section labelledBy={headingId}>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <SectionHeading id={headingId} eyebrow="FAQ" title="Questions" tone="ink" />
+          <SectionHeading id={headingId} eyebrow="FAQ" title="Questions" />
         </div>
         <div className="lg:col-span-8">
-          <ul className="border-t border-paper">
+          <ul className="border-t border-line-inverse">
             {items.map((item, i) => (
               <li key={item.id} data-reveal style={revealDelay(i)} className="border-b border-line-inverse">
                 <Provisional status={item.status}>

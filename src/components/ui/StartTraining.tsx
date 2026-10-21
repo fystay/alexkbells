@@ -20,11 +20,11 @@ interface StartTrainingProps {
 
 const bar: Record<Tone, string> = {
   light: "bg-ink text-paper focus-visible:outline-ink",
-  dark: "bg-paper text-ink focus-visible:outline-paper",
+  dark: "rounded-full bg-paper text-ink focus-visible:outline-paper",
 };
 const square: Record<Tone, string> = {
   light: "bg-paper text-ink",
-  dark: "bg-ink text-paper",
+  dark: "rounded-full bg-ink text-paper",
 };
 
 /**

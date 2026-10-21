@@ -7,7 +7,7 @@ export function SiteHeader() {
   const cta = getPrimaryCta();
 
   return (
-    <header className="sticky top-0 z-40 bg-ink text-paper">
+    <header className="sticky top-0 z-40 bg-ink/80 text-paper backdrop-blur-md">
       <div className="container-page relative flex h-16 items-center justify-between gap-8 sm:h-20">
         <Logo tone="dark" priority />
         <div className="flex items-center gap-5 xl:gap-6">

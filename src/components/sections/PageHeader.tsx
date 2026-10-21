@@ -7,23 +7,20 @@ interface PageHeaderProps {
   title: ReactNode;
   intro?: ReactNode;
   children?: ReactNode;
-  /**
-   * Desktop only (lg+), beside the text. Hidden on phones and tablets so the
-   * page's information and call to action come first.
-   */
+  /** Desktop only (lg+), beside the text, so the page's information and call to action come first on phones. */
   image?: Photo | null;
 }
 
-/** Opening block for inner pages, on ink like the header above it. The page's only <h1>. */
+/** Opening block for the public pages, on the continuous dark surface. The page's only <h1>. */
 export function PageHeader({ eyebrow, title, intro, children, image }: PageHeaderProps) {
   return (
-    <div className="bg-ink text-paper">
-      <div className="container-page pt-14 pb-14 sm:pt-20 sm:pb-20 lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-20">
+    <header>
+      <div className="container-page pt-20 pb-16 sm:pt-28 sm:pb-24 lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-32">
         <div className={image ? "lg:col-span-7" : "lg:col-span-12"}>
           <p className="eyebrow text-muted-inverse">{eyebrow}</p>
-          <h1 className="mt-4 max-w-4xl font-display text-h1 text-balance">{title}</h1>
-          {intro ? <div className="mt-6 max-w-2xl text-lede text-muted-inverse">{intro}</div> : null}
-          {children ? <div className="mt-8 flex flex-wrap gap-3">{children}</div> : null}
+          <h1 className="mt-5 max-w-4xl font-display text-h1 text-balance">{title}</h1>
+          {intro ? <div className="mt-7 max-w-2xl text-lede text-muted-inverse">{intro}</div> : null}
+          {children ? <div className="mt-10 flex flex-wrap gap-3">{children}</div> : null}
         </div>
         {image ? (
           <div className="hidden lg:col-span-5 lg:block">
@@ -31,6 +28,6 @@ export function PageHeader({ eyebrow, title, intro, children, image }: PageHeade
           </div>
         ) : null}
       </div>
-    </div>
+    </header>
   );
 }

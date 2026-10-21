@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NightPage } from "@/components/ui/NightPage";
 import { pageMetadata } from "@/lib/metadata";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -18,7 +19,7 @@ export const metadata: Metadata = pageMetadata({
 export default function MembershipsPage() {
   const booking = getPrimaryCtaFor("group-class");
   return (
-    <>
+    <NightPage>
       <PageHeader
         eyebrow="Memberships"
         title="Kettlebell memberships"
@@ -34,7 +35,7 @@ export default function MembershipsPage() {
       <MembershipSection showTermsLink={false} />
       <MembershipTerms />
       <CancellationPolicy />
-      <CtaBand tone="ink" />
-    </>
+      <CtaBand />
+    </NightPage>
   );
 }
