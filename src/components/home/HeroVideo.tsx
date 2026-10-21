@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 interface HeroVideoProps {
   sources: { src: string; type: string }[];
   poster: string;
+  /** CSS object-position for the crop. */
+  position?: string;
   className?: string;
 }
 
@@ -24,7 +26,7 @@ const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g,
  *   control is removed.
  * - The video is decorative (aria-hidden); the page makes sense without it.
  */
-export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
+export function HeroVideo({ sources, poster, position = "50% 50%", className }: HeroVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(true);
@@ -32,7 +34,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   const [unavailable, setUnavailable] = useState(false);
 
   const html =
-    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover">` +
+    `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover" style="object-position:${escapeAttr(position)}">` +
     sources.map((s) => `<source src="${escapeAttr(s.src)}" type="${escapeAttr(s.type)}">`).join("") +
     "</video>";
 
@@ -83,7 +85,7 @@ export function HeroVideo({ sources, poster, className }: HeroVideoProps) {
   };
 
   return (
-    <div className={className} style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: "center" }}>
+    <div className={className} style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: position }}>
       <div
         ref={containerRef}
         className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}

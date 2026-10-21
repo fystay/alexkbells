@@ -13,17 +13,21 @@ export interface HeroVideoConfig {
   sources: { src: string; type: string }[];
   /** First frame, shown before the film loads and for visitors who prefer reduced motion. */
   poster: string;
-  /** Wide view of what the film shows, for the poster image's alt text. Empty if purely atmospheric. */
-  posterAlt: string;
+  /** CSS object-position for the crop (the film is vertical; the card is shorter on phones). */
+  position?: string;
 }
 
-export const heroVideo = null as HeroVideoConfig | null;
-// Example:
-// export const heroVideo: HeroVideoConfig = {
-//   sources: [
-//     { src: "/media/hero.mp4", type: 'video/mp4; codecs="avc1.64001F"' },
-//     { src: "/media/hero.webm", type: 'video/webm; codecs="vp9"' },
-//   ],
-//   poster: "/media/hero-poster.jpg",
-//   posterAlt: "",
-// };
+/**
+ * Cut from the owner's own class footage (supplied 2026-10-21; the unedited
+ * clip is a 14 s vertical phone video of a class swinging together, no signage
+ * in frame): first 8.8 s, silent, lifted slightly in brightness and warmth to
+ * suit the cream page. Re-cut with ffmpeg if a better clip arrives.
+ */
+export const heroVideo = {
+  sources: [
+    { src: "/media/hero.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+    { src: "/media/hero.webm", type: 'video/webm; codecs="vp9"' },
+  ],
+  poster: "/media/hero-poster.jpg",
+  position: "50% 58%",
+} as HeroVideoConfig | null;

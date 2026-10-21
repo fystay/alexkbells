@@ -9,7 +9,7 @@ import { HeroVideo } from "./HeroVideo";
 
 /**
  * Clean opening: one rounded picture (the owner's film from content/media.ts,
- * or a still until it is supplied) and the words beside or beneath it, so
+ * or a still if none is set) and the words beside or beneath it, so
  * nothing sits on top of the footage and its colours stay as filmed. On
  * phones the picture comes first, then the headline and the button, all in
  * the first screen. DOM order is text first so the heading leads for screen readers.
@@ -19,7 +19,7 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="pt-4 pb-16 sm:pt-6 sm:pb-24 lg:pb-28">
       <div className="container-page flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-14">
-        <div className="order-2 mt-6 lg:order-1 lg:col-span-5 lg:mt-0">
+        <div className="order-2 mt-6 lg:order-1 lg:col-span-6 lg:mt-0">
           <p className="eyebrow hidden text-muted-inverse sm:block">
             {site.name} {site.descriptor} · Cumbernauld, Glasgow
           </p>
@@ -38,11 +38,11 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative order-1 h-[min(24rem,32svh)] min-h-[13rem] overflow-hidden rounded-3xl bg-ink-soft sm:h-[26rem] lg:order-2 lg:col-span-7 lg:h-[min(36rem,calc(100svh-9rem))]">
+        <div className="relative order-1 h-[min(24rem,32svh)] min-h-[13rem] overflow-hidden rounded-3xl bg-ink-soft sm:h-[26rem] lg:order-2 lg:col-span-5 lg:col-start-8 lg:h-[min(38rem,calc(100svh-9rem))]">
           {heroVideo ? (
-            <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} className="absolute inset-0" />
+            <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} position={heroVideo.position} className="absolute inset-0" />
           ) : (
-            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 58vw, 100vw" priority square className="absolute inset-0" />
+            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 42vw, 100vw" priority square className="absolute inset-0" />
           )}
         </div>
       </div>

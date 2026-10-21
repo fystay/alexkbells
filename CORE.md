@@ -16,7 +16,7 @@ New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettleb
 | Starter £40 / 4 weeks, 4 credits · Regular £65, 8 credits · Dedicated £85, 12 credits | C | Per-class cost (£10 / £8.13 / £7.08) and savings (£8 / £31 / £59) are **calculated** from price × credits against £12 (`lib/membership.ts`, tested against the owner's figures) |
 | Membership terms and cancellation policy | C | Published as written in `content/policy.ts` |
 | Membership sign-up, auto-renewal billing, credit accounts | U | **Nothing is built.** Buttons are enquiries to /contact; set `MEMBERSHIP_URL` (https) to link a real sign-up page later. The terms say memberships renew automatically and credits are returned to "your account": that needs a real billing and credit system before it is true in practice |
-| Hero film | U | Not yet supplied. The hero shows a still photograph until `content/media.ts` is filled in |
+| Hero film | C | Supplied 2026-10-21 (12 vertical phone clips, 464×832 or 576×1024). Used: one, cut to 8.8 s, silent (`public/media/hero.mp4/.webm`, poster `hero-poster.jpg`, `content/media.ts`). It shows a class swinging together; no signage in frame; people shown must be happy to appear. The other 11 are unused: most show another gym's APEX | FREQUENCY signage and are low-resolution |
 
 ## RAENG rebrand (2026-10-21)
 
