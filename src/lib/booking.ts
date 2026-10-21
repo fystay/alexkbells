@@ -30,7 +30,8 @@ export type EnquiryMode = "send" | "demo" | "unavailable";
 
 export const ENQUIRY_HREF = "/contact";
 export const BOOK_PAGE_HREF = "/book";
-export const ONLINE_COACHING_HREF = "/online-coaching";
+/** The online coaching enquiry form. The page /online-coaching describes the service and links here. */
+export const ONLINE_COACHING_HREF = "/online-coaching/enquire";
 
 const LABELS: Record<BookableService | "any", string> = {
   any: "Book your session",

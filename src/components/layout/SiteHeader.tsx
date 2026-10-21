@@ -9,8 +9,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-ink text-paper">
       <div className="container-page relative flex h-16 items-center justify-between gap-6 sm:h-20">
-        <Logo tone="dark" priority />
-        <div className="flex items-center gap-6 lg:gap-8">
+        <Logo tone="dark" />
+        <div className="flex items-center gap-5 xl:gap-8">
           <DesktopNav />
           <div className="hidden md:block">
             <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" variant="button" />

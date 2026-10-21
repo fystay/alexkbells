@@ -25,9 +25,9 @@ export const services: Service[] = [
   },
   {
     id: "one-to-one",
-    name: "One-to-one coaching",
-    shortName: "One-to-one",
-    href: "/coaching#one-to-one",
+    name: "1:1 coaching",
+    shortName: "1:1",
+    href: "/coaching",
     summary:
       "Face-to-face kettlebell coaching, tailored to you as an individual.",
     points: [
@@ -54,7 +54,7 @@ export const services: Service[] = [
     id: "online-coaching",
     name: "Online coaching",
     shortName: "Online",
-    href: "/coaching#online",
+    href: "/online-coaching",
     summary:
       "Personalised kettlebell programming with ongoing support and progression, wherever you train.",
     points: ["Personalised programming", "Ongoing support", "Progression"],

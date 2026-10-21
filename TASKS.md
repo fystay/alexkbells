@@ -1,4 +1,4 @@
-# TASKS — Alex K Bells
+# TASKS — RAENG
 
 Priority: P0 blocks launch · P1 before/at launch · P2 later.
 
@@ -142,3 +142,16 @@ See Coach portal below.
 - [ ] **P2** Delete a cancelled charge's payment link at Square automatically (today: Dashboard)
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
+
+## RAENG rebrand (2026-10-21)
+
+### Done
+- [x] Brand, nav, wordmark, share image and icons; dark-first home (six sections); /about; /coaching 1:1 only; /online-coaching service page + /online-coaching/enquire; classes page restructured; supplied photos optimised into `public/images/raeng/` with a central manifest
+- [x] Removed hero video, carousel, old logo artwork and scripts; e2e rewritten for the new structure
+
+### Open (needs the owner)
+- [ ] P0 Confirm the venue, timetable, prices and coach details are unchanged under RAENG; confirm everyone in the supplied photos agrees to appear (and replace any frame that isn't OK)
+- [ ] P1 RAENG Instagram/Facebook handles, email, phone, domain (`SITE_URL`), a verified Resend sending domain named RAENG
+- [ ] P1 Alex's own words: background, qualifications, philosophy, motivation, brand story; a current portrait
+- [ ] P1 Booking/payment decision unchanged (see CORE.md open decisions): on-site request flow stays; Square not live
+- [ ] P2 Real RAENG logo artwork if one exists; Online coaching feature list, capacity/cancellation policy, testimonials

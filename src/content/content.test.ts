@@ -3,6 +3,9 @@ import { services } from "./services";
 import { timetable } from "./classes";
 import { faq } from "./faq";
 import { journey } from "./journey";
+import { coach } from "./coach";
+import { aboutStory } from "./about";
+import { testimonials } from "./community";
 
 // Guards against accidental publication: anything not yet approved by the
 // client must stay provisional. Update deliberately when Alex confirms.
@@ -45,6 +48,15 @@ describe("content approval state", () => {
   it("has unique ids within each list", () => {
     for (const ids of [services.map((s) => s.id), timetable.sessions.map((s) => s.id), faq.map((f) => f.id)]) {
       expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+
+  it("keeps unsupplied RAENG content out of the site", () => {
+    // Nothing has been supplied for these slots; none may be published until Alex confirms it.
+    expect(testimonials.filter((t) => t.status === "confirmed")).toEqual([]);
+    expect(aboutStory).toBeNull();
+    for (const field of [coach.background, coach.qualifications, coach.philosophy, coach.motivation]) {
+      expect(field === null || field.status === "provisional").toBe(true);
     }
   });
 });

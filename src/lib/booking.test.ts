@@ -125,7 +125,7 @@ describe("getBookingAction", () => {
 
 describe("getOnlineCoachingAction", () => {
   it("links to the onboarding journey only when it can be completed", () => {
-    expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching");
+    expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching/enquire");
     expect(getOnlineCoachingAction({}).href).toBe(ENQUIRY_HREF);
     // Always worded as an enquiry, never as signing up or starting.
     expect(getOnlineCoachingAction(formEnv).label).toBe("Enquire about online coaching");

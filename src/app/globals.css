@@ -126,60 +126,6 @@
 }
 
 /*
- * Hero headline: a soft halo and a slow sheen, like light moving across
- * polished steel. Monochrome only. Unlayered so it sets the headline colour
- * outright. Without background-clip: text it is plain paper (ink on desktop).
- * The sheen crosses in about 2.5 s, then rests; under reduced motion it never runs.
- */
-.hero-headline {
-  color: var(--color-paper);
-}
-
-@media (width >= 64rem) {
-  .hero-headline {
-    color: var(--color-ink);
-  }
-}
-
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .hero-headline {
-    /* Base #d4d1ca keeps over 12:1 against the ink fade; the band of pure white is the sheen. */
-    background-image: linear-gradient(105deg, #d4d1ca 0%, #d4d1ca 36%, #ffffff 50%, #d4d1ca 64%, #d4d1ca 100%);
-    background-size: 250% 100%;
-    background-position: 100% 0;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.4)) drop-shadow(0 0 22px rgb(246 244 239 / 0.35));
-    animation: hero-sheen 7s cubic-bezier(0.4, 0, 0.2, 1) 0.8s infinite;
-  }
-
-  /* Desktop: ink on paper, so a graphite sheen and no halo. */
-  @media (width >= 64rem) {
-    .hero-headline {
-      background-image: linear-gradient(105deg, var(--color-ink) 0%, var(--color-ink) 40%, #6b6862 50%, var(--color-ink) 60%, var(--color-ink) 100%);
-      filter: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-headline {
-      animation: none;
-    }
-  }
-}
-
-@keyframes hero-sheen {
-  0% {
-    background-position: 100% 0;
-  }
-  35%,
-  100% {
-    background-position: 0% 0;
-  }
-}
-
-/*
  * Scroll reveal (lib/reveal.ts). Elements marked data-reveal fade up the
  * first time they enter the viewport. Only active once the head script has
  * set html[data-reveal-ready], which it never does under reduced motion or

@@ -182,7 +182,7 @@ export async function createChargeLink(db: Db, square: SquareConfig, chargeId: s
 
   const made = await createPaymentLink(
     square,
-    { idempotencyKey: link.idempotency_key, name: charge.description, amountPence: link.amount_pence, note: `Alex K Bells ref ${link.id.slice(0, 8)}` },
+    { idempotencyKey: link.idempotency_key, name: charge.description, amountPence: link.amount_pence, note: `RAENG ref ${link.id.slice(0, 8)}` },
     fetchImpl,
   );
   if (!made.ok) {

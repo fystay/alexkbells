@@ -1,7 +1,18 @@
-# DESIGN — Alex K Bells
+# DESIGN — RAENG
 
 Tokens are defined once in `src/app/globals.css` (`@theme`). This file explains
 how to use them.
+
+## RAENG rebrand (2026-10-21) — supersedes anything below that conflicts
+
+- **Dark-first.** Pages are mostly `ink` bands with `paper` text; a cream (`paper`) or stone (`surface`) band breaks them up, and the closing CTA is cream so it stands out from the ink footer. Tokens are unchanged. Page order on home: hero (ink) → approach (paper) → find your training (ink) → community (surface) → coach (ink) → CTA (paper).
+- **Wordmark:** "RAENG" set in the site face, extra-bold, 112% width, tracked 0.2em (`Logo.tsx` → `Wordmark`). No logo image exists. The footer adds the three themes. Favicon/apple icon are an "R" on ink; the share image is the wordmark and themes (generated once, `public/og-image.png`).
+- **Photography:** colour, not greyscale. All photos go through `PhotoFrame` (`object-cover` around the focal point, rounded `rounded-xl` corners, ink fill while loading) and are listed by role in `src/content/images.ts` — swap files there, not in components. Square corners remain for full-bleed frames (phone hero).
+- **Navigation:** Home · Classes · 1:1 Coaching · Online Coaching · About RAENG (+ Contact in the phone menu/footer, Coach login). Desktop nav from `lg`; below that a Menu button. Current page is `aria-current="page"`. The homepage section tracker was removed.
+- **Pages:** `/` (hero, approach, find your training, community, coach, CTA), `/classes`, `/coaching` (1:1 only), `/online-coaching` (the service) with `/online-coaching/enquire` (the existing questionnaire; every "enquire" button points there), `/about`.
+- **Home hero:** photo + headline "Built through movement. / Defined by discipline.", primary "Explore Training" (jumps to `#find-your-training`), secondary "About RAENG"; the oversized wordmark below is decorative. The hero video, carousel, sheen animation, `WaysToTrain`, `HowToBook` and `HeroVideo` were removed.
+- Components `Hero`, `Philosophy`, `FindYourTraining`, `Community`, `CoachIntro` are in `src/components/home/`; `Steps`, `PhotoFrame` in `ui/`. `CtaBand` takes `tone` ("paper" default). `PageHeader` is now ink.
+- The component table below still describes some removed pieces (`WaysToTrain`, `HowToBook`, hero video notes in Imagery): treat those as history.
 
 ## Principles
 

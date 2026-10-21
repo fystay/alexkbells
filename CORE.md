@@ -1,10 +1,14 @@
-# CORE — Alex K Bells
+# CORE — RAENG
 
 Source of truth for the business, goals, constraints and open decisions.
 Values that appear on the website live in code (`src/content/`) — this file
 records *status*, not duplicate values.
 
 Last reviewed: 2026-10-19
+
+## RAENG rebrand (2026-10-21)
+
+The business is now **RAENG** (brand themes STRENGTH · COMMUNITY · DISCIPLINE; descriptor "Strength & Kettlebell Coaching"). Name and descriptor live in `src/content/site.ts`. Everything confirmed below (venue, timetable, prices, coach name, Instagram/Facebook) is carried over unchanged, **on the assumption that the rebrand did not change them**: confirm with the owner. The social handles are still `@alex.kbells`; no RAENG handle, email, phone, domain or logo artwork has been supplied. The wordmark is typeset (no image logo). The photographs in `public/images/raeng/` were supplied 2026-10-21 and show real people (consent to appear to be confirmed); four supplied frames showing another gym's signage were not used.
 
 ## Business
 

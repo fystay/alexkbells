@@ -7,73 +7,26 @@ import { coachLoginNav, mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
 
-/** Homepage sections linked from the menu ("/#ways-to-train" → "ways-to-train"). */
-const SECTION_IDS = mainNav.map((item) => item.href.slice(2));
-
-/**
- * The homepage section being read: the last menu section whose top has passed
- * 35% of the way down the screen. Null above the first (the hero) and on
- * other pages.
- */
-function useCurrentSection(pathname: string): string | null {
-  const [current, setCurrent] = useState<string | null>(null);
-  useEffect(() => {
-    if (pathname !== "/") return;
-    let frame = 0;
-    const update = () => {
-      const line = window.innerHeight * 0.35;
-      let found: string | null = null;
-      for (const id of SECTION_IDS) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        const { top, bottom } = el.getBoundingClientRect();
-        if (top <= line && bottom > line) found = id;
-      }
-      setCurrent(found);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    window.addEventListener("hashchange", onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      window.removeEventListener("hashchange", onScroll);
-    };
-  }, [pathname]);
-  return pathname === "/" ? current : null;
-}
-
-/**
- * aria-current for a menu link: "location" for the homepage section being
- * read, "page" for the page you're on.
- */
-function currentFor(pathname: string, section: string | null, href: string): "location" | "page" | undefined {
-  if (href.startsWith("/#")) return section === href.slice(2) ? "location" : undefined;
+/** "page" for the page you're on (a section's sub-pages count too); Home only matches exactly. */
+function currentFor(pathname: string, href: string): "page" | undefined {
+  if (href === "/") return pathname === "/" ? "page" : undefined;
   return pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined;
 }
 
 export function DesktopNav() {
   const pathname = usePathname();
-  const section = useCurrentSection(pathname);
   return (
-    <nav aria-label="Main" className="hidden xl:block">
-      <ul className="flex items-center gap-5 2xl:gap-7">
+    <nav aria-label="Main" className="hidden lg:block">
+      <ul className="flex items-center gap-5 xl:gap-8">
         {mainNav.map((item) => {
-          const current = currentFor(pathname, section, item.href);
-          const active = Boolean(current);
+          const active = Boolean(currentFor(pathname, item.href));
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                aria-current={current}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "relative inline-flex min-h-11 items-center whitespace-nowrap text-[0.8125rem] font-semibold uppercase tracking-[0.1em] transition-colors xl:text-sm",
                   "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
                   active
                     ? "text-paper after:scale-x-100"
@@ -92,15 +45,13 @@ export function DesktopNav() {
 
 export function MobileNav({ cta }: { cta: CallToAction }) {
   const pathname = usePathname();
-  const section = useCurrentSection(pathname);
   const [open, setOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
   const panelId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Close the menu whenever the route changes (e.g. back/forward). Links in the
-  // panel also close it on click: a same-page anchor like /#ways-to-train
-  // doesn't change the pathname, so the route check alone leaves it open.
+  // panel also close it on click, which covers a link to the page you're on.
   if (pathname !== lastPath) {
     setLastPath(pathname);
     setOpen(false);
@@ -119,7 +70,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   }, [open]);
 
   return (
-    <div className="xl:hidden">
+    <div className="lg:hidden">
       <button
         ref={buttonRef}
         type="button"
@@ -142,14 +93,13 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
         <nav aria-label="Main" className="container-page">
           <ul className="divide-y divide-line-inverse">
             {[...mainNav, ...pageNav].map((item) => {
-              const current = currentFor(pathname, section, item.href);
-              const active = Boolean(current);
+              const active = Boolean(currentFor(pathname, item.href));
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    aria-current={current}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
                       "relative flex min-h-14 items-center justify-between font-display text-2xl transition-colors",
                       active ? "text-paper" : "text-muted-inverse hover:text-paper",
@@ -164,7 +114,6 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
               );
             })}
           </ul>
-          {/* The original plain button (restored 2026-10-18 at the owner's request), not the split style used on the pages. */}
           <Link
             href={cta.href}
             onClick={() => setOpen(false)}
@@ -177,7 +126,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
           <Link
             href={coachLoginNav.href}
             onClick={() => setOpen(false)}
-            aria-current={currentFor(pathname, null, coachLoginNav.href)}
+            aria-current={currentFor(pathname, coachLoginNav.href)}
             className="mt-4 flex min-h-12 items-center justify-center border border-line-inverse px-6 text-sm font-semibold uppercase tracking-[0.08em] text-muted-inverse transition-colors hover:border-paper hover:text-paper"
           >
             {coachLoginNav.label}

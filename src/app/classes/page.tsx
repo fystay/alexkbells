@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { timetable } from "@/content/classes";
+import { timetable, groupClass } from "@/content/classes";
+import { faqAnswer } from "@/content/faq";
+import { images } from "@/content/images";
 import { site } from "@/content/site";
 import { isPublishable } from "@/lib/publish";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Timetable } from "@/components/sections/Timetable";
 import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
+import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
@@ -56,60 +60,67 @@ export default function ClassesPage() {
       : { title: "Come to Media House", body: `Classes take place at ${venue}.` },
   ];
 
+  // Everything below is Alex's class listing or the confirmed FAQ answers.
+  const involves = [
+    { title: "The sessions", body: groupClass.description },
+    { title: "Who they're for", body: "All experience levels. Exercises are scaled to your ability." },
+    { title: "Your first session", body: faqAnswer("first-session") },
+    { title: "What to bring", body: faqAnswer("bring") },
+  ];
+
   return (
     <>
       <PageHeader
-        image={site.pageImages.classes}
-        eyebrow="Group classes"
-        title="Kettlebell classes in Cumbernauld"
-        intro={classes.summary}
+        image={images.classes}
+        eyebrow="Classes"
+        title="Group kettlebell training"
+        intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
       >
-        <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="light" className="w-full sm:w-[22rem]" />
-        <ButtonLink href="#book" variant="text" className="self-center sm:ml-4">
+        <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="w-full sm:w-[22rem]" />
+        <ButtonLink href="#join" variant="text" tone="dark" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
       </PageHeader>
 
-      <Section id="timetable" labelledBy="timetable-heading">
-        <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
+      <Section id="what-to-expect" labelledBy="expect-heading">
+        <SectionHeading id="expect-heading" eyebrow="What to expect" title="Purposeful training, together" />
+        <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {involves.map((item) => (
+            <div key={item.title} data-reveal className="border-t border-ink pt-4">
+              <dt className="font-display text-h3">{item.title}</dt>
+              <dd className="mt-3 text-muted">{item.body}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      <Section tone="ink" id="timetable" labelledBy="timetable-heading">
+        <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" tone="ink" />
         <div className="mt-10">
-          <Timetable labelledBy="timetable-heading" />
+          <Timetable labelledBy="timetable-heading" tone="ink" />
         </div>
         {classes.prices.length > 0 ? (
           <div className="mt-12 max-w-md">
-            <PriceList prices={classes.prices} />
+            <PriceList prices={classes.prices} tone="ink" />
+            <p className="mt-3 text-sm text-muted-inverse">{groupClass.payment}</p>
           </div>
         ) : null}
       </Section>
 
-      <Section tone="ink" id="book" labelledBy="join-heading">
+      <Section id="join" labelledBy="join-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
-            <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
-            {open ? <InstagramAlternative tone="ink" className="mt-4" /> : null}
+            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" />
+            <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="light" className="mt-8 w-full sm:w-[22rem]" />
+            {open ? <InstagramAlternative tone="paper" className="mt-4" /> : null}
           </div>
-          <ol className="grid grid-cols-1 gap-8 lg:col-span-7">
-            {joinSteps.map((step, i) => (
-              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line-inverse pt-5">
-                <span className="eyebrow pt-1 text-muted-inverse" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="text-lg font-bold">{step.title}</h3>
-                  <p className="mt-2 text-muted-inverse">{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <Steps steps={joinSteps} className="lg:col-span-7" />
         </div>
       </Section>
 
       <Location />
-      <CtaBand
-        title="Prefer personal coaching?"
-        body="Personal coaching is available face to face in Cumbernauld or online."
-      />
+      <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
+      <CtaBand body="Prefer personal coaching? Train face to face or online." />
     </>
   );
 }

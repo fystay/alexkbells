@@ -5,6 +5,8 @@ export const publicRoutes = [
   "/coaching",
   "/contact",
   "/online-coaching",
+  "/online-coaching/enquire",
+  "/about",
   "/privacy",
   "/book",
   "/book/group-class",

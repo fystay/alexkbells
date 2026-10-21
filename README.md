@@ -1,6 +1,6 @@
-# Alex K Bells — website
+# RAENG — website
 
-Public website for Alex K Bells, kettlebell coach in Cumbernauld.
+Public website for RAENG (formerly Alex K Bells), strength and kettlebell coaching in Cumbernauld, Glasgow.
 Next.js 16 · TypeScript · Tailwind CSS v4.
 
 ## Getting started

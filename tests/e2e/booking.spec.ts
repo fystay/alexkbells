@@ -218,12 +218,14 @@ test.describe("booking prototype (demo availability)", () => {
 test.describe("online coaching onboarding", () => {
   test("site navigation → tailored questions → review → sent to Alex", async ({ page, request }) => {
     await page.goto("/");
-    await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Online coaching" }).click();
+    await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Online Coaching" }).click();
     await expect(page).toHaveURL(/\/online-coaching$/);
+    await page.getByRole("link", { name: "Enquire about online coaching" }).first().click();
+    await expect(page).toHaveURL(/\/online-coaching\/enquire$/);
     await expect(page.getByRole("radio", { name: /Get stronger/ })).toBeVisible();
     // Worded as an enquiry, never as signing up.
     await expect(page.getByRole("heading", { level: 1, name: "Ask about online coaching" })).toBeVisible();
-    await expect(page.getByText("This is an enquiry, not a sign-up: nothing is booked and there's nothing to pay.")).toBeVisible();
+    await expect(page.locator("p:visible", { hasText: "This is an enquiry, not a sign-up: nothing is booked and there's nothing to pay." })).toBeVisible();
     await expect(page.locator("main")).not.toContainText(/get started|sign up|join now/i);
     // Not a calendar booking.
     await expect(page.getByTestId("calendar-grid")).toHaveCount(0);
@@ -270,7 +272,7 @@ test.describe("online coaching onboarding", () => {
   });
 
   test("an email-service failure is reported, never shown as sent", async ({ page }) => {
-    await page.goto("/online-coaching");
+    await page.goto("/online-coaching/enquire");
     await choose(page, "Get stronger");
     await continueButton(page).click();
     await choose(page, "New to kettlebells");
@@ -286,7 +288,7 @@ test.describe("online coaching onboarding", () => {
 });
 
 test.describe("production configuration", () => {
-  for (const path of ["/", "/book", "/book/group-class", "/book/one-to-one", "/online-coaching", "/classes"]) {
+  for (const path of ["/", "/book", "/book/group-class", "/book/one-to-one", "/online-coaching", "/online-coaching/enquire", "/classes", "/about"]) {
     test(`${path} shows no demonstration availability or provisional content`, async ({ page }) => {
       await page.goto(PROD + path);
       await page.waitForLoadState("networkidle");

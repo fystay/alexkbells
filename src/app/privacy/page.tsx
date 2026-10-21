@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Notice",
-  description: "How Alex K Bells uses the details you send through the website.",
+  description: "How RAENG uses the details you send through the website.",
   path: "/privacy",
 });
 

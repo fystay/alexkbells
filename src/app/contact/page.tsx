@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
+import { images } from "@/content/images";
 import Link from "next/link";
 import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -10,7 +11,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Get in touch with Alex K Bells about group kettlebell classes, one-to-one coaching or online coaching in Cumbernauld.",
+    "Get in touch with RAENG about group kettlebell classes, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
   path: "/contact",
 });
 
@@ -22,15 +23,16 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
-        image={site.pageImages.contact}
+        image={images.communityFocus}
         eyebrow="Contact"
         title="Get in touch"
-        intro="Ask about group classes, one-to-one coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
+        intro="Ask about group classes, 1:1 coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
       >
         {/* The page's one action, in the first screen at every width. */}
         <ButtonLink
           href={site.social.instagram.url}
           external
+          tone="dark"
           className="w-full whitespace-normal text-center sm:w-auto sm:whitespace-nowrap"
         >
           Message Alex on Instagram
@@ -60,7 +62,7 @@ export default function ContactPage() {
                 Send a direct message on Instagram. It helps to include:
               </p>
               <ul className="mt-3 max-w-md list-disc space-y-1 pl-5 text-muted-inverse marker:text-muted-inverse">
-                <li>What you are interested in: group classes, one-to-one or online coaching</li>
+                <li>What you are interested in: group classes, 1:1 or online coaching</li>
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>

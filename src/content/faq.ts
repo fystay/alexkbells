@@ -72,3 +72,10 @@ export const faq: FaqItem[] = [
     status: "confirmed",
   },
 ];
+
+/** One answer by id, so pages quote the FAQ instead of repeating it. */
+export function faqAnswer(id: string): string {
+  const item = faq.find((f) => f.id === id);
+  if (!item) throw new Error(`Unknown FAQ item: ${id}`);
+  return item.answer;
+}
