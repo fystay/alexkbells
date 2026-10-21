@@ -16,8 +16,8 @@ export function SiteFooter() {
         <div className="col-span-2 lg:order-1 lg:col-span-5">
           <Logo variant="lockup" tone="dark" />
           <p className="mt-5 max-w-sm text-sm text-muted-inverse">
-            Purposeful strength training and coaching in Cumbernauld, Glasgow: group classes,
-            1:1 coaching and online coaching.
+            Kettlebell classes in Cumbernauld, Glasgow, with flexible memberships, plus 1:1
+            and online coaching.
           </p>
         </div>
 

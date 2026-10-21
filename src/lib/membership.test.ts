@@ -1,0 +1,39 @@
+import { describe, expect, it } from "vitest";
+import { membershipPlans } from "@/content/memberships";
+import { getService } from "@/content/services";
+import { formatPenceShort, planFigures } from "./membership";
+
+const payg = getService("group-classes").prices[0].amountGbp;
+
+// The figures supplied by the owner on 2026-10-21 (class price £12).
+const expected = {
+  starter: { price: 40, credits: 4, payg: "£48", saving: "£8", perClass: "£10" },
+  regular: { price: 65, credits: 8, payg: "£96", saving: "£31", perClass: "£8.13" },
+  dedicated: { price: 85, credits: 12, payg: "£144", saving: "£59", perClass: "£7.08" },
+};
+
+describe("membership figures", () => {
+  it("pay as you go is £12 per class", () => {
+    expect(payg).toBe(12);
+  });
+
+  it.each(membershipPlans)("$name matches the owner's figures", (plan) => {
+    const want = expected[plan.id];
+    expect(plan.priceGbp).toBe(want.price);
+    expect(plan.credits).toBe(want.credits);
+    const f = planFigures(plan, payg);
+    expect(formatPenceShort(f.payAsYouGoPence)).toBe(want.payg);
+    expect(formatPenceShort(f.savingPence)).toBe(want.saving);
+    expect(formatPenceShort(f.perClassPence)).toBe(want.perClass);
+  });
+
+  it("rounds a half-penny up, to the nearest penny", () => {
+    expect(planFigures({ id: "regular", name: "x", priceGbp: 65, credits: 8 }, 12).perClassPence).toBe(813);
+  });
+
+  it("only highlights a plan with the lowest cost per class", () => {
+    const cost = (p: (typeof membershipPlans)[number]) => planFigures(p, payg).perClassPence;
+    const lowest = Math.min(...membershipPlans.map(cost));
+    for (const p of membershipPlans.filter((p) => p.highlight)) expect(cost(p)).toBe(lowest);
+  });
+});

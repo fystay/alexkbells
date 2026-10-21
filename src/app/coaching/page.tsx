@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -47,7 +46,6 @@ export default function CoachingPage() {
   return (
     <>
       <PageHeader
-        image={images.oneToOne}
         eyebrow="1:1 Coaching"
         title="Coaching built around you"
         intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."

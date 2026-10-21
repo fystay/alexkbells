@@ -3,6 +3,16 @@
 Tokens are defined once in `src/app/globals.css` (`@theme`). This file explains
 how to use them.
 
+## Kettlebell Club redesign (2026-10-21, later) — supersedes the dark-first notes below
+
+- **Palette (four colours):** black (`ink`: header, footer, hero fade, contrast bands, the highlighted plan), warm cream (`paper`: the main surface), white (`white` section tone: the memberships section and one band on About), muted grey (`surface`/`muted`/`line`: secondary text, dividers, the pay-as-you-go card). No other colours.
+- **Minimal imagery:** the hero (film or still), the coach's before-and-after pair, and one photograph on the Classes header (desktop only). Everything else is type on hairlines. All photos go through `PhotoFrame`; roles in `content/images.ts`; the film in `content/media.ts`.
+- **Hero:** full-bleed, 100svh minus header (min 32 rem, max 60 rem), a dark fade, text low-left, "Book now" + "View memberships". `HeroVideo` (client): autoplay muted loop, visible pause control, poster for reduced motion.
+- **Logo:** the supplied artwork. Header: cream monogram + live "RAENG / KETTLEBELL CLUB" text; footer: cream lockup. Black versions exist for light surfaces. Favicon: black monogram on cream.
+- **Memberships:** `MembershipCards` (1 column phones, 2 tablets, 4 from `xl`). Each card: name, £ per 4 weeks, credits, cost per class, pay-as-you-go equivalent, saving, and a two-bar comparison (decorative; the figures are text). The one highlight ("Best value" on Dedicated) must be true of the figures (a test checks it is the lowest cost per class). Buttons say "Enquire" (accessible name "Enquire about Starter").
+- **Navigation:** Home · Classes · Memberships · 1:1 Coaching · Online Coaching · About RAENG; the desktop bar shows from `xl`, below that the Menu button.
+- **Home order:** hero → the club (paper) → coach and journey (ink) → find your training (paper) → memberships (white) → closing CTA (ink).
+
 ## RAENG rebrand (2026-10-21) — supersedes anything below that conflicts
 
 - **Dark-first.** Pages are mostly `ink` bands with `paper` text; a cream (`paper`) or stone (`surface`) band breaks them up, and the closing CTA is cream so it stands out from the ink footer. Tokens are unchanged. Page order on home: hero (ink) → approach (paper) → find your training (ink) → community (surface) → coach (ink) → CTA (paper).

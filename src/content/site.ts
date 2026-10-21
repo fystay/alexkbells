@@ -4,11 +4,30 @@
  */
 export const site = {
   name: "RAENG",
-  descriptor: "Strength & Kettlebell Coaching",
+  descriptor: "Kettlebell Club",
+  /** "RAENG" is Thai (แรง) for strength. Shown on the logo; not used as page text. */
+  thai: "แรง",
   /** Brand themes, shown together as "STRENGTH · COMMUNITY · DISCIPLINE". */
   themes: ["Strength", "Community", "Discipline"] as const,
   description:
-    "RAENG: purposeful strength training and coaching in Cumbernauld, Glasgow. Group kettlebell classes, one-to-one coaching and online coaching.",
+    "RAENG Kettlebell Club in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and online coaching.",
+
+  /**
+   * The supplied logo (assets/brand/raeng-logo-source.jpg), cut into
+   * transparent black and cream versions. Black art goes on cream surfaces,
+   * cream art on black ones. Never recolour or retype it.
+   */
+  logo: {
+    mark: {
+      black: { src: "/brand/raeng-mark-black.png", width: 316, height: 258 },
+      cream: { src: "/brand/raeng-mark-cream.png", width: 316, height: 258 },
+    },
+    lockup: {
+      black: { src: "/brand/raeng-lockup-black.png", width: 760, height: 645 },
+      cream: { src: "/brand/raeng-lockup-cream.png", width: 760, height: 645 },
+      alt: "RAENG Kettlebell Club. Strength, community, discipline.",
+    },
+  },
 
   location: {
     venue: "Media House",
@@ -50,6 +69,7 @@ export const site = {
 export const mainNav = [
   { label: "Home", href: "/" },
   { label: "Classes", href: "/classes" },
+  { label: "Memberships", href: "/memberships" },
   { label: "1:1 Coaching", href: "/coaching" },
   { label: "Online Coaching", href: "/online-coaching" },
   { label: "About RAENG", href: "/about" },

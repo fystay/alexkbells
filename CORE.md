@@ -6,6 +6,18 @@ records *status*, not duplicate values.
 
 Last reviewed: 2026-10-19
 
+## Kettlebell Club redesign (2026-10-21, later)
+
+New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettlebell, RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE); transparent black and cream versions in `public/brand/`. Descriptor is now **Kettlebell Club**. Owner's memberships brief (supersedes the earlier dark-first direction and the £10 class price):
+
+| Item | Status | Notes |
+|---|---|---|
+| Pay as you go | C | **£12 per class** (was £10; changed by the owner 2026-10-21). Shown wherever the class price appears, including the booking flow and the coach portal's default |
+| Starter £40 / 4 weeks, 4 credits · Regular £65, 8 credits · Dedicated £85, 12 credits | C | Per-class cost (£10 / £8.13 / £7.08) and savings (£8 / £31 / £59) are **calculated** from price × credits against £12 (`lib/membership.ts`, tested against the owner's figures) |
+| Membership terms and cancellation policy | C | Published as written in `content/policy.ts` |
+| Membership sign-up, auto-renewal billing, credit accounts | U | **Nothing is built.** Buttons are enquiries to /contact; set `MEMBERSHIP_URL` (https) to link a real sign-up page later. The terms say memberships renew automatically and credits are returned to "your account": that needs a real billing and credit system before it is true in practice |
+| Hero film | U | Not yet supplied. The hero shows a still photograph until `content/media.ts` is filled in |
+
 ## RAENG rebrand (2026-10-21)
 
 The business is now **RAENG** (brand themes STRENGTH · COMMUNITY · DISCIPLINE; descriptor "Strength & Kettlebell Coaching"). Name and descriptor live in `src/content/site.ts`. Everything confirmed below (venue, timetable, prices, coach name, Instagram/Facebook) is carried over unchanged, **on the assumption that the rebrand did not change them**: confirm with the owner. The social handles are still `@alex.kbells`; no RAENG handle, email, phone, domain or logo artwork has been supplied. The wordmark is typeset (no image logo). The photographs in `public/images/raeng/` were supplied 2026-10-21 and show real people (consent to appear to be confirmed); four supplied frames showing another gym's signage were not used.

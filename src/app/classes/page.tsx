@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { timetable, groupClass } from "@/content/classes";
@@ -103,6 +104,9 @@ export default function ClassesPage() {
           <div className="mt-12 max-w-md">
             <PriceList prices={classes.prices} tone="ink" />
             <p className="mt-3 text-sm text-muted-inverse">{groupClass.payment}</p>
+            <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em] text-paper underline underline-offset-[6px] hover:no-underline">
+              Save with a membership <span aria-hidden="true" className="ml-2">→</span>
+            </Link>
           </div>
         ) : null}
       </Section>
@@ -120,7 +124,7 @@ export default function ClassesPage() {
 
       <Location />
       <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
-      <CtaBand body="Prefer personal coaching? Train face to face or online." />
+      <CtaBand tone="paper" body="Prefer personal coaching? Train face to face or online." />
     </>
   );
 }

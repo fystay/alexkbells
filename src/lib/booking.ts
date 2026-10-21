@@ -153,3 +153,15 @@ export function getOnlineCoachingAction(env: Env = process.env): CallToAction {
   const href = onlineEnquiryMode(env) === "unavailable" ? ENQUIRY_HREF : ONLINE_COACHING_HREF;
   return { kind: "enquiry", label: "Enquire about online coaching", href, external: false };
 }
+
+/**
+ * Every membership button. Memberships renew automatically, which needs a
+ * real billing set-up that doesn't exist yet, so until MEMBERSHIP_URL (an
+ * https sign-up page, e.g. a Square subscription link) is set this is an
+ * enquiry to /contact. It never pretends anyone has joined or paid.
+ */
+export function getMembershipAction(planName: string, env: Env = process.env): CallToAction {
+  const url = parseBookingUrl(env.MEMBERSHIP_URL);
+  if (url) return { kind: "booking", label: `Join ${planName}`, href: url.toString(), external: true };
+  return { kind: "enquiry", label: `Enquire about ${planName}`, href: ENQUIRY_HREF, external: false };
+}

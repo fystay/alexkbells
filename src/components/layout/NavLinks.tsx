@@ -16,8 +16,8 @@ function currentFor(pathname: string, href: string): "page" | undefined {
 export function DesktopNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Main" className="hidden lg:block">
-      <ul className="flex items-center gap-5 xl:gap-8">
+    <nav aria-label="Main" className="hidden xl:block">
+      <ul className="flex items-center gap-5 2xl:gap-8">
         {mainNav.map((item) => {
           const active = Boolean(currentFor(pathname, item.href));
           return (
@@ -70,7 +70,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   }, [open]);
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         ref={buttonRef}
         type="button"

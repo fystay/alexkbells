@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
 
-export const DEFAULT_TITLE = `${site.name} | Strength & Kettlebell Coaching in Cumbernauld, Glasgow`;
+export const DEFAULT_TITLE = `${site.name} ${site.descriptor} | Kettlebell Classes in Cumbernauld, Glasgow`;
 
 /** Social preview image (generated from the logo by scripts/brand_assets.py). */
 const shareImage = {

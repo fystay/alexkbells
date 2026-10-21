@@ -46,7 +46,7 @@ export function StartTraining({ href, label, srSuffix, external = false, tone = 
         className,
       )}
     >
-      <span className={cn("flex-1 text-left", large ? "pl-5" : "pl-4")}>
+      <span className={cn("flex-1 text-left", large ? "pl-5" : "whitespace-nowrap pl-4")}>
         {label}
         {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </span>

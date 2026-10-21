@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { CoachIntro } from "@/components/home/CoachIntro";
-import { Community } from "@/components/home/Community";
+import { CoachStory } from "@/components/home/CoachStory";
 import { FindYourTraining } from "@/components/home/FindYourTraining";
 import { Hero } from "@/components/home/Hero";
-import { Philosophy } from "@/components/home/Philosophy";
+import { Statement } from "@/components/home/Statement";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { MembershipSection } from "@/components/memberships/MembershipSection";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
@@ -14,10 +14,10 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Philosophy />
+      <Statement />
+      <CoachStory />
       <FindYourTraining />
-      <Community />
-      <CoachIntro />
+      <MembershipSection />
       <CtaBand />
     </>
   );

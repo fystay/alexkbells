@@ -19,17 +19,20 @@ interface PhotoFrameProps {
  * while the image loads. Decorative frames pass alt="" via a photo whose alt is empty.
  */
 export function PhotoFrame({ photo, sizes, className, priority = false, square = false }: PhotoFrameProps) {
+  // `className` may position the frame (e.g. "absolute inset-0"), so the image sits in an inner box that always fills it.
   return (
-    <div className={cn("relative overflow-hidden bg-ink-soft", !square && "rounded-xl", className)}>
-      <Image
-        src={photo.src}
-        alt={photo.alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className="object-cover"
-        style={photo.position ? { objectPosition: photo.position } : undefined}
-      />
+    <div className={cn("overflow-hidden bg-ink-soft", !square && "rounded-xl", className)}>
+      <div className="relative size-full">
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className="object-cover"
+          style={photo.position ? { objectPosition: photo.position } : undefined}
+        />
+      </div>
     </div>
   );
 }

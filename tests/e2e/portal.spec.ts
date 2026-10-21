@@ -128,10 +128,10 @@ test("confirming a class request creates the client, books the place, and paymen
   await row.getByRole("button", { name: "Attended" }).click();
   await expect(row.getByText("Attended", { exact: true })).toBeVisible();
 
-  // A £5 part payment, then the rest.
+  // A £7 part payment (of the £12 class), then the rest.
   await row.getByRole("link", { name: "Record payment" }).click();
-  await expect(page.getByLabel("Amount received")).toHaveValue("10");
-  await page.getByLabel("Amount received").fill("5");
+  await expect(page.getByLabel("Amount received")).toHaveValue("12");
+  await page.getByLabel("Amount received").fill("7");
   await page.getByRole("button", { name: "Record payment" }).click();
   await expect(page.getByText("Payment recorded.")).toBeVisible();
 
@@ -153,7 +153,7 @@ test("confirming a class request creates the client, books the place, and paymen
   await expect(page.getByRole("status").filter({ hasText: "Refund recorded." })).toBeVisible();
 
   await page.goto(`/coach/clients/${clientId}?tab=payments`);
-  await expect(page.getByRole("listitem").filter({ hasText: "Total received" }).getByText("£5.00")).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: "Total received" }).getByText("£7.00")).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Due later" }).getByText("£5.00")).toBeVisible();
 });
 

@@ -3,7 +3,7 @@ import type { Service } from "./types";
 /**
  * Coaching offers. Descriptions use only previously published wording.
  * Prices confirmed by the project owner on 2026-10-15 (the figures from the
- * original brief); the group class price (£10 per person) on 2026-10-17.
+ * original brief); the group class price (£10 per person) on 2026-10-17, raised to £12 per class by the owner on 2026-10-21 (memberships brief).
  */
 export const services: Service[] = [
   {
@@ -18,7 +18,7 @@ export const services: Service[] = [
       {
         status: "confirmed",
         label: "Per class",
-        amountGbp: 10,
+        amountGbp: 12,
         unit: "per person",
       },
     ],

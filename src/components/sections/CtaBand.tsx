@@ -17,7 +17,7 @@ interface CtaBandProps {
   titleSecondary?: string;
   body?: string;
   headingId?: string;
-  /** The band's surface. Cream by default so it stands out from the ink footer below it. */
+  /** The band's surface. Black by default; cream where the section above is dark. */
   tone?: "paper" | "ink";
 }
 
@@ -32,7 +32,7 @@ export function CtaBand({
   titleSecondary = "Build with discipline.",
   body,
   headingId = "cta-heading",
-  tone = "paper",
+  tone = "ink",
 }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCta();

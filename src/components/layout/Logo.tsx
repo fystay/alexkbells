@@ -1,41 +1,59 @@
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/content/site";
 import { cn } from "@/lib/cn";
 
 interface LogoProps {
-  /** mark: the wordmark alone (header). lockup: wordmark with the three themes beneath (footer). */
+  /** mark: the R monogram with the name beside it (header). lockup: the full supplied logo (footer). */
   variant?: "mark" | "lockup";
-  /** Surface behind the logo. */
+  /** Surface behind the logo: "dark" uses the cream artwork, "light" the black. */
   tone?: "dark" | "light";
   className?: string;
+  priority?: boolean;
 }
 
 /**
- * RAENG is set as type, not drawn: heavy, wide capitals in the site's own
- * typeface, tracked out. There is no logo artwork to keep in sync; if one is
- * supplied later, replace the contents of this component.
+ * The supplied artwork, in the version that suits the surface. The header
+ * pairs the monogram with the name as live text so it stays sharp and
+ * readable at small sizes; the footer shows the whole lockup.
  */
-export function Wordmark({ className }: { className?: string }) {
-  return (
-    // Negative right margin cancels the trailing letter-spacing so the word centres.
-    <span className={cn("mr-[-0.2em] whitespace-nowrap font-extrabold uppercase tracking-[0.2em] [font-stretch:112%]", className)}>
-      {site.name}
-    </span>
-  );
-}
-
-export function Logo({ variant = "mark", tone = "dark", className }: LogoProps) {
+export function Logo({ variant = "mark", tone = "dark", className, priority = false }: LogoProps) {
+  const art = tone === "dark" ? "cream" : "black";
   const muted = tone === "dark" ? "text-muted-inverse" : "text-muted";
+  const { logo } = site;
+
   return (
     <Link
       href="/"
-      className={cn("inline-flex min-h-11 flex-col justify-center leading-none", className)}
-      aria-label={`${site.name}, home`}
+      className={cn("inline-flex min-h-11 items-center gap-3", className)}
+      aria-label={`${site.name} ${site.descriptor}, home`}
     >
-      <Wordmark className={variant === "lockup" ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl"} />
       {variant === "lockup" ? (
-        <span className={cn("eyebrow mt-3 text-[0.6875rem]", muted)}>{site.themes.join(" · ")}</span>
-      ) : null}
+        <Image
+          src={logo.lockup[art].src}
+          alt=""
+          width={logo.lockup[art].width}
+          height={logo.lockup[art].height}
+          sizes="224px"
+          className="h-auto w-44 sm:w-52"
+        />
+      ) : (
+        <>
+          <Image
+            src={logo.mark[art].src}
+            alt=""
+            width={logo.mark[art].width}
+            height={logo.mark[art].height}
+            priority={priority}
+            sizes="64px"
+            className="h-8 w-auto sm:h-9"
+          />
+          <span className="flex flex-col leading-none">
+            <span className="text-lg font-extrabold uppercase tracking-[0.18em] [font-stretch:112%] sm:text-xl">{site.name}</span>
+            <span className={cn("eyebrow mt-1 hidden text-[0.5625rem] tracking-[0.3em] 2xs:block", muted)}>{site.descriptor}</span>
+          </span>
+        </>
+      )}
     </Link>
   );
 }

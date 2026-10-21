@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { images } from "@/content/images";
 import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -40,7 +39,6 @@ export default function OnlineCoachingPage() {
   return (
     <>
       <PageHeader
-        image={images.online}
         eyebrow="Online coaching"
         title="Coaching that goes where you train"
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."

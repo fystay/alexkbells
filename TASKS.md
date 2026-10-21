@@ -143,6 +143,12 @@ See Coach portal below.
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
 
+## Kettlebell Club redesign (2026-10-21, later)
+- [x] New logo (black/cream), cream-led palette, hero video support, /memberships (cards, terms, cancellation policy), coach + before/after on home, minimal imagery, £12 class price, tests
+- [ ] P0 Supply the hero film (`content/media.ts`) and confirm the before/after and hero photos may be used
+- [ ] P0 Decide how memberships are sold and billed (Square Subscriptions? manual?) and build credits/renewals; until then buttons are enquiries. Check the auto-renew and "credit returned to your account" wording against what actually happens
+- [ ] P1 Check the £12 price in the coach portal's stored data (`akb_` tables keep their own per-class price if one was saved)
+
 ## RAENG rebrand (2026-10-21)
 
 ### Done

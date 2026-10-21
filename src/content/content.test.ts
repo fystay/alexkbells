@@ -15,7 +15,7 @@ describe("content approval state", () => {
       .flatMap((s) => s.prices.map((p) => `${s.id}:${p.label}:${p.amountGbp}:${p.status}`))
       .sort();
     expect(confirmed).toEqual([
-      "group-classes:Per class:10:confirmed",
+      "group-classes:Per class:12:confirmed",
       "one-to-one:Four sessions:130:confirmed",
       "one-to-one:Single session:35:confirmed",
       "online-coaching:Monthly:79:confirmed",

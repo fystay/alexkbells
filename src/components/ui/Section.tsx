@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export type SectionTone = "paper" | "surface" | "ink";
+export type SectionTone = "paper" | "surface" | "white" | "ink";
 
 const toneClasses: Record<SectionTone, string> = {
   paper: "bg-paper text-ink",
   surface: "bg-surface text-ink",
+  white: "bg-white text-ink",
   ink: "bg-ink text-paper",
 };
 
