@@ -18,6 +18,13 @@ New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettleb
 | Membership sign-up, auto-renewal billing, credit accounts | U | **Nothing is built.** Buttons are enquiries to /contact; set `MEMBERSHIP_URL` (https) to link a real sign-up page later. The terms say memberships renew automatically and credits are returned to "your account": that needs a real billing and credit system before it is true in practice |
 | Hero film | C | Supplied 2026-10-21 (12 vertical phone clips, 464×832 or 576×1024). Used: one, cut to 8.8 s, silent (`public/media/hero.mp4/.webm`, poster `hero-poster.jpg`, `content/media.ts`). It shows a class swinging together; no signage in frame; people shown must be happy to appear. The other 11 are unused: most show another gym's APEX | FREQUENCY signage and are low-resolution |
 
+## Master redesign brief (2026-10-22)
+
+- Class schedule changed by the owner: **Monday 6:30 pm, Wednesday 6:30 pm, Saturday 9:00 am** (Saturday was 10:15). Single source: `content/classes.ts`.
+- The brief is titled "Alex K Bells" and names the old Lovable site; the owner's earlier instruction and supplied logo make the brand **RAENG Kettlebell Club**, which is kept. Confirm.
+- Regular's cost per class is £8.125; the site shows £8.13 (nearest penny), Dedicated £7.08.
+- Square: subscriptions (four-weekly billing), member credits and self-service booking are **not built**. The Square developer docs could not be reached from the build environment, so the Subscriptions API was not verified; nothing is faked. What exists and is tested: bookings as requests that Alex confirms (capacity enforced in the database when set per class), Square payment links per charge with verified webhooks (sandbox only), manual subscriptions and check-ins in the coach portal.
+
 ## RAENG rebrand (2026-10-21)
 
 The business is now **RAENG** (brand themes STRENGTH · COMMUNITY · DISCIPLINE; descriptor "Strength & Kettlebell Coaching"). Name and descriptor live in `src/content/site.ts`. Everything confirmed below (venue, timetable, prices, coach name, Instagram/Facebook) is carried over unchanged, **on the assumption that the rebrand did not change them**: confirm with the owner. The social handles are still `@alex.kbells`; no RAENG handle, email, phone, domain or logo artwork has been supplied. The wordmark is typeset (no image logo). The photographs in `public/images/raeng/` were supplied 2026-10-21 and show real people (consent to appear to be confirmed); four supplied frames showing another gym's signage were not used.

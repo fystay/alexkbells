@@ -28,9 +28,7 @@ export function DesktopNav() {
                 className={cn(
                   "relative inline-flex min-h-11 items-center whitespace-nowrap text-[0.8125rem] font-semibold uppercase tracking-[0.1em] transition-colors xl:text-sm",
                   "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
-                  active
-                    ? "text-paper after:scale-x-100"
-                    : "text-muted-inverse after:scale-x-0 hover:text-paper hover:after:scale-x-100",
+                  active ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",
                 )}
               >
                 {item.label}
@@ -77,7 +75,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold uppercase tracking-[0.1em] text-paper"
+        className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold uppercase tracking-[0.1em] "
       >
         {open ? "Close" : "Menu"}
         <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -88,10 +86,10 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line-inverse bg-ink pb-8 sm:h-[calc(100dvh-5rem)]"
+        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-5rem)]"
       >
         <nav aria-label="Main" className="container-page">
-          <ul className="divide-y divide-line-inverse">
+          <ul className="divide-y divide-grey">
             {[...mainNav, ...pageNav].map((item) => {
               const active = Boolean(currentFor(pathname, item.href));
               return (
@@ -100,15 +98,12 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
                     href={item.href}
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "relative flex min-h-14 items-center justify-between font-display text-2xl transition-colors",
-                      active ? "text-paper" : "text-muted-inverse hover:text-paper",
-                    )}
+                    className={cn("relative flex min-h-14 items-center justify-between font-display text-2xl", !active && "hover:underline")}
                   >
                     {/* A bar in the gutter marks where you are. */}
-                    {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-paper sm:-left-6" /> : null}
+                    {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-ink sm:-left-6" /> : null}
                     {item.label}
-                    {active ? <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-paper" /> : null}
+                    {active ? <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-ink" /> : null}
                   </Link>
                 </li>
               );
@@ -118,7 +113,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             href={cta.href}
             onClick={() => setOpen(false)}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-6 flex min-h-12 items-center justify-center bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-[background-color] duration-200 hover:bg-white focus-visible:outline-paper active:translate-y-px"
+            className="mt-6 flex min-h-12 items-center justify-center rounded-md border border-ink bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-white hover:text-ink active:translate-y-px"
           >
             {cta.label}
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
@@ -127,7 +122,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             href={coachLoginNav.href}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, coachLoginNav.href)}
-            className="mt-4 flex min-h-12 items-center justify-center border border-line-inverse px-6 text-sm font-semibold uppercase tracking-[0.08em] text-muted-inverse transition-colors hover:border-paper hover:text-paper"
+            className="mt-4 flex min-h-12 items-center justify-center rounded-md border border-grey px-6 text-sm font-semibold uppercase tracking-[0.08em] hover:border-ink"
           >
             {coachLoginNav.label}
           </Link>

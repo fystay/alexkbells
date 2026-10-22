@@ -24,10 +24,10 @@ export function coachDetails() {
 function Frame({ photo, label }: { photo: Photo; label: string }) {
   return (
     <figure className="relative">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-ink-soft">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-paper">
         <Image src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 28vw, 50vw" className="object-cover" />
       </div>
-      <figcaption className="eyebrow absolute bottom-4 left-4 rounded-full bg-ink/70 px-3 py-1.5 text-paper backdrop-blur">{label}</figcaption>
+      <figcaption className="eyebrow absolute bottom-3 left-3 rounded bg-paper px-2 py-1 text-ink">{label}</figcaption>
     </figure>
   );
 }
@@ -44,25 +44,25 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
 
   return (
     <Provisional status={showJourney ? journey.status : "confirmed"}>
-      <Section tone="raised" id="coach" labelledBy="coach-heading">
+      <Section tone="white" id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
           <div className="lg:col-span-6">
-            <p className="eyebrow mb-4 text-muted-inverse">Meet your coach</p>
+            <p className="eyebrow mb-4 ">Meet your coach</p>
             <Heading id="coach-heading" className="font-display text-h1 text-balance">
               {coach.name}
             </Heading>
-            <p className="mt-6 max-w-xl text-lede text-muted-inverse">{coach.summary}</p>
+            <p className="mt-6 max-w-xl text-lede ">{coach.summary}</p>
             {showJourney ? (
-              <div className="mt-8 max-w-xl border-t border-line-inverse pt-6">
+              <div className="mt-8 max-w-xl border-t border-grey pt-6">
                 <h3 className="font-display text-h3">{journey.title}</h3>
-                <p className="mt-3 text-muted-inverse">{journey.intro}</p>
+                <p className="mt-3 ">{journey.intro}</p>
               </div>
             ) : null}
             {details.length > 0 ? (
-              <dl className="mt-8 max-w-xl space-y-6 border-t border-line-inverse pt-6">
+              <dl className="mt-8 max-w-xl space-y-6 border-t border-grey pt-6">
                 {details.map((d) => (
                   <div key={d.label}>
-                    <dt className="eyebrow text-muted-inverse">{d.label}</dt>
+                    <dt className="eyebrow ">{d.label}</dt>
                     {d.paragraphs.map((text) => (
                       <dd key={text} className="mt-2">
                         {text}
@@ -72,16 +72,16 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
                 ))}
               </dl>
             ) : null}
-            <ButtonLink href="/about" tone="dark" variant="secondary" className="mt-10 w-full sm:w-auto">
+            <ButtonLink href="/about" variant="secondary" className="mt-10 w-full sm:w-auto">
               About RAENG
             </ButtonLink>
-            <p className="mt-6 flex flex-wrap items-center gap-x-5 text-sm text-muted-inverse">
-              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold text-paper underline underline-offset-4 hover:no-underline focus-visible:outline-paper">
+            <p className="mt-6 flex flex-wrap items-center gap-x-5 text-sm ">
+              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
                 Instagram {site.social.instagram.handle}
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
               <span>{site.social.instagram.followers} followers</span>
-              <a href={site.social.facebook.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold text-paper underline underline-offset-4 hover:no-underline focus-visible:outline-paper">
+              <a href={site.social.facebook.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
                 Facebook<span className="sr-only"> ({site.social.facebook.name}, opens in a new tab)</span>
               </a>
             </p>
@@ -92,7 +92,7 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
                 <Frame photo={photos.before} label={journey.beforeLabel} />
                 <Frame photo={photos.after} label={journey.afterLabel} />
               </div>
-              <p className="mt-3 text-sm text-muted-inverse">{journey.caption}</p>
+              <p className="mt-3 text-sm ">{journey.caption}</p>
             </div>
           ) : null}
         </div>

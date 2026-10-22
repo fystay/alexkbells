@@ -54,9 +54,9 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
 
         <div className="mt-8 lg:mt-10">
           {external ? (
-            <div className="max-w-2xl bg-ink p-8 text-paper sm:p-10">
-              <p className="text-lede text-muted-inverse">Bookings are taken on Alex&apos;s booking page.</p>
-              <ButtonLink href={external.toString()} external tone="dark" className="mt-6">
+            <div className="max-w-2xl rounded-lg border border-grey bg-white p-8 sm:p-10">
+              <p className="text-lede">Bookings are taken on Alex&apos;s booking page.</p>
+              <ButtonLink href={external.toString()} external className="mt-6">
                 Continue to booking
               </ButtonLink>
             </div>

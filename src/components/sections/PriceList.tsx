@@ -19,13 +19,13 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
 
   if (visible.length === 0) {
     return (
-      <p className="text-sm text-muted-inverse">
+      <p className="text-sm ">
         {linkContact ? (
-          <Link href="/contact" className="font-semibold text-paper underline underline-offset-4">
+          <Link href="/contact" className="font-semibold  underline underline-offset-4">
             Get in touch
           </Link>
         ) : (
-          <span className="font-semibold text-paper">Get in touch</span>
+          <span className="font-semibold ">Get in touch</span>
         )}{" "}
         for current pricing.
       </p>
@@ -36,14 +36,14 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
 
   return (
     <Provisional status={status}>
-      <dl className="divide-y divide-line-inverse border-y border-line-inverse">
+      <dl className="divide-y divide-grey border-y border-grey">
         {visible.map((price) => (
           <div key={price.label} className="flex items-baseline justify-between gap-4 py-5">
-            <dt className="text-sm text-muted-inverse">{price.label}</dt>
+            <dt className="text-sm ">{price.label}</dt>
             <dd className="text-right">
-              {price.prefix ? <span className="mr-1.5 text-sm text-muted-inverse">{price.prefix}</span> : null}
+              {price.prefix ? <span className="mr-1.5 text-sm">{price.prefix}</span> : null}
               <span className="text-2xl font-medium tabular-nums">{formatGbp(price.amountGbp)}</span>
-              <span className="ml-1.5 text-sm text-muted-inverse">{price.unit}</span>
+              <span className="ml-1.5 text-sm ">{price.unit}</span>
             </dd>
           </div>
         ))}

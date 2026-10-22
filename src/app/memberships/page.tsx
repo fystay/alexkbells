@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SitePage } from "@/components/ui/SitePage";
 import { pageMetadata } from "@/lib/metadata";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -19,23 +18,23 @@ export const metadata: Metadata = pageMetadata({
 export default function MembershipsPage() {
   const booking = getPrimaryCtaFor("group-class");
   return (
-    <SitePage>
+    <>
       <PageHeader
         eyebrow="Memberships"
         title="Kettlebell memberships"
         intro="Class credits every four weeks for Monday, Wednesday and Saturday classes, at a lower cost per class than paying as you go."
       >
-        <ButtonLink href="#memberships" tone="dark" variant="action" className="w-full sm:w-72">
+        <ButtonLink href="#memberships" variant="action" className="w-full sm:w-72">
           Compare memberships
         </ButtonLink>
-        <ButtonLink href={booking.href} external={booking.external} tone="dark" variant="text" className="self-center sm:ml-4">
+        <ButtonLink href={booking.href} external={booking.external} variant="text" className="self-center sm:ml-4">
           Or book a single class
         </ButtonLink>
       </PageHeader>
-      <MembershipSection showTermsLink={false} />
+      <MembershipSection />
       <MembershipTerms />
       <CancellationPolicy />
       <CtaBand />
-    </SitePage>
+    </>
   );
 }

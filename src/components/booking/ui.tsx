@@ -113,7 +113,7 @@ export function ChoiceGroup({
             <span className="min-w-0">
               <span className="block font-semibold">{o.label}</span>
               {o.detail ? (
-                <span className="mt-0.5 block text-sm text-muted group-has-[:checked]/tile:text-muted-inverse">
+                <span className="mt-0.5 block text-sm text-muted group-has-[:checked]/tile:text-white">
                   {o.detail}
                 </span>
               ) : null}
@@ -137,7 +137,7 @@ export function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 const input =
-  "mt-2 block w-full min-h-12 border border-muted bg-white px-4 py-3 text-base text-ink transition-colors duration-150 placeholder:text-muted hover:border-ink focus-visible:border-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-ink";
+  "mt-2 block w-full min-h-12 border border-muted bg-white px-4 py-3 text-base text-ink transition-colors duration-150 placeholder:text-grey hover:border-ink focus-visible:border-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-ink";
 
 interface TextFieldProps {
   name: string;
@@ -297,7 +297,7 @@ export function Stepper({
 }
 
 const primaryButton =
-  "inline-flex min-h-12 items-center justify-center gap-3 bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-[background-color,transform] duration-150 hover:bg-ink-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-3 bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-[background-color,transform] duration-150 border border-ink hover:bg-white hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:active:scale-100";
 
 /**
  * Back / next controls. Sticks to the bottom of the screen on phones so the
@@ -315,7 +315,7 @@ export function ActionBar({
   hint?: string;
 }) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 mt-10 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+    <div className="sticky bottom-0 z-10 -mx-4 mt-10 border-t border-line bg-paper px-4 py-3 sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
       <div className="flex items-center justify-between gap-4">
         {onBack ? (
           <button
@@ -402,7 +402,7 @@ export function PrivacyLine({ action }: { action: string }) {
 export function InstagramFallback({ children }: { children: ReactNode }) {
   return (
     <div className="bg-ink p-8 text-paper sm:p-10">
-      <p className="max-w-xl text-lede text-muted-inverse">{children}</p>
+      <p className="max-w-xl text-lede text-white">{children}</p>
       <a
         href={site.social.instagram.url}
         target="_blank"

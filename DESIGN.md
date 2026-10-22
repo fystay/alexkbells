@@ -3,6 +3,17 @@
 Tokens are defined once in `src/app/globals.css` (`@theme`). This file explains
 how to use them.
 
+## Current design system (2026-10-22 master brief) — read this first; older sections below are history
+
+- **Four UI colours, nothing else:** ink #171717 (text, buttons), paper #F5F2EB (page), white #FFFFFF (alternate sections, cards, the selected surface), grey #777873 (borders, dividers, large type). No #000000, tints, opacities, gradients, extra greys or hover colours. Enforced by `src/palette.test.ts` (tokens and source) and checked in the browser (computed colours on every page).
+- **Grey is never small text.** It measures 3.98:1 on paper and 4.45:1 on white, under the 4.5:1 AA threshold, so it appears only as borders, dividers and large type (≥24px, where 3:1 suffices; e.g. the second headline line). Secondary text is ink. `text-muted` therefore resolves to ink. Button hover inverts black and white (white on grey would fail contrast).
+- **Light throughout.** Cream page with white bands for contrast; no dark sections. Header, footer and page all light. Utility pages (booking, enquiry, coach area) use the same tokens directly.
+- **Shape:** 6–8px radii (`rounded-md` buttons, `rounded-lg` cards and pictures), 1px grey borders, no shadows. Buttons: black fill / white text; outline; underlined text link; split "action" bar (white arrow square).
+- **Home, in order:** hero (video, "Get stronger. Move better.", Book a class / Explore coaching) → find your training (group classes lead, 1:1 and online beside) → why kettlebells (four short items, type only) → memberships (3 cards + pay as you go + "before you join" facts) → Alex (before/after) → practical information (times, venue, how to book, one-line cancellation summary) → closing CTA. Words for the hero, the benefits and the booking steps are in `content/home.ts`.
+- **Memberships:** three white cards side by side (stacked on phones); Regular has the heavier border (a style, no badge, no popularity claim); pay as you go is a plain row. Per-class cost, pay-as-you-go equivalent and saving are calculated (`lib/membership.ts`). Buttons are enquiries until per-plan sign-up URLs are set (`MEMBERSHIP_URL_STARTER/REGULAR/DEDICATED` or `MEMBERSHIP_URL`).
+- **Imagery:** the hero film (natural colour), the before/after pair, and one photograph on /classes (desktop only).
+- **Logo:** the supplied artwork recoloured to ink #171717 (header: top three lines; footer: the full logo).
+
 ## Logo and colours, corrected (2026-10-22) — latest
 
 - **Logo:** the supplied artwork only (`assets/brand/raeng-logo-source.jpg`, confirmed correct by the owner: monogram, arched RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE). Header = its top three lines (monogram, RAENG, Thai), cropped from the artwork, not retyped (`public/brand/raeng-header-black.png`). Footer = the whole logo (`raeng-lockup-black.png`). Favicon and share image use the artwork on its own background. The earlier typeset "RAENG / KETTLEBELL CLUB" beside a monogram was wrong and is gone.

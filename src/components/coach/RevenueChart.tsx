@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 const FILL: Record<ServiceKey, string> = {
   group: "bg-ink",
   pt: "bg-muted",
-  online: "bg-muted-inverse",
+  online: "bg-grey",
   other: "bg-line",
 };
 

@@ -18,11 +18,11 @@ interface TimetableProps {
 
 /** Shown in place of the timetable until it is confirmed. */
 export function TimetableFallback() {
-  const muted = "text-muted-inverse";
+  const muted = "";
   return (
     <p className={cn("max-w-xl text-lede", muted)}>
       The class timetable is being finalised.{" "}
-      <Link href="/contact" className="text-paper underline underline-offset-4">
+      <Link href="/contact" className="underline underline-offset-4">
         Get in touch
       </Link>{" "}
       for current class times.
@@ -33,8 +33,8 @@ export function TimetableFallback() {
 export function Timetable({ labelledBy, layout = "row" }: TimetableProps) {
   const stack = layout === "stack";
   const sessions = sortSessions(timetable.sessions);
-  const line = "border-line-inverse";
-  const muted = "text-muted-inverse";
+  const line = "border-grey";
+  const muted = "";
 
   if (layout === "mini") {
     return (

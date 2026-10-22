@@ -6,7 +6,6 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -45,7 +44,7 @@ export default function CoachingPage() {
   ];
 
   return (
-    <SitePage>
+    <>
       <PageHeader
         eyebrow="1:1 Coaching"
         title="Coaching built around you"
@@ -56,7 +55,7 @@ export default function CoachingPage() {
           label={booking.label}
           srSuffix=" (1:1 coaching)"
           external={booking.external}
-          tone="dark"
+         
           className="w-full sm:w-[22rem]"
         />
       </PageHeader>
@@ -73,9 +72,9 @@ export default function CoachingPage() {
           </div>
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-7">
             {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
+              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
                 <h3 className="font-display text-h3">{f.title}</h3>
-                <p className="mt-3 text-muted-inverse">{f.body}</p>
+                <p className="mt-3 ">{f.body}</p>
               </li>
             ))}
           </ul>
@@ -96,7 +95,7 @@ export default function CoachingPage() {
               label={booking.label}
               srSuffix=" (1:1 coaching)"
               external={booking.external}
-              tone="dark"
+             
               className="mt-8 w-full sm:w-[22rem]"
             />
             {open ? <InstagramAlternative className="mt-4" /> : null}
@@ -112,13 +111,13 @@ export default function CoachingPage() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <PriceList prices={service.prices} />
-            <p className="mt-6 text-muted-inverse">
+            <p className="mt-6 ">
               Prefer to train in a group?{" "}
-              <Link href="/classes" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
+              <Link href="/classes" className="font-semibold  underline underline-offset-4 hover:no-underline">
                 See group classes
               </Link>
               . Further from Cumbernauld?{" "}
-              <Link href="/online-coaching" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
+              <Link href="/online-coaching" className="font-semibold  underline underline-offset-4 hover:no-underline">
                 See online coaching
               </Link>
               .
@@ -129,6 +128,6 @@ export default function CoachingPage() {
 
       <Location />
       <CtaBand />
-    </SitePage>
+    </>
   );
 }

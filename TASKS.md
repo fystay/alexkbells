@@ -143,6 +143,13 @@ See Coach portal below.
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
 
+## Master redesign (2026-10-22)
+- [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
+- [ ] P0 Decide membership billing: Square Subscriptions (needs the plan set up in Square, API access verified against current docs, a webhook for renewals, and a credit ledger with idempotent allocation per four-week period) or manual billing through the coach portal. Until then buttons are enquiries
+- [ ] P0 Confirm class capacity (set per class in the coach portal; blank means not full)
+- [ ] P1 Square Sandbox end-to-end test of payment links (DEPLOYMENT.md), then live credentials
+- [ ] P1 Confirm brand name on the site (RAENG Kettlebell Club vs Alex K Bells)
+
 ## Kettlebell Club redesign (2026-10-21, later)
 - [x] New logo (black/cream), cream-led palette, hero video support, /memberships (cards, terms, cancellation policy), coach + before/after on home, minimal imagery, £12 class price, tests
 - [x] Hero film cut from supplied footage (2026-10-21)

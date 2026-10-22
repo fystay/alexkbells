@@ -449,18 +449,18 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
 test("homepage hero: headline, copy and both calls to action work", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
-  await expect(hero.locator("h1")).toContainText("Built through movement.");
-  await expect(hero.locator("h1")).toContainText("Defined by discipline.");
-  await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
-  await hero.getByRole("link", { name: "View memberships" }).click();
-  await expect(page).toHaveURL(/\/memberships$/);
+  await expect(hero.locator("h1")).toContainText("Get stronger.");
+  await expect(hero.locator("h1")).toContainText("Move better.");
+  await expect(hero.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
+  await hero.getByRole("link", { name: "Explore coaching" }).click();
+  await expect(page).toHaveURL(/\/coaching$/);
 });
 
 test("homepage hero and its call to action are in the first screen on phones and desktop", async ({ page }) => {
   for (const [width, height] of [[360, 640], [390, 844], [768, 1024], [1024, 768], [1440, 900]]) {
     await page.setViewportSize({ width, height });
     await page.goto("/");
-    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book now" }).boundingBox())!;
+    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book a class" }).boundingBox())!;
     expect(cta.y + cta.height, `${width}x${height}`).toBeLessThanOrEqual(height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   }
@@ -469,7 +469,8 @@ test("homepage hero and its call to action are in the first screen on phones and
 test("homepage: services, memberships and the coach's story are there, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
   const training = page.locator("#find-your-training");
-  await expect(training.getByRole("link", { name: "Explore Classes" })).toHaveAttribute("href", "/classes");
+  await expect(training.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
+  await expect(training.getByRole("link", { name: "See memberships" })).toHaveAttribute("href", "/memberships");
   await expect(training.getByRole("link", { name: "Explore 1:1 Coaching" })).toHaveAttribute("href", "/coaching");
   await expect(training.getByRole("link", { name: "Explore Online Coaching" })).toHaveAttribute("href", "/online-coaching");
   await expect(page.locator("#memberships")).toBeVisible();
@@ -495,8 +496,8 @@ test.describe("memberships", () => {
 
   test("each card shows the owner's price, credits, cost per class and saving", async ({ page }) => {
     await page.goto("/memberships");
-    const cards = page.locator("#memberships ul > li");
-    await expect(cards).toHaveCount(4);
+    const cards = page.locator("#memberships ul[aria-labelledby] > li");
+    await expect(cards).toHaveCount(3);
     for (const [i, p] of PLANS.entries()) {
       const card = cards.nth(i);
       await expect(card.getByRole("heading", { name: p.name })).toBeVisible();
@@ -506,9 +507,9 @@ test.describe("memberships", () => {
       await expect(card.locator("dl")).toContainText(p.payg);
       await expect(card.locator("dl")).toContainText(p.save);
     }
-    const payg = cards.nth(3);
-    await expect(payg).toContainText("£12");
-    await expect(payg).toContainText("No membership credit allowance");
+    const payg = page.locator("#memberships").getByRole("heading", { name: "Pay as you go" }).locator("..");
+    await expect(payg).toContainText("£12 per class");
+    await expect(payg).toContainText("No membership needed");
   });
 
   test("buttons are enquiries or bookings, never sign-ups or payments", async ({ page }) => {
@@ -517,7 +518,7 @@ test.describe("memberships", () => {
       const link = page.getByRole("link", { name: `Enquire about ${p.name}` });
       await expect(link).toHaveAttribute("href", "/contact");
     }
-    await expect(page.locator("#memberships").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+    await expect(page.locator("#memberships").getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
     await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);
   });
 
@@ -538,7 +539,7 @@ test.describe("memberships", () => {
     await page.setViewportSize({ width: 320, height: 640 });
     await page.goto("/memberships");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
-    const tops = await page.locator("#memberships ul > li").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().left)));
+    const tops = await page.locator("#memberships ul[aria-labelledby] > li").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().left)));
     expect(new Set(tops).size).toBe(1);
   });
 });

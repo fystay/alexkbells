@@ -659,22 +659,22 @@ function Outcome({
   return (
     <div className="animate-step-in" role="status">
       <div className="bg-ink p-8 text-paper sm:p-12">
-        <p className="eyebrow text-muted-inverse">{demo ? "Demonstration complete" : "Request sent"}</p>
+        <p className="eyebrow text-white">{demo ? "Demonstration complete" : "Request sent"}</p>
         <h2 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-h2 text-balance focus:outline-none">
           {demo ? "No booking has been made" : "Thanks — Alex will be in touch"}
         </h2>
-        <p className="mt-5 max-w-xl text-lede text-muted-inverse">
+        <p className="mt-5 max-w-xl text-lede text-white">
           {demo
             ? `This was sample availability, so nothing was booked or sent. Once real availability is connected, this screen would confirm ${service.toLowerCase()} on ${longWhen}.`
             : `Your request is with Alex. He'll reply to ${email} to confirm a time. Your place is booked once he confirms.`}
         </p>
-        <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-line-inverse sm:grid-cols-2">
-          <div className="border-b border-line-inverse py-4 sm:border-b-0">
-            <dt className="eyebrow text-muted-inverse">Service</dt>
+        <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-white sm:grid-cols-2">
+          <div className="border-b border-white py-4 sm:border-b-0">
+            <dt className="eyebrow text-white">Service</dt>
             <dd className="mt-1 font-semibold">{service}</dd>
           </div>
           <div className="py-4">
-            <dt className="eyebrow text-muted-inverse">{demo ? "Sample time" : "When"}</dt>
+            <dt className="eyebrow text-white">{demo ? "Sample time" : "When"}</dt>
             <dd className="mt-1 font-semibold">{when}</dd>
           </div>
         </dl>
@@ -684,7 +684,7 @@ function Outcome({
           <button
             type="button"
             onClick={onRestart}
-            className="inline-flex min-h-12 items-center justify-center bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors hover:bg-ink-soft"
+            className="inline-flex min-h-12 items-center justify-center bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors border border-ink hover:bg-white hover:text-ink"
           >
             Try another booking
           </button>

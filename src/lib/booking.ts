@@ -156,12 +156,19 @@ export function getOnlineCoachingAction(env: Env = process.env): CallToAction {
 
 /**
  * Every membership button. Memberships renew automatically, which needs a
- * real billing set-up that doesn't exist yet, so until MEMBERSHIP_URL (an
- * https sign-up page, e.g. a Square subscription link) is set this is an
- * enquiry to /contact. It never pretends anyone has joined or paid.
+ * real billing set-up that doesn't exist yet, so until a sign-up page is
+ * configured this is an enquiry to /contact. Set MEMBERSHIP_URL_STARTER,
+ * MEMBERSHIP_URL_REGULAR and MEMBERSHIP_URL_DEDICATED (https), or one shared
+ * MEMBERSHIP_URL, to a hosted sign-up page (e.g. a Square subscription link
+ * created in the Square Dashboard). It never pretends anyone has joined or paid.
  */
-export function getMembershipAction(planName: string, env: Env = process.env): CallToAction {
-  const url = parseBookingUrl(env.MEMBERSHIP_URL);
+export function getMembershipAction(
+  planName: string,
+  planId?: "starter" | "regular" | "dedicated",
+  env: Env = process.env,
+): CallToAction {
+  const perPlan = planId ? env[`MEMBERSHIP_URL_${planId.toUpperCase()}`] : undefined;
+  const url = parseBookingUrl(perPlan) ?? parseBookingUrl(env.MEMBERSHIP_URL);
   if (url) return { kind: "booking", label: `Join ${planName}`, href: url.toString(), external: true };
   return { kind: "enquiry", label: `Enquire about ${planName}`, href: ENQUIRY_HREF, external: false };
 }

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
 import { site } from "@/content/site";
 import { Section } from "@/components/ui/Section";
-import { SitePage } from "@/components/ui/SitePage";
 import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
@@ -96,7 +95,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
 
 export default function PrivacyPage() {
   return (
-    <SitePage>
+    <>
       <PageHeader eyebrow="Privacy" title="Privacy notice" intro={`Last updated ${LAST_UPDATED}.`} />
       <Section labelledBy="privacy-heading">
         <h2 id="privacy-heading" className="sr-only">
@@ -106,11 +105,11 @@ export default function PrivacyPage() {
           {sections.map((s) => (
             <section key={s.heading}>
               <h3 className="text-lg font-bold">{s.heading}</h3>
-              <div className="mt-2 text-muted-inverse">{s.body}</div>
+              <div className="mt-2 ">{s.body}</div>
             </section>
           ))}
         </div>
       </Section>
-    </SitePage>
+    </>
   );
 }

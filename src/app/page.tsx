@@ -1,25 +1,28 @@
 import type { Metadata } from "next";
-import { SitePage } from "@/components/ui/SitePage";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { CoachStory } from "@/components/home/CoachStory";
 import { FindYourTraining } from "@/components/home/FindYourTraining";
 import { Hero } from "@/components/home/Hero";
-import { Statement } from "@/components/home/Statement";
+import { PracticalInfo } from "@/components/home/PracticalInfo";
+import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { MembershipSummary } from "@/components/memberships/MembershipSummary";
+import { MembershipSection } from "@/components/memberships/MembershipSection";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
+// Order follows what visitors want to know: how to book, what's on offer, why
+// kettlebells, the memberships, who Alex is, then the practical details.
 export default function HomePage() {
   return (
-    <SitePage>
+    <>
       <Hero />
-      <Statement />
-      <CoachStory />
       <FindYourTraining />
-      <MembershipSummary />
+      <WhyKettlebells />
+      <MembershipSection />
+      <CoachStory />
+      <PracticalInfo />
       <CtaBand />
-    </SitePage>
+    </>
   );
 }

@@ -3,16 +3,16 @@ import type { Timetable } from "./types";
 /**
  * Group class timetable as supplied by the client.
  *
- * Confirmed for publication by the project owner on 2026-10-15; Saturday
- * moved to 10:15 and the 60-minute length confirmed on 2026-10-17 (from
- * Alex's own class listing). See CORE.md.
+ * Confirmed for publication by the project owner on 2026-10-15; the
+ * 60-minute length on 2026-10-17 (Alex's own class listing); Saturday moved to
+ * 9:00 am by the owner on 2026-10-22 (latest schedule supplied by Alex). See CORE.md.
  */
 export const timetable: Timetable = {
   status: "confirmed",
   sessions: [
     { id: "mon-evening", day: "Monday", start: "18:30", durationMinutes: 60 },
     { id: "wed-evening", day: "Wednesday", start: "18:30", durationMinutes: 60 },
-    { id: "sat-morning", day: "Saturday", start: "10:15", durationMinutes: 60 },
+    { id: "sat-morning", day: "Saturday", start: "09:00", durationMinutes: 60 },
   ],
 };
 

@@ -1,39 +1,33 @@
+import { hero } from "@/content/home";
 import { images } from "@/content/images";
 import { heroVideo } from "@/content/media";
-import { site } from "@/content/site";
-import { getPrimaryCta } from "@/lib/booking";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { HeroVideo } from "./HeroVideo";
 
 /**
- * Clean opening: one picture whose edges melt into the cream page (the owner's film from content/media.ts,
- * or a still if none is set) and the words beside or beneath it, so
- * nothing sits on top of the footage and its colours stay as filmed. On
- * phones the picture comes first, then the headline and the button, all in
- * the first screen. DOM order is text first so the heading leads for screen readers.
+ * Video-led opening: the owner's film (content/media.ts) beside the words on
+ * desktop and above them on phones, with its edges dissolving into the page.
+ * Words live in content/home.ts. DOM order is text first so the heading leads
+ * for screen readers; the picture is ordered first on phones with CSS.
  */
 export function Hero() {
-  const cta = getPrimaryCta();
+  const cta = getPrimaryCtaFor("group-class");
   return (
-    <section aria-labelledby="hero-heading" className="pt-4 pb-16 sm:pt-6 sm:pb-24 lg:pb-28">
+    <section aria-labelledby="hero-heading" className="bg-paper pt-4 pb-14 sm:pt-6 sm:pb-20 lg:pb-24">
       <div className="container-page flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-14">
         <div className="order-2 mt-6 lg:order-1 lg:col-span-6 lg:mt-0">
-          <p className="eyebrow hidden text-muted-inverse sm:block">
-            {site.name} {site.descriptor} · Cumbernauld, Glasgow
-          </p>
-          <h1 id="hero-heading" className="font-display text-h1 text-balance sm:mt-5 lg:text-h2">
-            Built through movement.
-            <span className="block text-muted-inverse">Defined by discipline.</span>
+          <h1 id="hero-heading" className="font-display text-h1 text-balance lg:text-display-split">
+            {hero.headline}
+            <span className="block text-grey">{hero.headlineSecondary}</span>
           </h1>
-          <p className="mt-4 max-w-md text-lede text-muted-inverse sm:mt-6">
-            Kettlebell classes, flexible memberships and personal coaching, built around good technique and a club that shows up.
-          </p>
+          <p className="mt-4 max-w-md text-lede sm:mt-6">{hero.copy}</p>
           <div className="mt-6 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:items-center">
-            <StartTraining href={cta.href} label={cta.label} external={cta.external} tone="dark" className="w-full sm:w-64" />
-            <ButtonLink href="/memberships" tone="dark" variant="secondary" className="w-full sm:w-auto">
-              View memberships
+            <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="w-full sm:w-64" />
+            <ButtonLink href="/coaching" variant="secondary" className="w-full sm:w-auto">
+              {hero.secondaryLabel}
             </ButtonLink>
           </div>
         </div>
@@ -42,7 +36,7 @@ export function Hero() {
           {heroVideo ? (
             <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} position={heroVideo.position} className="absolute inset-0" />
           ) : (
-            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 42vw, 100vw" priority square className="hero-feather absolute inset-0 bg-transparent" />
+            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 42vw, 100vw" priority square className="hero-feather absolute inset-0 bg-paper" />
           )}
         </div>
       </div>

@@ -5,7 +5,6 @@ import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { SitePage } from "@/components/ui/SitePage";
 import { CoachStory } from "@/components/home/CoachStory";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Location } from "@/components/sections/Location";
@@ -30,13 +29,13 @@ export default function AboutPage() {
   const story = aboutStory && isPublishable(aboutStory.status) ? aboutStory : null;
 
   return (
-    <SitePage>
+    <>
       <PageHeader
         eyebrow="About RAENG"
         title="Strength is built through consistency."
         intro="RAENG is a kettlebell club in Cumbernauld, Glasgow: classes with flexible memberships, plus 1:1 and online coaching, built around good technique and a club that shows up."
       >
-        <ButtonLink href="/memberships" tone="dark" variant="secondary" className="w-full sm:w-auto">
+        <ButtonLink href="/memberships" variant="secondary" className="w-full sm:w-auto">
           View memberships
         </ButtonLink>
       </PageHeader>
@@ -47,7 +46,7 @@ export default function AboutPage() {
             <div className="lg:col-span-5">
               <SectionHeading id="story-heading" eyebrow="Our story" title={story.title} />
             </div>
-            <div className="max-w-2xl space-y-5 text-lede text-muted-inverse lg:col-span-7">
+            <div className="max-w-2xl space-y-5 text-lede  lg:col-span-7">
               {story.paragraphs.map((text) => (
                 <p key={text}>{text}</p>
               ))}
@@ -65,12 +64,12 @@ export default function AboutPage() {
         />
         <ol className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3">
           {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
-              <p className="eyebrow text-muted-inverse" aria-hidden="true">
+            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
+              <p className="eyebrow " aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-3 font-display text-h2">{p.title}</h3>
-              <p className="mt-3 text-muted-inverse">{p.body}</p>
+              <p className="mt-3 ">{p.body}</p>
             </li>
           ))}
         </ol>
@@ -90,9 +89,9 @@ export default function AboutPage() {
           </div>
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-7">
             {kettlebell.map((b, i) => (
-              <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
+              <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
                 <h3 className="font-display text-h3">{b.title}</h3>
-                <p className="mt-2 text-muted-inverse">{b.body}</p>
+                <p className="mt-2 ">{b.body}</p>
               </li>
             ))}
           </ul>
@@ -101,6 +100,6 @@ export default function AboutPage() {
 
       <Location />
       <CtaBand body="Come and train with us." />
-    </SitePage>
+    </>
   );
 }

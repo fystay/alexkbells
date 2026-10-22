@@ -31,9 +31,9 @@ describe("membership figures", () => {
     expect(planFigures({ id: "regular", name: "x", priceGbp: 65, credits: 8 }, 12).perClassPence).toBe(813);
   });
 
-  it("only highlights a plan with the lowest cost per class", () => {
-    const cost = (p: (typeof membershipPlans)[number]) => planFigures(p, payg).perClassPence;
-    const lowest = Math.min(...membershipPlans.map(cost));
-    for (const p of membershipPlans.filter((p) => p.highlight)) expect(cost(p)).toBe(lowest);
+  it("makes no popularity or promotional claim about any plan", () => {
+    // The middle plan is only drawn with a heavier border (`featured`); plans carry no badge text.
+    expect(membershipPlans.filter((p) => p.featured).map((p) => p.id)).toEqual(["regular"]);
+    for (const p of membershipPlans) expect(Object.keys(p).sort()).toEqual(["credits", "featured", "id", "name", "priceGbp"].filter((k) => k in p).sort());
   });
 });

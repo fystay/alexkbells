@@ -10,19 +10,19 @@ export function SiteFooter() {
   const { email, phone } = site.contact;
 
   return (
-    <footer className="theme-cream border-t border-line-inverse bg-ink text-paper">
+    <footer className="border-t border-grey bg-white text-ink">
       {/* Mobile: brand, then Explore (sized to its links) | Contact + Find us. */}
       <div className="container-page grid grid-cols-[auto_minmax(0,1fr)] gap-x-12 gap-y-10 sm:gap-x-20 py-14 sm:py-16 lg:grid-cols-12 lg:gap-8">
         <div className="col-span-2 lg:order-1 lg:col-span-5">
           <Logo variant="lockup" />
-          <p className="mt-5 max-w-sm text-sm text-muted-inverse">
+          <p className="mt-5 max-w-sm text-sm ">
             Kettlebell classes in Cumbernauld, Glasgow, with flexible memberships, plus 1:1
             and online coaching.
           </p>
         </div>
 
         <nav aria-label="Footer" className="lg:order-2 lg:col-span-2">
-          <h2 className="eyebrow text-muted-inverse">Explore</h2>
+          <h2 className="eyebrow ">Explore</h2>
           <ul className="mt-2 text-sm lg:mt-4">
             {footerNav.map((item) => (
               <li key={item.href}>
@@ -37,7 +37,7 @@ export function SiteFooter() {
         {/* lg:contents lets both blocks rejoin the 12-column grid on desktop. */}
         <div className="flex min-w-0 flex-col gap-10 sm:flex-row sm:gap-20 lg:contents">
           <div className="lg:order-4 lg:col-span-2">
-            <h2 className="eyebrow text-muted-inverse">Contact</h2>
+            <h2 className="eyebrow ">Contact</h2>
             <ul className="mt-2 text-sm lg:mt-4">
               <li>
                 <a
@@ -79,7 +79,7 @@ export function SiteFooter() {
           </div>
 
           <div className="lg:order-3 lg:col-span-3">
-            <h2 className="eyebrow text-muted-inverse">Find us</h2>
+            <h2 className="eyebrow ">Find us</h2>
             <address className="mt-4 text-sm not-italic leading-relaxed">
               {formatAddressLines().map((line) => (
                 <span key={line} className="block">
@@ -99,8 +99,8 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-line-inverse">
-        <div className="container-page flex flex-col gap-1 py-5 text-xs text-muted-inverse sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-t border-grey">
+        <div className="container-page flex flex-col gap-1 py-5 text-xs  sm:flex-row sm:items-center sm:justify-between">
           <p>
             {site.name} · {site.descriptor}
           </p>

@@ -22,10 +22,10 @@ export function Provisional({ status, children, fallback = null }: ProvisionalPr
 
   return (
     <div
-      className="relative outline-2 outline-offset-4 outline-dashed outline-[#b45309]"
+      className="relative outline-2 outline-offset-4 outline-dashed outline-grey"
       data-provisional="true"
     >
-      <span className="absolute -top-3 right-2 z-10 bg-[#b45309] px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wider text-white">
+      <span className="absolute -top-3 right-2 z-10 border border-grey bg-white px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wider text-ink">
         Preview · awaiting confirmation
       </span>
       {children}

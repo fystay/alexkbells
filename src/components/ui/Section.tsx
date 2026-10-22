@@ -1,15 +1,12 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/**
- * Sections sit on the continuous dark page surface. "plain" has no background
- * of its own; "raised" lays a barely-there cream tint over it for emphasis.
- */
-export type SectionTone = "plain" | "raised";
+/** "plain" sits on the cream page; "white" is a white band for contrast. */
+export type SectionTone = "plain" | "white";
 
 const toneClasses: Record<SectionTone, string> = {
-  plain: "",
-  raised: "bg-linear-to-b from-transparent via-white to-transparent",
+  plain: "bg-paper text-ink",
+  white: "bg-white text-ink",
 };
 
 interface SectionProps {
@@ -27,7 +24,7 @@ export function Section({ children, tone = "plain", id, labelledBy, className, s
     <section
       id={id}
       aria-labelledby={labelledBy}
-      className={cn(toneClasses[tone], spacing === "default" ? "py-20 sm:py-28 lg:py-32" : "py-12 sm:py-16", className)}
+      className={cn(toneClasses[tone], spacing === "default" ? "py-16 sm:py-24 lg:py-28" : "py-10 sm:py-14", className)}
     >
       <div className="container-page">{children}</div>
     </section>
@@ -46,11 +43,11 @@ interface SectionHeadingProps {
 export function SectionHeading({ id, eyebrow, title, intro, as: Heading = "h2", className }: SectionHeadingProps) {
   return (
     <div data-reveal className={cn("max-w-3xl", className)}>
-      {eyebrow ? <p className="eyebrow mb-5 text-muted-inverse">{eyebrow}</p> : null}
+      {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
       <Heading id={id} className={cn("font-display text-balance", Heading === "h1" ? "text-h1" : "text-h2")}>
         {title}
       </Heading>
-      {intro ? <div className="mt-6 max-w-2xl text-lede text-muted-inverse">{intro}</div> : null}
+      {intro ? <div className="mt-5 max-w-xl text-lede">{intro}</div> : null}
     </div>
   );
 }

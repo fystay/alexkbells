@@ -347,7 +347,7 @@ async function Tell({ request }: { request: BookingRequest }) {
       <textarea id="message-text" readOnly rows={8} defaultValue={message.body} className="mt-2 block w-full border border-muted bg-white p-3 text-base" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {request.email ? (
-          <a href={mailtoLink(request.email, message)} className="inline-flex min-h-11 items-center bg-ink px-5 text-sm font-semibold uppercase tracking-[0.1em] text-paper hover:bg-ink-soft">
+          <a href={mailtoLink(request.email, message)} className="inline-flex min-h-11 items-center bg-ink px-5 text-sm font-semibold uppercase tracking-[0.1em] text-paper border border-ink hover:bg-white hover:text-ink">
             Open in email
           </a>
         ) : null}

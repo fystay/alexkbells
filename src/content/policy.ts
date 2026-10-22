@@ -1,3 +1,5 @@
+import { getService } from "./services";
+
 /**
  * Membership terms and the class cancellation policy, supplied by the owner
  * on 2026-10-21 and published as written. Change the wording here only on
@@ -7,7 +9,7 @@ export const membershipTerms = [
   "Class credits can be used across any available Monday, Wednesday or Saturday class.",
   "Memberships renew automatically every four weeks, with new credits allocated on renewal.",
   "Unused credits expire at the end of each membership period and do not roll over.",
-  "Additional classes can be purchased at the pay-as-you-go price, subject to availability.",
+  `Additional classes can be purchased for £${getService("group-classes").prices[0].amountGbp}, subject to availability.`,
   "All bookings and cancellations are subject to the class cancellation policy.",
 ] as const;
 
@@ -33,3 +35,14 @@ export const cancellationPolicy = {
   agreement: "By booking a class, you agree to these cancellation terms.",
   thanks: "Thank you for your understanding and cooperation.",
 } as const;
+
+/**
+ * The four conditions a customer must see before committing to a membership,
+ * in short form (the full wording is above and on /memberships).
+ */
+export const membershipKeyFacts = [
+  { title: "Renews automatically", body: "Every four weeks, with new credits each time." },
+  { title: "Credits expire", body: "Unused credits don't roll over to the next period." },
+  { title: "Cancel 24 hours ahead", body: "Cancel 24 hours or more before class and your credit is returned." },
+  { title: "Late or no-show", body: "Under 24 hours' notice, or not turning up, forfeits the credit." },
+] as const;

@@ -5,7 +5,6 @@ import { getService } from "@/content/services";
 import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
@@ -38,14 +37,14 @@ export default function OnlineCoachingPage() {
   ];
 
   return (
-    <SitePage>
+    <>
       <PageHeader
         eyebrow="Online coaching"
         title="Coaching that goes where you train"
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."
       >
-        <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} tone="dark" className="w-full sm:w-[22rem]" />
-        <p className="w-full text-sm text-muted-inverse">
+        <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className="w-full sm:w-[22rem]" />
+        <p className="w-full text-sm ">
           This is an enquiry, not a sign-up: nothing is booked and there&apos;s nothing to pay.
         </p>
       </PageHeader>
@@ -54,12 +53,12 @@ export default function OnlineCoachingPage() {
         <SectionHeading id="included-heading" eyebrow="What you get" title="Structure, support and progress" />
         <ul className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
           {included.map((item, i) => (
-            <li key={item.title} data-reveal style={revealDelay(i)} className="border-t border-line-inverse pt-4">
-              <p className="eyebrow text-muted-inverse" aria-hidden="true">
+            <li key={item.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
+              <p className="eyebrow " aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-3 font-display text-h3">{item.title}</h3>
-              <p className="mt-3 text-muted-inverse">{item.body}</p>
+              <p className="mt-3 ">{item.body}</p>
             </li>
           ))}
         </ul>
@@ -69,7 +68,7 @@ export default function OnlineCoachingPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading id="how-heading" eyebrow="How it works" title="Start with a conversation" />
-            <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
+            <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className="mt-8 w-full sm:w-[22rem]" />
           </div>
           <Steps steps={steps} className="lg:col-span-7" />
         </div>
@@ -82,13 +81,13 @@ export default function OnlineCoachingPage() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <PriceList prices={service.prices} />
-            <p className="mt-6 text-muted-inverse">
+            <p className="mt-6 ">
               Prefer to train in person?{" "}
-              <Link href="/coaching" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
+              <Link href="/coaching" className="font-semibold  underline underline-offset-4 hover:no-underline">
                 See 1:1 coaching
               </Link>{" "}
               or{" "}
-              <Link href="/classes" className="font-semibold text-paper underline underline-offset-4 hover:no-underline">
+              <Link href="/classes" className="font-semibold  underline underline-offset-4 hover:no-underline">
                 group classes
               </Link>
               .
@@ -98,6 +97,6 @@ export default function OnlineCoachingPage() {
       </Section>
 
       <CtaBand />
-    </SitePage>
+    </>
   );
 }

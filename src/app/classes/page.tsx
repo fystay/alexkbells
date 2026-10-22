@@ -11,7 +11,6 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { SitePage } from "@/components/ui/SitePage";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Timetable } from "@/components/sections/Timetable";
@@ -71,15 +70,15 @@ export default function ClassesPage() {
   ];
 
   return (
-    <SitePage>
+    <>
       <PageHeader
         image={images.classes}
         eyebrow="Classes"
         title="Group kettlebell training"
         intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
       >
-        <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="w-full sm:w-[22rem]" />
-        <ButtonLink href="#join" variant="text" tone="dark" className="self-center sm:ml-4">
+        <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
+        <ButtonLink href="#join" variant="text" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
       </PageHeader>
@@ -88,9 +87,9 @@ export default function ClassesPage() {
         <SectionHeading id="expect-heading" eyebrow="What to expect" title="Purposeful training, together" />
         <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {involves.map((item) => (
-            <div key={item.title} data-reveal className="border-t border-line-inverse pt-4">
+            <div key={item.title} data-reveal className="border-t border-grey pt-4">
               <dt className="font-display text-h3">{item.title}</dt>
-              <dd className="mt-3 text-muted-inverse">{item.body}</dd>
+              <dd className="mt-3 ">{item.body}</dd>
             </div>
           ))}
         </dl>
@@ -104,8 +103,8 @@ export default function ClassesPage() {
         {classes.prices.length > 0 ? (
           <div className="mt-12 max-w-md">
             <PriceList prices={classes.prices} />
-            <p className="mt-3 text-sm text-muted-inverse">{groupClass.payment}</p>
-            <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em] text-paper underline underline-offset-[6px] hover:no-underline">
+            <p className="mt-3 text-sm ">{groupClass.payment}</p>
+            <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em]  underline underline-offset-[6px] hover:no-underline">
               Save with a membership <span aria-hidden="true" className="ml-2">→</span>
             </Link>
           </div>
@@ -116,7 +115,7 @@ export default function ClassesPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" />
-            <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
+            <StartTraining href={booking.href} label={booking.label} external={booking.external} className="mt-8 w-full sm:w-[22rem]" />
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
           <Steps steps={joinSteps} className="lg:col-span-7" />
@@ -126,6 +125,6 @@ export default function ClassesPage() {
       <Location />
       <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
       <CtaBand body="Prefer personal coaching? Train face to face or online." />
-    </SitePage>
+    </>
   );
 }
