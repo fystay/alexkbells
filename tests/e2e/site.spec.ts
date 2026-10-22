@@ -619,17 +619,14 @@ test("online coaching page leads to the enquiry form, which is not a booking", a
   await expect(page.getByRole("heading", { level: 1, name: "Ask about online coaching" })).toBeVisible();
 });
 
-test("hero film: silent, plays on its own, can be paused, and offers MP4 and WebM", async ({ page }) => {
+test("hero film: silent, plays on its own with no on-screen control, and offers MP4 and WebM", async ({ page }) => {
   await page.goto("/");
   const video = page.locator("section[aria-labelledby=hero-heading] video");
   await expect(video).toHaveCount(1);
   await expect(video).toHaveJSProperty("muted", true);
   await expect(video.locator("source")).toHaveCount(2);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
-  await page.getByRole("button", { name: "Pause background video" }).click();
-  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
-  await page.getByRole("button", { name: "Play background video" }).click();
-  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
+  await expect(page.getByRole("button", { name: /background video/ })).toHaveCount(0);
 });
 
 test("hero film files exist and the poster is served", async ({ request }) => {
@@ -639,13 +636,14 @@ test("hero film files exist and the poster is served", async ({ request }) => {
   }
 });
 
-test("with Reduce Motion the hero shows the still poster and the film waits for play", async ({ browser, baseURL }) => {
+test("with Reduce Motion the hero shows the still poster and the film stays still", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ reducedMotion: "reduce", baseURL });
   const page = await context.newPage();
   await page.goto("/");
   const video = page.locator("section[aria-labelledby=hero-heading] video");
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
-  await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
+  await page.waitForTimeout(1500);
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   await context.close();
 });
 

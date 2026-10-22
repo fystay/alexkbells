@@ -12,6 +12,8 @@ interface HeroVideoProps {
   className?: string;
   /** Square edges for a full-bleed film. */
   square?: boolean;
+  /** Show the pause/play button. Off on the home hero (owner, 2026-10-22); Reduce Motion still keeps it still. */
+  controls?: boolean;
   /** Where the pause button sits (Tailwind position classes). */
   controlClassName?: string;
 }
@@ -32,7 +34,7 @@ const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g,
  *   control is removed.
  * - The video is decorative (aria-hidden); the page makes sense without it.
  */
-export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, portrait, position = "50% 50%", className, square = false, controlClassName = "right-4 bottom-4 sm:right-6 sm:bottom-6" }: HeroVideoProps) {
+export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, portrait, position = "50% 50%", className, square = false, controls = true, controlClassName = "right-4 bottom-4 sm:right-6 sm:bottom-6" }: HeroVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(true);
@@ -128,7 +130,7 @@ export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, 
           />
         )}
       </div>
-      {unavailable ? null : (
+      {unavailable || !controls ? null : (
         <button
           type="button"
           onClick={toggle}

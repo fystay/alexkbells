@@ -169,3 +169,12 @@
     0 1px 3px var(--color-ink),
     0 0 14px var(--color-white);
 }
+
+/* Selected item in the header (current page in the menu, Book now in the
+   booking flow): a soft dark halo, ink letters lifted by a blurred grey
+   shadow. Palette colours only; the blur does the fading. */
+@utility ink-glow {
+  text-shadow:
+    0 0 1px var(--color-ink),
+    0 2px 14px var(--color-grey);
+}
