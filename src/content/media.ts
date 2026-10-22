@@ -20,11 +20,14 @@ export interface HeroVideoConfig {
 }
 
 /**
- * A fast 8.6 s cut (twelve shots of under a second, whip and blur transitions,
- * a few in slow motion; silent) from the owner's own class footage (phone
- * clips supplied 2026-10-21), landscape crop, warmed slightly. Shots avoid
- * third-party signage and people lying down. Rebuild with
- * `scripts/hero_montage.sh`; it lists the shots and transitions.
+ * A fast cut (twelve short shots, 8.6 s on desktop and 7.2 s on phones;
+ * whip, zoom and cross transitions, a few in slow motion; silent; seamless
+ * loop) from the owner's own class footage (phone clips supplied 2026-10-21).
+ * Every shot has faces in frame, one grade and light sharpening. Shots avoid
+ * third-party signage (checked on frame sheets) and people lying down. The
+ * source clips are only 464-576 px wide, so it is soft on big screens: replace
+ * with the original files when available. Rebuild with `scripts/hero_montage.sh`
+ * (and `ORIENT=portrait` for the phone cut); it lists every shot.
  */
 export const heroVideo = {
   sources: [
