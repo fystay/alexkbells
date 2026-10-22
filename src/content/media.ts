@@ -18,10 +18,11 @@ export interface HeroVideoConfig {
 }
 
 /**
- * A fast 10 s cut (ten 1 s shots, hard cuts, silent) from the owner's own
- * class footage (phone clips supplied 2026-10-21), landscape crop, warmed
- * slightly. Shots avoid third-party signage and people lying down. Rebuild
- * with `scripts/hero_montage.sh`; it lists the shots.
+ * A fast 8.6 s cut (twelve shots of under a second, whip and blur transitions,
+ * a few in slow motion; silent) from the owner's own class footage (phone
+ * clips supplied 2026-10-21), landscape crop, warmed slightly. Shots avoid
+ * third-party signage and people lying down. Rebuild with
+ * `scripts/hero_montage.sh`; it lists the shots and transitions.
  */
 export const heroVideo = {
   sources: [
