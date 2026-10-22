@@ -7,7 +7,7 @@ interface StartTrainingProps {
   /** Read after the label by screen readers only, e.g. " (1:1 coaching)". */
   srSuffix?: string;
   external?: boolean;
-  /** "bar": the full-size button on the pages. "button": the compact one in the header (ink outline box and ink text on the light header). */
+  /** "bar": the full-size button on the pages. "button": the compact one in the header (just the words in ink; underlined on hover). */
   variant?: "bar" | "button";
   /** Over the dark film: white button, ink text. */
   onDark?: boolean;
@@ -31,7 +31,7 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
           ? onDark
             ? "min-h-14 border border-white bg-white text-ink hover:bg-transparent hover:text-white"
             : "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
-          : "min-h-11 border-[1.5px] border-ink bg-transparent text-ink hover:bg-ink hover:text-paper lg:min-h-12",
+          : "min-h-11 bg-transparent text-ink underline-offset-8 hover:underline lg:min-h-12",
         className,
       )}
     >
