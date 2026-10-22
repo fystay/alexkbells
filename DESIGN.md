@@ -6,10 +6,11 @@ how to use them.
 ## Cream minimalism (2026-10-21, latest) — supersedes every dark/black-surface note below
 
 The client's intent (relayed 2026-10-21): a white or warm cream background with minimalist black and muted-grey writing, like his logo. So the public site is light:
-- **Surface:** warm cream #FAF9F4 drifting to white and back (`.site-surface`), black type, muted grey #6B6B6B for secondary text (5.1:1 on cream), hairlines `line-inverse` (#DCDBD6). Black appears only as type, buttons, the logo and the highlighted membership card. No dark bands, no black header or footer.
+- **Surface:** one plain off-white cream #FAF9F4 (`.site-surface`, no gradient), black type, muted grey #6B6B6B for secondary text (5.1:1 on cream), hairlines `line-inverse` (#DCDBD6). Black appears only as type, buttons, the logo and the highlighted membership card. No dark bands, no black header or footer.
 - **How it is built:** components are written with role classes (`text-paper` main text, `text-muted-inverse` secondary, `bg-ink` surface, `bg-paper` black fills, `border-line-inverse` hairlines). `.theme-cream` maps those roles onto cream/black; it is applied by `SitePage` (public pages), the header and the footer. The booking pages and coach area sit outside it and use the default light tokens, so the whole site matches. Do not add literal colours to public components: use the role classes.
 - **Logo:** black artwork everywhere (header monogram + live name; footer lockup). The cream artwork in `public/brand/` is spare.
 - **Buttons:** black pills with a cream arrow circle; outline pills in black. Cards: barely-there tinted, rounded-3xl.
+- **Hero picture:** no box or border: its four edges dissolve into the cream through an eased alpha mask (`.hero-feather`, wider on desktop, softer on phones). The pause/play control sits outside the fade.
 - The hero, the short home page, the memberships layout and the one faint ring ornament are as described in the dark notes below; read "cream" for "dark".
 
 ## Dark minimalism (2026-10-21, latest) — supersedes the cream-led notes below

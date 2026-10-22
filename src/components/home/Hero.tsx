@@ -8,7 +8,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { HeroVideo } from "./HeroVideo";
 
 /**
- * Clean opening: one rounded picture (the owner's film from content/media.ts,
+ * Clean opening: one picture whose edges melt into the cream page (the owner's film from content/media.ts,
  * or a still if none is set) and the words beside or beneath it, so
  * nothing sits on top of the footage and its colours stay as filmed. On
  * phones the picture comes first, then the headline and the button, all in
@@ -38,11 +38,11 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative order-1 h-[min(24rem,32svh)] min-h-[13rem] overflow-hidden rounded-3xl bg-ink-soft sm:h-[26rem] lg:order-2 lg:col-span-5 lg:col-start-8 lg:h-[min(38rem,calc(100svh-9rem))]">
+        <div className="relative order-1 h-[min(24rem,32svh)] min-h-[13rem] sm:h-[26rem] lg:order-2 lg:col-span-5 lg:col-start-8 lg:h-[min(38rem,calc(100svh-9rem))]">
           {heroVideo ? (
             <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} position={heroVideo.position} className="absolute inset-0" />
           ) : (
-            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 42vw, 100vw" priority square className="absolute inset-0" />
+            <PhotoFrame photo={images.hero} sizes="(min-width: 1024px) 42vw, 100vw" priority square className="hero-feather absolute inset-0 bg-transparent" />
           )}
         </div>
       </div>

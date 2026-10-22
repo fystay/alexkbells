@@ -85,12 +85,18 @@ export function HeroVideo({ sources, poster, position = "50% 50%", className }: 
   };
 
   return (
-    <div className={className} style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: position }}>
+    <div className={className}>
+      {/* The picture (poster behind the film) carries the feathered edges; the control below is outside the fade. */}
       <div
-        ref={containerRef}
-        className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+        className="hero-feather absolute inset-0"
+        style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: position }}
+      >
+        <div
+          ref={containerRef}
+          className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
       {unavailable ? null : (
         <button
           type="button"
