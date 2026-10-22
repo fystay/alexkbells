@@ -4,6 +4,8 @@ import { pageMetadata } from "@/lib/metadata";
 import { CoachStory } from "@/components/home/CoachStory";
 import { FindYourTraining } from "@/components/home/FindYourTraining";
 import { Hero } from "@/components/home/Hero";
+import { FirstClass } from "@/components/home/FirstClass";
+import { Testimonials } from "@/components/home/Testimonials";
 import { QuickFacts } from "@/components/home/QuickFacts";
 import { PracticalInfo } from "@/components/home/PracticalInfo";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
@@ -18,10 +20,12 @@ export default function HomePage() {
     <>
       <Hero />
       <QuickFacts />
+      <FirstClass />
       <FindYourTraining />
       <WhyKettlebells />
       <MembershipSummary />
       <CoachStory />
+      <Testimonials />
       <PracticalInfo />
     </>
   );

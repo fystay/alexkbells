@@ -115,3 +115,8 @@ Contact
 | Date | Item | Approved by |
 |---|---|---|
 | — | — | — |
+
+## Home page slots awaiting content (2026-10-22)
+
+- **Member quotes:** `content/community.ts` (`testimonials`). The "In their words" section appears on the home page once an entry is `confirmed` (written permission, attribution as agreed). Empty now.
+- **Your first class:** `content/firstClass.ts`. Short beginner reassurance points in Alex's own words; the section appears under the at-a-glance strip once `confirmed`. Null now.
