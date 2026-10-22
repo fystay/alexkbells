@@ -1,79 +1,107 @@
 import Link from "next/link";
+import { images } from "@/content/images";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { formatPenceShort, planFigures } from "@/lib/membership";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import type { Photo } from "@/content/types";
+import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { cn } from "@/lib/cn";
 
 function leadPrice(id: "one-to-one" | "online-coaching") {
   const price = publishable(getService(id).prices)[0];
   return price ? `${price.prefix ? `${price.prefix} ` : ""}${formatGbp(price.amountGbp)} ${price.unit}` : null;
 }
 
+interface Card {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  price: string | null;
+  href: string;
+  cta: string;
+  photo?: Photo;
+  /** Solid ink card (no photo available): white text on ink. */
+  inverse?: boolean;
+}
+
 /**
- * The three ways to train. Group classes and memberships lead (they are what
- * Alex most wants people to find), with 1:1 and online beside them as two
- * short rows. Only confirmed prices and times are shown.
+ * The three ways to train as a row of cards: swipe sideways on phones and
+ * tablets, three across on desktop. Only confirmed prices are shown.
  */
 export function FindYourTraining() {
-  const classes = getService("group-classes");
-  const price = publishable(classes.prices)[0];
+  const group = getService("group-classes");
+  const price = publishable(group.prices)[0];
   const lowest = Math.min(...membershipPlans.map((p) => planFigures(p, price?.amountGbp ?? 0).perClassPence));
 
-  const others = [
+  const cards: Card[] = [
     {
-      id: "one-to-one" as const,
-      title: "1:1 coaching",
-      body: "Face-to-face coaching with Alex.",
-      href: "/coaching",
-      cta: "Explore 1:1 Coaching",
+      id: "group",
+      eyebrow: "Group classes",
+      title: "Kettlebell classes",
+      body: "Coached kettlebell training, scaled to your level.",
+      price: price ? `${formatGbp(price.amountGbp)} per class, from ${formatPenceShort(lowest)} with a membership` : null,
+      href: "/memberships",
+      cta: "See memberships",
+      photo: images.classes,
     },
     {
-      id: "online-coaching" as const,
+      id: "one-to-one",
+      eyebrow: "One to one",
+      title: "1:1 coaching",
+      body: "Face-to-face coaching with Alex.",
+      price: leadPrice("one-to-one"),
+      href: "/coaching",
+      cta: "Explore 1:1 Coaching",
+      photo: images.hero,
+    },
+    {
+      id: "online",
+      eyebrow: "Online",
       title: "Online coaching",
       body: "Personalised programming, wherever you train.",
+      price: leadPrice("online-coaching"),
       href: "/online-coaching",
       cta: "Explore Online Coaching",
+      inverse: true,
     },
   ];
 
   return (
     <Section id="find-your-training" labelledBy="training-heading">
       <SectionHeading id="training-heading" eyebrow="Ways to train" title="Find your training" />
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:mt-10 lg:grid-cols-12 lg:gap-6">
-        <div data-reveal className="flex flex-col rounded-lg border border-grey bg-white p-6 sm:p-8 lg:col-span-7">
-          <p className="eyebrow">Group classes</p>
-          <h3 className="mt-3 font-display text-h2">Kettlebell classes</h3>
-          <p className="mt-3 max-w-md">Coached kettlebell training, scaled to your level.</p>
-          {price ? (
-            <p className="mt-1">
-              {formatGbp(price.amountGbp)} per class, or from {formatPenceShort(lowest)} per class with a membership.
-            </p>
-          ) : null}
-          <div className="mt-auto pt-6">
-            <ButtonLink href="/memberships" variant="secondary" className="w-full sm:w-auto">
-              See memberships
-            </ButtonLink>
-          </div>
-        </div>
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-6">
-          {others.map((o) => (
-            <li key={o.id} data-reveal className="flex flex-col rounded-lg border border-grey p-6">
-              <h3 className="font-display text-h3">{o.title}</h3>
-              <p className="mt-3 flex-1">{o.body}</p>
-              <p className="mt-4 text-sm font-semibold">{leadPrice(o.id)}</p>
+      <ul
+        aria-label="Ways to train"
+        className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0"
+      >
+        {cards.map((c) => (
+          <li
+            key={c.id}
+            data-reveal
+            className={cn(
+              "flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-lg border sm:w-[46%] lg:w-auto",
+              c.inverse ? "border-ink bg-ink text-white" : "border-grey bg-white",
+            )}
+          >
+            {c.photo ? <PhotoFrame photo={c.photo} sizes="(min-width: 1024px) 30vw, 78vw" square className="aspect-[4/3] w-full" /> : null}
+            <div className="flex flex-1 flex-col p-5 sm:p-6">
+              <p className="eyebrow">{c.eyebrow}</p>
+              <h3 className="mt-2 font-display text-h3">{c.title}</h3>
+              <p className="mt-2 flex-1">{c.body}</p>
+              {c.price ? <p className="mt-3 text-sm font-semibold">{c.price}</p> : null}
               <Link
-                href={o.href}
+                href={c.href}
                 className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
               >
-                {o.cta} <span aria-hidden="true">→</span>
+                {c.cta} <span aria-hidden="true">→</span>
               </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </Section>
   );
 }

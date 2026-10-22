@@ -483,10 +483,10 @@ test("homepage: services, memberships and the coach's story are there, and no te
   await expect(coach.getByText("Now", { exact: true })).toBeVisible();
 });
 
-test("the home page uses little imagery: the hero plus the before-and-after pair", async ({ page }) => {
+test("the home page uses little imagery: two training cards plus the before-and-after pair", async ({ page }) => {
   await page.goto("/");
   const imgs = await page.$$eval("main img", (els) => els.length);
-  expect(imgs).toBeLessThanOrEqual(3);
+  expect(imgs).toBeLessThanOrEqual(4);
 });
 
 test.describe("memberships", () => {
