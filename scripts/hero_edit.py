@@ -32,25 +32,24 @@ XF = 0.16  # whip length
 # top of the swing, the bell arriving at the chest), found from the clips'
 # motion (pauses) and checked on timestamped frame sheets. c5 is itself an
 # edit of several people; shots stay inside its own cuts (1.5, 3.0, 4.75,
-# 6.0, 7.0, 8.25 s).
+# 6.0, 7.0, 8.25 s). Order (owner, 2026-10-22): the group shot opens the film,
+# then only close-ups of individuals.
 # seg: [(source seconds, speed)] - speed < 1 is slow motion, > 1 speeds up.
 # push: extra zoom over the shot. out: how it leaves ("cut", "left", "right").
 # land: crop position of the landscape slice; port/pz/px: portrait crop position, zoom and
 # horizontal position (px=0 keeps c8's wall banner, at the right, out of frame).
 # only: use the shot in one version (c8 is too narrow a slice for the landscape cut).
 SHOTS = [
-    dict(c="c7", t=0.57, seg=[(1.5, 1.0)], push=0.05, out="cut", land=0.58, port=0.5, pz=1.0),          # class swings, one full rep
+    dict(c="c7", t=0.57, seg=[(2.3, 1.0)], push=0.07, out="cut", land=0.58, port=0.5, pz=1.0),          # the class together: opens the film (group shots only here)
     dict(c="c5", t=3.0, seg=[(0.35, 1.0), (0.45, 0.5)], push=0.06, out="left", land=0.25, port=0.0, pz=1.3),  # swing to the top, slow at the float
     dict(c="c5", t=4.75, seg=[(0.65, 1.0), (0.5, 0.6)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),   # bell up to the chest, hold
     dict(c="c8", t=8.4, seg=[(0.5, 1.4), (0.55, 0.5)], push=0.06, out="right", port=0.35, px=0.0, pz=1.6, only="portrait"),  # press drives up fast, slow lockout
     dict(c="c5", t=4.0, seg=[(0.4, 1.0), (0.35, 0.5)], push=0.06, out="right", land=0.3, only="landscape"),  # swing, slow at the top
-    dict(c="c7", t=5.07, seg=[(1.56, 1.0)], push=0.04, out="cut", land=0.58, port=0.5, pz=1.0),         # class swings again
     dict(c="c5", t=1.5, seg=[(0.5, 1.0), (0.3, 0.6)], push=0.06, out="left", port=0.0, px=0.0, pz=1.3, only="portrait"),    # swing, slow at the top
     dict(c="c5", t=8.25, seg=[(0.65, 1.0), (0.5, 0.55)], push=0.08, out="cut", land=0.5, port=0.0, px=0.0, pz=1.3),  # squat, slow at the bottom
     dict(c="c8", t=6.25, seg=[(0.5, 1.3), (0.4, 0.55)], push=0.06, out="right", port=0.8, px=0.0, pz=1.6, only="portrait"),  # swing into the rack
     dict(c="c5", t=6.0, seg=[(0.35, 1.0), (0.35, 0.6)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),    # close-up, effort
     dict(c="c8", t=14.5, seg=[(0.4, 1.3), (0.7, 0.55)], push=0.05, out="cut", port=0.45, px=0.0, pz=1.6, only="portrait"),  # overhead press lockout
-    dict(c="c7", t=9.0, seg=[(1.2, 1.0)], push=0.05, out="cut", land=0.58, port=0.5, pz=1.0),           # class, back to the start
 ]
 
 
