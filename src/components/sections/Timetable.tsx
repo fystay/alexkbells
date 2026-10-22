@@ -23,7 +23,7 @@ export function TimetableFallback() {
     <p className={cn("max-w-xl text-lede", muted)}>
       The class timetable is being finalised.{" "}
       <Link href="/contact" className="underline underline-offset-4">
-        Get in touch
+        Send a message
       </Link>{" "}
       for current class times.
     </p>

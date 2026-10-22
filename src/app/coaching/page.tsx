@@ -34,7 +34,7 @@ export default function CoachingPage() {
 
   const steps = [
     {
-      title: open ? "Send a booking request" : "Get in touch",
+      title: open ? "Send a booking request" : "Message Alex",
       body: open
         ? "Tell Alex the days and times that suit you and a little about your training."
         : "Message Alex on Instagram with what you want from your training and when you're free.",

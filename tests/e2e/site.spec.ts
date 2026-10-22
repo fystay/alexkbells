@@ -197,7 +197,7 @@ test("skip link moves focus to main content", async ({ page }) => {
 
 test("the contact page leads to Alex's Instagram", async ({ page }) => {
   await page.goto("/contact");
-  await expect(page.locator("h1")).toHaveText(/get in touch/i);
+  await expect(page.locator("h1")).toHaveText(/contact raeng/i);
   // The action is in the first screen on phones and desktop.
   for (const [width, height] of [[390, 844], [1440, 900]]) {
     await page.setViewportSize({ width, height });
@@ -669,4 +669,12 @@ test("footer groups collapse on phones and are open on desktop", async ({ page }
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(footer.getByRole("link", { name: "Memberships" })).toBeVisible();
   await expect(footer.getByText("Media House")).toBeVisible();
+});
+
+test("no page says 'Get in touch': the main button is always 'Book now'", async ({ page }) => {
+  for (const route of ["/", "/classes", "/memberships", "/coaching", "/online-coaching", "/about", "/contact", "/privacy"]) {
+    await page.goto(route);
+    await expect(page.locator("body"), route).not.toContainText(/get in touch/i);
+    await expect(page.locator("header").first().getByRole("link", { name: "Book now" }), route).toBeVisible();
+  }
 });

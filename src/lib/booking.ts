@@ -46,15 +46,15 @@ const PATHS: Record<BookableService | "any", string> = {
 };
 
 /**
- * The one primary call to action used across the public site. Bookings are
- * arranged by messaging Alex (see /contact), so this never depends on the
- * booking mode and never implies an online booking. The /book flow below is
- * kept for a future booking route but is not linked from public pages.
+ * The one primary call to action used across the public site: always "Book
+ * now" (owner's rule, 2026-10-22: never "Get in touch"). Where nothing can
+ * take a booking it opens /book, which says so plainly and offers Instagram;
+ * it never shows a fake confirmation.
  */
 export const PRIMARY_CTA: CallToAction = {
   kind: "enquiry",
-  label: "Get in touch",
-  href: ENQUIRY_HREF,
+  label: "Book now",
+  href: BOOK_PAGE_HREF,
   external: false,
 };
 
@@ -62,9 +62,8 @@ export const PRIMARY_CTA: CallToAction = {
  * What pages render for the primary call to action. Since 2026-10-18 the
  * button opens the booking page (/book) wherever booking works (a booking
  * URL, the request flow, or the labelled demo), production included, and on
- * every Vercel Preview so the flow can be tried, labelled "Book now" (owner's
- * wording, 2026-10-20; previously "Start your training"). Otherwise it is
- * PRIMARY_CTA: "Get in touch" to /contact, never "book" where nothing can be booked.
+ * every Vercel Preview so the flow can be tried. The label is always "Book now".
+ * Where nothing can be booked it is PRIMARY_CTA, still "Book now", still /book.
  */
 export const BOOK_NOW_LABEL = "Book now";
 
@@ -82,7 +81,7 @@ export function getPrimaryCta(env: Env = process.env): CallToAction {
  */
 export function getPrimaryCtaFor(service: BookableService, env: Env = process.env): CallToAction {
   const cta = getPrimaryCta(env);
-  if (cta.href !== BOOK_PAGE_HREF) return cta;
+  if (cta.kind !== "booking") return cta;
   return { ...cta, href: PATHS[service] };
 }
 
@@ -122,7 +121,7 @@ export function bookingConfigWarning(env: Env = process.env): string | null {
     return "BOOKING_URL is not a valid https URL, so it is ignored.";
   }
   if (bookingMode(env) !== "unavailable") return null;
-  return "No booking route is configured: the main button says \"Get in touch\" and links to /contact and /book shows the Instagram fallback. Set SUPABASE_URL and SUPABASE_SECRET_KEY (requests stored for the coach area), the Resend settings (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL), or BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
+  return "No booking route is configured: the main button still says \"Book now\" but /book only shows the Instagram fallback. Set SUPABASE_URL and SUPABASE_SECRET_KEY (requests stored for the coach area), the Resend settings (RESEND_API_KEY, BOOKING_NOTIFY_EMAIL, BOOKING_FROM_EMAIL), or BOOKING_URL — see DEPLOYMENT.md. (BOOKING_DEMO is ignored on production.)";
 }
 
 /** The primary "Book" button for a service, or for booking in general. */
@@ -134,9 +133,7 @@ export function getBookingAction(service: BookableService | "any" = "any", env: 
   if (mode === "demo" || mode === "request") {
     return { kind: "booking", label: LABELS[service], href: PATHS[service], external: false };
   }
-  return service === "group-class"
-    ? { kind: "enquiry", label: "Enquire about classes", href: ENQUIRY_HREF, external: false }
-    : { kind: "enquiry", label: "Get in touch", href: ENQUIRY_HREF, external: false };
+  return { kind: "enquiry", label: "Book now", href: BOOK_PAGE_HREF, external: false };
 }
 
 export function getClassBookingAction(env: Env = process.env): CallToAction {

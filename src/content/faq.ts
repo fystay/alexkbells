@@ -62,12 +62,12 @@ export const faq: FaqItem[] = [
     id: "one-to-one",
     question: "Do you offer one-to-one sessions?",
     answer:
-      "Yes. One-to-one coaching is face to face and tailored to you as an individual. Get in touch to discuss what you're looking for.",
+      "Yes. One-to-one coaching is face to face and tailored to you as an individual. Send a message to discuss what you're looking for.",
     status: "confirmed",
   },
   {
     id: "contact",
-    question: "What's the best way to get in touch?",
+    question: "What's the best way to contact you?",
     answer: `Send a message on Instagram (${site.social.instagram.handle}).`,
     status: "confirmed",
   },

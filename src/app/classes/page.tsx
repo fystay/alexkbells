@@ -27,7 +27,7 @@ export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
   description: bookingOpen
     ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
-    : "Group kettlebell classes at Media House, Cumbernauld. Get in touch to join a session.",
+    : "Group kettlebell classes at Media House, Cumbernauld. Book now to join a session.",
   path: "/classes",
 });
 
@@ -45,7 +45,7 @@ export default function ClassesPage() {
       title: "Choose a session",
       body: timesPublished
         ? "Pick the class time that suits you from the timetable above."
-        : "Class times are being finalised. Get in touch to hear about current sessions.",
+        : "Class times are being finalised. Send a message to hear about current sessions.",
     },
     open
       ? {
@@ -53,7 +53,7 @@ export default function ClassesPage() {
           body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose Beginner.",
         }
       : {
-          title: "Get in touch to book",
+          title: "Message Alex to book",
           body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
         },
     open

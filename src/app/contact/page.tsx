@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Get in touch with RAENG Kettlebell Club about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
+    "Contact RAENG Kettlebell Club about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
   path: "/contact",
 });
 
@@ -23,7 +23,7 @@ export default function ContactPage() {
     <>
       <PageHeader
         eyebrow="Contact"
-        title="Get in touch"
+        title="Contact RAENG"
         intro="Ask about group classes, memberships, 1:1 coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
       >
         {/* The page's one action, in the first screen at every width. */}
@@ -39,7 +39,7 @@ export default function ContactPage() {
 
       <Section labelledBy="methods-heading">
         <h2 id="methods-heading" className="sr-only">
-          Ways to get in touch
+          Ways to reach us
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">

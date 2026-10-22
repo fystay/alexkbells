@@ -31,7 +31,7 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
             {title}
           </h2>
           <p className="mt-5 max-w-xl text-lede">
-            {body ?? (times.length > 0 ? `Classes run ${times.map((t) => `${t.days} ${t.time}`).join(", ")}.` : "Get in touch to join a class.")}
+            {body ?? (times.length > 0 ? `Classes run ${times.map((t) => `${t.days} ${t.time}`).join(", ")}.` : "Book now to join a class.")}
           </p>
         </div>
         <div data-reveal className="lg:col-span-5">

@@ -6,13 +6,13 @@ import { formatGbp } from "@/lib/schedule";
 
 interface PriceListProps {
   prices: Price[];
-  /** Link "Get in touch" to /contact. Off where a contact button sits right below. */
+  /** Link "Send a message" to /contact. Off where a contact button sits right below. */
   linkContact?: boolean;
 }
 
 /**
  * Shows only publishable prices. When none can be published (e.g. all are
- * provisional on production) it shows a neutral "get in touch" line instead.
+ * provisional on production) it shows a neutral "send a message" line instead.
  */
 export function PriceList({ prices, linkContact = true }: PriceListProps) {
   const visible = publishable(prices);
@@ -22,10 +22,10 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
       <p className="text-sm ">
         {linkContact ? (
           <Link href="/contact" className="font-semibold  underline underline-offset-4">
-            Get in touch
+            Send a message
           </Link>
         ) : (
-          <span className="font-semibold ">Get in touch</span>
+          <span className="font-semibold ">Send a message</span>
         )}{" "}
         for current pricing.
       </p>
