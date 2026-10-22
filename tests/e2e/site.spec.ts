@@ -751,3 +751,13 @@ test("header: Book now sits as far from the right edge as the menu icon is from 
     expect(Math.abs(right - left), `at ${width}px`).toBeLessThan(2.5);
   }
 });
+
+test("headings are underlined, except in the site header and the home hero", async ({ page }) => {
+  await page.goto("/");
+  const deco = (sel: string) => page.locator(sel).first().evaluate((el) => getComputedStyle(el).textDecorationLine);
+  expect(await deco("section[aria-labelledby=hero-heading] h1")).toBe("none");
+  expect(await deco("#quick-facts-heading")).toBe("underline");
+  expect(await deco("#training-heading")).toBe("underline");
+  await page.goto("/classes");
+  expect(await deco("main h1")).toBe("underline");
+});

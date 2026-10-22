@@ -209,3 +209,17 @@
     transform: none;
   }
 }
+
+/* Headings are underlined everywhere on the page body (owner, 2026-10-22),
+   except in the site header and the home hero. Ink line, a little below the
+   letters, thickness scaled to the type. */
+@layer base {
+  main :is(h1, h2, h3) {
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.18em;
+  }
+  main section[aria-labelledby="hero-heading"] :is(h1, h2, h3) {
+    text-decoration-line: none;
+  }
+}
