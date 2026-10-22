@@ -472,7 +472,6 @@ test("homepage hero and its call to action are in the first screen on phones and
 test("homepage: services, memberships and the coach's story are there, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
   const training = page.locator("#find-your-training");
-  await expect(training.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
   await expect(training.getByRole("link", { name: "See memberships" })).toHaveAttribute("href", "/memberships");
   await expect(training.getByRole("link", { name: "Explore 1:1 Coaching" })).toHaveAttribute("href", "/coaching");
   await expect(training.getByRole("link", { name: "Explore Online Coaching" })).toHaveAttribute("href", "/online-coaching");

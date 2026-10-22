@@ -29,8 +29,8 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-grey bg-white text-ink">
       {/* Mobile: brand, then Explore (sized to its links) | Contact + Find us. */}
-      <div className="container-page grid grid-cols-1 gap-y-8 py-10 sm:py-12 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:order-1 lg:col-span-5">
+      <div className="container-page grid grid-cols-1 py-10 sm:py-12 lg:grid-cols-12 lg:gap-8">
+        <div className="mb-8 lg:order-1 lg:col-span-5">
           <Logo variant="lockup" />
           <p className="mt-5 max-w-sm text-sm ">
             Kettlebell classes in Cumbernauld, Glasgow, with flexible memberships, plus 1:1

@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { getPrimaryCtaFor } from "@/lib/booking";
 import { formatPenceShort, planFigures } from "@/lib/membership";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
-import { hero } from "@/content/home";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { StartTraining } from "@/components/ui/StartTraining";
 
 function leadPrice(id: "one-to-one" | "online-coaching") {
   const price = publishable(getService(id).prices)[0];
@@ -22,7 +19,6 @@ function leadPrice(id: "one-to-one" | "online-coaching") {
  */
 export function FindYourTraining() {
   const classes = getService("group-classes");
-  const book = getPrimaryCtaFor("group-class");
   const price = publishable(classes.prices)[0];
   const lowest = Math.min(...membershipPlans.map((p) => planFigures(p, price?.amountGbp ?? 0).perClassPence));
 
@@ -56,8 +52,7 @@ export function FindYourTraining() {
               {formatGbp(price.amountGbp)} per class, or from {formatPenceShort(lowest)} per class with a membership.
             </p>
           ) : null}
-          <div className="mt-auto flex flex-col gap-3 pt-7 sm:flex-row sm:items-center">
-            <StartTraining href={book.href} label={book.kind === "booking" ? hero.primaryLabel : book.label} external={book.external} className="w-full sm:w-64" />
+          <div className="mt-auto pt-6">
             <ButtonLink href="/memberships" variant="secondary" className="w-full sm:w-auto">
               See memberships
             </ButtonLink>
