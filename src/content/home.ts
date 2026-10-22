@@ -6,7 +6,7 @@ export const hero = {
   headline: "Get stronger.",
   headlineSecondary: "Move better.",
   copy: "Kettlebell coaching in Cumbernauld: group classes, one to one or online.",
-  primaryLabel: "Book a class",
+  primaryLabel: "Book now",
   secondaryLabel: "Explore coaching",
 } as const;
 

@@ -25,11 +25,11 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
         "group inline-flex items-center justify-between gap-3 rounded-md border border-ink bg-ink p-1 text-sm font-semibold uppercase tracking-[0.08em] text-white transition-colors duration-200 hover:bg-white hover:text-ink active:translate-y-px",
-        large ? "min-h-14" : "min-h-11",
+        large ? "min-h-14" : "min-h-11 lg:min-h-12",
         className,
       )}
     >
-      <span className={cn("flex-1 text-left", large ? "pl-5" : "whitespace-nowrap pl-3 text-xs max-[359px]:pr-3 sm:pl-4 sm:text-sm")}>
+      <span className={cn("flex-1 text-left", large ? "pl-5" : "whitespace-nowrap pl-3 text-xs max-[359px]:pr-3 sm:pl-4 sm:text-sm lg:pl-5 lg:pr-2")}>
         {label}
         {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </span>
@@ -37,7 +37,7 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
         aria-hidden="true"
         className={cn(
           "flex items-center justify-center self-stretch rounded bg-white text-ink group-hover:bg-ink group-hover:text-white",
-          large ? "w-12" : "w-8 max-[359px]:hidden sm:w-9",
+          large ? "w-12" : "w-8 max-[359px]:hidden sm:w-9 lg:w-10",
         )}
       >
         <svg viewBox="0 0 16 16" className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="1.5">

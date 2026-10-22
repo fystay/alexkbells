@@ -73,7 +73,7 @@ export function MembershipCards({ labelledBy }: { labelledBy: string }) {
           </p>
         </div>
         <ButtonLink href={action.href} external={action.external} variant="secondary" className="w-full sm:w-auto">
-          Book a class
+          Book now
         </ButtonLink>
       </div>
     </>

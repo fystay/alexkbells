@@ -1,4 +1,4 @@
-import { getPrimaryCta } from "@/lib/booking";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Logo } from "./Logo";
 import { MobileNav } from "./NavLinks";
@@ -8,7 +8,7 @@ import { MobileNav } from "./NavLinks";
  * logo centred, the booking button at the right.
  */
 export function SiteHeader() {
-  const cta = getPrimaryCta();
+  const cta = getPrimaryCtaFor("group-class");
 
   return (
     <header className="sticky top-0 z-40 border-b border-grey bg-paper text-ink">

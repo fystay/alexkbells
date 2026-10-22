@@ -454,7 +454,7 @@ test("homepage hero: headline, copy and both calls to action work", async ({ pag
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   await expect(hero.locator("h1")).toContainText("Get stronger.");
   await expect(hero.locator("h1")).toContainText("Move better.");
-  await expect(hero.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
+  await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);
 });
@@ -463,7 +463,7 @@ test("homepage hero and its call to action are in the first screen on phones and
   for (const [width, height] of [[360, 640], [390, 844], [768, 1024], [1024, 768], [1440, 900]]) {
     await page.setViewportSize({ width, height });
     await page.goto("/");
-    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book a class" }).boundingBox())!;
+    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book now" }).boundingBox())!;
     expect(cta.y + cta.height, `${width}x${height}`).toBeLessThanOrEqual(height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   }
@@ -520,7 +520,7 @@ test.describe("memberships", () => {
       const link = page.getByRole("link", { name: `Enquire about ${p.name}` });
       await expect(link).toHaveAttribute("href", "/contact");
     }
-    await expect(page.locator("#memberships").getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
+    await expect(page.locator("#memberships").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);
   });
 
