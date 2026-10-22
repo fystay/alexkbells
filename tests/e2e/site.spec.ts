@@ -700,3 +700,24 @@ test("no arrows anywhere on the public pages", async ({ page }) => {
     await expect(page.locator('svg path[d*="M1 8h13"]'), route).toHaveCount(0);
   }
 });
+
+test("home memberships: swipe cards with a counter and Previous / Next on phones, four across on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const section = page.locator("#memberships");
+  const cards = section.getByRole("list", { name: "Membership plans" }).locator("> li");
+  await expect(cards).toHaveCount(4);
+  await expect(section.getByText("01 / 04")).toBeVisible();
+  await expect(section.getByRole("button", { name: "Previous" })).toBeDisabled();
+  await section.getByRole("button", { name: "Next" }).click();
+  await expect(section.getByText("02 / 04")).toBeVisible({ timeout: 5000 });
+  for (const [name, text] of [["Starter", "£40"], ["Regular", "£65"], ["Dedicated", "£85"]]) {
+    const card = cards.filter({ has: page.getByRole("heading", { name }) });
+    await expect(card).toContainText(text);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(section.getByRole("button", { name: "Next" })).toBeHidden();
+  const lefts = await cards.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+  expect(new Set(lefts).size).toBe(1);
+});
