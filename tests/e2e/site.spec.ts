@@ -752,12 +752,12 @@ test("header: Book now sits as far from the right edge as the menu icon is from 
   }
 });
 
-test("headings are underlined, except in the site header and the home hero", async ({ page }) => {
+test("section titles are underlined, headings are not", async ({ page }) => {
   await page.goto("/");
-  const deco = (sel: string) => page.locator(sel).first().evaluate((el) => getComputedStyle(el).textDecorationLine);
-  expect(await deco("section[aria-labelledby=hero-heading] h1")).toBe("none");
-  expect(await deco("#quick-facts-heading")).toBe("underline");
-  expect(await deco("#training-heading")).toBe("underline");
-  await page.goto("/classes");
-  expect(await deco("main h1")).toBe("underline");
+  const deco = (loc: ReturnType<typeof page.locator>) => loc.first().evaluate((el) => getComputedStyle(el).textDecorationLine);
+  expect(await deco(page.getByText("Group kettlebell classes", { exact: true }))).toBe("underline");
+  expect(await deco(page.getByText("Ways to train", { exact: true }))).toBe("underline");
+  expect(await deco(page.locator("#quick-facts-heading"))).toBe("none");
+  expect(await deco(page.locator("#training-heading"))).toBe("none");
+  expect(await deco(page.locator("section[aria-labelledby=hero-heading] h1"))).toBe("none");
 });

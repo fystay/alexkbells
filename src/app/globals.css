@@ -210,16 +210,18 @@
   }
 }
 
-/* Headings are underlined everywhere on the page body (owner, 2026-10-22),
-   except in the site header and the home hero. Ink line, a little below the
-   letters, thickness scaled to the type. */
+/* Section titles (the small spaced label above a page or section heading,
+   e.g. "Group kettlebell classes", "Ways to train") are underlined (owner,
+   2026-10-22), except in the site header and the home hero. Headings
+   themselves are not. */
 @layer base {
-  main :is(h1, h2, h3) {
+  main .eyebrow:has(+ :is(h1, h2)),
+  main .eyebrow:has(+ * > :is(h1, h2):first-child) {
     text-decoration-line: underline;
-    text-decoration-thickness: 0.06em;
-    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.45em;
   }
-  main section[aria-labelledby="hero-heading"] :is(h1, h2, h3) {
+  main section[aria-labelledby="hero-heading"] .eyebrow {
     text-decoration-line: none;
   }
 }
