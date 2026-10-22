@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { coachLoginNav, mainNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
@@ -62,14 +62,14 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
+        className="menu-panel absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
       >
         <nav aria-label="Main" className="px-4 sm:px-6">
           <ul className="divide-y divide-grey">
-            {[...mainNav, ...pageNav].map((item) => {
+            {[...mainNav, ...pageNav].map((item, i) => {
               const active = Boolean(currentFor(pathname, item.href));
               return (
-                <li key={item.href}>
+                <li key={item.href} className="menu-rise" style={{ "--i": i } as CSSProperties}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
@@ -87,18 +87,20 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
           </ul>
           <Link
             href={cta.href}
+            style={{ "--i": mainNav.length + pageNav.length } as CSSProperties}
             onClick={() => setOpen(false)}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-6 flex min-h-12 items-center justify-center rounded-md border border-ink bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-white hover:text-ink active:translate-y-px"
+            className="menu-rise mt-6 flex min-h-12 items-center justify-center rounded-md border border-ink bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-white hover:text-ink active:translate-y-px"
           >
             {cta.label}
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
           </Link>
           <Link
             href={coachLoginNav.href}
+            style={{ "--i": mainNav.length + pageNav.length + 1 } as CSSProperties}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, coachLoginNav.href)}
-            className="mt-4 flex min-h-12 items-center justify-center rounded-md border border-grey px-6 text-sm font-semibold uppercase tracking-[0.08em] hover:border-ink"
+            className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-md border border-grey px-6 text-sm font-semibold uppercase tracking-[0.08em] hover:border-ink"
           >
             {coachLoginNav.label}
           </Link>

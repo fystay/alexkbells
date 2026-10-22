@@ -588,6 +588,8 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   await expect(page.getByRole("button", { name: "Close" })).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Home" })).toBeFocused();
+  // Let the menu's reveal finish so contrast is measured on the settled colours.
+  await page.waitForTimeout(1500);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
