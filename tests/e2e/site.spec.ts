@@ -649,14 +649,15 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: at-a-glance facts and class times sit straight under the hero", async ({ page }) => {
+test("home: the class statement, when / where / from and Book now sit straight under the hero", async ({ page }) => {
   await page.goto("/");
-  const facts = page.getByRole("region", { name: "At a glance" });
-  await expect(facts).toContainText("Mon · Wed · Sat");
-  await expect(facts).toContainText("Media House, Cumbernauld");
-  await expect(facts).toContainText("a class");
+  const facts = page.getByRole("region", { name: "3 classes a week" });
+  await expect(facts.getByRole("heading", { level: 2 })).toHaveText(/3 classes\s*a week/);
   await expect(facts).toContainText("Mon & Wed 6:30 pm");
   await expect(facts).toContainText("Sat 9:00 am");
+  await expect(facts).toContainText("Media House, Cumbernauld");
+  await expect(facts).toContainText("£7.08 a class");
+  await expect(facts.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
 });
 
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
