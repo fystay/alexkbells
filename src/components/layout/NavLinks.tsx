@@ -50,11 +50,11 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
+        aria-label={open ? "Close" : "Menu"}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-2 px-1 text-sm font-semibold uppercase tracking-[0.1em] "
+        className="-ml-2.5 inline-flex size-11 items-center justify-center"
       >
-        {open ? "Close" : "Menu"}
-        <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.5">
           {open ? <path d="M4 4l12 12M16 4L4 16" /> : <path d="M2 6h16M2 14h16" />}
         </svg>
       </button>
