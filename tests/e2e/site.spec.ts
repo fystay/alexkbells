@@ -649,3 +649,25 @@ test("with Reduce Motion the hero shows the still poster and the film waits for 
   await expect(page.getByRole("button", { name: "Play background video" })).toBeVisible();
   await context.close();
 });
+
+test("home: at-a-glance facts and class times sit straight under the hero", async ({ page }) => {
+  await page.goto("/");
+  const facts = page.getByRole("region", { name: "At a glance" });
+  await expect(facts).toContainText("Mon · Wed · Sat");
+  await expect(facts).toContainText("Media House, Cumbernauld");
+  await expect(facts).toContainText("a class");
+  await expect(facts).toContainText("Mon & Wed 6:30 pm");
+  await expect(facts).toContainText("Sat 9:00 am");
+});
+
+test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const footer = page.locator("footer");
+  await expect(footer.getByRole("link", { name: "Classes" })).toBeHidden();
+  await footer.getByText("Explore", { exact: true }).click();
+  await expect(footer.getByRole("link", { name: "Classes" })).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(footer.getByRole("link", { name: "Memberships" })).toBeVisible();
+  await expect(footer.getByText("Media House")).toBeVisible();
+});

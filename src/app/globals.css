@@ -152,3 +152,11 @@
     transform: translateY(24px);
   }
 }
+
+/* From lg the footer groups are always open: show the content of closed <details>. */
+@media (min-width: 64rem) {
+  .footer-group::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+}

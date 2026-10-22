@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { footerNav, formatAddressLines, mapsUrl, site } from "@/content/site";
 import { Logo } from "./Logo";
 
@@ -6,14 +7,30 @@ import { Logo } from "./Logo";
 const footerLink =
   "inline-flex min-h-11 items-center hover:underline underline-offset-4 lg:min-h-0 lg:py-1";
 
+/**
+ * A collapsible block on phones (native details, no script); from lg the
+ * content is always shown and the heading is plain.
+ */
+function FooterGroup({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
+  return (
+    <details className={`footer-group border-t border-grey lg:border-0 ${className ?? ""}`}>
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between lg:pointer-events-none lg:min-h-0 [&::-webkit-details-marker]:hidden">
+        <h2 className="eyebrow">{title}</h2>
+        <span aria-hidden="true" className="text-lg leading-none lg:hidden">+</span>
+      </summary>
+      <div className="pb-4 lg:pb-0">{children}</div>
+    </details>
+  );
+}
+
 export function SiteFooter() {
   const { email, phone } = site.contact;
 
   return (
     <footer className="border-t border-grey bg-white text-ink">
       {/* Mobile: brand, then Explore (sized to its links) | Contact + Find us. */}
-      <div className="container-page grid grid-cols-[auto_minmax(0,1fr)] gap-x-12 gap-y-10 sm:gap-x-20 py-14 sm:py-16 lg:grid-cols-12 lg:gap-8">
-        <div className="col-span-2 lg:order-1 lg:col-span-5">
+      <div className="container-page grid grid-cols-1 gap-y-8 py-10 sm:py-12 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:order-1 lg:col-span-5">
           <Logo variant="lockup" />
           <p className="mt-5 max-w-sm text-sm ">
             Kettlebell classes in Cumbernauld, Glasgow, with flexible memberships, plus 1:1
@@ -22,8 +39,8 @@ export function SiteFooter() {
         </div>
 
         <nav aria-label="Footer" className="lg:order-2 lg:col-span-2">
-          <h2 className="eyebrow ">Explore</h2>
-          <ul className="mt-2 text-sm lg:mt-4">
+          <FooterGroup title="Explore">
+          <ul className="text-sm lg:mt-4">
             {footerNav.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className={footerLink}>
@@ -32,13 +49,13 @@ export function SiteFooter() {
               </li>
             ))}
           </ul>
+          </FooterGroup>
         </nav>
 
         {/* lg:contents lets both blocks rejoin the 12-column grid on desktop. */}
-        <div className="flex min-w-0 flex-col gap-10 sm:flex-row sm:gap-20 lg:contents">
-          <div className="lg:order-4 lg:col-span-2">
-            <h2 className="eyebrow ">Contact</h2>
-            <ul className="mt-2 text-sm lg:mt-4">
+        <div className="flex min-w-0 flex-col lg:contents">
+          <FooterGroup title="Contact" className="lg:order-4 lg:col-span-2">
+            <ul className="text-sm lg:mt-4">
               <li>
                 <a
                   href={site.social.instagram.url}
@@ -76,11 +93,10 @@ export function SiteFooter() {
                 </li>
               ) : null}
             </ul>
-          </div>
+          </FooterGroup>
 
-          <div className="lg:order-3 lg:col-span-3">
-            <h2 className="eyebrow ">Find us</h2>
-            <address className="mt-4 text-sm not-italic leading-relaxed">
+          <FooterGroup title="Find us" className="lg:order-3 lg:col-span-3">
+            <address className="text-sm lg:mt-4 not-italic leading-relaxed">
               {formatAddressLines().map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -95,7 +111,7 @@ export function SiteFooter() {
             >
               Open in Google Maps<span className="sr-only"> (opens in a new tab)</span>
             </a>
-          </div>
+          </FooterGroup>
         </div>
       </div>
 

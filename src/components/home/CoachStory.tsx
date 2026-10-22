@@ -55,7 +55,7 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
             {showJourney ? (
               <div className="mt-5 max-w-xl border-t border-grey pt-5">
                 <h3 className="font-display text-h3">{journey.title}</h3>
-                <p className="mt-3 ">{journey.intro}</p>
+                <p className="mt-3">His own change came from turning up and getting 1% better every day.</p>
               </div>
             ) : null}
             {details.length > 0 ? (
