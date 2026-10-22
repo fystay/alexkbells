@@ -20,9 +20,10 @@ export interface HeroVideoConfig {
 }
 
 /**
- * A 7.6 s cut in the style of the JD Gyms hero (owner's reference, 2026-10-22)
- * from the owner's own class footage (phone clips supplied 2026-10-21): varied
- * rhythm (0.35-1.15 s shots), slow motion at the moment of effort, a speed-up
+ * A cut in the style of the JD Gyms hero (owner's reference, 2026-10-22)
+ * from the owner's own class footage (phone clips supplied 2026-10-21): each
+ * shot one whole movement cut at its natural end (about 1-1.6 s; 14 s on phones,
+ * 10 s on desktop), slow motion at the moment of effort, a speed-up
  * into each move, whip-pan swipes left and right with motion blur between some
  * clips, hard cuts elsewhere, and slow push-in zooms. Faces in frame, no
  * third-party signage, nobody lying down; grade C. The source clips are only
