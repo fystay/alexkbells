@@ -19,6 +19,8 @@ how to use them.
 - **Imagery:** the hero film (natural colour), the before/after pair, and one photograph on /classes (desktop only).
 - **Logo:** the supplied artwork recoloured to ink #171717 (header: top three lines; footer: the full logo).
 
+- **Logo (2026-10-22, supersedes the notes below):** the owner's RAENG FITNESS artwork (`assets/brand/raeng-fitness-logo-source.jpg`: R monogram with Thai แรง inside it, RAENG, FITNESS, rule, STRENGTH · COMMUNITY · DISCIPLINE), cut with `scripts/logo_from_source.py` into ink-coloured transparent PNGs. Header = monogram, RAENG, FITNESS; footer, favicon, Apple icon and share image = the whole artwork. Never retyped or redrawn.
+
 ## Logo and colours, corrected (2026-10-22) — latest
 
 - **Logo:** the supplied artwork only (`assets/brand/raeng-logo-source.jpg`, confirmed correct by the owner: monogram, arched RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE). Header = its top three lines (monogram, RAENG, Thai), cropped from the artwork, not retyped (`public/brand/raeng-header-black.png`). Footer = the whole logo (`raeng-lockup-black.png`). Favicon and share image use the artwork on its own background. The earlier typeset "RAENG / KETTLEBELL CLUB" beside a monogram was wrong and is gone.

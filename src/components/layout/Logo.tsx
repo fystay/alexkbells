@@ -33,7 +33,7 @@ export function Logo({ variant = "header", className, priority = false }: LogoPr
           height={logo.header.height}
           priority={priority}
           sizes="120px"
-          className="h-11 w-auto max-w-none shrink-0 sm:h-14"
+          className="h-12 w-auto max-w-none shrink-0 sm:h-16"
         />
       )}
     </Link>

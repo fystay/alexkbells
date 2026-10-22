@@ -13,20 +13,21 @@ export const site = {
     "RAENG Kettlebell Club in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and online coaching.",
 
   /**
-   * The supplied logo (assets/brand/raeng-logo-source.jpg, confirmed as the
-   * correct artwork 2026-10-22), cut into transparent black PNGs for the cream
-   * page. `header` is the top three lines of the artwork (monogram, RAENG,
-   * Thai), cropped not retyped; `lockup` is the whole logo. Never recolour,
+   * The supplied logo (assets/brand/raeng-fitness-logo-source.jpg: RAENG FITNESS,
+   * supplied by the owner 2026-10-22 as the exact logo; made with
+   * scripts/logo_from_source.py), cut into transparent black PNGs for the cream
+   * page. `header` is the top of the artwork (monogram with Thai, RAENG,
+   * FITNESS), cropped not retyped; `lockup` is the whole logo. Never recolour,
    * redraw or retype it.
    */
   logo: {
-    header: { src: "/brand/raeng-header-black.png", width: 665, height: 404 },
-    mark: { src: "/brand/raeng-mark-black.png", width: 316, height: 258 },
+    header: { src: "/brand/raeng-header-black.png", width: 970, height: 619 },
+    mark: { src: "/brand/raeng-mark-black.png", width: 406, height: 343 },
     lockup: {
       src: "/brand/raeng-lockup-black.png",
-      width: 760,
-      height: 645,
-      alt: "RAENG Kettlebell Club. Strength, community, discipline.",
+      width: 970,
+      height: 740,
+      alt: "RAENG Fitness. Strength, community, discipline.",
     },
   },
 
