@@ -9,6 +9,8 @@ interface StartTrainingProps {
   external?: boolean;
   /** "bar": the full-size button on the pages. "button": the compact one in the header (ink text with a line beneath, on the light header). */
   variant?: "bar" | "button";
+  /** Over the dark film: white button, ink text. */
+  onDark?: boolean;
   className?: string;
 }
 
@@ -17,7 +19,7 @@ interface StartTrainingProps {
  * straight to the destination and it works without JavaScript. Black bar,
  * hover inverts. No arrow.
  */
-export function StartTraining({ href, label, srSuffix, external = false, variant = "bar", className }: StartTrainingProps) {
+export function StartTraining({ href, label, srSuffix, external = false, variant = "bar", onDark = false, className }: StartTrainingProps) {
   const large = variant === "bar";
   return (
     <Link
@@ -26,7 +28,9 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       className={cn(
         "group inline-flex items-center justify-center gap-3 rounded-md p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
         large
-          ? "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
+          ? onDark
+            ? "min-h-14 border border-white bg-white text-ink hover:bg-transparent hover:text-white"
+            : "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
           : "min-h-11 bg-transparent text-ink underline decoration-1 underline-offset-8 hover:decoration-2 lg:min-h-12",
         className,
       )}

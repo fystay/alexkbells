@@ -7,7 +7,7 @@
 # The clips are vertical phone footage (464 or 576 px wide), so the desktop cut
 # is a wide slice of them: each shot has its own crop position, chosen so
 # faces are in the slice. Shots avoid third-party signage and people lying down
-# (checked by eye on frame sheets).
+# (checked by eye on frame sheets). The grade is slightly dark so white text sits legibly on the film.
 # Shot syntax: clip@start[:crop position 0-1][^zoom (portrait)][*speed]
 set -euo pipefail
 SRC=$1; OUT=$2
@@ -42,7 +42,7 @@ for ((k=0;k<=n;k++)); do
     CROP="crop=iw:iw/2:0:(ih-iw/2)*$pos"
   fi
   args+=(-ss "$t" -t "$dur" -i "$f")
-  filt+="[$i:v]setpts=(PTS-STARTPTS)/$speed,fps=30,trim=duration=$len,setpts=PTS-STARTPTS,$CROP,scale=$SIZE:flags=lanczos,unsharp=5:5:0.6,setsar=1,eq=brightness=0.06:contrast=1.06:saturation=1.05,format=yuv420p[v$i];"
+  filt+="[$i:v]setpts=(PTS-STARTPTS)/$speed,fps=30,trim=duration=$len,setpts=PTS-STARTPTS,$CROP,scale=$SIZE:flags=lanczos,unsharp=5:5:0.6,setsar=1,eq=brightness=-0.07:contrast=1.08:saturation=1.05,format=yuv420p[v$i];"
   i=$((i+1))
 done
 cur="v0"; total=$OUTLEN

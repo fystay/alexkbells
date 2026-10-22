@@ -15,6 +15,8 @@ interface ButtonLinkProps {
   children: ReactNode;
   variant?: Variant;
   external?: boolean;
+  /** Over the dark film: white outline and text. */
+  onDark?: boolean;
   className?: string;
 }
 
@@ -29,8 +31,10 @@ const styles: Record<Variant, string> = {
   action: `min-h-14 rounded-md border border-ink bg-ink text-white hover:bg-white hover:text-ink ${press}`,
 };
 
-export function ButtonLink({ href, children, variant = "primary", external = false, className }: ButtonLinkProps) {
-  const classes = cn(base, styles[variant], "justify-center", className);
+const darkSecondary = `min-h-12 rounded-md border border-white px-6 text-white hover:bg-white hover:text-ink ${press}`;
+
+export function ButtonLink({ href, children, variant = "primary", external = false, onDark = false, className }: ButtonLinkProps) {
+  const classes = cn(base, onDark && variant === "secondary" ? darkSecondary : styles[variant], "justify-center", className);
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noopener noreferrer">

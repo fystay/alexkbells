@@ -411,6 +411,8 @@ test.describe("on a phone", () => {
       await expect(page.locator("h1")).toHaveCount(1);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, path).toBeLessThanOrEqual(0);
+      // Colour transitions caught mid-way read as low contrast; switch them off for the check.
+      await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important}" });
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`), path).toEqual([]);
     }
