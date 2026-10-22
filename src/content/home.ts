@@ -3,9 +3,8 @@
  * words here and nothing else needs to change. Keep it short.
  */
 export const hero = {
-  headline: "Get stronger.",
-  headlineSecondary: "Move better.",
-  copy: "Kettlebell coaching in Cumbernauld: group classes, one to one or online.",
+  headline: "Train with purpose.",
+  headlineSecondary: "Build with discipline.",
   primaryLabel: "Book now",
   secondaryLabel: "Explore coaching",
 } as const;

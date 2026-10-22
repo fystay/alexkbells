@@ -160,3 +160,12 @@
     display: block;
   }
 }
+
+/* Hero headline: a soft white halo so it glows off the film without a box,
+   tint or extra colour, over a tight ink shadow that keeps the letter edges
+   crisp on bright frames (palette colours only; the blur does the fading). */
+@utility hero-glow {
+  text-shadow:
+    0 1px 3px var(--color-ink),
+    0 0 14px var(--color-white);
+}

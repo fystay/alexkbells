@@ -452,8 +452,8 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
 test("homepage hero: headline, copy and both calls to action work", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
-  await expect(hero.locator("h1")).toContainText("Get stronger.");
-  await expect(hero.locator("h1")).toContainText("Move better.");
+  await expect(hero.locator("h1")).toContainText("Train with purpose.");
+  await expect(hero.locator("h1")).toContainText("Build with discipline.");
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);
