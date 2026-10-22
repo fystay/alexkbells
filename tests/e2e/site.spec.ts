@@ -734,3 +734,20 @@ test("header Book now is underlined only in the booking flow", async ({ page }) 
   await page.goto("/classes");
   expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("none");
 });
+
+test("header: Book now sits as far from the right edge as the menu icon is from the left", async ({ page }) => {
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+    const { left, right } = await page.evaluate(() => {
+      const h = document.querySelector("header")!;
+      const icon = h.querySelector("button svg path")!.getBoundingClientRect();
+      const text = h.querySelector("a[href^='/book'] span")!.firstChild!;
+      const range = document.createRange();
+      range.selectNodeContents(text);
+      return { left: icon.left, right: window.innerWidth - range.getBoundingClientRect().right };
+    });
+    // The text box includes the letter-spacing after the last letter (about 1px).
+    expect(Math.abs(right - left), `at ${width}px`).toBeLessThan(2.5);
+  }
+});

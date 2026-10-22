@@ -29,16 +29,17 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       aria-current={current ? "page" : undefined}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group inline-flex items-center justify-center gap-3 rounded-md p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
+        "group inline-flex items-center justify-center gap-3 rounded-md text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
+        large && "p-1",
         large
           ? onDark
             ? "min-h-14 border border-white bg-white text-ink hover:bg-transparent hover:text-white"
             : "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
-          : "min-h-11 bg-transparent text-ink underline-offset-8 hover:underline lg:min-h-12",
+          : "mr-[3.5px] min-h-11 bg-transparent text-ink underline-offset-8 hover:underline lg:min-h-12",
         className,
       )}
     >
-      <span className={cn("px-5 text-center", !large && "whitespace-nowrap px-3 text-xs sm:px-4 sm:text-sm lg:px-6")}>
+      <span className={cn("text-center", large ? "px-5" : "whitespace-nowrap text-xs sm:text-sm")}>
         {label}
         {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </span>
