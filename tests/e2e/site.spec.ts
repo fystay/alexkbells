@@ -721,3 +721,15 @@ test("home memberships: swipe cards with a counter and Previous / Next on phones
   const lefts = await cards.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
   expect(new Set(lefts).size).toBe(1);
 });
+
+test("header Book now is underlined only in the booking flow", async ({ page }) => {
+  const book = () => page.locator("header").first().getByRole("link", { name: "Book now" });
+  await page.goto("/");
+  await expect(book()).not.toHaveAttribute("aria-current", "page");
+  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("none");
+  await page.goto("/book/group-class");
+  await expect(book()).toHaveAttribute("aria-current", "page");
+  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("underline");
+  await page.goto("/classes");
+  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("none");
+});

@@ -1,6 +1,6 @@
 import { site } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { StartTraining } from "@/components/ui/StartTraining";
+import { HeaderBook } from "./HeaderBook";
 import { Logo } from "./Logo";
 import { MobileNav } from "./NavLinks";
 
@@ -19,7 +19,7 @@ export function SiteHeader() {
         </div>
         <Logo priority />
         <div className="justify-self-end">
-          <StartTraining href={cta.href} label={cta.label} external={cta.external} variant="button" />
+          <HeaderBook cta={cta} />
         </div>
       </div>
       {/* The logo's tagline, as in the artwork: the line above is part of the logo image. */}

@@ -11,6 +11,8 @@ interface StartTrainingProps {
   variant?: "bar" | "button";
   /** Over the dark film: white button, ink text. */
   onDark?: boolean;
+  /** Marks the link as the current section (aria-current="page"). */
+  current?: boolean;
   className?: string;
 }
 
@@ -19,11 +21,12 @@ interface StartTrainingProps {
  * straight to the destination and it works without JavaScript. Black bar,
  * hover inverts. No arrow.
  */
-export function StartTraining({ href, label, srSuffix, external = false, variant = "bar", onDark = false, className }: StartTrainingProps) {
+export function StartTraining({ href, label, srSuffix, external = false, variant = "bar", onDark = false, current = false, className }: StartTrainingProps) {
   const large = variant === "bar";
   return (
     <Link
       href={href}
+      aria-current={current ? "page" : undefined}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
         "group inline-flex items-center justify-center gap-3 rounded-md p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
