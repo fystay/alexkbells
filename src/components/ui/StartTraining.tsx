@@ -7,7 +7,7 @@ interface StartTrainingProps {
   /** Read after the label by screen readers only, e.g. " (1:1 coaching)". */
   srSuffix?: string;
   external?: boolean;
-  /** "bar": the full-size button on the pages. "button": the compact one in the header (ink outline and ink text on the light header). */
+  /** "bar": the full-size button on the pages. "button": the compact one in the header (ink text with a line beneath, on the light header). */
   variant?: "bar" | "button";
   className?: string;
 }
@@ -24,10 +24,10 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       href={href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group inline-flex items-center justify-center gap-3 rounded-md border border-ink p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
+        "group inline-flex items-center justify-center gap-3 rounded-md p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
         large
-          ? "min-h-14 bg-ink text-white hover:bg-white hover:text-ink"
-          : "min-h-11 border-[1.5px] bg-transparent text-ink hover:bg-ink hover:text-paper lg:min-h-12",
+          ? "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
+          : "min-h-11 bg-transparent text-ink underline decoration-1 underline-offset-8 hover:decoration-2 lg:min-h-12",
         className,
       )}
     >
