@@ -20,15 +20,14 @@ export interface HeroVideoConfig {
 }
 
 /**
- * A fast cut (twelve short shots, 8.6 s on desktop and 7.2 s on phones;
- * whip, zoom and cross transitions, a few in slow motion; silent; seamless
- * loop) from the owner's own class footage (phone clips supplied 2026-10-21).
- * Every shot has faces in frame and one grade (lifted, contrasty, slightly
- * cool; the lower part darkened for the white text) with light sharpening. Shots avoid
- * third-party signage (checked on frame sheets) and people lying down. The
- * source clips are only 464-576 px wide, so it is soft on big screens: replace
- * with the original files when available. Rebuild with `scripts/hero_montage.sh`
- * (and `ORIENT=portrait` for the phone cut); it lists every shot.
+ * A 7.6 s cut in the style of the JD Gyms hero (owner's reference, 2026-10-22)
+ * from the owner's own class footage (phone clips supplied 2026-10-21): varied
+ * rhythm (0.35-1.15 s shots), slow motion at the moment of effort, a speed-up
+ * into each move, whip-pan swipes left and right with motion blur between some
+ * clips, hard cuts elsewhere, and slow push-in zooms. Faces in frame, no
+ * third-party signage, nobody lying down; grade C. The source clips are only
+ * 464-576 px wide, so it is soft on big screens. Rebuild with
+ * `python3 scripts/hero_edit.py <clips> public/media`; it lists every shot.
  */
 export const heroVideo = {
   sources: [

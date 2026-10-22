@@ -105,7 +105,7 @@ grade, writing `public/journey/before.jpg`, `after.jpg` and
 
 ### Hero video
 
-**Current (2026-10-22):** `scripts/hero_montage.sh` (ffmpeg only) cuts a fast montage of twelve short shots (faces in frame, one grade, seamless loop) with cross/whip transitions and a few slow-mo shots, in a landscape and a 9:16 phone version from the owner's phone clips: landscape crop, slight warmth, silent, H.264 MP4 + VP9 WebM + poster. The paragraph below describes the earlier, superseded pipeline.
+**Current (2026-10-22, latest):** `scripts/hero_edit.py` (Python + ffmpeg) cuts the JD Gyms-style hero: varied rhythm, slow motion and speed-ups inside shots, whip-pan swipes with motion blur, push-in zooms, landscape and 9:16 versions. Before that, `scripts/hero_montage.sh` (ffmpeg only) cuts a fast montage of twelve short shots (faces in frame, one grade, seamless loop) with cross/whip transitions and a few slow-mo shots, in a landscape and a 9:16 phone version from the owner's phone clips: landscape crop, slight warmth, silent, H.264 MP4 + VP9 WebM + poster. The paragraph below describes the earlier, superseded pipeline.
 
 `scripts/hero_video.py` (Python + OpenCV + numpy + ffmpeg, run manually)
 cuts the hero loop from Alex's reel. It removes his own caption/handle
