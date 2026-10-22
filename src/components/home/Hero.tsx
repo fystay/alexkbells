@@ -17,9 +17,9 @@ import { HeroVideo } from "./HeroVideo";
 export function Hero() {
   const cta = getPrimaryCtaFor("group-class");
   return (
-    <section aria-labelledby="hero-heading" className="bg-paper sm:pt-6 sm:pb-10">
+    <section aria-labelledby="hero-heading" className="bg-paper sm:pt-5 sm:pb-8">
       <div className="relative sm:container-page">
-        <div className="relative h-[calc(100svh-4rem)] min-h-[30rem] sm:h-[30rem] lg:h-[min(36rem,calc(100svh-9rem))]">
+        <div className="relative h-[calc(100svh-5.25rem)] min-h-[30rem] sm:h-[26rem] lg:h-[min(32rem,calc(100svh-12rem))]">
           {heroVideo ? (
             <HeroVideo
               sources={heroVideo.sources}
@@ -33,7 +33,7 @@ export function Hero() {
             <PhotoFrame photo={images.hero} sizes="100vw" priority className="absolute inset-0 max-sm:rounded-none" />
           )}
         </div>
-        <div className="absolute inset-x-4 bottom-6 z-10 text-white sm:inset-x-auto sm:bottom-10 sm:left-10 sm:max-w-xl">
+        <div className="absolute inset-x-4 bottom-6 z-10 text-white sm:bottom-10 sm:left-10 sm:right-auto sm:max-w-xl">
           <h1 id="hero-heading" className="font-display text-h1 text-balance sm:text-h2 sm:whitespace-nowrap">
             {hero.headline}
             <span className="block">{hero.headlineSecondary}</span>
