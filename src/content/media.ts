@@ -18,10 +18,10 @@ export interface HeroVideoConfig {
 }
 
 /**
- * Cut from the owner's own class footage (supplied 2026-10-21; the unedited
- * clip is a 14 s vertical phone video of a class swinging together, no signage
- * in frame): first 8.8 s, silent, lifted slightly in brightness and warmth to
- * suit the cream page. Re-cut with ffmpeg if a better clip arrives.
+ * A fast 10 s cut (ten 1 s shots, hard cuts, silent) from the owner's own
+ * class footage (phone clips supplied 2026-10-21), landscape crop, warmed
+ * slightly. Shots avoid third-party signage and people lying down. Rebuild
+ * with `scripts/hero_montage.sh`; it lists the shots.
  */
 export const heroVideo = {
   sources: [
@@ -29,5 +29,5 @@ export const heroVideo = {
     { src: "/media/hero.webm", type: 'video/webm; codecs="vp9"' },
   ],
   poster: "/media/hero-poster.jpg",
-  position: "50% 58%",
+  position: "50% 50%",
 } as HeroVideoConfig | null;

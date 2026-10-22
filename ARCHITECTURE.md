@@ -105,6 +105,8 @@ grade, writing `public/journey/before.jpg`, `after.jpg` and
 
 ### Hero video
 
+**Current (2026-10-22):** `scripts/hero_montage.sh` (ffmpeg only) cuts a fast 10 s montage of ten 1 s shots from the owner's phone clips: landscape crop, slight warmth, silent, H.264 MP4 + VP9 WebM + poster. The paragraph below describes the earlier, superseded pipeline.
+
 `scripts/hero_video.py` (Python + OpenCV + numpy + ffmpeg, run manually)
 cuts the hero loop from Alex's reel. It removes his own caption/handle
 overlays by building exact per-pixel templates (pixels bright in every frame
