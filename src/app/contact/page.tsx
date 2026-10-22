@@ -44,7 +44,7 @@ export default function ContactPage() {
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div id="enquire" className="rounded-3xl border border-line-inverse bg-paper/[0.04] p-8 sm:p-12">
+            <div id="enquire" className="rounded-3xl border border-line-inverse bg-white p-8 sm:p-12">
               <p className="eyebrow text-muted-inverse">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">
                 <a

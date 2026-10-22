@@ -9,7 +9,7 @@ export type SectionTone = "plain" | "raised";
 
 const toneClasses: Record<SectionTone, string> = {
   plain: "",
-  raised: "bg-linear-to-b from-transparent via-paper/[0.045] to-transparent",
+  raised: "bg-linear-to-b from-transparent via-white to-transparent",
 };
 
 interface SectionProps {

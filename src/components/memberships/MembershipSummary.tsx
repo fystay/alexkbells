@@ -37,7 +37,7 @@ export function MembershipSummary() {
                   key={plan.id}
                   className={cn(
                     "grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-1 border-t border-line-inverse py-5 sm:grid-cols-[1.2fr_1fr_1fr_auto]",
-                    plan.highlight && "bg-paper/[0.05] px-4 sm:-mx-4 sm:px-4",
+                    plan.highlight && "bg-white px-4 sm:-mx-4 sm:px-4",
                   )}
                 >
                   <h3 className="font-display text-h3">

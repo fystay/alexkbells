@@ -31,7 +31,7 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
     <li
       data-reveal
       style={revealDelay(index)}
-      className={cn("flex flex-col rounded-3xl p-7 sm:p-8", dark ? "bg-paper text-ink" : "border border-line-inverse bg-paper/[0.04]")}
+      className={cn("flex flex-col rounded-3xl p-7 sm:p-8", dark ? "bg-paper text-ink" : "border border-line-inverse bg-white")}
     >
       {/* Every card reserves this line so the names align; only the highlighted plan has text in it. */}
       <p className={cn("eyebrow h-4 text-[0.6875rem]", muted)}>{plan.highlight ?? ""}</p>

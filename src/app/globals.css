@@ -7,17 +7,16 @@
  * `line` is decorative only (1.4:1) — never use it for text.
  */
 @theme {
-  /* The four brand colours, exactly as supplied (2026-10-21):
-     black #000000 · warm cream #FAF9F4 · white #FFFFFF · muted grey #6B6B6B.
-     Every other value is a blend of these four (a tint of cream over black,
-     or cream/grey on cream), so nothing outside the palette appears. */
+  /* Theme colours, taken from the logo (2026-10-22): black #000000, the logo's
+     off-white background #FDF8F2, white #FFFFFF and muted grey #6B6B6B. Hairlines
+     are the grey faded over the background; nothing else is introduced. */
   --color-ink: #000000;
-  --color-ink-soft: #141413; /* cream 8% over black */
-  --color-paper: #faf9f4;
+  --color-ink-soft: #1a1a1a;
+  --color-paper: #fdf8f2; /* the logo's own background */
   --color-white: #ffffff;
-  --color-surface: #f2f1ec; /* grey 6% over cream: light raised surface */
-  --color-line: #dcdbd6; /* grey 22% over cream: hairlines on light */
-  --color-line-inverse: #2b2b2a; /* cream 17% over black: hairlines on dark */
+  --color-surface: #ffffff; /* raised panels are white */
+  --color-line: #ddd9d4; /* grey 22% over the logo background */
+  --color-line-inverse: #2b2b2a;
   --color-muted: #6b6b6b; /* grey: secondary text on cream (5.1:1) */
   --color-muted-inverse: #aaa9a6; /* cream 68% over black: secondary text on dark (9:1). The grey itself is only 3.9:1 on black, so it is used for lines and large type, not body text */
   --color-grey: #6b6b6b;
@@ -159,11 +158,11 @@
  * and use the default light tokens directly, so they match.
  */
 .theme-cream {
-  --color-ink: #faf9f4; /* the page surface: warm cream */
-  --color-ink-soft: #f1f0eb; /* grey 5% over cream */
+  --color-ink: #fdf8f2; /* the page surface: the logo's off-white */
+  --color-ink-soft: #ffffff; /* picture placeholders: white */
   --color-paper: #000000; /* main text, fills and buttons: black */
-  --color-muted-inverse: #6b6b6b; /* secondary text: muted grey (5.1:1 on cream) */
-  --color-line-inverse: #dcdbd6; /* hairlines: grey 22% over cream */
+  --color-muted-inverse: #6b6b6b; /* secondary text: muted grey (5.0:1 on the off-white) */
+  --color-line-inverse: #ddd9d4; /* hairlines: grey 22% over the off-white */
   color: var(--color-paper);
 }
 

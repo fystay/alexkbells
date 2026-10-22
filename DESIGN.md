@@ -3,6 +3,11 @@
 Tokens are defined once in `src/app/globals.css` (`@theme`). This file explains
 how to use them.
 
+## Logo and colours, corrected (2026-10-22) — latest
+
+- **Logo:** the supplied artwork only (`assets/brand/raeng-logo-source.jpg`, confirmed correct by the owner: monogram, arched RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE). Header = its top three lines (monogram, RAENG, Thai), cropped from the artwork, not retyped (`public/brand/raeng-header-black.png`). Footer = the whole logo (`raeng-lockup-black.png`). Favicon and share image use the artwork on its own background. The earlier typeset "RAENG / KETTLEBELL CLUB" beside a monogram was wrong and is gone.
+- **Colours (from the logo):** black #000000, the logo's own off-white background #FDF8F2 (page), white #FFFFFF (raised panels, cards), muted grey #6B6B6B (secondary text, 5.0:1 on the page). Hairlines are the grey faded over the off-white. No cream tints, no black tints.
+
 ## Cream minimalism (2026-10-21, latest) — supersedes every dark/black-surface note below
 
 The client's intent (relayed 2026-10-21): a white or warm cream background with minimalist black and muted-grey writing, like his logo. So the public site is light:

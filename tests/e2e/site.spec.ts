@@ -442,7 +442,7 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
     const link = scope.getByRole("link", { name: "RAENG Kettlebell Club, home" });
     // The header carries the name as live text beside the monogram; the footer shows the full lockup.
     await expect(link).toHaveAttribute("href", "/");
-    await expect(link.locator("img").first()).toHaveAttribute("src", /raeng-(mark|lockup)-black/);
+    await expect(link.locator("img").first()).toHaveAttribute("src", /raeng-(header|lockup)-black/);
   }
 });
 
