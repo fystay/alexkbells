@@ -30,3 +30,8 @@ export function formatPenceShort(pence: number): string {
     minimumFractionDigits: pence % 100 === 0 ? 0 : 2,
   }).format(pounds);
 }
+
+/** The biggest saving any plan offers over pay as you go, in pence (every credit used). */
+export function maxSavingPence(plans: readonly MembershipPlan[], payAsYouGoGbp: number): number {
+  return Math.max(...plans.map((p) => planFigures(p, payAsYouGoGbp).savingPence));
+}

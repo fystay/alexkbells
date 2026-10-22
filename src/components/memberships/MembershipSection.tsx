@@ -1,4 +1,6 @@
+import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
+import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { MembershipCards } from "./MembershipCards";
 import { MembershipFacts } from "./MembershipFacts";
@@ -12,8 +14,8 @@ export function MembershipSection({ headingId = "memberships-heading" }: { headi
       <SectionHeading
         id={headingId}
         eyebrow="Kettlebell memberships"
-        title="Train more, pay less per class"
-        intro={`Pay as you go is £${payg.amountGbp} a class. Every membership brings the cost of each class down.`}
+        title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks`}
+        intro={`Pay as you go is £${payg.amountGbp} a class. Every membership brings the cost of each class down, and the more you train, the more you save.`}
       />
       <div className="mt-10 lg:mt-14">
         <MembershipCards labelledBy={headingId} />

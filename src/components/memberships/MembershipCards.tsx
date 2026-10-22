@@ -33,9 +33,12 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
           <dt className="text-sm">Pay as you go</dt>
           <dd className="tabular-nums">{formatPenceShort(f.payAsYouGoPence)}</dd>
         </div>
-        <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-grey pt-3">
-          <dt className="text-sm font-semibold">You save</dt>
-          <dd className="font-display text-2xl tabular-nums">{formatPenceShort(f.savingPence)}</dd>
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-ink px-4 py-3 text-white">
+          <dt className="text-sm font-semibold uppercase tracking-[0.08em]">You save</dt>
+          <dd className="text-right">
+            <span className="font-display text-3xl tabular-nums">{formatPenceShort(f.savingPence)}</span>
+            <span className="block text-xs">every {BILLING_WEEKS} weeks</span>
+          </dd>
         </div>
       </dl>
 

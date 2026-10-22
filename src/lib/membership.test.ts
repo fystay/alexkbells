@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { formatPenceShort, planFigures } from "./membership";
+import { formatPenceShort, maxSavingPence, planFigures } from "./membership";
 
 const payg = getService("group-classes").prices[0].amountGbp;
 
@@ -35,5 +35,12 @@ describe("membership figures", () => {
     // The middle plan is only drawn with a heavier border (`featured`); plans carry no badge text.
     expect(membershipPlans.filter((p) => p.featured).map((p) => p.id)).toEqual(["regular"]);
     for (const p of membershipPlans) expect(Object.keys(p).sort()).toEqual(["credits", "featured", "id", "name", "priceGbp"].filter((k) => k in p).sort());
+  });
+});
+
+describe("maxSavingPence", () => {
+  it("is the Dedicated plan's £59 against £12 a class", async () => {
+    const { membershipPlans } = await import("@/content/memberships");
+    expect(maxSavingPence(membershipPlans, 12)).toBe(5900);
   });
 });

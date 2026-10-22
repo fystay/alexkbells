@@ -2,7 +2,7 @@ import Link from "next/link";
 import { membershipPlans, BILLING_WEEKS } from "@/content/memberships";
 import { membershipKeyFacts } from "@/content/policy";
 import { getService } from "@/content/services";
-import { formatPenceShort, planFigures } from "@/lib/membership";
+import { formatPenceShort, maxSavingPence, planFigures } from "@/lib/membership";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
@@ -22,8 +22,8 @@ export function MembershipSummary() {
           <SectionHeading
             id="memberships-summary-heading"
             eyebrow="Kettlebell memberships"
-            title="Train more, pay less per class"
-            intro={`Pay as you go is £${payg.amountGbp} a class.`}
+            title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks`}
+            intro={`Pay as you go is £${payg.amountGbp} a class. Every membership costs less per class.`}
           />
           <ButtonLink href="/memberships" variant="action" className="mt-6 w-full sm:w-72">
             Compare and join
@@ -37,7 +37,7 @@ export function MembershipSummary() {
                 <li
                   key={plan.id}
                   className={cn(
-                    "grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-0.5 px-5 py-4 sm:grid-cols-[1fr_1.4fr_1fr_auto]",
+                    "grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-4 sm:grid-cols-[1fr_1.4fr_auto_auto]",
                     i > 0 && "border-t border-grey",
                     plan.featured && "font-semibold",
                   )}
@@ -50,9 +50,10 @@ export function MembershipSummary() {
                   <p className="text-sm font-normal sm:order-2">
                     {plan.credits} credits · {formatPenceShort(f.perClassPence)} per class
                   </p>
-                  <p className="text-right text-sm sm:order-3 sm:text-left">
-                    <span className="sr-only">You save </span>Save {formatPenceShort(f.savingPence)}
-                    <span className="font-normal"> vs {formatPenceShort(f.payAsYouGoPence)}</span>
+                  <p className="sm:order-3">
+                    <span className="inline-flex items-baseline gap-1 rounded-md bg-ink px-2.5 py-1 font-semibold text-white">
+                      <span className="sr-only">You save </span>Save {formatPenceShort(f.savingPence)}
+                    </span>
                   </p>
                 </li>
               );
