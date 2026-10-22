@@ -31,7 +31,7 @@ export function QuickFacts() {
   ] as (Fact | null)[]).filter((f): f is Fact => f !== null);
 
   return (
-    <Section spacing="compact" labelledBy="quick-facts-heading">
+    <Section tone="white" spacing="compact" labelledBy="quick-facts-heading">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-end lg:gap-10">
         <div>
           <p className="eyebrow">Group kettlebell classes</p>
