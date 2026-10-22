@@ -3,7 +3,7 @@
 Usage: python3 scripts/logo_from_source.py
 Reads assets/brand/raeng-fitness-logo-source.jpg and writes, in the artwork's
 own shapes (nothing retyped or redrawn), transparent PNGs in #171717:
-  public/brand/raeng-header-black.png  monogram + RAENG + FITNESS
+  public/brand/raeng-header-black.png  monogram + RAENG + FITNESS + rule
   public/brand/raeng-mark-black.png    monogram only
   public/brand/raeng-lockup-black.png  the whole logo
 plus the favicon, Apple icon and share image on the artwork's own background.
@@ -45,7 +45,7 @@ def cut(y0, y1, name, pad=6):
     print(name, out.size)
     return out.size
 
-cut(mono[0], fit[1], "raeng-header-black")
+cut(mono[0], rule[1], "raeng-header-black")
 cut(mono[0], mono[1], "raeng-mark-black")
 cut(mono[0], tag[1], "raeng-lockup-black")
 

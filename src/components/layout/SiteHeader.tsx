@@ -1,3 +1,4 @@
+import { site } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Logo } from "./Logo";
@@ -12,7 +13,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-grey bg-paper text-ink">
-      <div className="container-page relative grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-2 sm:h-28 sm:gap-6">
+      <div className="container-page grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-2 sm:h-28 sm:gap-6">
         <div className="justify-self-start">
           <MobileNav cta={cta} />
         </div>
@@ -21,6 +22,10 @@ export function SiteHeader() {
           <StartTraining href={cta.href} label={cta.label} external={cta.external} variant="button" />
         </div>
       </div>
+      {/* The logo's tagline, as in the artwork: the line above is part of the logo image. */}
+      <p className="-mt-1 pb-2 text-center text-[0.625rem] font-medium uppercase tracking-[0.3em] sm:pb-3 sm:text-xs">
+        {site.themes.join(" · ")}
+      </p>
     </header>
   );
 }

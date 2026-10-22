@@ -17,11 +17,11 @@ export const site = {
    * supplied by the owner 2026-10-22 as the exact logo; made with
    * scripts/logo_from_source.py), cut into transparent black PNGs for the cream
    * page. `header` is the top of the artwork (monogram with Thai, RAENG,
-   * FITNESS), cropped not retyped; `lockup` is the whole logo. Never recolour,
+   * FITNESS and the line beneath it), cropped not retyped; `lockup` is the whole logo. Never recolour,
    * redraw or retype it.
    */
   logo: {
-    header: { src: "/brand/raeng-header-black.png", width: 970, height: 619 },
+    header: { src: "/brand/raeng-header-black.png", width: 970, height: 676 },
     mark: { src: "/brand/raeng-mark-black.png", width: 406, height: 343 },
     lockup: {
       src: "/brand/raeng-lockup-black.png",

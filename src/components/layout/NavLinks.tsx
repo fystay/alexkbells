@@ -62,7 +62,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full h-[calc(100dvh-5.25rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-7rem)] lg:inset-x-auto lg:left-10 lg:h-auto lg:max-h-[calc(100dvh-8rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
+        className="absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
       >
         <nav aria-label="Main" className="px-4 sm:px-6">
           <ul className="divide-y divide-grey">
