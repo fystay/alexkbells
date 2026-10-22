@@ -7,7 +7,10 @@
 # The clips are vertical phone footage (464 or 576 px wide), so the desktop cut
 # is a wide slice of them: each shot has its own crop position, chosen so
 # faces are in the slice. Shots avoid third-party signage and people lying down
-# (checked by eye on frame sheets). The grade is slightly dark so white text sits legibly on the film.
+# (checked by eye on frame sheets). Grade (owner's pick C, 2026-10-22): shadows
+# and mids lifted with a contrast curve, slightly cool, more saturated; the
+# lower part of each frame is gently darkened so the white hero text stays
+# readable while the rest of the picture stays bright.
 # Shot syntax: clip@start[:crop position 0-1][^zoom (portrait)][*speed]
 set -euo pipefail
 SRC=$1; OUT=$2
@@ -42,7 +45,7 @@ for ((k=0;k<=n;k++)); do
     CROP="crop=iw:iw/2:0:(ih-iw/2)*$pos"
   fi
   args+=(-ss "$t" -t "$dur" -i "$f")
-  filt+="[$i:v]setpts=(PTS-STARTPTS)/$speed,fps=30,trim=duration=$len,setpts=PTS-STARTPTS,$CROP,scale=$SIZE:flags=lanczos,unsharp=5:5:0.6,setsar=1,eq=brightness=-0.07:contrast=1.08:saturation=1.05,format=yuv420p[v$i];"
+  filt+="[$i:v]setpts=(PTS-STARTPTS)/$speed,fps=30,trim=duration=$len,setpts=PTS-STARTPTS,$CROP,scale=$SIZE:flags=lanczos,unsharp=5:5:0.6,setsar=1,curves=all='0/0 0.2/0.14 0.55/0.62 1/1',eq=gamma=1.3:saturation=1.2,colorbalance=rs=-0.04:bs=0.05,format=yuv420p,geq=lum='lum(X\,Y)*(1-0.4*min(max((Y/H-0.45)/0.55\,0)\,1))':cb='cb(X\,Y)':cr='cr(X\,Y)'[v$i];"
   i=$((i+1))
 done
 cur="v0"; total=$OUTLEN

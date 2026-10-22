@@ -23,7 +23,8 @@ export interface HeroVideoConfig {
  * A fast cut (twelve short shots, 8.6 s on desktop and 7.2 s on phones;
  * whip, zoom and cross transitions, a few in slow motion; silent; seamless
  * loop) from the owner's own class footage (phone clips supplied 2026-10-21).
- * Every shot has faces in frame, one grade and light sharpening. Shots avoid
+ * Every shot has faces in frame and one grade (lifted, contrasty, slightly
+ * cool; the lower part darkened for the white text) with light sharpening. Shots avoid
  * third-party signage (checked on frame sheets) and people lying down. The
  * source clips are only 464-576 px wide, so it is soft on big screens: replace
  * with the original files when available. Rebuild with `scripts/hero_montage.sh`
