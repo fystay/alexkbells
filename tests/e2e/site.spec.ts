@@ -633,7 +633,7 @@ test("hero film: silent, plays on its own, can be paused, and offers MP4 and Web
 });
 
 test("hero film files exist and the poster is served", async ({ request }) => {
-  for (const file of ["/media/hero.mp4", "/media/hero.webm", "/media/hero-poster.jpg"]) {
+  for (const file of ["/media/hero.mp4", "/media/hero.webm", "/media/hero-poster.jpg", "/media/hero-portrait.mp4", "/media/hero-portrait.webm", "/media/hero-portrait-poster.jpg"]) {
     const res = await request.get(file);
     expect(res.status(), file).toBe(200);
   }
@@ -677,4 +677,17 @@ test("no page says 'Get in touch': the main button is always 'Book now'", async 
     await expect(page.locator("body"), route).not.toContainText(/get in touch/i);
     await expect(page.locator("header").first().getByRole("link", { name: "Book now" }), route).toBeVisible();
   }
+});
+
+test("hero film covers the phone screen edge to edge with the vertical cut", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const source = page.locator("section[aria-labelledby=hero-heading] video source").first();
+  await expect(source).toHaveAttribute("src", "/media/hero-portrait.mp4");
+  const box = (await page.locator("section[aria-labelledby=hero-heading] video").boundingBox())!;
+  expect(Math.round(box.x)).toBe(0);
+  expect(Math.round(box.width)).toBe(390);
+  expect(box.height).toBeGreaterThan(844 - 64 - 4);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.locator("section[aria-labelledby=hero-heading] video source").first()).toHaveAttribute("src", "/media/hero.mp4");
 });

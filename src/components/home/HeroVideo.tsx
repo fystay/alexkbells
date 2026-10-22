@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 interface HeroVideoProps {
   sources: { src: string; type: string }[];
   poster: string;
+  /** A 9:16 cut used under 640 px wide. */
+  portrait?: { sources: { src: string; type: string }[]; poster: string };
   /** CSS object-position for the crop. */
   position?: string;
   className?: string;
@@ -30,12 +32,26 @@ const escapeAttr = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g,
  *   control is removed.
  * - The video is decorative (aria-hidden); the page makes sense without it.
  */
-export function HeroVideo({ sources, poster, position = "50% 50%", className, square = false, controlClassName = "right-4 bottom-4 sm:right-6 sm:bottom-6" }: HeroVideoProps) {
+export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, portrait, position = "50% 50%", className, square = false, controlClassName = "right-4 bottom-4 sm:right-6 sm:bottom-6" }: HeroVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(true);
   const [userPlayed, setUserPlayed] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
+
+  // Which cut to play: the vertical one on phones. Chosen after mount (the
+  // film is decoration; both posters are in the server-rendered page).
+  const [phone, setPhone] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const sync = () => setPhone(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  const isPortrait = Boolean(portrait) && phone === true;
+  const sources = isPortrait ? portrait!.sources : landscapeSources;
+  const poster = isPortrait ? portrait!.poster : landscapePoster;
 
   const html =
     `<video autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1" poster="${escapeAttr(poster)}" class="size-full object-cover" style="object-position:${escapeAttr(position)}">` +
@@ -73,7 +89,7 @@ export function HeroVideo({ sources, poster, position = "50% 50%", className, sq
       v.removeEventListener("pause", sync);
       v.removeEventListener("ended", restart);
     };
-  }, []);
+  }, [phone]);
 
   const toggle = () => {
     const v = containerRef.current?.querySelector("video");
@@ -90,15 +106,27 @@ export function HeroVideo({ sources, poster, position = "50% 50%", className, sq
 
   return (
     <div className={className}>
-      <div
-        className={`absolute inset-0 overflow-hidden bg-white${square ? "" : " rounded-lg"}`}
-        style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: position }}
-      >
+      <div className={`absolute inset-0 overflow-hidden bg-white${square ? "" : " sm:rounded-lg"}`}>
+        {portrait ? (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 sm:hidden"
+            style={{ backgroundImage: `url("${portrait.poster}")`, backgroundSize: "cover", backgroundPosition: "50% 50%" }}
+          />
+        ) : null}
         <div
-          ref={containerRef}
-          className={userPlayed ? "size-full" : "size-full motion-reduce:invisible"}
-          dangerouslySetInnerHTML={{ __html: html }}
+          aria-hidden="true"
+          className={portrait ? "absolute inset-0 hidden sm:block" : "absolute inset-0"}
+          style={{ backgroundImage: `url("${landscapePoster}")`, backgroundSize: "cover", backgroundPosition: position }}
         />
+        {phone === null ? null : (
+          <div
+            key={isPortrait ? "portrait" : "landscape"}
+            ref={containerRef}
+            className={userPlayed ? "absolute inset-0" : "absolute inset-0 motion-reduce:invisible"}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        )}
       </div>
       {unavailable ? null : (
         <button

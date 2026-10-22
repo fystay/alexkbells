@@ -15,6 +15,8 @@ export interface HeroVideoConfig {
   poster: string;
   /** CSS object-position for the crop (the film is vertical; the card is shorter on phones). */
   position?: string;
+  /** A 9:16 cut for phones (under 640 px wide), where the film fills the screen edge to edge. */
+  portrait?: { sources: { src: string; type: string }[]; poster: string };
 }
 
 /**
@@ -31,4 +33,11 @@ export const heroVideo = {
   ],
   poster: "/media/hero-poster.jpg",
   position: "50% 50%",
+  portrait: {
+    sources: [
+      { src: "/media/hero-portrait.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+      { src: "/media/hero-portrait.webm", type: 'video/webm; codecs="vp9"' },
+    ],
+    poster: "/media/hero-portrait-poster.jpg",
+  },
 } as HeroVideoConfig | null;
