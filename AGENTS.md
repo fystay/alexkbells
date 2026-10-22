@@ -22,6 +22,8 @@ Read `CORE.md` (facts and their status), then the relevant `DESIGN.md`, `CONTENT
 ## Owner rules (non-negotiable)
 - **Never use the words "Get in touch"** on the site (buttons, links, headings, copy). The main button is always **"Book now"**, whether or not booking is switched on; where nothing can be booked it opens /book, which says so honestly. This holds even when the owner says "go ahead with your recommendation". Enforced by a unit test and an e2e test.
 
+- **After every change that is pushed, give the owner the preview link** (the Vercel preview for the latest `raeng-rebrand` build, plus the always-latest branch link https://alexkbells-git-raeng-rebrand-fystay1.vercel.app).
+
 ## Code standards
 - TypeScript strict; no `any` without a commented justification.
 - Server components by default; `"use client"` only for interactivity.
