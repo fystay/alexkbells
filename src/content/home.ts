@@ -17,10 +17,3 @@ export const whyKettlebells = [
   { title: "Movement quality", body: "Moving a weight through space builds balance, timing and coordination." },
   { title: "Efficient and adaptable", body: "One piece of kit, scaled to your level, in a class, at home or away." },
 ] as const;
-
-/** How booking a class works today. Matches the request flow on /book: Alex confirms each place. */
-export const bookingSteps = [
-  { title: "Choose a class", body: "Pick a Monday, Wednesday or Saturday session." },
-  { title: "Send your request", body: "It takes about a minute. New to kettlebells? Choose Beginner." },
-  { title: "Alex confirms", body: "Then you come along. Pay by bank transfer or cash." },
-] as const;

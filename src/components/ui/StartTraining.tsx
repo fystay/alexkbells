@@ -29,7 +29,7 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
         className,
       )}
     >
-      <span className={cn("flex-1 text-left", large ? "pl-5" : "whitespace-nowrap pl-4")}>
+      <span className={cn("flex-1 text-left", large ? "pl-5" : "whitespace-nowrap pl-3 text-xs sm:pl-4 sm:text-sm")}>
         {label}
         {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </span>
@@ -37,7 +37,7 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
         aria-hidden="true"
         className={cn(
           "flex items-center justify-center self-stretch rounded bg-white text-ink group-hover:bg-ink group-hover:text-white",
-          large ? "w-12" : "w-9",
+          large ? "w-12" : "w-8 sm:w-9",
         )}
       >
         <svg viewBox="0 0 16 16" className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="1.5">

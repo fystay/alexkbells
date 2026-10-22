@@ -24,8 +24,7 @@ describe("four-colour palette", () => {
 
   it("uses no other colour anywhere in the source", () => {
     for (const file of files("src")) {
-      // The hero's edge fade is an alpha mask, not a colour: it alone may use rgb().
-      const text = readFileSync(file, "utf8").replace(/\.hero-feather[\s\S]*?\n\}\n/, "");
+      const text = readFileSync(file, "utf8");
       const hex = [...text.matchAll(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g)].map((m) => m[0].toLowerCase());
       // Strip hex that is part of the token block or comments quoting the palette.
       for (const h of hex) {

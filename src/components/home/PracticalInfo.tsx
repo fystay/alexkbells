@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { bookingSteps } from "@/content/home";
 import { formatAddressLines, mapsUrl } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -16,7 +15,7 @@ export function PracticalInfo() {
   return (
     <Section id="practical-info" labelledBy="practical-heading">
       <SectionHeading id="practical-heading" eyebrow="Practical information" title="Class times and booking" />
-      <div className="mt-10 grid grid-cols-1 gap-10 lg:mt-14 lg:grid-cols-12 lg:gap-12">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-4">
           <h3 className="eyebrow mb-4">When</h3>
           <Timetable layout="compact" />
@@ -40,29 +39,16 @@ export function PracticalInfo() {
           </a>
         </div>
         <div className="lg:col-span-5">
-          <h3 className="eyebrow mb-4">How to book</h3>
-          <ol className="border-t border-grey">
-            {bookingSteps.map((s, i) => (
-              <li key={s.title} className="grid grid-cols-[2rem_1fr] gap-x-3 border-b border-grey py-3">
-                <span className="eyebrow pt-1" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p>
-                  <span className="font-semibold">{s.title}.</span> {s.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="mt-6 w-full sm:w-64" />
+          <h3 className="eyebrow mb-4">Book</h3>
+          <p className="border-t border-grey pt-3">Pick a class and send your request; it takes about a minute. Alex confirms each place. Cancel 24 hours or more before a class and your credit is returned.</p>
+          <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="mt-5 w-full sm:w-64" />
+          <p className="mt-4 text-sm">
+            <Link href="/memberships#cancellation" className="font-semibold underline underline-offset-4 hover:no-underline">
+              Read the cancellation policy
+            </Link>
+          </p>
         </div>
       </div>
-      <p className="mt-10 max-w-3xl border-t border-grey pt-5 text-sm">
-        Cancel 24 hours or more before a class and your credit is returned. Later cancellations and no-shows forfeit it.{" "}
-        <Link href="/memberships#cancellation" className="font-semibold underline underline-offset-4 hover:no-underline">
-          Read the full cancellation policy
-        </Link>
-        .
-      </p>
     </Section>
   );
 }

@@ -217,24 +217,27 @@ test("the Instagram card links straight to Alex's profile for updates", async ({
   await expect(follow).toHaveAttribute("target", "_blank");
 });
 
-test("header logo, navigation and booking button never overlap", async ({ page }) => {
+test("header: menu at the left, logo centred, Book Now at the right, none overlapping", async ({ page }) => {
   for (const width of [320, 360, 390, 768, 900, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/");
+    const box = async (sel: string) => page.locator(sel).first().evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right };
+    });
+    const menu = await box("header button");
     const logo = await page.locator("header a[aria-label$=', home']").evaluate((el) => {
       // The wordmark can be wider than its link box, so measure the visible content.
       const rects = [...el.querySelectorAll("img, span")].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0);
-      return Math.max(...rects.map((r) => r.right));
+      return { left: Math.min(...rects.map((r) => r.left)), right: Math.max(...rects.map((r) => r.right)) };
     });
-    const firstControl = Math.min(
-      ...(await page.locator("header nav a:visible, header button:visible, header .md\\:block > a:visible").evaluateAll((els) =>
-        els.map((el) => el.getBoundingClientRect().left),
-      )),
-    );
-    expect(logo, `logo overlaps navigation at ${width}px`).toBeLessThanOrEqual(firstControl);
+    const book = await box("header > div > :last-child a, header > div > a:last-child");
+    expect(menu.right, `menu overlaps logo at ${width}px`).toBeLessThanOrEqual(logo.left);
+    expect(logo.right, `logo overlaps Book Now at ${width}px`).toBeLessThanOrEqual(book.left);
+    // Centred whenever the two side controls leave room; on the narrowest phones it shifts to avoid them.
+    if (width >= 600) expect(Math.abs((logo.left + logo.right) / 2 - width / 2), `logo is not centred at ${width}px`).toBeLessThan(2);
   }
 });
-
 
 test("contact, Instagram and directions links point at verified destinations", async ({ page }) => {
   await page.goto("/contact");
@@ -424,12 +427,12 @@ for (const [label, href] of NAV) {
     for (const [width, height] of [[390, 844], [1280, 800]]) {
       await page.setViewportSize({ width, height });
       await page.goto(href === "/" ? "/classes" : "/");
-      if (width < 1280) await page.getByRole("button", { name: "Menu" }).click();
+      await page.getByRole("button", { name: "Menu" }).click();
       const nav = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
       await nav.getByRole("link", { name: label, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`${href === "/" ? "/$" : href + "$"}`));
       await expect(page.locator("h1:visible")).toHaveCount(1);
-      if (width < 1280) await page.getByRole("button", { name: "Menu" }).click();
+      await page.getByRole("button", { name: "Menu" }).click();
       await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
       await expect(nav.getByRole("link", { name: label, exact: true })).toHaveAttribute("aria-current", "page");
     }

@@ -45,15 +45,15 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
   return (
     <Provisional status={showJourney ? journey.status : "confirmed"}>
       <Section tone="white" id="coach" labelledBy="coach-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-14">
           <div className="lg:col-span-6">
             <p className="eyebrow mb-4 ">Meet your coach</p>
-            <Heading id="coach-heading" className="font-display text-h1 text-balance">
+            <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {coach.name}
             </Heading>
-            <p className="mt-6 max-w-xl text-lede ">{coach.summary}</p>
+            <p className="mt-4 max-w-xl text-lede">{coach.summary}</p>
             {showJourney ? (
-              <div className="mt-8 max-w-xl border-t border-grey pt-6">
+              <div className="mt-5 max-w-xl border-t border-grey pt-5">
                 <h3 className="font-display text-h3">{journey.title}</h3>
                 <p className="mt-3 ">{journey.intro}</p>
               </div>
@@ -72,10 +72,10 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
                 ))}
               </dl>
             ) : null}
-            <ButtonLink href="/about" variant="secondary" className="mt-10 w-full sm:w-auto">
+            <ButtonLink href="/about" variant="secondary" className="mt-6 w-full sm:w-auto">
               About RAENG
             </ButtonLink>
-            <p className="mt-6 flex flex-wrap items-center gap-x-5 text-sm ">
+            <p className="mt-3 flex flex-wrap items-center gap-x-5 text-sm">
               <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
                 Instagram {site.social.instagram.handle}
                 <span className="sr-only"> (opens in a new tab)</span>

@@ -1,21 +1,24 @@
 import { getPrimaryCta } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Logo } from "./Logo";
-import { DesktopNav, MobileNav } from "./NavLinks";
+import { MobileNav } from "./NavLinks";
 
+/**
+ * Three parts, the same at every width: the Menu dropdown at the left, the
+ * logo centred, the booking button at the right.
+ */
 export function SiteHeader() {
   const cta = getPrimaryCta();
 
   return (
     <header className="sticky top-0 z-40 border-b border-grey bg-paper text-ink">
-      <div className="container-page relative flex h-16 items-center justify-between gap-8 sm:h-20">
-        <Logo priority />
-        <div className="flex items-center gap-5 xl:gap-6">
-          <DesktopNav />
-          <div className="hidden md:block">
-            <StartTraining href={cta.href} label={cta.label} external={cta.external} variant="button" />
-          </div>
+      <div className="container-page relative grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-2 sm:h-20 sm:gap-6">
+        <div className="justify-self-start">
           <MobileNav cta={cta} />
+        </div>
+        <Logo priority />
+        <div className="justify-self-end">
+          <StartTraining href={cta.href} label={cta.label} external={cta.external} variant="button" />
         </div>
       </div>
     </header>

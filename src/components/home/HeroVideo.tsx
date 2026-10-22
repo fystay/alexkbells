@@ -86,9 +86,8 @@ export function HeroVideo({ sources, poster, position = "50% 50%", className }: 
 
   return (
     <div className={className}>
-      {/* The picture (poster behind the film) carries the feathered edges; the control below is outside the fade. */}
       <div
-        className="hero-feather absolute inset-0"
+        className="absolute inset-0 overflow-hidden rounded-lg bg-white"
         style={{ backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: position }}
       >
         <div

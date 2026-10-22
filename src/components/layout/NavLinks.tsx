@@ -13,34 +13,10 @@ function currentFor(pathname: string, href: string): "page" | undefined {
   return pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined;
 }
 
-export function DesktopNav() {
-  const pathname = usePathname();
-  return (
-    <nav aria-label="Main" className="hidden xl:block">
-      <ul className="flex items-center gap-5 2xl:gap-8">
-        {mainNav.map((item) => {
-          const active = Boolean(currentFor(pathname, item.href));
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "relative inline-flex min-h-11 items-center whitespace-nowrap text-[0.8125rem] font-semibold uppercase tracking-[0.1em] transition-colors xl:text-sm",
-                  "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-current after:transition-transform after:duration-200",
-                  active ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",
-                )}
-              >
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
-
+/**
+ * The one navigation, at every width: a Menu button at the top left that opens
+ * a dropdown (full width on phones, a panel under the button from lg).
+ */
 export function MobileNav({ cta }: { cta: CallToAction }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -68,7 +44,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
   }, [open]);
 
   return (
-    <div className="xl:hidden">
+    <div>
       <button
         ref={buttonRef}
         type="button"
@@ -86,9 +62,9 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-5rem)]"
+        className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-5rem)] lg:inset-x-auto lg:left-10 lg:h-auto lg:max-h-[calc(100dvh-6rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
       >
-        <nav aria-label="Main" className="container-page">
+        <nav aria-label="Main" className="px-4 sm:px-6">
           <ul className="divide-y divide-grey">
             {[...mainNav, ...pageNav].map((item) => {
               const active = Boolean(currentFor(pathname, item.href));
@@ -101,7 +77,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
                     className={cn("relative flex min-h-14 items-center justify-between font-display text-2xl", !active && "hover:underline")}
                   >
                     {/* A bar in the gutter marks where you are. */}
-                    {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-ink sm:-left-6" /> : null}
+                    {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-ink sm:-left-6 lg:-left-6" /> : null}
                     {item.label}
                     {active ? <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-ink" /> : null}
                   </Link>

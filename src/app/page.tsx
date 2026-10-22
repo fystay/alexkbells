@@ -6,8 +6,7 @@ import { FindYourTraining } from "@/components/home/FindYourTraining";
 import { Hero } from "@/components/home/Hero";
 import { PracticalInfo } from "@/components/home/PracticalInfo";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
-import { CtaBand } from "@/components/sections/CtaBand";
-import { MembershipSection } from "@/components/memberships/MembershipSection";
+import { MembershipSummary } from "@/components/memberships/MembershipSummary";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
@@ -19,10 +18,9 @@ export default function HomePage() {
       <Hero />
       <FindYourTraining />
       <WhyKettlebells />
-      <MembershipSection />
+      <MembershipSummary />
       <CoachStory />
       <PracticalInfo />
-      <CtaBand />
     </>
   );
 }

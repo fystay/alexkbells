@@ -48,11 +48,11 @@ export function FindYourTraining() {
   return (
     <Section id="find-your-training" labelledBy="training-heading">
       <SectionHeading id="training-heading" eyebrow="Ways to train" title="Find your training" />
-      <div className="mt-10 grid grid-cols-1 gap-6 lg:mt-14 lg:grid-cols-12 lg:gap-8">
-        <div data-reveal className="flex flex-col rounded-lg border border-grey bg-white p-7 sm:p-9 lg:col-span-7">
+      <div className="mt-8 grid grid-cols-1 gap-4 lg:mt-10 lg:grid-cols-12 lg:gap-6">
+        <div data-reveal className="flex flex-col rounded-lg border border-grey bg-white p-6 sm:p-8 lg:col-span-7">
           <p className="eyebrow">Group classes</p>
           <h3 className="mt-3 font-display text-h2">Kettlebell classes</h3>
-          <p className="mt-4 max-w-md">Coached kettlebell training for strength, conditioning and movement quality, scaled to your level.</p>
+          <p className="mt-3 max-w-md">Coached kettlebell training for strength, conditioning and movement quality, scaled to your level.</p>
           {times.length > 0 ? (
             <p className="mt-5 text-lg font-semibold">{times.map((t) => `${t.days} ${t.time}`).join(" · ")}</p>
           ) : null}
@@ -68,9 +68,9 @@ export function FindYourTraining() {
             </ButtonLink>
           </div>
         </div>
-        <ul className="grid grid-cols-1 gap-6 lg:col-span-5">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-6">
           {others.map((o) => (
-            <li key={o.id} data-reveal className="flex flex-col rounded-lg border border-grey p-7">
+            <li key={o.id} data-reveal className="flex flex-col rounded-lg border border-grey p-6">
               <h3 className="font-display text-h3">{o.title}</h3>
               <p className="mt-3 flex-1">{o.body}</p>
               <p className="mt-4 text-sm font-semibold">{leadPrice(o.id)}</p>
