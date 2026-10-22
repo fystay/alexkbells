@@ -25,7 +25,7 @@ export default function RequestPage({ params, searchParams }: PageProps<"/coach/
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/requests">← All requests</TextLink>
+        <TextLink href="/coach/requests">All requests</TextLink>
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading the request…</p>}>
         <RequestView params={params} searchParams={searchParams} />

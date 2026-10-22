@@ -691,3 +691,12 @@ test("hero film covers the phone screen edge to edge with the vertical cut", asy
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator("section[aria-labelledby=hero-heading] video source").first()).toHaveAttribute("src", "/media/hero.mp4");
 });
+
+test("no arrows anywhere on the public pages", async ({ page }) => {
+  for (const route of ["/", "/classes", "/memberships", "/coaching", "/online-coaching", "/about", "/contact", "/book", "/book/group-class", "/privacy"]) {
+    await page.goto(route);
+    await expect(page.locator("body"), route).not.toContainText(/[→←↑↓›»]/);
+    // The arrow icon used to be an SVG path "M1 8h13M9 3l5 5-5 5".
+    await expect(page.locator('svg path[d*="M1 8h13"]'), route).toHaveCount(0);
+  }
+});

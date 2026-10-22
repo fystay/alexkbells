@@ -116,10 +116,10 @@ async function Sessions({ searchParams }: { searchParams: PageProps<"/coach/sess
           actions={
             <>
               <TextLink href={`/coach/sessions?view=${view}&month=${addMonths(monthStart, -1).slice(0, 7)}`}>
-                <span aria-hidden="true">← </span>Previous
+                Previous
               </TextLink>
               <TextLink href={`/coach/sessions?view=${view}&month=${addMonths(monthStart, 1).slice(0, 7)}`}>
-                Next<span aria-hidden="true"> →</span>
+                Next
               </TextLink>
             </>
           }

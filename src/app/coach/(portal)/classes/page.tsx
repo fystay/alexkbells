@@ -85,12 +85,11 @@ async function Classes({ searchParams }: { searchParams: PageProps<"/coach/class
         actions={
           <>
             <TextLink href={`/coach/classes?month=${addMonths(monthStart, -1).slice(0, 7)}`}>
-              <span aria-hidden="true">← </span>
+              
               {formatMonth(addMonths(monthStart, -1))}
             </TextLink>
             <TextLink href={`/coach/classes?month=${addMonths(monthStart, 1).slice(0, 7)}`}>
               {formatMonth(addMonths(monthStart, 1))}
-              <span aria-hidden="true"> →</span>
             </TextLink>
           </>
         }

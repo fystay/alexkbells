@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * primary: black. secondary: outlined. text: underlined link. action: the
- * split "Book" bar (label left, arrow in a white square at the right).
+ * solid "action" bar. No arrows anywhere on the site (owner, 2026-10-22).
  * Hover inverts black and white (a fourth colour would be needed for anything
  * else, and white on the grey fails contrast).
  */
@@ -29,41 +29,12 @@ const styles: Record<Variant, string> = {
   action: `min-h-14 rounded-md border border-ink bg-ink text-white hover:bg-white hover:text-ink ${press}`,
 };
 
-function Arrow() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
-      className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <path d="M1 8h13M9 3l5 5-5 5" />
-    </svg>
-  );
-}
-
 export function ButtonLink({ href, children, variant = "primary", external = false, className }: ButtonLinkProps) {
-  const action = variant === "action";
-  const classes = cn(base, styles[variant], action ? "justify-between gap-4 p-1" : "justify-center", className);
-  const content = action ? (
-    <>
-      <span className="flex-1 pl-4 text-left sm:pl-5">{children}</span>
-      <span
-        aria-hidden="true"
-        className="flex w-12 shrink-0 items-center justify-center self-stretch rounded bg-white text-ink group-hover:bg-ink group-hover:text-white"
-      >
-        <Arrow />
-      </span>
-    </>
-  ) : null;
-
+  const classes = cn(base, styles[variant], "justify-center", className);
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
-        {action ? content : children}
-        {action ? null : <Arrow />}
+        {children}
         <span className="sr-only">(opens in a new tab)</span>
       </a>
     );
@@ -71,8 +42,7 @@ export function ButtonLink({ href, children, variant = "primary", external = fal
 
   return (
     <Link href={href} className={classes}>
-      {action ? content : children}
-      {action ? null : <Arrow />}
+      {children}
     </Link>
   );
 }

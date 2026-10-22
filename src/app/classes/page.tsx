@@ -105,7 +105,7 @@ export default function ClassesPage() {
             <PriceList prices={classes.prices} />
             <p className="mt-3 text-sm ">{groupClass.payment}</p>
             <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em]  underline underline-offset-[6px] hover:no-underline">
-              Save with a membership <span aria-hidden="true" className="ml-2">→</span>
+              Save with a membership
             </Link>
           </div>
         ) : null}

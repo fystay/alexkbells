@@ -323,7 +323,7 @@ export function ActionBar({
             onClick={onBack}
             className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
           >
-            <span aria-hidden="true">←</span> {backLabel}
+            {backLabel}
           </button>
         ) : (
           <span />
@@ -336,9 +336,6 @@ export function ActionBar({
           className={primaryButton}
         >
           {next.pending ? "Sending…" : next.label}
-          <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M1 8h13M9 3l5 5-5 5" />
-          </svg>
         </button>
       </div>
       <p id="action-hint" aria-live="polite" className="mt-1 min-h-5 text-right text-sm text-muted">

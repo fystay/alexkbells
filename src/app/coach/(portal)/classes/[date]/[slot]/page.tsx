@@ -24,7 +24,7 @@ export default function ClassPage({ params }: PageProps<"/coach/classes/[date]/[
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/classes">← Classes</TextLink>
+        <TextLink href="/coach/classes">Classes</TextLink>
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading the class…</p>}>
         <ClassView params={params} />

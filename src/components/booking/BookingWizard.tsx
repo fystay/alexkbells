@@ -331,7 +331,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                   href="/online-coaching"
                   className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
                 >
-                  Explore online coaching <span aria-hidden="true">→</span>
+                  Explore online coaching
                 </Link>
               </div>
               <ActionBar

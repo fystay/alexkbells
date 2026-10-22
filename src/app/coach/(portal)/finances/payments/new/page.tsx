@@ -20,7 +20,7 @@ export default function NewPaymentPage({ searchParams }: PageProps<"/coach/finan
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/finances">← Finances</TextLink>
+        <TextLink href="/coach/finances">Finances</TextLink>
       </p>
       <div className="mt-4">
         <PageHeader title="Record a payment" eyebrow="Money you've received" />

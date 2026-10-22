@@ -96,7 +96,7 @@ export function FindYourTraining() {
                 href={c.href}
                 className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
               >
-                {c.cta} <span aria-hidden="true">→</span>
+                {c.cta}
               </Link>
             </div>
           </li>

@@ -53,7 +53,7 @@ export default function ClientPage({ params, searchParams }: PageProps<"/coach/c
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/clients">← Clients</TextLink>
+        <TextLink href="/coach/clients">Clients</TextLink>
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading the client…</p>}>
         <ClientView params={params} searchParams={searchParams} />

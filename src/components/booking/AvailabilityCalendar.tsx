@@ -168,9 +168,9 @@ function MonthButton({ direction, disabled, onClick }: { direction: "previous" |
       onClick={onClick}
       disabled={disabled}
       aria-label={`${direction === "previous" ? "Previous" : "Next"} month`}
-      className="inline-flex size-11 items-center justify-center transition-colors hover:bg-surface disabled:text-line disabled:hover:bg-transparent"
+      className="inline-flex min-h-11 items-center justify-center px-3 text-sm font-semibold transition-colors hover:bg-surface disabled:text-line disabled:hover:bg-transparent"
     >
-      <span aria-hidden="true">{direction === "previous" ? "←" : "→"}</span>
+      {direction === "previous" ? "Previous" : "Next"}
     </button>
   );
 }
