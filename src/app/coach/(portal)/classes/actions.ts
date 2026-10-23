@@ -9,6 +9,7 @@ import { actionContext } from "@/lib/coach/context";
 import { dbMessage } from "@/lib/coach/errors";
 import { ATTENDANCE_STATUS } from "@/lib/coach/labels";
 import { FormReader } from "@/lib/coach/validate";
+import { payWithCredit, periodOn } from "@/lib/coach/memberships";
 
 const CHECK = "Please check the highlighted fields.";
 
@@ -28,12 +29,20 @@ export async function addAttendeeAction(_prev: ActionState, formData: FormData):
   if ("error" in ctx) return ctx.error;
   const form = new FormReader(formData);
   const clientId = form.id("client", { label: "a client", required: true });
-  const price = form.pounds("price", { label: "the price", required: true, allowZero: true });
+  const useCredit = form.checked("credit");
+  const price = useCredit ? 0 : form.pounds("price", { label: "the price", required: true, allowZero: true });
   const chosen = readClass(form, String(formData.get("class") ?? ""), ctx.today);
   if (!form.ok || !chosen || price === null) return failure(CHECK, form.errors);
   const client = await getClient(ctx.db, clientId);
   if (!client.ok) return failure(dbMessage(client.error));
   if (!client.data) return failure("That client no longer exists.", { client: "Choose a client." });
+  // A member's place: check there's a credit before adding them, so nobody is added unpaid by mistake.
+  if (useCredit) {
+    const period = await periodOn(ctx.db, clientId, chosen.date);
+    if (!period.ok) return failure(dbMessage(period.error));
+    if (!period.data) return failure(dbMessage({ kind: "rule", code: "P0001", rule: "no_membership" }), { credit: "No membership period covers this class." });
+    if (period.data.credits_left < 1) return failure(dbMessage({ kind: "rule", code: "P0001", rule: "no_credits" }), { credit: "No credits left in this period." });
+  }
   const occ = occurrence(chosen.date, chosen.slot);
   const result = await addAttendee(ctx.db, {
     clientId,
@@ -45,6 +54,12 @@ export async function addAttendeeAction(_prev: ActionState, formData: FormData):
     description: classChargeDescription(chosen.date, chosen.slot),
   });
   if (!result.ok) return failure(dbMessage(result.error));
+  if (useCredit) {
+    const paid = await payWithCredit(ctx.db, result.data);
+    refresh();
+    if (!paid.ok) return failure(`${client.data.full_name} was added, but the credit couldn't be used: ${dbMessage(paid.error)}`);
+    return success(`${client.data.full_name} added, paid with a membership credit.`);
+  }
   refresh();
   return success(`${client.data.full_name} added${price > 0 ? ", with the class charge" : ""}.`);
 }

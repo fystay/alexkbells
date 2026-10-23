@@ -12,26 +12,27 @@ export const CLASS_WINDOW_DAYS = 28;
 
 const WEEKDAYS: Weekday[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-/** Only the fields the browser needs. */
-export type ClassSlot = Pick<ClassSession, "day" | "start">;
+/** Only the fields the browser needs (`id`, the timetable slot, to mark full classes). */
+export type ClassSlot = Pick<ClassSession, "day" | "start"> & { id?: string };
 
 export function classSlotId(date: DateKey, time: TimeOfDay): string {
   return `class-${date}-${time}`;
 }
 
-export function classAvailability(sessions: readonly ClassSlot[], today: DateKey): AvailabilityWindow {
+/**
+ * `full`: "slot|date" keys of classes that have reached the capacity Alex set
+ * (lib/class-capacity.ts); they show as fully booked and can't be chosen.
+ */
+export function classAvailability(sessions: readonly ClassSlot[], today: DateKey, full: ReadonlySet<string> = new Set()): AvailabilityWindow {
   const from = addDays(today, 1);
   const to = addDays(today, CLASS_WINDOW_DAYS);
   const days: DayAvailability[] = [];
   for (let i = 1; i <= CLASS_WINDOW_DAYS; i++) {
     const date = addDays(today, i);
     const day = WEEKDAYS[weekdayIndex(date)];
-    const times = sessions
-      .filter((s) => s.day === day)
-      .map((s) => s.start)
-      .sort();
-    if (times.length === 0) continue;
-    days.push({ date, slots: times.map((time) => ({ id: classSlotId(date, time), time, available: true })) });
+    const todays = sessions.filter((s) => s.day === day).sort((a, b) => a.start.localeCompare(b.start));
+    if (todays.length === 0) continue;
+    days.push({ date, slots: todays.map((s) => ({ id: classSlotId(date, s.start), time: s.start, available: !(s.id && full.has(`${s.id}|${date}`)) })) });
   }
   return { source: "live", from, to, days };
 }

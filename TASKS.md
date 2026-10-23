@@ -129,10 +129,12 @@ See Coach portal below.
 - [x] Public sign-ups off in Supabase (verified 2026-10-20)
 - [ ] **P0** Turn on leaked-password protection (Auth → Providers → Email; affects the shared project's other app too); change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
 - [x] Email alerts to Alex: outcome recorded per request, one immediate retry, daily cron retry inside the provider's idempotency window, shown in the portal (2026-10-20, code only)
-- [ ] **P0** Turn alerts on: apply `20261020000100_akb_request_alerts.sql`, Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
+- [x] `20261020000100_akb_request_alerts.sql` applied to the live database (2026-10-23)
+- [ ] **P0** Turn alerts on: Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
 - [ ] **P1** Alex adds retention periods for client and financial records to `/privacy`
 - [ ] **P1** Real-device pass of the portal on Alex's phone
-- [ ] **P2** Default class capacity per timetable slot (now set per date); public calendar showing full dates once capacities exist
+- [x] Public calendar hides full dates and the server refuses them, from capacities set per date (2026-10-23)
+- [ ] **P2** Default class capacity per timetable slot (now set per date)
 - [ ] **P2** Anonymise-on-request for former clients with financial history (now: set to Former)
 - [x] Square card payments built (2026-10-21): payment links per charge, signed webhooks re-read from Square, duplicate-event table, idempotent ledger functions, refunds mirrored from Square, daily reconciliation, sandbox/production guard (code + migration `20261021000000_akb_square.sql`, not applied)
 - [x] Test-environment options and costs checked; database + app safeguards against Sandbox records in the live database (2026-10-21)
@@ -145,7 +147,9 @@ See Coach portal below.
 
 ## Master redesign (2026-10-22)
 - [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
-- [ ] P0 Decide membership billing: Square Subscriptions (needs the plan set up in Square, API access verified against current docs, a webhook for renewals, and a credit ledger with idempotent allocation per four-week period) or manual billing through the coach portal. Until then buttons are enquiries
+- [x] Memberships in the coach portal (2026-10-23, migration `20261023000000_akb_memberships.sql` applied live): plan carried on the booking request, start from the request, four-week periods with credits and one charge each, daily renewal cron (`/api/cron/membership-renewals`), pay class places with credits, 24-hour rule enforced in the database, give a credit back, pause/resume/cancel
+- [ ] P0 Owner: confirm manual membership billing (portal charge each period, paid by Square link or recorded by hand) is acceptable, or ask for Square Subscriptions (automatic card billing; needs the plan in Square and the API checked against current docs)
+- [ ] P1 Coach cancels a whole class: return every member's credit in one step (today: "Give credit back" per place)
 - [ ] P0 Confirm class capacity (set per class in the coach portal; blank means not full)
 - [ ] P1 Square Sandbox end-to-end test of payment links (DEPLOYMENT.md), then live credentials
 - [ ] P1 Confirm brand name on the site (RAENG Kettlebell Club vs Alex K Bells)
@@ -154,7 +158,7 @@ See Coach portal below.
 - [x] New logo (black/cream), cream-led palette, hero video support, /memberships (cards, terms, cancellation policy), coach + before/after on home, minimal imagery, £12 class price, tests
 - [x] Hero film cut from supplied footage (2026-10-21)
 - [ ] P0 Confirm everyone in the hero film, hero still and before/after photos agrees to appear; a higher-resolution clip would look sharper on large screens
-- [ ] P0 Decide how memberships are sold and billed (Square Subscriptions? manual?) and build credits/renewals; until then buttons are enquiries. Check the auto-renew and "credit returned to your account" wording against what actually happens
+- [x] Credits/renewals built (see Master redesign). The auto-renew and "credit returned" wording now matches the portal: renewal creates the period, credits and charge; an in-time cancellation returns the credit
 - [ ] P1 Check the £12 price in the coach portal's stored data (`akb_` tables keep their own per-class price if one was saved)
 
 ## RAENG rebrand (2026-10-21)

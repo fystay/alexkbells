@@ -317,7 +317,8 @@ test.describe("production configuration", () => {
     const window = classAvailability(timetable.sessions, toDateKey(new Date()));
     const day = window.days[0];
     const shown = window.days.filter((d) => d.date.slice(0, 7) === day.date.slice(0, 7));
-    await expect(page.locator('[data-status="available"]')).toHaveCount(shown.length);
+    // (Another test may fill one class up meanwhile: available or fully booked, every class date is shown.)
+    await expect(page.locator('[data-status="available"], [data-status="full"]')).toHaveCount(shown.length);
     await pickDate(page, `${formatLongDate(day.date)}, available`);
     await page.locator("#times label").first().click();
 
@@ -406,6 +407,60 @@ test.describe("production configuration", () => {
     await page.goto(`${PROD}/coach/requests`);
     await page.getByRole("link", { name: /EMAIL-DOWN Booker/ }).first().click();
     await expect(page.locator("dt", { hasText: "Email alert" }).locator("xpath=following-sibling::dd")).toContainText("Not sent yet (1 try)");
+  });
+
+  test("a plan chosen on the plan cards travels with the request to Alex", async ({ page, request }) => {
+    await page.goto(`${PROD}/book/group-class?plan=regular`);
+    await expect(page.getByText("Regular · £65 / 4 weeks · 8 class credits")).toBeVisible();
+    const day = classAvailability(timetable.sessions, toDateKey(new Date())).days[0];
+    await pickDate(page, `${formatLongDate(day.date)}, available`);
+    await page.locator("#times label").first().click();
+    await continueButton(page).click();
+    await choose(page, "Advanced");
+    await page.getByRole("textbox", { name: "Name" }).fill("Plan Chooser");
+    await page.getByRole("textbox", { name: "Email" }).fill("plan-chooser@example.com");
+    await page.waitForTimeout(3100);
+    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await expect(page.getByRole("status")).toContainText("Request sent");
+    const row = (await stored(request)).find((r) => r.name === "Plan Chooser");
+    expect(row).toMatchObject({ details: { plan: "regular", membership: "Regular membership (£65 every 4 weeks, 8 class credits)" } });
+    expect(row!.summary).toContain("Regular membership");
+    const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Plan Chooser");
+    expect(sent!.payload.text).toContain("Membership: Regular membership (£65 every 4 weeks, 8 class credits)");
+  });
+
+  test("a made-up plan in the link is ignored", async ({ page }) => {
+    await page.goto(`${PROD}/book/group-class?plan=platinum`);
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+    await expect(page.getByText("Your plan")).toHaveCount(0);
+  });
+
+  test("a class that has reached its capacity shows as fully booked and can't be requested", async ({ page, request }) => {
+    // The last class date in the booking window, filled to a capacity of 1 in the coach database.
+    const window = classAvailability(timetable.sessions, toDateKey(new Date()));
+    const last = window.days[window.days.length - 1];
+    const session = timetable.sessions.find((s) => s.start === last.slots[0].time && new Date(`${last.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }) === s.day)!;
+    const run = async (query: string, params: unknown[] = []) => {
+      const r = await request.post(`${SUPABASE}/test/sql`, { data: { sql: query, params } });
+      expect(r.ok(), await r.text()).toBe(true);
+      return (await r.json()) as Record<string, unknown>[];
+    };
+    const [client] = await run("insert into akb_clients (full_name, email, status) values ('Full Class', $1, 'active') returning id", [`full-${Date.now()}@example.com`]);
+    await run("select akb_add_attendee($1, $2, $3::date, $4::timestamptz, 60, 0, 'Group class')", [client.id, session.id, last.date, `${last.date}T18:30:00Z`]);
+    await run("update akb_class_sessions set capacity = 1 where slot = $1 and class_date = $2::date", [session.id, last.date]);
+    try {
+      const api = await request.get(`${PROD}/api/classes/full`);
+      expect(await api.json()).toMatchObject({ known: true, full: expect.arrayContaining([`${session.id}|${last.date}`]) });
+      expect(JSON.stringify(await (await request.get(`${PROD}/api/classes/full`)).json())).not.toContain("Full Class");
+
+      await page.goto(`${PROD}/book/group-class`);
+      await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+      const cell = page.getByLabel(`${formatLongDate(last.date)}, fully booked`);
+      for (let i = 0; i < 2 && !(await cell.count()); i++) await page.getByRole("button", { name: "Next" }).first().click();
+      await expect(cell).toBeDisabled();
+    } finally {
+      await run("update akb_class_sessions set capacity = null where slot = $1 and class_date = $2::date", [session.id, last.date]);
+    }
   });
 
   test("Square endpoints are off until Square is configured, and never accept unsigned calls", async ({ request }) => {

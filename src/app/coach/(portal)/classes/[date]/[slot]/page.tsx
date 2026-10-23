@@ -14,9 +14,11 @@ import { listRequests } from "@/lib/coach/requests";
 import { PAYMENT_STATE_LABEL, paymentState } from "@/lib/coach/revenue";
 import { addMinutesIso, formatClock, formatLongDate, formatStamp, toLondon } from "@/lib/coach/time";
 import type { AttendanceStatus } from "@/lib/coach/types";
-import { ActionForm, Field, MoneyField, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
+import { ActionForm, Checkbox, Field, MoneyField, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
 import { Badge, EmptyState, LoadError, Panel, TextLink } from "@/components/coach/ui";
 import { addAttendeeAction, setAttendanceAction, updateClassAction } from "../../actions";
+import { payWithCreditAction, returnCreditAction } from "../../../memberships/actions";
+import { creditsLine, periodsOn } from "@/lib/coach/memberships";
 
 export const metadata: Metadata = { title: "Class" };
 
@@ -57,6 +59,10 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
   if (!places.ok) return <LoadError message={loadMessage(places.error)} />;
   const charges = places.data.length ? await listCharges(db, { attendanceIds: places.data.map((p) => p.id) }) : { ok: true as const, data: [] };
   if (!charges.ok) return <LoadError message={loadMessage(charges.error)} />;
+  // Members with a period covering this class (for "Pay with a credit").
+  const periods = await periodsOn(db, clients.filter((c) => c.status !== "former").map((c) => c.id), date);
+  if (!periods.ok) return <LoadError message={loadMessage(periods.error)} />;
+  const periodFor = (clientId: string) => periods.data.find((x) => x.client_id === clientId);
 
   const name = (id: string) => clients.find((c) => c.id === id)?.full_name ?? "Client";
   const pending = requests.filter((r) => r.status === "new" || r.status === "awaiting");
@@ -94,13 +100,21 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
                 {places.data.map((p) => {
                   const charge = charges.data.find((c) => c.attendance_id === p.id);
                   const state = paymentState(charge);
+                  const onCredit = Boolean(p.membership_period_id);
+                  const period = periodFor(p.client_id);
+                  const canUseCredit = !onCredit && (p.status === "booked" || p.status === "attended") && period && period.credits_left > 0 && state !== "paid" && state !== "part";
+                  const forfeited = onCredit && (p.status === "no_show" || (p.status === "cancelled" && p.late_cancel));
                   return (
                     <li key={p.id} className="py-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <TextLink href={`/coach/clients/${p.client_id}?tab=bookings`}>{name(p.client_id)}</TextLink>
                         <span className="flex flex-wrap gap-2">
                           <Badge tone={p.status === "attended" ? "strong" : p.status === "booked" ? "plain" : "muted"}>{ATTENDANCE_STATUS[p.status]}</Badge>
-                          <Badge tone={state === "unpaid" || state === "part" ? "strong" : "muted"}>{PAYMENT_STATE_LABEL[state]}</Badge>
+                          {onCredit ? (
+                            <Badge tone="muted">{forfeited ? "Credit used (late or missed)" : p.status === "cancelled" ? "Credit returned" : "Membership credit"}</Badge>
+                          ) : (
+                            <Badge tone={state === "unpaid" || state === "part" ? "strong" : "muted"}>{PAYMENT_STATE_LABEL[state]}</Badge>
+                          )}
                         </span>
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -112,7 +126,23 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
                             </SubmitButton>
                           ))}
                         </ActionForm>
-                        {charge && (state === "unpaid" || state === "part") ? (
+                        {canUseCredit ? (
+                          <ActionForm action={payWithCreditAction} label={`Pay with a credit for ${name(p.client_id)}`}>
+                            <input type="hidden" name="attendance" value={p.id} />
+                            <SubmitButton variant="secondary" className="min-h-11 px-3 text-xs">
+                              Pay with a credit ({creditsLine(period)})
+                            </SubmitButton>
+                          </ActionForm>
+                        ) : null}
+                        {forfeited ? (
+                          <ActionForm action={returnCreditAction} label={`Give the credit back to ${name(p.client_id)}`} confirm="Give the credit back? The place is marked cancelled.">
+                            <input type="hidden" name="attendance" value={p.id} />
+                            <SubmitButton variant="quiet" className="min-h-11 text-xs">
+                              Give credit back
+                            </SubmitButton>
+                          </ActionForm>
+                        ) : null}
+                        {!onCredit && charge && (state === "unpaid" || state === "part") ? (
                           <TextLink href={`/coach/finances/payments/new?client=${p.client_id}&charge=${charge.id}`} className="text-sm">
                             Record payment
                           </TextLink>
@@ -148,6 +178,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
                 <input type="hidden" name="class" value={classValue} />
                 <SelectField name="client" label="Client" required placeholder="Choose a client" options={addable.map((c) => ({ value: c.id, label: c.full_name }))} />
                 <MoneyField name="price" label="Price" defaultValue={penceToInput(defaultPrices().classPence)} required hint="0 for a free place." />
+                <Checkbox name="credit" label="Pay with their membership credit" hint="For members: no class charge; one credit from their current period is used." />
                 <div>
                   <SubmitButton variant="secondary">Add to class</SubmitButton>
                 </div>

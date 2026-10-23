@@ -46,7 +46,7 @@ redeploy: pages, including `/book`, are prerendered at build time.
 | `RESEND_API_KEY` | Optional since requests are stored in Supabase: API key from Alex's own Resend account, "sending access" only | a separate test key, optional | Mark as Sensitive in Vercel. With the two settings below, also emails each request to Alex |
 | `BOOKING_NOTIFY_EMAIL` | Alex's inbox for booking requests | a test inbox | Requests arrive here with Reply-To set to the visitor |
 | `BOOKING_FROM_EMAIL` | e.g. `Alex K Bells <bookings@<verified domain>>` | same | Must be on a domain verified in Resend (needs the domain decision; DNS records with Alex's approval) |
-| `CRON_SECRET` | random string, 32+ characters (e.g. `openssl rand -hex 32`) — needed with the Resend settings | same, optional | Sensitive. Vercel Cron sends it as `Authorization: Bearer …` to `/api/cron/request-alerts`, which resends failed alerts to Alex. Without it (or under 16 characters) the endpoint refuses every call |
+| `CRON_SECRET` | random string, 32+ characters (e.g. `openssl rand -hex 32`) — needed with the Resend settings and for membership renewals | same, optional | Sensitive. Vercel Cron sends it as `Authorization: Bearer …` to `/api/cron/request-alerts` (resends failed alerts to Alex), `/api/cron/membership-renewals` and `/api/cron/square-reconcile`. Without it (or under 16 characters) the endpoint refuses every call |
 | `SUPABASE_URL` | `https://sqkpixwvugrxllrxlexs.supabase.co` — **set** | same — **set** | Project `Alexkbells` in the developer's Supabase organisation. Turns on booking requests (stored) and the coach login |
 | `SUPABASE_SECRET_KEY` | secret key (`sb_secret_...`) from the Supabase dashboard — **set 2026-10-17** | same — **set** | Sensitive. Bypasses RLS, so server code only. `SUPABASE_URL` also set for both, 2026-10-17 |
 | `COACH_EMAIL` | **set 2026-10-18** to the developer's account (Supabase user created the same day); change to Alex's email at handover (comma-separate to allow more than one) | same — **set** | Turns on `/coach/login` with the two Supabase settings. Only these addresses can sign in |
@@ -109,12 +109,20 @@ The portal uses the same settings as the coach login (`SUPABASE_URL`, `SUPABASE_
 
 Each new booking request (group class or one-to-one) and online coaching enquiry is stored and, when the Resend settings are set, emailed to `BOOKING_NOTIFY_EMAIL`. The two are independent (ARCHITECTURE.md → Key decisions 5). To turn alerts on:
 
-1. Apply `supabase/migrations/20261020000100_akb_request_alerts.sql` (adds nullable `alert_*` columns to `akb_booking_requests` only; safe to run again). The site works before it is applied: requests are still stored, and only the alert outcome isn't recorded (a log line says so).
+1. ~~Apply `supabase/migrations/20261020000100_akb_request_alerts.sql`~~ Applied to the live database 2026-10-23.
 2. A Resend account owned by Alex, with a verified sending domain (DNS records on his domain). Without a domain, Resend's test sender `onboarding@resend.dev` only delivers to the Resend account's own address.
 3. In Vercel → Production: `RESEND_API_KEY` (Sensitive, sending access only), `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`; redeploy.
 4. Check: send a test request; the coach area's request page shows "Email alert: Sent …"; Vercel → Settings → Cron Jobs lists `/api/cron/request-alerts`.
 
 Retries: a transient failure (no answer, 429, 5xx) is retried once straight away; anything still failed is retried by the daily cron (07:17 UTC; Hobby plans allow daily jobs only) while it is under 23 hours old, the window in which Resend still recognises the idempotency key, so a retry can't deliver a second copy. On a Pro plan an hourly schedule (`17 * * * *` in `vercel.json`) catches every failure inside that window. A failure older than that stays "Not sent yet" on the request page; the request itself is always in the inbox.
+
+### Memberships (2026-10-23, live database)
+
+`supabase/migrations/20261023000000_akb_memberships.sql` is applied (tables `akb_memberships`, `akb_membership_periods`, two columns on `akb_class_attendance`, functions service-role only; checked: `anon`/`authenticated` have no access). Plans, prices and credits come from `src/content/memberships.ts` only.
+
+- `/api/cron/membership-renewals` runs daily (06:11 UTC, `CRON_SECRET` bearer) and creates each active membership's next period, credits and charge once (re-running creates nothing). Without `CRON_SECRET` no renewals happen; Alex can still start memberships, and the next run catches up.
+- Billing is manual: each period's charge appears in Finances as owed; record the payment, or send a Square link once Square is live. Nothing charges a card automatically.
+- Capacity: set a class date's capacity in the portal; once full, the public calendar shows it unavailable (`/api/classes/full`, cached 30 s) and the server refuses requests for it.
 
 Data kept: client details, bookings, payments and notes, all in Supabase (EU West). Alex should add retention to the privacy notice (e.g. delete former clients' records after N years; financial records are usually kept six years in the UK). A former client with no bookings or payments can be deleted from their record; anyone with history is kept (set them to Former).
 

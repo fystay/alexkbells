@@ -102,16 +102,29 @@ export function confirmRequest(
 }
 
 /** The parts of a request's details the portal uses. */
-export function requestDetails(request: Pick<BookingRequest, "details">): { experience: string; classDate: string; classSlot: string; days: string; times: string; other: [string, string][] } {
+export function requestDetails(request: Pick<BookingRequest, "details">): {
+  experience: string;
+  classDate: string;
+  classSlot: string;
+  days: string;
+  times: string;
+  /** Plan id chosen on the membership cards ("starter", "regular", "dedicated"), or "". */
+  plan: string;
+  /** e.g. "Regular membership (£65 every 4 weeks, 8 class credits)". */
+  membership: string;
+  other: [string, string][];
+} {
   const d = request.details ?? {};
   const str = (key: string) => (typeof d[key] === "string" ? (d[key] as string) : "");
-  const known = new Set(["experience", "classDate", "classSlot", "days", "times"]);
+  const known = new Set(["experience", "classDate", "classSlot", "days", "times", "plan", "membership"]);
   return {
     experience: str("experience"),
     classDate: str("classDate"),
     classSlot: str("classSlot"),
     days: str("days"),
     times: str("times"),
+    plan: str("plan"),
+    membership: str("membership"),
     other: Object.entries(d)
       .filter(([k, v]) => !known.has(k) && typeof v === "string")
       .map(([k, v]) => [k, v as string]),

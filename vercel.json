@@ -9,6 +9,10 @@
     {
       "path": "/api/cron/square-reconcile",
       "schedule": "23 7 * * *"
+    },
+    {
+      "path": "/api/cron/membership-renewals",
+      "schedule": "11 6 * * *"
     }
   ]
 }

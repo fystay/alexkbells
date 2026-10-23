@@ -67,6 +67,9 @@ test.describe("access", () => {
     "/coach/sessions",
     "/coach/sessions/new",
     "/coach/online",
+    "/coach/memberships",
+    "/coach/memberships/new",
+    "/coach/memberships/00000000-0000-4000-8000-000000000000",
     "/coach/finances",
     "/coach/finances/payments/new",
   ];
@@ -391,6 +394,60 @@ test("finances: totals by period and service, and a safe CSV export", async ({ p
   await expect(page.getByText("No payments in this period.")).toBeVisible();
 });
 
+test("memberships: start the plan chosen on the site, pay places with credits, 24-hour rule, renewals", async ({ page, request }) => {
+  const person = unique("Member Flow");
+  const clientId = await seedClient(request, person);
+  const requestId = await seedRequest(request, person, {
+    details: { plan: "starter", membership: "Starter membership (£40 every 4 weeks, 4 class credits)" },
+  });
+  await signIn(page);
+
+  // The request shows the plan, and starts it prefilled.
+  await page.goto(`/coach/requests/${requestId}`);
+  await expect(page.getByText("Starter membership (£40 every 4 weeks, 4 class credits)")).toBeVisible();
+  await page.getByRole("link", { name: "Start this membership" }).click();
+  await expect(page).toHaveURL(/\/coach\/memberships\/new\?plan=starter/);
+  await expect(page.getByRole("combobox", { name: "Client" })).toHaveValue(clientId);
+  await expect(page.getByRole("radio", { name: /Starter/ })).toBeChecked();
+  await page.getByRole("button", { name: "Start membership" }).click();
+  await expect(page.getByRole("status")).toContainText("Membership started");
+  await expect(page.getByText("4 of 4 credits left").first()).toBeVisible();
+  const membershipUrl = page.url();
+  const [row] = await sql<{ request_id: string; price_pence: number }>(request, "select request_id, price_pence from akb_memberships where client_id = $1", [clientId]);
+  expect(row).toEqual({ request_id: requestId, price_pence: 4000 });
+
+  // A class a week ahead (inside the period, more than 24 hours away), paid with a credit.
+  const date = next(0, 1);
+  await page.goto(`/coach/classes/${date}/mon-evening`);
+  const add = page.getByRole("form", { name: "Add someone to this class" });
+  await add.getByLabel("Client").selectOption({ label: person.name });
+  await add.getByLabel("Pay with their membership credit").check();
+  await add.getByRole("button", { name: "Add to class" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "paid with a membership credit" })).toBeVisible();
+  const mine = page.getByRole("listitem").filter({ hasText: person.name });
+  await expect(mine.getByText("Membership credit")).toBeVisible();
+  await page.goto(membershipUrl);
+  await expect(page.getByText("3 of 4 credits left").first()).toBeVisible();
+
+  // Cancelled more than 24 hours ahead: the credit comes back.
+  await page.goto(`/coach/classes/${date}/mon-evening`);
+  await page.getByRole("form", { name: `Attendance for ${person.name}` }).getByRole("button", { name: "Cancelled" }).click();
+  await expect(mine.getByText("Credit returned")).toBeVisible();
+  await page.goto(membershipUrl);
+  await expect(page.getByText("4 of 4 credits left").first()).toBeVisible();
+
+  // The daily renewal needs the cron secret and is safe to repeat.
+  expect((await request.get("/api/cron/membership-renewals")).status()).toBe(401);
+  for (let i = 0; i < 2; i++) {
+    const renew = await request.get("/api/cron/membership-renewals", { headers: { authorization: "Bearer e2e-cron-secret-0123456789" } });
+    expect(renew.status()).toBe(200);
+    expect(renew.headers()["cache-control"]).toContain("no-store");
+    expect(Object.keys((await renew.json()) as object).sort()).toEqual(["ok", "periodsCreated"]);
+  }
+  const periods = await sql<{ n: number }>(request, "select count(*)::int as n from akb_membership_periods p join akb_memberships m on m.id = p.membership_id where m.client_id = $1", [clientId]);
+  expect(periods).toEqual([{ n: 1 }]);
+});
+
 test("a database outage shows an error, not empty data", async ({ page }) => {
   await signIn(page);
   await page.goto("/coach/clients?q=FAIL-TEST");
@@ -406,7 +463,7 @@ test.describe("on a phone", () => {
     const clientId = await seedClient(request, person);
     const requestId = await seedRequest(request, unique("Phone Request"), { details: { classDate: next(5, 1), classSlot: "sat-morning" } });
     await signIn(page);
-    for (const path of ["/coach", "/coach/requests", `/coach/requests/${requestId}`, "/coach/clients", `/coach/clients/${clientId}`, `/coach/classes/${next(5)}/sat-morning`, "/coach/sessions", "/coach/online", "/coach/finances", "/coach/finances/payments/new"]) {
+    for (const path of ["/coach", "/coach/requests", `/coach/requests/${requestId}`, "/coach/clients", `/coach/clients/${clientId}`, `/coach/classes/${next(5)}/sat-morning`, "/coach/sessions", "/coach/online", "/coach/memberships", "/coach/memberships/new", "/coach/finances", "/coach/finances/payments/new"]) {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

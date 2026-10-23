@@ -21,6 +21,7 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
+import { useChosenPlan } from "@/lib/chosen-plan";
 import {
   ActionBar,
   ChoiceGroup,
@@ -83,6 +84,9 @@ const getServerToday = () => null;
 
 export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
   const demo = mode === "demo";
+  const chosenPlan = useChosenPlan();
+  const [full, setFull] = useState<string[]>([]);
+  const fullSet = new Set(full);
   const initialStep = initialService ? 1 : 0;
   const [step, setStepState] = useState(initialStep);
   // The first step appears without the fade; later steps fade in so the change is noticed.
@@ -149,7 +153,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       ? loaded.window
       : null
     : usesSessions && today
-      ? classAvailability(classes, today)
+      ? classAvailability(classes, today, fullSet)
       : null;
   const chosenSlot = avail?.days.find((d) => d.date === date)?.slots.find((s) => s.id === slotId && s.available) ?? null;
   const chosenClass =
@@ -158,6 +162,22 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       : null;
 
   const done = demo ? demoDone : serverState.status === "success";
+
+  // Live classes: which dates are full (capacity reached in the coach portal).
+  // Best effort: if it can't be read, every date stays open and Alex confirms.
+  useEffect(() => {
+    if (demo || service !== "group-class") return;
+    let live = true;
+    fetch("/api/classes/full")
+      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown }>) : { full: [] }))
+      .then((body) => {
+        if (live && Array.isArray(body.full)) setFull(body.full.filter((k): k is string => typeof k === "string"));
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [demo, service]);
 
   useEffect(() => {
     if (!demo || !service || !today) return;
@@ -521,6 +541,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                     <input type="hidden" name="classDate" value={date} />
                   </>
                 ) : null}
+                {/* The membership plan chosen on the plan cards (?plan=), group classes only. */}
+                {chosenPlan && service === "group-class" ? <input type="hidden" name="plan" value={chosenPlan.id} /> : null}
                 {!demo && !usesSessions ? days.map((d) => <input key={d} type="hidden" name="days" value={d} />) : null}
                 {!demo && !usesSessions ? times.map((t) => <input key={t} type="hidden" name="times" value={t} />) : null}
                 <SubmissionMeta meta={meta} />

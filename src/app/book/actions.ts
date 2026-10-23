@@ -4,6 +4,7 @@ import { bookingMode } from "@/lib/booking";
 import { BOOKABLE_SERVICES, BOOKING_EXPERIENCE, PREFERRED_DAYS, PREFERRED_TIMES, labelFor, listLabels } from "@/lib/booking-options";
 import {
   bookingEmail,
+  describePlan,
   describeWhen,
   isBookingFormEnabled,
   parseBookingRequest,
@@ -12,6 +13,8 @@ import {
   type FormState,
 } from "@/lib/booking-request";
 import { publishedClasses } from "@/lib/class-sessions";
+import { fullClasses, fullKey } from "@/lib/class-capacity";
+import { londonToday } from "@/lib/coach/time";
 import { deliverRequest } from "@/lib/deliver-request";
 import { idempotencyKey } from "@/lib/send-email";
 
@@ -45,6 +48,14 @@ export async function submitBookingRequest(
   }
 
   const { data } = parsed;
+  // Never trust the calendar: a class that has reached its capacity can't be requested.
+  const slot = publishedClasses().find((c) => c.label === data.session);
+  if (data.service === "group-class" && data.classDate && slot) {
+    const full = await fullClasses(londonToday());
+    if (full.known && full.keys.includes(fullKey(slot.id, data.classDate))) {
+      return { status: "error", message: "Please check the highlighted fields.", errors: { when: "That class is now full. Choose another date." } };
+    }
+  }
   const key = await idempotencyKey([
     data.submissionId,
     data.service,
@@ -55,13 +66,14 @@ export async function submitBookingRequest(
     data.days.join(","),
     data.times.join(","),
     data.message,
+    data.plan,
   ]);
   const delivered = await deliverRequest(
     {
       idempotencyKey: key,
       kind: "booking",
       service: labelFor(BOOKABLE_SERVICES, data.service),
-      summary: describeWhen(data),
+      summary: data.plan ? `${describeWhen(data)} · ${describePlan(data.plan).split(" (")[0]}`.slice(0, 300) : describeWhen(data),
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -93,6 +105,11 @@ function requestDetails(data: BookingRequest): Record<string, string> {
   if (data.session && data.classDate && slot) {
     details.classDate = data.classDate;
     details.classSlot = slot.id;
+  }
+  // The plan id lets the coach portal start that membership from the request.
+  if (data.plan) {
+    details.plan = data.plan;
+    details.membership = describePlan(data.plan);
   }
   if (data.days.length) details.days = listLabels(data.days.map((d) => labelFor(PREFERRED_DAYS, d)));
   if (data.times.length) details.times = listLabels(data.times.map((t) => labelFor(PREFERRED_TIMES, t)));

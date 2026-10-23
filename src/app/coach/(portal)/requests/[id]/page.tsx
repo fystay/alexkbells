@@ -16,7 +16,7 @@ import { addDays, formatDate, formatDateTime, formatStamp } from "@/lib/coach/ti
 import type { BookingRequest, Client } from "@/lib/coach/types";
 import { ActionForm, Field, MoneyField, RadioGroup, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
 import { Flash } from "@/components/coach/Flash";
-import { Badge, Details, LoadError, Notice, Panel, TextLink } from "@/components/coach/ui";
+import { ActionLink, Badge, Details, LoadError, Notice, Panel, TextLink } from "@/components/coach/ui";
 import { awaitingAction, cancelAction, completeAction, confirmRequestAction, declineAction, notifiedAction } from "../actions";
 
 export const metadata: Metadata = { title: "Request" };
@@ -85,6 +85,7 @@ async function RequestView({ params, searchParams }: { params: PageProps<"/coach
               ["When", request.summary || "—"],
               ...(details.days ? ([["Preferred days", details.days]] as [string, string][]) : []),
               ...(details.times ? ([["Preferred times", details.times]] as [string, string][]) : []),
+              ...(details.membership ? ([["Membership", details.membership]] as [string, string][]) : []),
               ["Experience", details.experience],
               ...details.other.map(([k, v]) => [k.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()), v] as [string, string]),
               ["Message", request.message ? <span className="whitespace-pre-line">{request.message}</span> : ""],
@@ -96,6 +97,18 @@ async function RequestView({ params, searchParams }: { params: PageProps<"/coach
               ...(request.alert_status ? ([["Email alert", alertLabel(request)]] as [string, string][]) : []),
             ]}
           />
+          {details.plan ? (
+            <div className="mt-4">
+              {/* They chose a plan on the site: start it here (prefilled), once you've agreed it with them. */}
+              <ActionLink
+                href={`/coach/memberships/new?plan=${encodeURIComponent(details.plan)}&request=${request.id}${known ? `&client=${known.id}` : ""}`}
+                variant="secondary"
+              >
+                Start this membership
+              </ActionLink>
+              {!known ? <p className="mt-2 text-sm text-muted">Link or create their client record first, so the membership is on it.</p> : null}
+            </div>
+          ) : null}
         </Panel>
 
         <Panel title="Who is this?" id="who-heading">
