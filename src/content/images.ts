@@ -42,14 +42,14 @@ export const images = {
     alt: "A group in a dark training studio mid-way through kettlebell swings, one person in the foreground",
     position: "50% 55%",
   },
-  /**
-   * "Why kettlebells" tiles (2026-10-23): stills from the owner's class footage,
-   * taken from the hero film (faces in frame, no third-party signage).
-   */
-  whyStrength: { src: "/images/why/strength.jpg", width: 600, height: 800, alt: "A man in a green T-shirt presses a kettlebell overhead in a group class", position: "50% 40%" },
-  whyConditioning: { src: "/images/why/conditioning.jpg", width: 600, height: 800, alt: "A man in a teal T-shirt at the bottom of a kettlebell swing, with the class swinging behind him", position: "50% 50%" },
-  whyMovement: { src: "/images/why/movement.jpg", width: 600, height: 800, alt: "A woman holds a kettlebell at her chest at the bottom of a deep goblet squat", position: "50% 50%" },
-  whyAdaptable: { src: "/images/why/adaptable.jpg", width: 600, height: 800, alt: "Three people swing kettlebells side by side", position: "50% 40%" },
+  /** "Why kettlebells" (option C, owner 2026-10-23): one photo beside the numbered list. Cropped so no third-party signage shows. */
+  whyKettlebells: {
+    src: "/images/why/class-swing.jpg",
+    width: 600,
+    height: 800,
+    alt: "A man in a teal T-shirt at the bottom of a kettlebell swing, with the class swinging behind him",
+    position: "50% 15%",
+  },
 } satisfies Record<string, Photo>;
 
 export type ImageRole = keyof typeof images;

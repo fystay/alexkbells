@@ -11,8 +11,8 @@ export const hero = {
 
 /** Practical benefits of kettlebell training, described, not promised. No medical or results claims. */
 export const whyKettlebells = [
-  { title: "Strength", body: "Train the whole body at once.", image: "whyStrength" },
-  { title: "Conditioning", body: "Strength and fitness, together.", image: "whyConditioning" },
-  { title: "Movement quality", body: "Balance, timing and coordination.", image: "whyMovement" },
-  { title: "Efficient and adaptable", body: "One bit of kit, scaled to you.", image: "whyAdaptable" },
+  { title: "Strength", body: "Train the whole body at once." },
+  { title: "Conditioning", body: "Strength and fitness, together." },
+  { title: "Movement quality", body: "Balance, timing and coordination." },
+  { title: "Efficient and adaptable", body: "One bit of kit, scaled to you." },
 ] as const;

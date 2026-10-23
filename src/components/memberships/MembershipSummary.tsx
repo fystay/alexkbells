@@ -19,8 +19,11 @@ const payg = getService("group-classes").prices[0];
  */
 /** Each card's own action, so a visitor can act where they read the saving. */
 function PlanLink({ href, label, external, kind }: CallToAction) {
-  const verb = kind === "enquiry" && label.startsWith("Enquire") ? "Enquire" : kind === "booking" && label.startsWith("Join") ? "Join" : label;
-  const rest = verb === label ? "" : label.slice(verb.length);
+  // Owner, 2026-10-23: plan cards say "Select" while joining goes through an enquiry
+  // ("Enquire about Starter" -> "Select" + hidden " Starter"); "Join" once a join link is set.
+  const enquiry = kind === "enquiry" && label.startsWith("Enquire about ");
+  const verb = enquiry ? "Select" : kind === "booking" && label.startsWith("Join") ? "Join" : label;
+  const rest = enquiry ? ` ${label.slice("Enquire about ".length)}` : verb === label ? "" : label.slice(verb.length);
   return (
     <Link
       href={href}

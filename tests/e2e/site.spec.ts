@@ -771,7 +771,7 @@ test("home: each membership card has its own action, and class times appear once
   const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
   for (const name of ["Starter", "Regular", "Dedicated"]) {
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
-    await expect(card.getByRole("link", { name: new RegExp(`^(Enquire about|Join) ${name}`) })).toHaveCount(1);
+    await expect(card.getByRole("link", { name: new RegExp(`^(Select|Join) ${name}`) })).toHaveCount(1);
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
