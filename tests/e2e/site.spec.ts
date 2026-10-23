@@ -761,3 +761,16 @@ test("section titles are underlined, headings are not", async ({ page }) => {
   expect(await deco(page.locator("#training-heading"))).toBe("none");
   expect(await deco(page.locator("section[aria-labelledby=hero-heading] h1"))).toBe("none");
 });
+
+test("home: each membership card has its own action, and class times appear once", async ({ page }) => {
+  await page.goto("/");
+  const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
+  for (const name of ["Starter", "Regular", "Dedicated"]) {
+    const card = cards.filter({ has: page.getByRole("heading", { name }) });
+    await expect(card.getByRole("link", { name: new RegExp(`^(Enquire about|Join) ${name}`) })).toHaveCount(1);
+  }
+  const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
+  await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await expect(page.locator("main").getByText("Sat 9:00 am")).toHaveCount(1);
+  await expect(page.locator("#practical-heading")).toHaveText("Find us and book");
+});

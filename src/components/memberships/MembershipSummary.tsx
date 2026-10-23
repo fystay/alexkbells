@@ -6,6 +6,7 @@ import { formatPenceShort, maxSavingPence, planFigures } from "@/lib/membership"
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
+import { getMembershipAction, getPrimaryCtaFor, type CallToAction } from "@/lib/booking";
 import { PlanCarousel } from "./PlanCarousel";
 
 const payg = getService("group-classes").prices[0];
@@ -16,7 +17,25 @@ const payg = getService("group-classes").prices[0];
  * per class and saving, the conditions in one line, and one button to the
  * full cards where each plan can be joined.
  */
+/** Each card's own action, so a visitor can act where they read the saving. */
+function PlanLink({ href, label, external, kind }: CallToAction) {
+  const verb = kind === "enquiry" && label.startsWith("Enquire") ? "Enquire" : kind === "booking" && label.startsWith("Join") ? "Join" : label;
+  const rest = verb === label ? "" : label.slice(verb.length);
+  return (
+    <Link
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="mt-4 inline-flex min-h-11 items-center self-start text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
+    >
+      {verb}
+      {rest ? <span className="sr-only">{rest}</span> : null}
+      {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+    </Link>
+  );
+}
+
 export function MembershipSummary() {
+  const book = getPrimaryCtaFor("group-class");
   const card = "flex w-[82%] shrink-0 snap-start flex-col rounded-lg bg-white p-5 sm:w-[46%] sm:p-6 lg:w-auto";
   return (
     <Section id="memberships" labelledBy="memberships-summary-heading">
@@ -49,6 +68,7 @@ export function MembershipSummary() {
                     <span className="sr-only">You save </span>Save {formatPenceShort(f.savingPence)}
                   </span>
                 </p>
+                <PlanLink {...getMembershipAction(plan.name, plan.id)} />
               </li>
             );
           })}
@@ -58,6 +78,8 @@ export function MembershipSummary() {
               <span className="font-display text-4xl tabular-nums">£{payg.amountGbp}</span>
               <span className="ml-1 text-sm"> per class</span>
             </p>
+            <p className="mt-4 flex-1 border-t border-grey pt-4 text-sm">No membership needed.</p>
+            <PlanLink {...book} label="Book now" />
           </li>
         </PlanCarousel>
       </div>
