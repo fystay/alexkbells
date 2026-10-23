@@ -47,13 +47,13 @@ XF = 0.16  # whip length
 # on him; every other moment has the gym's APEX banners right behind him. c1 and
 # c3 show the banners throughout, so they are not used.
 SHOTS = [
-    dict(c="c7", t=0.57, seg=[(4.4, 1.0)], push=0.07, out="cut", port=0.5, pz=1.0, track=False, only="portrait"),
-    dict(c="c7", t=0.57, seg=[(4.4, 1.0)], push=0.07, out="cut", land=0.58, track=False, only="landscape"),  # the class together: opens the film (group shots only here)
+    dict(c="c7", t=0.5, seg=[(0.7, 0.45), (0.65, 1.0), (1.5, 1.0), (0.85, 0.45), (0.3, 1.0)], push=0.07, out="cut", port=0.5, pz=1.0, track=False, only="portrait"),
+    dict(c="c7", t=0.5, seg=[(0.7, 0.45), (0.65, 1.0), (1.5, 1.0), (0.85, 0.45), (0.3, 1.0)], push=0.07, out="cut", land=0.58, track=False, only="landscape"),  # the class together: opens the film (group shots only here)
     dict(c="c5", t=4.75, seg=[(0.75, 1.0), (0.5, 0.42)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),   # white tee: bell up to the chest, hold
     dict(c="c5", t=3.0, seg=[(0.5, 1.0), (0.5, 0.42)], push=0.06, out="left", port=0.0, pz=1.3, only="portrait"),  # teal: swing to the top, slow at the float (too fast to follow in the wide crop)
     dict(c="c12", t=3.2, seg=[(0.4, 1.3), (1.0, 0.4)], push=0.06, out="right", port=0.33, px=0.5, pz=2.1, track=False, only="portrait"),  # green tee: snatch, fast punch-through, slow lockout overhead (starts after the pull, when the banner behind him is out of the crop)
     dict(c="c5", t=4.0, seg=[(0.45, 1.0), (0.3, 0.38)], push=0.06, out="cut", land=0.3, port=0.0, pz=1.3),  # orange: swing, slow at the top
-    dict(c="c6", t=9.0, seg=[(0.5, 1.0), (0.5, 0.45)], push=0.06, out="cut", port=0.2, pz=1.4, only="portrait"),  # woman: goblet squat, slow at the bottom (from 9 s the wall behind is dark, no signs)
+    dict(c="c6", t=9.0, seg=[(1.4, 1.0)], push=0.12, out="cut", port=0.2, pz=1.4, only="portrait"),  # woman: goblet squat at real speed with a slow push-in (c6 is 30 fps, so slow motion stutters; from 9 s the wall behind is dark, no signs)
     dict(c="c5", t=8.25, seg=[(0.85, 1.0), (0.6, 0.45)], push=0.08, out="right", port=0.0, px=0.0, pz=1.3, track=False, only="portrait"),  # green: squat, slow at the bottom (fixed crop: the tracker drifts to the background)
     dict(c="c5", t=8.55, seg=[(0.5, 1.0), (0.6, 0.4)], push=0.08, out="right", land=0.44, track=False, only="landscape"),  # green, wide cut: starts in the squat so his head stays in the slice and the wall sign stays out
     dict(c="c5", t=6.0, seg=[(0.5, 1.0), (0.45, 0.5)], push=0.10, out="cut", port=0.0, pz=1.3, aim=0.48, only="portrait"),  # red: close-up, effort
