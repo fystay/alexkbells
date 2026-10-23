@@ -515,31 +515,20 @@ test.describe("memberships", () => {
     await expect(payg.getByRole("table", { name: "Extra vs a membership" })).toBeVisible();
   });
 
-  test("choose a plan: the card turns ink, Your plan fills in, Book now opens the calendar with the plan", async ({ page }) => {
+  test("one tap: the whole plan card is Book now, inverts under the pointer and opens the calendar with the plan", async ({ page }) => {
     await page.goto("/memberships");
     const section = page.locator("#memberships");
-    const bar = section.getByText("Your plan", { exact: true }).locator("../..");
-    await expect(bar).toContainText("Select a plan above to continue.");
-    await expect(bar.getByRole("button", { name: "Book now" })).toBeDisabled();
-
-    await section.getByRole("button", { name: "Select Regular" }).click();
-    const regular = section.locator("li[data-selected]").filter({ has: page.getByRole("heading", { name: "Regular" }) });
-    await expect(regular).toHaveAttribute("data-selected", "true");
+    for (const p of PLANS) {
+      await expect(section.getByRole("link", { name: `Book now with the ${p.name} plan` })).toHaveAttribute("href", `/book/group-class?plan=${p.name.toLowerCase()}`);
+    }
+    await expect(section.getByRole("link", { name: "Book now (pay as you go)" })).toHaveAttribute("href", "/book/group-class");
+    const regular = section.getByRole("list", { name: "Membership plans" }).locator("> li").filter({ has: page.getByRole("heading", { name: "Regular" }) });
+    await regular.hover();
     await expect.poll(() => regular.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
-    await expect(section.getByRole("button", { name: "Selected Regular" })).toHaveAttribute("aria-pressed", "true");
-    await expect(bar).toContainText("Regular");
-    await expect(bar).toContainText("£65 / 4 weeks · 8 class credits");
-    const go = bar.getByRole("link", { name: "Book now with the Regular plan" });
-    await expect(go).toHaveAttribute("href", "/book/group-class?plan=regular");
-
-    // Only one plan at a time.
-    await section.getByRole("button", { name: "Select Starter" }).click();
-    await expect(regular).toHaveAttribute("data-selected", "false");
-    await expect(bar).toContainText("£40 / 4 weeks · 4 class credits");
-
-    await bar.getByRole("link", { name: /Book now with the Starter plan/ }).click();
-    await expect(page).toHaveURL(/\/book\/group-class\?plan=starter$/);
-    await expect(page.locator("main")).toContainText("Starter · £40 / 4 weeks · 4 class credits");
+    // Clicking anywhere on the card (here near its top, over the price) follows the card's link.
+    await regular.click({ position: { x: 40, y: 90 } });
+    await expect(page).toHaveURL(/\/book\/group-class\?plan=regular$/);
+    await expect(page.locator("main")).toContainText("Regular · £65 / 4 weeks · 8 class credits");
     await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);
   });
 
@@ -679,7 +668,7 @@ test("home: the class week shows one card per class, venue, from-price and Book"
   await expect(cards.nth(0)).toContainText("6:30 pm");
   await expect(cards.nth(2)).toContainText("Sat");
   await expect(cards.nth(2)).toContainText("9:00 am");
-  await expect(facts.getByRole("link", { name: "Book Saturday 9:00 am" })).toHaveAttribute("href", "/book/group-class");
+  await expect(facts.getByRole("link", { name: "Book now Saturday 9:00 am" })).toHaveAttribute("href", "/book/group-class");
   await expect(facts).toContainText("Media House, Cumbernauld");
   await expect(facts).toContainText("£7.08 a class");
 });
@@ -791,7 +780,7 @@ test("home: each membership card has its own action, and class times appear once
   const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
   for (const name of ["Starter", "Regular", "Dedicated"]) {
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
-    await expect(card.getByRole("button", { name: `Select ${name}` })).toHaveCount(1);
+    await expect(card.getByRole("link", { name: `Book now with the ${name} plan` })).toHaveCount(1);
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { images } from "@/content/images";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
@@ -6,6 +5,7 @@ import { formatPenceShort, planFigures } from "@/lib/membership";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import type { Photo } from "@/content/types";
+import { CardLink, tapCard, tapCardInverse } from "@/components/ui/CardLink";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
@@ -83,7 +83,7 @@ export function FindYourTraining() {
             data-reveal
             className={cn(
               "flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-lg border sm:w-[46%] lg:w-auto",
-              c.inverse ? "border-ink bg-ink text-white" : "border-grey bg-white",
+              c.inverse ? cn("border-ink bg-ink text-white", tapCardInverse) : cn("border-grey bg-white", tapCard),
             )}
           >
             {c.photo ? (
@@ -103,12 +103,7 @@ export function FindYourTraining() {
               <h3 className="mt-2 font-display text-h3">{c.title}</h3>
               <p className="mt-2 flex-1">{c.body}</p>
               {c.price ? <p className="mt-3 text-sm font-semibold">{c.price}</p> : null}
-              <Link
-                href={c.href}
-                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
-              >
-                {c.cta}
-              </Link>
+              <CardLink href={c.href} label={c.cta} />
             </div>
           </li>
         ))}

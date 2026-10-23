@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { timetable } from "@/content/classes";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
@@ -8,6 +7,7 @@ import { formatPenceShort, planFigures } from "@/lib/membership";
 import { isPublishable, publishable } from "@/lib/publish";
 import { formatTime, partOfDay, shortDay, sortSessions } from "@/lib/schedule";
 import { Section } from "@/components/ui/Section";
+import { CardLink, tapCard } from "@/components/ui/CardLink";
 import { cn } from "@/lib/cn";
 
 /**
@@ -62,7 +62,7 @@ export function ClassWeekCards({ className }: { className?: string }) {
   return (
     <ul aria-label="Class times" className={cn("grid grid-cols-3 gap-2.5 sm:gap-4", className)}>
       {sessions.map((s) => (
-        <li key={s.id} className="flex flex-col items-center rounded-lg border border-ink px-2 py-4 text-center">
+        <li key={s.id} className={cn("flex flex-col items-center rounded-lg border border-ink px-2 pt-4 pb-1 text-center", tapCard)}>
           <p className="eyebrow">{partOfDay(s.start)}</p>
           <p className="mt-2 font-display text-[clamp(1.75rem,1rem+3vw,2.75rem)] leading-none">
             <abbr title={s.day} className="no-underline">
@@ -70,13 +70,7 @@ export function ClassWeekCards({ className }: { className?: string }) {
             </abbr>
           </p>
           <p className="mt-2 font-semibold">{formatTime(s.start)}</p>
-          <Link
-            href={book.href}
-            {...(book.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="mt-1 inline-flex min-h-11 items-center text-xs font-semibold tracking-[0.08em] uppercase underline underline-offset-[6px] hover:no-underline"
-          >
-            Book<span className="sr-only"> {s.day} {formatTime(s.start)}</span>
-          </Link>
+          <CardLink href={book.href} label="Book now" srSuffix={` ${s.day} ${formatTime(s.start)}`} external={book.external} className="mt-3 w-full justify-center pt-0" />
         </li>
       ))}
     </ul>
