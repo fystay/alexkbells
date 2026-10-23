@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { aboutStory, pillars } from "@/content/about";
+import { images } from "@/content/images";
 import { isPublishable } from "@/lib/publish";
 import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { Section, SectionHeading } from "@/components/ui/Section";
+import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { CoachStory } from "@/components/home/CoachStory";
+import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Location } from "@/components/sections/Location";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -17,20 +19,17 @@ export const metadata: Metadata = pageMetadata({
   path: "/about",
 });
 
-// Hedged: what kettlebell training involves, not what it will do for any one person.
-const kettlebell = [
-  { title: "Build strength", body: "Swings, squats and presses work the whole body." },
-  { title: "Get fitter", body: "Train strength and conditioning in the same session." },
-  { title: "Move well", body: "Learn the key lifts with a coach on your technique." },
-  { title: "Train anywhere", body: "One kettlebell. At home, in the gym or away." },
-];
-
 export default function AboutPage() {
   const story = aboutStory && isPublishable(aboutStory.status) ? aboutStory : null;
+  // Sections alternate white / cream below the cream opening, as on the home page,
+  // whether or not the (optional) story is shown.
+  let n = 0;
+  const tone = (): SectionTone => (n++ % 2 === 0 ? "white" : "plain");
 
   return (
     <>
       <PageHeader
+        image={images.hero}
         eyebrow="About RAENG"
         title="Strength is built through consistency."
         intro="RAENG is a kettlebell club in Cumbernauld, Glasgow: classes with flexible memberships, plus 1:1 and online coaching, built around good technique and a club that shows up."
@@ -41,7 +40,7 @@ export default function AboutPage() {
       </PageHeader>
 
       {story ? (
-        <Section id="story" labelledBy="story-heading">
+        <Section tone={tone()} id="story" labelledBy="story-heading">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <SectionHeading id="story-heading" eyebrow="Our story" title={story.title} />
@@ -55,7 +54,7 @@ export default function AboutPage() {
         </Section>
       ) : null}
 
-      <Section id="values" labelledBy="values-heading">
+      <Section tone={tone()} id="values" labelledBy="values-heading">
         <SectionHeading
           id="values-heading"
           eyebrow="What we stand for"
@@ -75,31 +74,13 @@ export default function AboutPage() {
         </ol>
       </Section>
 
-      <CoachStory />
+      <CoachStory showAboutLink={false} tone={tone()} />
 
-      <Section id="kettlebells" labelledBy="kettlebells-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading
-              id="kettlebells-heading"
-              eyebrow="Why kettlebells"
-              title="One simple tool. A lot of training."
-              intro="The kettlebell rewards good technique and honest effort. It trains strength and conditioning together, and it scales from a first session to years of progression."
-            />
-          </div>
-          <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-7">
-            {kettlebell.map((b, i) => (
-              <li key={b.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
-                <h3 className="font-display text-h3">{b.title}</h3>
-                <p className="mt-2 ">{b.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Section>
+      {/* The home page is the reference (owner, 2026-10-23): the same section, word for word. */}
+      <WhyKettlebells tone={tone()} />
 
-      <Location />
-      <CtaBand body="Come and train with us." />
+      <Location tone={tone()} />
+      <CtaBand body="Come and train with us." tone={tone()} />
     </>
   );
 }

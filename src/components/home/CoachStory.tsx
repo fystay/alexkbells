@@ -6,7 +6,7 @@ import type { Photo } from "@/content/types";
 import { isPublishable } from "@/lib/publish";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
-import { Section } from "@/components/ui/Section";
+import { Section, type SectionTone } from "@/components/ui/Section";
 
 /** The optional coach fields that are confirmed, in reading order. Empty slots are skipped. */
 export function coachDetails() {
@@ -37,14 +37,22 @@ function Frame({ photo, label }: { photo: Photo; label: string }) {
  * pair (content/journey.ts), then who he is and what he does. The pair only
  * shows when the journey content is confirmed and both photos exist.
  */
-export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "h3" }) {
+export function CoachStory({
+  headingAs: Heading = "h2",
+  showAboutLink = true,
+  tone = "white",
+}: {
+  headingAs?: "h2" | "h3";
+  showAboutLink?: boolean;
+  tone?: SectionTone;
+}) {
   const details = coachDetails();
   const showJourney = isPublishable(journey.status);
   const photos = showJourney && journey.before && journey.after ? { before: journey.before, after: journey.after } : null;
 
   return (
     <Provisional status={showJourney ? journey.status : "confirmed"}>
-      <Section tone="white" id="coach" labelledBy="coach-heading">
+      <Section tone={tone} id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-14">
           <div className="lg:col-span-6">
             <p className="eyebrow mb-4 ">Meet your coach</p>
@@ -72,9 +80,11 @@ export function CoachStory({ headingAs: Heading = "h2" }: { headingAs?: "h2" | "
                 ))}
               </dl>
             ) : null}
-            <ButtonLink href="/about" variant="secondary" className="mt-6 w-full sm:w-auto">
-              About RAENG
-            </ButtonLink>
+            {showAboutLink ? (
+              <ButtonLink href="/about" variant="secondary" className="mt-6 w-full sm:w-auto">
+                About RAENG
+              </ButtonLink>
+            ) : null}
             <p className="mt-3 flex flex-wrap items-center gap-x-5 text-sm">
               <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
                 Instagram {site.social.instagram.handle}

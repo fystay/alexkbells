@@ -4,27 +4,31 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { groupedSessions } from "@/lib/schedule";
 import { StartTraining } from "@/components/ui/StartTraining";
-import { Section } from "@/components/ui/Section";
+import { Section, type SectionTone } from "@/components/ui/Section";
 import { hero } from "@/content/home";
+import type { BookableService } from "@/lib/booking-options";
 
 interface CtaBandProps {
   title?: string;
   body?: string;
   headingId?: string;
+  /** Where Book now goes: the page's own service (default group class), or "any" for the /book chooser. */
+  service?: BookableService | "any";
+  tone?: SectionTone;
 }
 
 /**
- * Closing call to action: one line, the class times, one booking button and
- * Instagram as a quieter link. Nothing here books anything: the button opens
+ * Closing call to action: one line (the class times unless the page gives its
+ * own), one booking button and Instagram as a quieter link. No arrow (owner rule). Nothing here books anything: the button opens
  * the booking request flow.
  */
-export function CtaBand({ title = "Ready to get stronger?", body, headingId = "cta-heading" }: CtaBandProps) {
+export function CtaBand({ title = "Ready to get stronger?", body, headingId = "cta-heading", service = "group-class", tone = "white" }: CtaBandProps) {
   const { instagram } = site.social;
-  const cta = getPrimaryCtaFor("group-class");
+  const cta = getPrimaryCtaFor(service);
   const times = isPublishable(timetable.status) ? groupedSessions(timetable.sessions) : [];
 
   return (
-    <Section tone="white" labelledBy={headingId}>
+    <Section tone={tone} labelledBy={headingId}>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end lg:gap-16">
         <div data-reveal className="lg:col-span-7">
           <h2 id={headingId} className="font-display text-h1 text-balance">
@@ -43,7 +47,6 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
             className="group mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em]"
           >
             <span className="underline underline-offset-[6px] group-hover:no-underline">Message on Instagram</span>
-            <span aria-hidden="true">↗</span>
             <span className="sr-only">(opens in a new tab)</span>
           </a>
         </div>

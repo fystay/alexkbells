@@ -7,7 +7,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
  */
 export function CancellationPolicy() {
   return (
-    <Section id="cancellation" labelledBy="cancellation-heading">
+    <Section tone="white" id="cancellation" labelledBy="cancellation-heading">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <SectionHeading id="cancellation-heading" eyebrow="Class policy" title="Class cancellation policy" intro={policy.intro} />

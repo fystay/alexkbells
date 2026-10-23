@@ -37,13 +37,13 @@ export default function ContactPage() {
         </ButtonLink>
       </PageHeader>
 
-      <Section labelledBy="methods-heading">
+      <Section tone="white" labelledBy="methods-heading">
         <h2 id="methods-heading" className="sr-only">
           Ways to reach us
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div id="enquire" className="rounded-3xl border border-grey bg-white p-8 sm:p-12">
+            <div id="enquire" className="rounded-lg border border-grey bg-white p-8 sm:p-12">
               <p className="eyebrow ">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">
                 <a

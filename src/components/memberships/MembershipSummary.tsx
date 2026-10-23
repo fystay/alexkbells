@@ -38,8 +38,6 @@ function PlanLink({ href, label, external, kind }: CallToAction) {
 }
 
 export function MembershipSummary() {
-  const book = getPrimaryCtaFor("group-class");
-  const card = "flex w-[82%] shrink-0 snap-start flex-col rounded-lg bg-white p-5 sm:w-[46%] sm:p-6 lg:w-auto";
   return (
     <Section tone="white" id="memberships" labelledBy="memberships-summary-heading">
       <SectionHeading
@@ -51,7 +49,22 @@ export function MembershipSummary() {
       <ButtonLink href="/memberships" variant="action" className="mt-6 w-full sm:w-72">
         Compare and join
       </ButtonLink>
-      <div className="mt-8">
+      <PlanCards className="mt-8" />
+    </Section>
+  );
+}
+
+/**
+ * The plan cards (Starter, Regular, Dedicated and Pay as you go, with its
+ * extra-cost table) and the one-line conditions. The home page is the
+ * reference (owner, 2026-10-23); /memberships shows exactly the same cards.
+ */
+export function PlanCards({ className }: { className?: string }) {
+  const book = getPrimaryCtaFor("group-class");
+  const card = "flex w-[82%] shrink-0 snap-start flex-col rounded-lg bg-white p-5 sm:w-[46%] sm:p-6 lg:w-auto";
+  return (
+    <>
+      <div className={className}>
         <PlanCarousel label="Membership plans">
           {membershipPlans.map((plan) => {
             const f = planFigures(plan, payg.amountGbp);
@@ -124,6 +137,6 @@ export function MembershipSummary() {
         </Link>
         .
       </p>
-    </Section>
+    </>
   );
 }

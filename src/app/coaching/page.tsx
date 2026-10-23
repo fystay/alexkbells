@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
+import { images } from "@/content/images";
+import { site } from "@/content/site";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -29,6 +33,7 @@ const focus = [
 
 export default function CoachingPage() {
   const service = getService("one-to-one");
+  const lead = publishable(service.prices)[0];
   const booking = getPrimaryCtaFor("one-to-one");
   const open = booking.kind === "booking";
 
@@ -46,6 +51,7 @@ export default function CoachingPage() {
   return (
     <>
       <PageHeader
+        image={images.oneToOne}
         eyebrow="1:1 Coaching"
         title="Coaching built around you"
         intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."
@@ -60,7 +66,7 @@ export default function CoachingPage() {
         />
       </PageHeader>
 
-      <Section id="who-for" labelledBy="who-heading">
+      <Section tone="white" id="who-for" labelledBy="who-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading
@@ -104,7 +110,7 @@ export default function CoachingPage() {
         </div>
       </Section>
 
-      <Section id="pricing" labelledBy="pricing-heading">
+      <Section tone="white" id="pricing" labelledBy="pricing-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Sessions and monthly coaching" />
@@ -126,8 +132,12 @@ export default function CoachingPage() {
         </div>
       </Section>
 
-      <Location />
-      <CtaBand />
+      <Location tone="plain" />
+      <CtaBand
+        title="Ready to train 1:1?"
+        body={lead ? `Sessions ${lead.prefix ? `${lead.prefix.toLowerCase()} ` : ""}${formatGbp(lead.amountGbp)} at ${site.location.venue}, ${site.location.town}.` : undefined}
+        service="one-to-one"
+      />
     </>
   );
 }

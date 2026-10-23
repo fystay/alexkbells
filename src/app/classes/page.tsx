@@ -13,7 +13,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { Timetable } from "@/components/sections/Timetable";
+import { ClassWeekCards } from "@/components/home/QuickFacts";
 import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { Faq } from "@/components/sections/Faq";
@@ -83,7 +83,7 @@ export default function ClassesPage() {
         </ButtonLink>
       </PageHeader>
 
-      <Section id="what-to-expect" labelledBy="expect-heading">
+      <Section tone="white" id="what-to-expect" labelledBy="expect-heading">
         <SectionHeading id="expect-heading" eyebrow="What to expect" title="Purposeful training, together" />
         <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {involves.map((item) => (
@@ -97,9 +97,8 @@ export default function ClassesPage() {
 
       <Section id="timetable" labelledBy="timetable-heading">
         <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
-        <div className="mt-10">
-          <Timetable labelledBy="timetable-heading" />
-        </div>
+        {/* The home page's day cards (owner, 2026-10-23: the home page is the reference). */}
+        <ClassWeekCards className="mt-10 max-w-3xl" />
         {classes.prices.length > 0 ? (
           <div className="mt-12 max-w-md">
             <PriceList prices={classes.prices} />
@@ -111,7 +110,7 @@ export default function ClassesPage() {
         ) : null}
       </Section>
 
-      <Section id="join" labelledBy="join-heading">
+      <Section tone="white" id="join" labelledBy="join-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" />
@@ -122,9 +121,9 @@ export default function ClassesPage() {
         </div>
       </Section>
 
-      <Location />
+      <Location tone="plain" />
       <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
-      <CtaBand body="Prefer personal coaching? Train face to face or online." />
+      <CtaBand body="Prefer personal coaching? Train face to face or online." tone="plain" />
     </>
   );
 }

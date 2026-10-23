@@ -1,16 +1,16 @@
 import { whyKettlebells } from "@/content/home";
 import { images } from "@/content/images";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
-import { Section, SectionHeading } from "@/components/ui/Section";
+import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { revealDelay } from "@/lib/reveal";
 
 /**
  * Option C (owner 2026-10-23): one photo from the class footage beside a
  * numbered list of the four benefits; the photo sits above the list on phones.
  */
-export function WhyKettlebells() {
+export function WhyKettlebells({ tone = "plain" }: { tone?: SectionTone }) {
   return (
-    <Section id="why-kettlebells" labelledBy="why-heading">
+    <Section tone={tone} id="why-kettlebells" labelledBy="why-heading">
       <SectionHeading id="why-heading" eyebrow="Why kettlebells" title="One tool. A lot of training." />
       <div className="mt-8 grid grid-cols-1 gap-6 lg:mt-10 lg:grid-cols-2 lg:gap-14">
         <PhotoFrame photo={images.whyKettlebells} sizes="(min-width: 1024px) 45vw, 100vw" className="aspect-[4/3] w-full lg:aspect-[4/5]" />

@@ -496,28 +496,29 @@ test.describe("memberships", () => {
     { name: "Dedicated", price: "£85", credits: "12 class credits", perClass: "£7.08", payg: "£144", save: "£59" },
   ];
 
-  test("each card shows the owner's price, credits, cost per class and saving", async ({ page }) => {
+  test("the page shows the home page's cards: price, credits, cost per class and saving", async ({ page }) => {
     await page.goto("/memberships");
-    const cards = page.locator("#memberships ul[aria-labelledby] > li");
-    await expect(cards).toHaveCount(3);
+    await expect(page.locator("h1")).toHaveText("Save up to £59 every 4 weeks");
+    const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
+    await expect(cards).toHaveCount(4);
     for (const [i, p] of PLANS.entries()) {
       const card = cards.nth(i);
       await expect(card.getByRole("heading", { name: p.name })).toBeVisible();
       await expect(card).toContainText(new RegExp(`${p.price}\\s*/\\s*4 weeks`));
-      await expect(card).toContainText(p.credits);
-      await expect(card.locator("dl")).toContainText(p.perClass);
-      await expect(card.locator("dl")).toContainText(p.payg);
-      await expect(card.locator("dl")).toContainText(p.save);
+      await expect(card).toContainText(p.credits.replace("class ", ""));
+      await expect(card).toContainText(`${p.perClass} per class`);
+      await expect(card).toContainText(`Save ${p.save}`);
     }
-    const payg = page.locator("#memberships").getByRole("heading", { name: "Pay as you go" }).locator("..");
+    const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12 per class");
     await expect(payg).toContainText("No membership needed");
+    await expect(payg.getByRole("table", { name: "Extra vs a membership" })).toBeVisible();
   });
 
   test("buttons are enquiries or bookings, never sign-ups or payments", async ({ page }) => {
     await page.goto("/memberships");
     for (const p of PLANS) {
-      const link = page.getByRole("link", { name: `Enquire about ${p.name}` });
+      const link = page.getByRole("link", { name: new RegExp(`^(Select|Join) ${p.name}`) });
       await expect(link).toHaveAttribute("href", "/contact");
     }
     await expect(page.locator("#memberships").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
@@ -537,12 +538,13 @@ test.describe("memberships", () => {
     await expect(policy).toContainText("By booking a class, you agree to these cancellation terms.");
   });
 
-  test("cards stack on phones without overflow and keep 44px buttons", async ({ page }) => {
+  test("cards fit phones without overflow and keep 44px buttons", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 640 });
     await page.goto("/memberships");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
-    const tops = await page.locator("#memberships ul[aria-labelledby] > li").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().left)));
-    expect(new Set(tops).size).toBe(1);
+    // Phones swipe through the same cards as the home page, one at a time.
+    const heights = await page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li a").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    for (const h of heights) expect(h).toBeGreaterThanOrEqual(44);
   });
 });
 

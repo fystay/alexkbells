@@ -5,7 +5,7 @@ import { revealDelay } from "@/lib/reveal";
 /** How memberships work: five short lines, numbered, in two columns from md. */
 export function MembershipTerms() {
   return (
-    <Section tone="white" id="how-it-works" labelledBy="terms-heading">
+    <Section id="how-it-works" labelledBy="terms-heading">
       <SectionHeading id="terms-heading" eyebrow="Memberships" title="How memberships work" />
       <ol className="mt-10 grid grid-cols-1 gap-x-12 gap-y-5 md:grid-cols-2">
         {membershipTerms.map((term, i) => (

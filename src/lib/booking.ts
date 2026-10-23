@@ -79,7 +79,7 @@ export function getPrimaryCta(env: Env = process.env): CallToAction {
  * page. Online coaching is an enquiry, not a booking: see
  * getOnlineCoachingAction.
  */
-export function getPrimaryCtaFor(service: BookableService, env: Env = process.env): CallToAction {
+export function getPrimaryCtaFor(service: BookableService | "any", env: Env = process.env): CallToAction {
   const cta = getPrimaryCta(env);
   if (cta.kind !== "booking") return cta;
   return { ...cta, href: PATHS[service] };

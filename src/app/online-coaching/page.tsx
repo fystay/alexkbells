@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
+import { site } from "@/content/site";
 import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -39,6 +40,15 @@ export default function OnlineCoachingPage() {
   return (
     <>
       <PageHeader
+        panel={
+          // No photo for online coaching yet: the same typographic panel as its card on the home page.
+          <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end rounded-lg bg-ink p-6 text-white lg:aspect-[4/5] lg:p-8">
+            <span className="font-display text-[clamp(2.25rem,1.4rem+2.2vw,3.25rem)] leading-[0.9]">
+              Train
+              <span className="block">anywhere</span>
+            </span>
+          </div>
+        }
         eyebrow="Online coaching"
         title="Coaching that goes where you train"
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."
@@ -49,7 +59,7 @@ export default function OnlineCoachingPage() {
         </p>
       </PageHeader>
 
-      <Section id="included" labelledBy="included-heading">
+      <Section tone="white" id="included" labelledBy="included-heading">
         <SectionHeading id="included-heading" eyebrow="What you get" title="Structure, support and progress" />
         <ul className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
           {included.map((item, i) => (
@@ -74,7 +84,7 @@ export default function OnlineCoachingPage() {
         </div>
       </Section>
 
-      <Section id="pricing" labelledBy="pricing-heading">
+      <Section tone="white" id="pricing" labelledBy="pricing-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Simple monthly coaching" />
@@ -96,7 +106,12 @@ export default function OnlineCoachingPage() {
         </div>
       </Section>
 
-      <CtaBand />
+      <CtaBand
+        title="Rather train in person?"
+        body={`Book a group class or a 1:1 session at ${site.location.venue}, ${site.location.town}.`}
+        service="any"
+        tone="plain"
+      />
     </>
   );
 }
