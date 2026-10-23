@@ -38,18 +38,19 @@ XF = 0.16  # whip length
 # push: extra zoom over the shot. out: how it leaves ("cut", "left", "right").
 # land: crop position of the landscape slice; port/pz/px: portrait crop position, zoom and
 # horizontal position (px=0 keeps c8's wall banner, at the right, out of frame).
-# only: use the shot in one version (c8 is too narrow a slice for the landscape cut).
+# only: use the shot in one version. track=False (track_land=False: wide cut only): fixed crop instead of following
+# the face. c8 (the shirtless lifter) is no longer used: his head leaves the
+# frame and the gym's wall banner shows whenever it is in.
 SHOTS = [
-    dict(c="c7", t=0.57, seg=[(2.3, 1.0)], push=0.07, out="cut", land=0.58, port=0.5, pz=1.0),          # the class together: opens the film (group shots only here)
-    dict(c="c5", t=3.0, seg=[(0.35, 1.0), (0.45, 0.5)], push=0.06, out="left", land=0.25, port=0.0, pz=1.3),  # swing to the top, slow at the float
-    dict(c="c5", t=4.75, seg=[(0.65, 1.0), (0.5, 0.6)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),   # bell up to the chest, hold
-    dict(c="c8", t=8.4, seg=[(0.5, 1.4), (0.55, 0.5)], push=0.06, out="right", port=0.35, px=0.0, pz=1.6, only="portrait"),  # press drives up fast, slow lockout
-    dict(c="c5", t=4.0, seg=[(0.4, 1.0), (0.35, 0.5)], push=0.06, out="right", land=0.3, only="landscape"),  # swing, slow at the top
-    dict(c="c5", t=1.5, seg=[(0.5, 1.0), (0.3, 0.6)], push=0.06, out="left", port=0.0, px=0.0, pz=1.3, only="portrait"),    # swing, slow at the top
-    dict(c="c5", t=8.25, seg=[(0.65, 1.0), (0.5, 0.55)], push=0.08, out="cut", land=0.5, port=0.0, px=0.0, pz=1.3),  # squat, slow at the bottom
-    dict(c="c8", t=6.25, seg=[(0.5, 1.3), (0.4, 0.55)], push=0.06, out="right", port=0.8, px=0.0, pz=1.6, only="portrait"),  # swing into the rack
-    dict(c="c5", t=6.0, seg=[(0.35, 1.0), (0.35, 0.6)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),    # close-up, effort
-    dict(c="c8", t=14.5, seg=[(0.4, 1.3), (0.7, 0.55)], push=0.05, out="cut", port=0.45, px=0.0, pz=1.6, only="portrait"),  # overhead press lockout
+    dict(c="c7", t=0.57, seg=[(2.3, 1.0)], push=0.07, out="cut", land=0.58, port=0.5, pz=1.0, track=False),  # the class together: opens the film (group shots only here)
+    dict(c="c5", t=3.0, seg=[(0.35, 1.0), (0.45, 0.5)], push=0.06, out="left", port=0.0, pz=1.3, only="portrait"),  # teal: swing to the top, slow at the float (too fast to follow in the wide crop)
+    dict(c="c5", t=4.95, seg=[(0.45, 1.0), (0.5, 0.6)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),   # white tee: bell up to the chest, hold
+    dict(c="c5", t=4.0, seg=[(0.4, 1.0), (0.35, 0.5)], push=0.06, out="right", land=0.3, port=0.0, pz=1.3),  # orange: swing, slow at the top
+    dict(c="c5", t=1.5, seg=[(0.5, 1.0), (0.3, 0.6)], push=0.06, out="left", port=0.0, px=0.0, pz=1.3, only="portrait"),  # red: swing, slow at the top
+    dict(c="c5", t=8.25, seg=[(0.65, 1.0), (0.5, 0.55)], push=0.08, out="right", port=0.0, px=0.0, pz=1.3, track=False, only="portrait"),  # green: squat, slow at the bottom (fixed crop: the tracker drifts to the background)
+    dict(c="c5", t=8.55, seg=[(0.5, 1.0), (0.4, 0.55)], push=0.08, out="right", land=0.44, track=False, only="landscape"),  # green, wide cut: starts in the squat so his head stays in the slice and the wall sign stays out
+    dict(c="c5", t=6.0, seg=[(0.35, 1.0), (0.35, 0.6)], push=0.10, out="cut", port=0.0, pz=1.3, aim=0.48, only="portrait"),  # red: close-up, effort
+    dict(c="c5", t=6.0, seg=[(0.3, 1.0), (0.25, 0.6)], push=0.08, out="cut", land=0.05, track=False, only="landscape"),  # red close-up, wide cut: ends before he bends out of the slice
 ]
 
 
@@ -58,6 +59,62 @@ GRADE = (
     "colorbalance=rs=-0.04:bs=0.05,format=yuv420p,"
     "geq=lum='lum(X\\,Y)*(1-0.4*min(max((Y/H-0.45)/0.55\\,0)\\,1))':cb='cb(X\\,Y)':cr='cr(X\\,Y)'"
 )
+
+
+def track_face(path: str, start: float, dur: float, step: float = 0.08):
+    """Centre (x, y) of the main person's face over [start, start+dur), in source
+    pixels, every `step` seconds (source time relative to `start`). The main
+    person is the largest face first seen, then the face nearest to it each
+    frame; gaps are interpolated and the track is smoothed. None if no face."""
+    import cv2  # only needed to rebuild the film
+    import numpy as np
+
+    data = cv2.data.haarcascades
+    cascades = [cv2.CascadeClassifier(data + n) for n in ("haarcascade_frontalface_default.xml", "haarcascade_profileface.xml")]
+    cap = cv2.VideoCapture(path)
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    times = list(np.arange(0, dur, step))
+    pts, prev = [], None
+    for t in times:
+        cap.set(cv2.CAP_PROP_POS_MSEC, (start + t) * 1000)
+        ok, frame = cap.read()
+        if not ok:
+            pts.append(None)
+            continue
+        g = cv2.equalizeHist(cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), None, fx=2, fy=2))
+        found = [tuple(v / 2 for v in r) for c in cascades for r in c.detectMultiScale(g, 1.1, 5, minSize=(40, 40))]
+        centres = [(x + w / 2, y + h / 2, w * h) for x, y, w, h in found]
+        if not centres:
+            pts.append(None)
+            continue
+        if prev is None:
+            best = max(centres, key=lambda c: c[2])
+        else:
+            best = min(centres, key=lambda c: (c[0] - prev[0]) ** 2 + (c[1] - prev[1]) ** 2)
+            if ((best[0] - prev[0]) ** 2 + (best[1] - prev[1]) ** 2) ** 0.5 > 0.3 * width:
+                pts.append(None)
+                continue
+        prev = best
+        pts.append(best[:2])
+    known = [i for i, p in enumerate(pts) if p]
+    if len(known) < max(2, len(pts) // 4):
+        return None
+    xs = np.interp(range(len(pts)), known, [pts[i][0] for i in known])
+    ys = np.interp(range(len(pts)), known, [pts[i][1] for i in known])
+    k = np.ones(5) / 5
+    ys = np.convolve(np.pad(ys, 2, mode="edge"), k, mode="valid")
+    xs = np.convolve(np.pad(xs, 2, mode="edge"), k, mode="valid")
+    return list(zip(times, xs, ys))
+
+
+def follow(track, value, lo: float, hi: float) -> str:
+    """An ffmpeg expression in t that moves linearly between the track's
+    keyframes (value(x, y) gives the crop offset), clamped to [lo, hi]."""
+    keys = [(t, min(max(value(x, y), lo), hi)) for t, x, y in track[::2]]
+    expr = f"{keys[-1][1]:.1f}"
+    for (t0, v0), (t1, v1) in reversed(list(zip(keys, keys[1:]))):
+        expr = f"if(lt(t\\,{t1:.2f})\\,{v0:.1f}+({v1 - v0:.1f})*(t-{t0:.2f})/{t1 - t0:.2f}\\,{expr})"
+    return f"if(lt(t\\,{keys[0][0]:.2f})\\,{keys[0][1]:.1f}\\,{expr})"
 
 
 def clip(name: str) -> str:
@@ -72,6 +129,31 @@ def build(orient: str) -> None:
     for i, s in enumerate(SH):
         src_total = sum(d for d, _ in s["seg"])
         args += ["-ss", str(s["t"]), "-t", str(round(src_total + 0.3, 3)), "-i", clip(s["c"])]
+        # The crop follows the main person's face (face tracking), so heads are
+        # never cut off; it is applied before retiming, in source time.
+        path = clip(s["c"])
+        SW, SH_ = 464, 832  # every clip used is 464 x 832 (c5, c7, c8)
+        if orient == "portrait":
+            zoom = s.get("pz", 1.0)
+            cw, ch = SW / zoom, SW / zoom * 16 / 9
+            cx = (SW - cw) * s.get("px", 0.5)
+            cy = f"{(SH_ - ch) * s['port']:.1f}"
+        else:
+            cw, ch, cx = SW, SW / 2, 0
+            cy = f"{(SH_ - ch) * s['land']:.1f}"
+        use = s.get("track", True) and (orient == "portrait" or s.get("track_land", True))
+        tr = track_face(path, s["t"], src_total) if use else None
+        if tr:
+            # Face centre sits 38% down the frame (aim): headroom above, the lift below.
+            aim = s.get("aim", 0.38)
+            cy = follow(tr, lambda x, y: y - aim * ch, 0, SH_ - ch)
+            if orient == "portrait" and s.get("track_x", True):
+                cx_expr = follow(tr, lambda x, y: x - cw / 2, 0, s.get("xmax", SW - cw))
+            else:
+                cx_expr = f"{cx:.1f}"
+        else:
+            cx_expr = f"{cx:.1f}"
+        crop = f"crop={cw:.0f}:{ch:.0f}:'{cx_expr}':'{cy}'"
         # Speed segments: trim each piece of source time, retime it, join.
         pieces, at = [], 0.0
         n = len(s["seg"])
@@ -79,16 +161,11 @@ def build(orient: str) -> None:
             filt.append(f"[{i}:v]split={n}" + "".join(f"[in{i}_{k}]" for k in range(n)))
         for k, (d, sp) in enumerate(s["seg"]):
             src = f"[in{i}_{k}]" if n > 1 else f"[{i}:v]"
-            filt.append(f"{src}trim=start={at}:duration={d},setpts=(PTS-STARTPTS)/{sp}[s{i}p{k}]")
+            filt.append(f"{src}trim=start={at}:duration={d},{crop},setpts=(PTS-STARTPTS)/{sp}[s{i}p{k}]")
             pieces.append(f"[s{i}p{k}]")
             at += d
         out_len = round(sum(d / sp for d, sp in s["seg"]), 3)
         lens.append(out_len)
-        if orient == "portrait":
-            zoom = s.get("pz", 1.0)
-            crop = f"crop=iw/{zoom}:iw/{zoom}*16/9:(iw-iw/{zoom})*{s.get('px', 0.5)}:(ih-iw/{zoom}*16/9)*{s['port']}"
-        else:
-            crop = f"crop=iw:iw/2:0:(ih-iw/2)*{s['land']}"
         push = s["push"]
         # Push-in: scale up a little over the shot, then crop back to the frame.
         zoomf = (
@@ -103,7 +180,7 @@ def build(orient: str) -> None:
         if i > 0 and SH[i - 1]["out"] in ("left", "right"):
             blur.append(f"gblur=sigma=18:sigmaV=0.01:enable='lte(t,{XF})'")
         chain = ",".join(
-            [f"fps={FPS}", f"trim=duration={out_len}", "setpts=PTS-STARTPTS", crop, f"scale={W}:{H}:flags=lanczos", zoomf, "unsharp=5:5:0.6", "setsar=1", GRADE] + blur
+            [f"fps={FPS}", f"trim=duration={out_len}", "setpts=PTS-STARTPTS", f"scale={W}:{H}:flags=lanczos", zoomf, "unsharp=5:5:0.6", "setsar=1", GRADE] + blur
         )
         filt.append(f"{''.join(pieces)}concat=n={len(pieces)}:v=1:a=0,{chain},format=yuv420p,settb=AVTB[v{i}]")
 
