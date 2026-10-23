@@ -56,7 +56,7 @@ export function FindYourTraining() {
       price: leadPrice("one-to-one"),
       href: "/coaching",
       cta: "Explore 1:1 Coaching",
-      photo: images.hero,
+      photo: images.oneToOne,
     },
     {
       id: "online",

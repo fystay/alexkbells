@@ -26,6 +26,14 @@ export const images = {
     alt: "A coach demonstrates a two-handed kettlebell swing in a training studio while a group follows behind",
     position: "50% 45%",
   },
+  /** "1:1 coaching" card in Ways to train (owner's photo, 2026-10-23). */
+  oneToOne: {
+    src: `${dir}/one-to-one-swing.jpg`,
+    width: 942,
+    height: 1669,
+    alt: "A man in a teal T-shirt swings a kettlebell to chest height, with a second person swinging behind him",
+    position: "50% 40%",
+  },
   /** Group classes page header (desktop only). */
   classes: {
     src: `${dir}/class-swing-wide.jpg`,
