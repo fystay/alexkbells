@@ -8,7 +8,7 @@ Last reviewed: 2026-10-19
 
 ## Kettlebell Club redesign (2026-10-21, later)
 
-New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettlebell, RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE); transparent black and cream versions in `public/brand/`. Descriptor is now **Kettlebell Club**. Owner's memberships brief (supersedes the earlier dark-first direction and the £10 class price):
+New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettlebell, RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE); transparent black and cream versions in `public/brand/`. Descriptor is now **Fitness**: the brand is **RAENG Fitness** (owner confirmed 2026-10-23, matching the logo); earlier "Kettlebell Club". Owner's memberships brief (supersedes the earlier dark-first direction and the £10 class price):
 
 | Item | Status | Notes |
 |---|---|---|

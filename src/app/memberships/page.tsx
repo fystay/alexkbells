@@ -11,7 +11,7 @@ import { MembershipTerms } from "@/components/memberships/MembershipTerms";
 export const metadata: Metadata = pageMetadata({
   title: "Kettlebell Memberships",
   description:
-    "RAENG Kettlebell Club memberships: Starter, Regular and Dedicated, with class credits every four weeks and the saving against pay as you go. Cumbernauld, Glasgow.",
+    "RAENG Fitness memberships: Starter, Regular and Dedicated, with class credits every four weeks and the saving against pay as you go. Cumbernauld, Glasgow.",
   path: "/memberships",
 });
 

@@ -442,7 +442,7 @@ for (const [label, href] of NAV) {
 test("the RAENG wordmark is a labelled home link in the header and footer", async ({ page }) => {
   await page.goto("/classes");
   for (const scope of [page.locator("header"), page.locator("footer")]) {
-    const link = scope.getByRole("link", { name: "RAENG Kettlebell Club, home" });
+    const link = scope.getByRole("link", { name: "RAENG Fitness, home" });
     // The header carries the name as live text beside the monogram; the footer shows the full lockup.
     await expect(link).toHaveAttribute("href", "/");
     await expect(link.locator("img").first()).toHaveAttribute("src", /raeng-(header|lockup)-black/);

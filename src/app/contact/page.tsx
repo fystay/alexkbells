@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Contact RAENG Kettlebell Club about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
+    "Contact RAENG Fitness about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
   path: "/contact",
 });
 

@@ -13,7 +13,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 export const metadata: Metadata = pageMetadata({
   title: "About RAENG",
   description:
-    "RAENG Kettlebell Club is a kettlebell club in Cumbernauld, Glasgow, built on strength, community and discipline. Meet the coach and see how we train.",
+    "RAENG Fitness is a kettlebell club in Cumbernauld, Glasgow, built on strength, community and discipline. Meet the coach and see how we train.",
   path: "/about",
 });
 

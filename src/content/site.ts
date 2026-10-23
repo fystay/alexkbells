@@ -4,13 +4,13 @@
  */
 export const site = {
   name: "RAENG",
-  descriptor: "Kettlebell Club",
+  descriptor: "Fitness",
   /** "RAENG" is Thai (แรง) for strength. Shown on the logo; not used as page text. */
   thai: "แรง",
   /** Brand themes, shown together as "STRENGTH · COMMUNITY · DISCIPLINE". */
   themes: ["Strength", "Community", "Discipline"] as const,
   description:
-    "RAENG Kettlebell Club in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and online coaching.",
+    "RAENG Fitness in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and online coaching.",
 
   /**
    * The supplied logo (assets/brand/raeng-fitness-logo-source.jpg: RAENG FITNESS,

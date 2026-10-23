@@ -86,7 +86,18 @@ export function FindYourTraining() {
               c.inverse ? "border-ink bg-ink text-white" : "border-grey bg-white",
             )}
           >
-            {c.photo ? <PhotoFrame photo={c.photo} sizes="(min-width: 1024px) 30vw, 78vw" square className="aspect-[4/3] w-full" /> : null}
+            {c.photo ? (
+              <PhotoFrame photo={c.photo} sizes="(min-width: 1024px) 30vw, 78vw" square className="aspect-[4/3] w-full" />
+            ) : (
+              // No photo for online coaching: a typographic panel the same size as the
+              // photos, so all three cards line up and the ink card has no empty gap.
+              <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end border-b border-grey p-5 sm:p-6">
+                <span className="font-display text-[clamp(2rem,1.2rem+2.2vw,3rem)] leading-[0.9]">
+                  Train
+                  <span className="block">anywhere</span>
+                </span>
+              </div>
+            )}
             <div className="flex flex-1 flex-col p-5 sm:p-6">
               <p className="eyebrow">{c.eyebrow}</p>
               <h3 className="mt-2 font-display text-h3">{c.title}</h3>
