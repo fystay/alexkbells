@@ -5,7 +5,7 @@ import { revealDelay } from "@/lib/reveal";
 /** Four short benefits in a quiet grid. Type only: no icons, no pictures. */
 export function WhyKettlebells() {
   return (
-    <Section tone="white" id="why-kettlebells" labelledBy="why-heading">
+    <Section id="why-kettlebells" labelledBy="why-heading">
       <SectionHeading id="why-heading" eyebrow="Why kettlebells" title="One tool. A lot of training." />
       <ul className="mt-8 grid grid-cols-2 gap-x-5 gap-y-6 lg:mt-10 lg:grid-cols-4 lg:gap-x-8">
         {whyKettlebells.map((b, i) => (

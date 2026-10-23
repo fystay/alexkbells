@@ -38,7 +38,7 @@ export function MembershipSummary() {
   const book = getPrimaryCtaFor("group-class");
   const card = "flex w-[82%] shrink-0 snap-start flex-col rounded-lg bg-white p-5 sm:w-[46%] sm:p-6 lg:w-auto";
   return (
-    <Section id="memberships" labelledBy="memberships-summary-heading">
+    <Section tone="white" id="memberships" labelledBy="memberships-summary-heading">
       <SectionHeading
         id="memberships-summary-heading"
         eyebrow="Kettlebell memberships"

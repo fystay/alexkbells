@@ -22,8 +22,9 @@ import { MembershipSummary } from "@/components/memberships/MembershipSummary";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
-// Order follows what visitors want to know: how to book, what's on offer, why
-// kettlebells, the memberships, who Alex is, then the practical details.
+// Order (owner, 2026-10-23): the film, then who Alex is (the strongest proof),
+// why kettlebells, the classes, what's on offer, memberships, then where to go.
+// Section backgrounds alternate cream / white down the page.
 export default function HomePage() {
   const cta = getPrimaryCtaFor("group-class");
   const price = publishable(getService("group-classes").prices)[0];
@@ -34,12 +35,12 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <CoachStory />
+      <WhyKettlebells />
       <QuickFacts />
       <FirstClass />
       <FindYourTraining />
-      <WhyKettlebells />
       <MembershipSummary />
-      <CoachStory />
       <Testimonials />
       <PracticalInfo />
       <StickyBook
