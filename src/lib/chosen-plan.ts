@@ -12,12 +12,16 @@ export function planFromId(id: string | null | undefined): MembershipPlan | null
 
 const noSubscribe = () => () => {};
 
-/** Client components: the plan in the current URL, or null (and null while server rendering). */
-export function useChosenPlan(): MembershipPlan | null {
-  const id = useSyncExternalStore(
+/** Client components: a query parameter of the current URL (null while server rendering). */
+export function useQueryParam(name: string): string | null {
+  return useSyncExternalStore(
     noSubscribe,
-    () => new URLSearchParams(window.location.search).get("plan"),
+    () => new URLSearchParams(window.location.search).get(name),
     () => null,
   );
-  return planFromId(id);
+}
+
+/** Client components: the plan in the current URL, or null (and null while server rendering). */
+export function useChosenPlan(): MembershipPlan | null {
+  return planFromId(useQueryParam("plan"));
 }

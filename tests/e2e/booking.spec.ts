@@ -429,6 +429,17 @@ test.describe("production configuration", () => {
     expect(sent!.payload.text).toContain("Membership: Regular membership (£65 every 4 weeks, 8 class credits)");
   });
 
+  test("a class chosen on the class cards opens the calendar on its next date", async ({ page }) => {
+    await page.goto(`${PROD}/`);
+    const facts = page.getByRole("region", { name: "3 classes a week" });
+    await facts.getByRole("list", { name: "Class times" }).locator("> li").filter({ hasText: "Wed" }).click({ position: { x: 20, y: 20 } });
+    await facts.getByRole("link", { name: "Book now" }).click();
+    await expect(page).toHaveURL(/\/book\/group-class\?class=wed-evening$/);
+    const next = classAvailability(timetable.sessions, toDateKey(new Date())).days.find((d) => new Date(`${d.date}T12:00:00`).getDay() === 3)!;
+    await expect(page.getByRole("radio", { name: new RegExp(`^${formatLongDate(next.date)}`) })).toBeChecked();
+    await expect(continueButton(page)).toBeEnabled();
+  });
+
   test("a made-up plan in the link is ignored", async ({ page }) => {
     await page.goto(`${PROD}/book/group-class?plan=platinum`);
     await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();

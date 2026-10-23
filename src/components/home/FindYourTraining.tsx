@@ -5,7 +5,8 @@ import { formatPenceShort, planFigures } from "@/lib/membership";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import type { Photo } from "@/content/types";
-import { CardLink, tapCard, tapCardInverse } from "@/components/ui/CardLink";
+import { ChoiceCards } from "@/components/ui/ChoiceCards";
+import { ChoiceMark, choiceCard } from "@/components/ui/choice";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
@@ -24,13 +25,13 @@ interface Card {
   href: string;
   cta: string;
   photo?: Photo;
-  /** Solid ink card (no photo available): white text on ink. */
-  inverse?: boolean;
 }
 
 /**
  * The three ways to train as a row of cards: swipe sideways on phones and
- * tablets, three across on desktop. Only confirmed prices are shown.
+ * tablets, three across on desktop. Choose one, then the button under the
+ * cards opens its page (select, then continue, like every choice on the site;
+ * owner 2026-10-23). Only confirmed prices are shown.
  */
 export function FindYourTraining() {
   const group = getService("group-classes");
@@ -66,48 +67,56 @@ export function FindYourTraining() {
       price: leadPrice("online-coaching"),
       href: "/online-coaching",
       cta: "Explore Online Coaching",
-      inverse: true,
     },
   ];
 
   return (
     <Section id="find-your-training" labelledBy="training-heading">
       <SectionHeading id="training-heading" eyebrow="Ways to train" title="Find your training" />
-      <ul
-        aria-label="Ways to train"
-        className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0"
+      <ChoiceCards
+        name="training"
+        legend="Choose a way to train"
+        choices={cards.map((c) => ({ value: c.id, label: c.title, href: c.href, action: c.cta }))}
+        idle="Continue"
+        prompt="Choose a way to train to continue."
       >
-        {cards.map((c) => (
-          <li
-            key={c.id}
-            data-reveal
-            className={cn(
-              "flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-lg border sm:w-[46%] lg:w-auto",
-              c.inverse ? cn("border-ink bg-ink text-white", tapCardInverse) : cn("border-grey bg-white", tapCard),
-            )}
-          >
-            {c.photo ? (
-              <PhotoFrame photo={c.photo} sizes="(min-width: 1024px) 30vw, 78vw" square className="aspect-[4/3] w-full" />
-            ) : (
-              // No photo for online coaching: a typographic panel the same size as the
-              // photos, so all three cards line up and the ink card has no empty gap.
-              <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end border-b border-grey p-5 sm:p-6">
-                <span className="font-display text-[clamp(2rem,1.2rem+2.2vw,3rem)] leading-[0.9]">
-                  Train
-                  <span className="block">anywhere</span>
-                </span>
+        <ul
+          aria-label="Ways to train"
+          className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0"
+        >
+          {cards.map((c) => (
+            <li
+              key={c.id}
+              data-reveal
+              className={cn(
+                "flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-lg border sm:w-[46%] lg:w-auto",
+                "border-grey bg-white",
+                choiceCard,
+              )}
+            >
+              {c.photo ? (
+                <PhotoFrame photo={c.photo} sizes="(min-width: 1024px) 30vw, 78vw" square className="aspect-[4/3] w-full" />
+              ) : (
+                // No photo for online coaching: a typographic panel the same size as the
+                // photos, so all three cards line up and the ink card has no empty gap.
+                <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end border-b border-grey p-5 sm:p-6">
+                  <span className="font-display text-[clamp(2rem,1.2rem+2.2vw,3rem)] leading-[0.9]">
+                    Train
+                    <span className="block">anywhere</span>
+                  </span>
+                </div>
+              )}
+              <div className="flex flex-1 flex-col p-5 sm:p-6">
+                <p className="eyebrow">{c.eyebrow}</p>
+                <h3 className="mt-2 font-display text-h3">{c.title}</h3>
+                <p className="mt-2 flex-1">{c.body}</p>
+                {c.price ? <p className="mt-3 text-sm font-semibold">{c.price}</p> : null}
+                <ChoiceMark name="training" value={c.id} label={c.title} />
               </div>
-            )}
-            <div className="flex flex-1 flex-col p-5 sm:p-6">
-              <p className="eyebrow">{c.eyebrow}</p>
-              <h3 className="mt-2 font-display text-h3">{c.title}</h3>
-              <p className="mt-2 flex-1">{c.body}</p>
-              {c.price ? <p className="mt-3 text-sm font-semibold">{c.price}</p> : null}
-              <CardLink href={c.href} label={c.cta} />
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </ChoiceCards>
     </Section>
   );
 }

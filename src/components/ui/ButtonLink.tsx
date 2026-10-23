@@ -33,6 +33,11 @@ const styles: Record<Variant, string> = {
 
 const darkSecondary = `min-h-12 rounded-md border border-white px-6 text-white hover:bg-white hover:text-ink ${press}`;
 
+/** The same look for a real `<button>` (e.g. the proceed button under selectable cards). */
+export function buttonClasses(variant: Variant = "primary", className?: string): string {
+  return cn(base, styles[variant], "justify-center", className);
+}
+
 export function ButtonLink({ href, children, variant = "primary", external = false, onDark = false, className }: ButtonLinkProps) {
   const classes = cn(base, onDark && variant === "secondary" ? darkSecondary : styles[variant], "justify-center", className);
   if (external) {
