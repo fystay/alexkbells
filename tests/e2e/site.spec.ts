@@ -774,3 +774,19 @@ test("home: each membership card has its own action, and class times appear once
   await expect(page.locator("main").getByText("Sat 9:00 am")).toHaveCount(1);
   await expect(page.locator("#practical-heading")).toHaveText("Find us and book");
 });
+
+test("phones: a Book now bar appears after the hero and hides over the footer", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const bar = page.getByRole("complementary", { name: "Book a class" });
+  await expect(bar).toHaveCount(0); // hidden (aria-hidden) at the top
+  await page.locator("#find-your-training").scrollIntoViewIfNeeded();
+  await expect(bar).toBeVisible();
+  await expect(bar.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await expect(bar).toContainText("Sat 9 am");
+  await page.locator("footer").scrollIntoViewIfNeeded();
+  await expect(bar).toHaveCount(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.locator("#find-your-training").scrollIntoViewIfNeeded();
+  await expect(page.locator("aside[aria-label='Book a class']")).toBeHidden();
+});

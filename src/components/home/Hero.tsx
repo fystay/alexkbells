@@ -2,7 +2,7 @@ import { hero } from "@/content/home";
 import { images } from "@/content/images";
 import { heroVideo } from "@/content/media";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import Link from "next/link";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { HeroVideo } from "./HeroVideo";
@@ -47,11 +47,15 @@ export function Hero() {
                 {hero.headlineSecondary}
               </span>
             </h1>
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-7 sm:flex sm:items-center">
-              <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} onDark className="w-full sm:w-56" />
-              <ButtonLink href="/coaching" variant="secondary" onDark className="w-full px-3 text-xs sm:w-auto sm:px-6 sm:text-sm">
+            {/* One button; the second option is a quieter text link (owner, 2026-10-23). */}
+            <div className="mt-6 flex items-center gap-5 sm:mt-7 sm:gap-7">
+              <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} onDark className="flex-1 sm:w-56 sm:flex-none" />
+              <Link
+                href="/coaching"
+                className="inline-flex min-h-11 items-center text-xs font-semibold uppercase tracking-[0.08em] whitespace-nowrap text-white underline underline-offset-[6px] hover:no-underline sm:text-sm"
+              >
                 {hero.secondaryLabel}
-              </ButtonLink>
+              </Link>
             </div>
           </div>
         </div>
