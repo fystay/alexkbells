@@ -21,7 +21,12 @@ interface PhotoFrameProps {
 export function PhotoFrame({ photo, sizes, className, priority = false, square = false }: PhotoFrameProps) {
   // `className` may position the frame (e.g. "absolute inset-0"), so the image sits in an inner box that always fills it.
   return (
-    <div className={cn("overflow-hidden bg-white", !square && "rounded-lg", className)}>
+    // Below-the-fold photos come into focus and settle from a slight zoom (globals.css);
+    // priority photos (the first view) appear at once.
+    <div
+      {...(priority ? {} : { "data-reveal": "", "data-reveal-photo": "" })}
+      className={cn("overflow-hidden bg-white", !square && "rounded-lg", className)}
+    >
       <div className="relative size-full">
         <Image
           src={photo.src}

@@ -31,6 +31,12 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${port}`,
     launchOptions: { executablePath },
+    // Tests start as returning visitors, so the first-visit opening curtain
+    // (lib/reveal.ts) doesn't play; tests/e2e/site.spec.ts covers it separately.
+    storageState: {
+      cookies: [],
+      origins: [port, productionPort].map((p) => ({ origin: `http://localhost:${p}`, localStorage: [{ name: "raeng-intro", value: "1" }] })),
+    },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [

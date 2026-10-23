@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
  * Put `tapCard` (white cards) or `tapCardInverse` (ink cards) on the card.
  */
 const tapBase =
-  "group relative cursor-pointer motion-safe:transition-colors has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink";
+  "group relative cursor-pointer motion-safe:transition-colors motion-safe:duration-[600ms] motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-ink";
 export const tapCard = cn(tapBase, "hover:border-ink hover:bg-ink hover:text-white active:border-ink active:bg-ink active:text-white");
 export const tapCardInverse = cn(tapBase, "hover:border-ink hover:bg-white hover:text-ink active:bg-white active:text-ink");
 /** For an ink badge inside a tappable card: flips to white with the card. */

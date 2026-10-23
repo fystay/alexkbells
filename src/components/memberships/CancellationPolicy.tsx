@@ -14,7 +14,7 @@ export function CancellationPolicy() {
         </div>
         <div className="lg:col-span-7">
           <h3 className="eyebrow">Cancellations</h3>
-          <dl className="mt-4 border-t border-ink">
+          <dl data-reveal className="mt-4 border-t border-ink">
             {policy.cancellations.map((c) => (
               <div key={c.when} className="grid grid-cols-1 gap-1 border-b border-grey py-4 sm:grid-cols-[14rem_1fr] sm:gap-6">
                 <dt className="font-semibold">{c.when}</dt>

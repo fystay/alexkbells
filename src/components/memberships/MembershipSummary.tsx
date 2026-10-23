@@ -6,6 +6,7 @@ import { extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
+import { revealDelay } from "@/lib/reveal";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { PlanCarousel } from "./PlanCarousel";
 import { CardLink, tapBadge, tapCard } from "@/components/ui/CardLink";
@@ -48,10 +49,10 @@ export function PlanCards({ className }: { className?: string }) {
     <>
       <div className={className}>
         <PlanCarousel label="Membership plans">
-          {membershipPlans.map((plan) => {
+          {membershipPlans.map((plan, i) => {
             const f = planFigures(plan, payg.amountGbp);
             return (
-              <li key={plan.id} className={cn(card, tapCard, plan.featured ? "border-2 border-ink" : "border border-grey")}>
+              <li key={plan.id} data-reveal style={revealDelay(i)} className={cn(card, tapCard, plan.featured ? "border-2 border-ink" : "border border-grey")}>
                 <h3 className="font-display text-h3">{plan.name}</h3>
                 <p className="mt-4">
                   <span className="font-display text-4xl tabular-nums">£{plan.priceGbp}</span>
@@ -70,7 +71,7 @@ export function PlanCards({ className }: { className?: string }) {
               </li>
             );
           })}
-          <li className={cn(card, tapCard, "border border-grey")}>
+          <li data-reveal style={revealDelay(membershipPlans.length)} className={cn(card, tapCard, "border border-grey")}>
             <h3 className="font-display text-h3">Pay as you go</h3>
             <p className="mt-4">
               <span className="font-display text-4xl tabular-nums">£{payg.amountGbp}</span>

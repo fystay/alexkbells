@@ -29,7 +29,7 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       aria-current={current ? "page" : undefined}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group inline-flex items-center justify-center gap-3 rounded-md text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
+        "group inline-flex items-center justify-center gap-3 rounded-md text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px",
         large && "p-1",
         large
           ? onDark

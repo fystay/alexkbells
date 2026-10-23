@@ -21,7 +21,7 @@ interface ButtonLinkProps {
 }
 
 const base =
-  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200";
+  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]";
 const press = "active:translate-y-px";
 
 const styles: Record<Variant, string> = {

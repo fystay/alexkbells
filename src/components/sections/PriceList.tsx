@@ -36,7 +36,7 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
 
   return (
     <Provisional status={status}>
-      <dl className="divide-y divide-grey border-y border-grey">
+      <dl data-reveal className="divide-y divide-grey border-y border-grey">
         {visible.map((price) => (
           <div key={price.label} className="flex items-baseline justify-between gap-4 py-5">
             <dt className="text-sm ">{price.label}</dt>

@@ -9,6 +9,7 @@ import { formatTime, partOfDay, shortDay, sortSessions } from "@/lib/schedule";
 import { Section } from "@/components/ui/Section";
 import { CardLink, tapCard } from "@/components/ui/CardLink";
 import { cn } from "@/lib/cn";
+import { revealDelay } from "@/lib/reveal";
 
 /**
  * The class week (option E, owner 2026-10-23): a statement of how often
@@ -61,8 +62,8 @@ export function ClassWeekCards({ className }: { className?: string }) {
   if (sessions.length === 0) return null;
   return (
     <ul aria-label="Class times" className={cn("grid grid-cols-3 gap-2.5 sm:gap-4", className)}>
-      {sessions.map((s) => (
-        <li key={s.id} className={cn("flex flex-col items-center rounded-lg border border-ink px-2 pt-4 pb-1 text-center", tapCard)}>
+      {sessions.map((s, i) => (
+        <li key={s.id} data-reveal style={revealDelay(i)} className={cn("flex flex-col items-center rounded-lg border border-ink px-2 pt-4 pb-1 text-center", tapCard)}>
           <p className="eyebrow">{partOfDay(s.start)}</p>
           <p className="mt-2 font-display text-[clamp(1.75rem,1rem+3vw,2.75rem)] leading-none">
             <abbr title={s.day} className="no-underline">

@@ -732,8 +732,9 @@ test("home memberships: swipe cards with a counter and Previous / Next on phones
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(section.getByRole("button", { name: "Next" })).toBeHidden();
-  const lefts = await cards.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
-  expect(new Set(lefts).size).toBe(1);
+  // Layout position (offsetTop), not the drawn box, which moves while the cards reveal.
+  const tops = await cards.evaluateAll((els) => els.map((e) => (e as HTMLElement).offsetTop));
+  expect(new Set(tops).size).toBe(1);
 });
 
 test("header Book now is underlined only in the booking flow", async ({ page }) => {
@@ -806,4 +807,28 @@ test("phones: a Book now bar appears after the hero and hides over the footer", 
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.locator("#find-your-training").scrollIntoViewIfNeeded();
   await expect(page.locator("aside[aria-label='Book a class']")).toBeHidden();
+});
+
+test.describe("opening curtain", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("plays once on a first visit, never blocks clicks, and not again on the next page", async ({ page }) => {
+    await page.goto("/");
+    const curtain = page.locator(".intro");
+    await expect(curtain).toBeVisible();
+    await expect(curtain).toHaveAttribute("aria-hidden", "true");
+    expect(await curtain.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe("none");
+    await expect(curtain).toBeHidden({ timeout: 4000 });
+    await page.goto("/classes");
+    await expect(page.locator("html")).not.toHaveAttribute("data-intro", /.*/);
+    await expect(curtain).toBeHidden();
+  });
+
+  test("never plays with Reduce Motion", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator(".intro")).toBeHidden();
+    await context.close();
+  });
 });
