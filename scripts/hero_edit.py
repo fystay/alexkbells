@@ -43,11 +43,15 @@ XF = 0.16  # whip length
 # frame and the gym's wall banner shows whenever it is in; c4 (blue top) has a
 # small wall logo at head height in every usable moment, so it is not used either.
 # The film is lengthened by fuller movements and more slow motion instead.
+# c12 (green tee, 2026-10-23): only the snatch lockout is used, phone cut, tight
+# on him; every other moment has the gym's APEX banners right behind him. c1 and
+# c3 show the banners throughout, so they are not used.
 SHOTS = [
     dict(c="c7", t=0.57, seg=[(4.4, 1.0)], push=0.07, out="cut", port=0.5, pz=1.0, track=False, only="portrait"),
     dict(c="c7", t=0.57, seg=[(4.4, 1.0)], push=0.07, out="cut", land=0.58, track=False, only="landscape"),  # the class together: opens the film (group shots only here)
     dict(c="c5", t=4.75, seg=[(0.75, 1.0), (0.5, 0.42)], push=0.10, out="cut", land=0.2, port=0.0, pz=1.3),   # white tee: bell up to the chest, hold
     dict(c="c5", t=3.0, seg=[(0.5, 1.0), (0.5, 0.42)], push=0.06, out="left", port=0.0, pz=1.3, only="portrait"),  # teal: swing to the top, slow at the float (too fast to follow in the wide crop)
+    dict(c="c12", t=3.2, seg=[(0.4, 1.3), (1.0, 0.4)], push=0.06, out="right", port=0.33, px=0.5, pz=2.1, track=False, only="portrait"),  # green tee: snatch, fast punch-through, slow lockout overhead (starts after the pull, when the banner behind him is out of the crop)
     dict(c="c5", t=4.0, seg=[(0.45, 1.0), (0.3, 0.38)], push=0.06, out="cut", land=0.3, port=0.0, pz=1.3),  # orange: swing, slow at the top
     dict(c="c6", t=9.0, seg=[(0.5, 1.0), (0.5, 0.45)], push=0.06, out="cut", port=0.2, pz=1.4, only="portrait"),  # woman: goblet squat, slow at the bottom (from 9 s the wall behind is dark, no signs)
     dict(c="c5", t=8.25, seg=[(0.85, 1.0), (0.6, 0.45)], push=0.08, out="right", port=0.0, px=0.0, pz=1.3, track=False, only="portrait"),  # green: squat, slow at the bottom (fixed crop: the tracker drifts to the background)
