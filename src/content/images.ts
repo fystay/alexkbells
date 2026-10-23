@@ -38,10 +38,10 @@ export const images = {
    * "Why kettlebells" tiles (2026-10-23): stills from the owner's class footage,
    * taken from the hero film (faces in frame, no third-party signage).
    */
-  whyStrength: { src: "/images/why/strength.jpg", width: 540, height: 960, alt: "A man in a green T-shirt locks a kettlebell out overhead", position: "50% 30%" },
-  whyConditioning: { src: "/images/why/conditioning.jpg", width: 540, height: 960, alt: "A class swinging kettlebells together in a training studio", position: "50% 55%" },
-  whyMovement: { src: "/images/why/movement.jpg", width: 540, height: 960, alt: "A man in a green T-shirt holds a kettlebell at his chest in a deep squat", position: "50% 55%" },
-  whyAdaptable: { src: "/images/why/adaptable.jpg", width: 540, height: 960, alt: "A man in a white T-shirt holds a single kettlebell at his chest", position: "50% 35%" },
+  whyStrength: { src: "/images/why/strength.jpg", width: 600, height: 800, alt: "A man in a green T-shirt presses a kettlebell overhead in a group class", position: "50% 40%" },
+  whyConditioning: { src: "/images/why/conditioning.jpg", width: 600, height: 800, alt: "A man in a teal T-shirt at the bottom of a kettlebell swing, with the class swinging behind him", position: "50% 50%" },
+  whyMovement: { src: "/images/why/movement.jpg", width: 600, height: 800, alt: "A woman holds a kettlebell at her chest at the bottom of a deep goblet squat", position: "50% 50%" },
+  whyAdaptable: { src: "/images/why/adaptable.jpg", width: 600, height: 800, alt: "Three people swing kettlebells side by side", position: "50% 40%" },
 } satisfies Record<string, Photo>;
 
 export type ImageRole = keyof typeof images;
