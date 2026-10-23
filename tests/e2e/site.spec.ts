@@ -483,10 +483,10 @@ test("homepage: services, memberships and the coach's story are there, and no te
   await expect(coach.getByText("Now", { exact: true })).toBeVisible();
 });
 
-test("the home page uses little imagery: two training cards plus the before-and-after pair", async ({ page }) => {
+test("the home page keeps imagery in check: four why tiles, two training cards and the before-and-after pair", async ({ page }) => {
   await page.goto("/");
   const imgs = await page.$$eval("main img", (els) => els.length);
-  expect(imgs).toBeLessThanOrEqual(4);
+  expect(imgs).toBeLessThanOrEqual(8);
 });
 
 test.describe("memberships", () => {
@@ -649,15 +649,19 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the class statement, when / where / from and Book now sit straight under the hero", async ({ page }) => {
+test("home: the class week shows one card per class, venue, from-price and Book", async ({ page }) => {
   await page.goto("/");
   const facts = page.getByRole("region", { name: "3 classes a week" });
   await expect(facts.getByRole("heading", { level: 2 })).toHaveText(/3 classes\s*a week/);
-  await expect(facts).toContainText("Mon & Wed 6:30 pm");
-  await expect(facts).toContainText("Sat 9:00 am");
+  const cards = facts.getByRole("list", { name: "Class times" }).locator("> li");
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText("Mon");
+  await expect(cards.nth(0)).toContainText("6:30 pm");
+  await expect(cards.nth(2)).toContainText("Sat");
+  await expect(cards.nth(2)).toContainText("9:00 am");
+  await expect(facts.getByRole("link", { name: "Book Saturday 9:00 am" })).toHaveAttribute("href", "/book/group-class");
   await expect(facts).toContainText("Media House, Cumbernauld");
   await expect(facts).toContainText("£7.08 a class");
-  await expect(facts.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
 });
 
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
@@ -771,7 +775,7 @@ test("home: each membership card has its own action, and class times appear once
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  await expect(page.locator("main").getByText("Sat 9:00 am")).toHaveCount(1);
+  await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
   await expect(page.locator("#practical-heading")).toHaveText("Find us and book");
 });
 
