@@ -8,9 +8,7 @@ interface StickyBookProps {
   href: string;
   label: string;
   external: boolean;
-  /** e.g. ["Mon & Wed 6:30 pm", "Sat 9:00 am"]. */
-  times: string[];
-  /** e.g. "From £7.08 a class". */
+  /** e.g. "From only £7.08 a class" (owner, 2026-10-23: price only, no class times). */
   price: string | null;
 }
 
@@ -19,7 +17,7 @@ interface StickyBookProps {
  * screen once the hero has scrolled away, hidden again over the footer.
  * Without JavaScript it never appears (the page already has Book now buttons).
  */
-export function StickyBook({ href, label, external, times, price }: StickyBookProps) {
+export function StickyBook({ href, label, external, price }: StickyBookProps) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -52,10 +50,7 @@ export function StickyBook({ href, label, external, times, price }: StickyBookPr
       )}
     >
       <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
-        <p className="min-w-0 text-[0.8125rem] leading-tight">
-          {times.length > 0 ? <span className="block font-semibold">{times.join(" · ")}</span> : null}
-          {price ? <span className="block">{price}</span> : null}
-        </p>
+        <p className="min-w-0 text-[0.9375rem] leading-tight font-semibold">{price}</p>
         <Link
           href={href}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}

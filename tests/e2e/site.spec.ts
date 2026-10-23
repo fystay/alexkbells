@@ -787,7 +787,8 @@ test("phones: a Book now bar appears after the hero and hides over the footer", 
   await page.locator("#find-your-training").scrollIntoViewIfNeeded();
   await expect(bar).toBeVisible();
   await expect(bar.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  await expect(bar).toContainText("Sat 9 am");
+  await expect(bar).toContainText(/^From only £\d+\.\d{2} a class/);
+  await expect(bar).not.toContainText("pm");
   await page.locator("footer").scrollIntoViewIfNeeded();
   await expect(bar).toHaveCount(0);
   await page.setViewportSize({ width: 1280, height: 800 });
