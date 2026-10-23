@@ -515,13 +515,31 @@ test.describe("memberships", () => {
     await expect(payg.getByRole("table", { name: "Extra vs a membership" })).toBeVisible();
   });
 
-  test("buttons are enquiries or bookings, never sign-ups or payments", async ({ page }) => {
+  test("choose a plan: the card turns ink, Your plan fills in, Book now opens the calendar with the plan", async ({ page }) => {
     await page.goto("/memberships");
-    for (const p of PLANS) {
-      const link = page.getByRole("link", { name: new RegExp(`^(Select|Join) ${p.name}`) });
-      await expect(link).toHaveAttribute("href", "/contact");
-    }
-    await expect(page.locator("#memberships").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+    const section = page.locator("#memberships");
+    const bar = section.getByText("Your plan", { exact: true }).locator("../..");
+    await expect(bar).toContainText("Select a plan above to continue.");
+    await expect(bar.getByRole("button", { name: "Book now" })).toBeDisabled();
+
+    await section.getByRole("button", { name: "Select Regular" }).click();
+    const regular = section.locator("li[data-selected]").filter({ has: page.getByRole("heading", { name: "Regular" }) });
+    await expect(regular).toHaveAttribute("data-selected", "true");
+    await expect.poll(() => regular.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
+    await expect(section.getByRole("button", { name: "Selected Regular" })).toHaveAttribute("aria-pressed", "true");
+    await expect(bar).toContainText("Regular");
+    await expect(bar).toContainText("£65 / 4 weeks · 8 class credits");
+    const go = bar.getByRole("link", { name: "Book now with the Regular plan" });
+    await expect(go).toHaveAttribute("href", "/book/group-class?plan=regular");
+
+    // Only one plan at a time.
+    await section.getByRole("button", { name: "Select Starter" }).click();
+    await expect(regular).toHaveAttribute("data-selected", "false");
+    await expect(bar).toContainText("£40 / 4 weeks · 4 class credits");
+
+    await bar.getByRole("link", { name: /Book now with the Starter plan/ }).click();
+    await expect(page).toHaveURL(/\/book\/group-class\?plan=starter$/);
+    await expect(page.locator("main")).toContainText("Starter · £40 / 4 weeks · 4 class credits");
     await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);
   });
 
@@ -773,7 +791,7 @@ test("home: each membership card has its own action, and class times appear once
   const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
   for (const name of ["Starter", "Regular", "Dedicated"]) {
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
-    await expect(card.getByRole("link", { name: new RegExp(`^(Select|Join) ${name}`) })).toHaveCount(1);
+    await expect(card.getByRole("button", { name: `Select ${name}` })).toHaveCount(1);
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");

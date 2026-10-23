@@ -8,6 +8,7 @@ import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { BookingWizard, type ClassInfo } from "./BookingWizard";
+import { ChosenPlan } from "./ChosenPlan";
 import { DemoNotice, InstagramFallback } from "./ui";
 
 interface BookingPageProps {
@@ -42,6 +43,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
           </h1>
           <p className="mt-4 text-lede text-muted">{intro}</p>
         </header>
+        {initialService !== "one-to-one" ? <ChosenPlan /> : null}
 
         {mode === "demo" ? (
           <div className="mt-5 max-w-2xl">

@@ -6,37 +6,30 @@ import { extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
-import { getMembershipAction, getPrimaryCtaFor, type CallToAction } from "@/lib/booking";
+import { getPrimaryCtaFor, type CallToAction } from "@/lib/booking";
 import { PlanCarousel } from "./PlanCarousel";
+import { PlanSelectProvider, SelectPlanButton, SelectableCard, YourPlanBar } from "./PlanSelect";
 
 const payg = getService("group-classes").prices[0];
 
-/**
- * The homepage view of memberships: one card per plan (swipe sideways on
- * phones and tablets, four across on desktop) with the price, credits, cost
- * per class and saving, the conditions in one line, and one button to the
- * full cards where each plan can be joined.
- */
-/** Each card's own action, so a visitor can act where they read the saving. */
-function PlanLink({ href, label, external, kind }: CallToAction) {
-  // Owner, 2026-10-23: plan cards say "Select" while joining goes through an enquiry
-  // ("Enquire about Starter" -> "Select" + hidden " Starter"); "Join" once a join link is set.
-  const enquiry = kind === "enquiry" && label.startsWith("Enquire about ");
-  const verb = enquiry ? "Select" : kind === "booking" && label.startsWith("Join") ? "Join" : label;
-  const rest = enquiry ? ` ${label.slice("Enquire about ".length)}` : verb === label ? "" : label.slice(verb.length);
+/** Pay as you go's own link straight to booking (it has no plan to choose). */
+function PlanLink({ href, label, external }: CallToAction) {
   return (
     <Link
       href={href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className="mt-4 inline-flex min-h-11 items-center self-start text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
     >
-      {verb}
-      {rest ? <span className="sr-only">{rest}</span> : null}
+      {label}
       {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
     </Link>
   );
 }
 
+/**
+ * The homepage view of memberships: the heading, Compare and join, and the
+ * plan cards (choose a plan, then Book now to the calendar).
+ */
 export function MembershipSummary() {
   return (
     <Section tone="white" id="memberships" labelledBy="memberships-summary-heading">
@@ -62,14 +55,23 @@ export function MembershipSummary() {
 export function PlanCards({ className }: { className?: string }) {
   const book = getPrimaryCtaFor("group-class");
   const card = "flex w-[82%] shrink-0 snap-start flex-col rounded-lg bg-white p-5 sm:w-[46%] sm:p-6 lg:w-auto";
+  const choices = membershipPlans.map((p) => ({ id: p.id, name: p.name, priceGbp: p.priceGbp, credits: p.credits, weeks: BILLING_WEEKS }));
   return (
-    <>
+    <PlanSelectProvider>
       <div className={className}>
         <PlanCarousel label="Membership plans">
           {membershipPlans.map((plan) => {
             const f = planFigures(plan, payg.amountGbp);
             return (
-              <li key={plan.id} className={cn(card, plan.featured ? "border-2 border-ink" : "border border-grey")}>
+              <SelectableCard
+                key={plan.id}
+                planId={plan.id}
+                className={cn(
+                  card,
+                  plan.featured ? "border-2 border-ink" : "border border-grey",
+                  "motion-safe:transition-colors data-[selected=true]:border-ink data-[selected=true]:bg-ink data-[selected=true]:text-white",
+                )}
+              >
                 <h3 className="font-display text-h3">{plan.name}</h3>
                 <p className="mt-4">
                   <span className="font-display text-4xl tabular-nums">£{plan.priceGbp}</span>
@@ -80,12 +82,12 @@ export function PlanCards({ className }: { className?: string }) {
                   <li className="mt-2">{formatPenceShort(f.perClassPence)} per class</li>
                 </ul>
                 <p className="mt-5">
-                  <span className="inline-flex items-baseline gap-1 rounded-md bg-ink px-2.5 py-1 font-semibold text-white">
+                  <span className="inline-flex items-baseline gap-1 rounded-md bg-ink px-2.5 py-1 font-semibold text-white group-data-[selected=true]:bg-white group-data-[selected=true]:text-ink">
                     <span className="sr-only">You save </span>Save {formatPenceShort(f.savingPence)}
                   </span>
                 </p>
-                <PlanLink {...getMembershipAction(plan.name, plan.id)} />
-              </li>
+                <SelectPlanButton planId={plan.id} name={plan.name} />
+              </SelectableCard>
             );
           })}
           <li className={cn(card, "border border-grey")}>
@@ -130,6 +132,7 @@ export function PlanCards({ className }: { className?: string }) {
           </li>
         </PlanCarousel>
       </div>
+      <YourPlanBar plans={choices} bookHref={book.href} external={book.external} />
       <p className="mt-4 text-sm">
         {membershipKeyFacts.slice(0, 3).map((f) => f.title).join(" · ")}. Savings compare with the £{payg.amountGbp} price and assume every credit is used.{" "}
         <Link href="/memberships#cancellation" className="font-semibold underline underline-offset-4 hover:no-underline">
@@ -137,6 +140,6 @@ export function PlanCards({ className }: { className?: string }) {
         </Link>
         .
       </p>
-    </>
+    </PlanSelectProvider>
   );
 }
