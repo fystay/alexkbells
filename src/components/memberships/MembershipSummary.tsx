@@ -2,7 +2,7 @@ import Link from "next/link";
 import { membershipPlans, BILLING_WEEKS } from "@/content/memberships";
 import { membershipKeyFacts } from "@/content/policy";
 import { getService } from "@/content/services";
-import { formatPenceShort, maxSavingPence, planFigures } from "@/lib/membership";
+import { extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "@/lib/membership";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
@@ -78,7 +78,38 @@ export function MembershipSummary() {
               <span className="font-display text-4xl tabular-nums">£{payg.amountGbp}</span>
               <span className="ml-1 text-sm"> per class</span>
             </p>
-            <p className="mt-4 flex-1 border-t border-grey pt-4 text-sm">No membership needed.</p>
+            <div className="mt-4 flex-1 border-t border-grey pt-4 text-sm">
+              <p>No membership needed.</p>
+              {/* Owner, 2026-10-23: what pay as you go costs on top of each plan. */}
+              <p id="payg-extra" className="eyebrow mt-6">
+                Extra vs a membership
+              </p>
+              <table aria-labelledby="payg-extra" className="mt-3 w-full text-[0.8125rem] tabular-nums">
+                <thead>
+                  <tr>
+                    <th scope="col" className="pb-2 text-left font-normal">
+                      <span className="sr-only">Plan</span>
+                    </th>
+                    <th scope="col" className="pb-2 text-right font-normal">Week</th>
+                    <th scope="col" className="pb-2 text-right font-normal">{BILLING_WEEKS} weeks</th>
+                    <th scope="col" className="pb-2 text-right font-semibold">Year</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {membershipPlans.map((plan) => {
+                    const x = extraCostPence(plan, payg.amountGbp);
+                    return (
+                      <tr key={plan.id}>
+                        <th scope="row" className="py-1 text-left font-normal">{plan.name}</th>
+                        <td className="py-1 text-right">{formatPenceShort(x.week)}</td>
+                        <td className="py-1 text-right">{formatPenceShort(x.period)}</td>
+                        <td className="py-1 text-right font-semibold">{formatPenceShort(x.year)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             <PlanLink {...book} label="Book now" />
           </li>
         </PlanCarousel>

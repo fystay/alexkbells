@@ -154,7 +154,7 @@ for (const route of [...publicRoutes, ...coachRoutes]) {
       await expect(page.locator("[data-provisional]")).toHaveCount(0);
       // Only the prices the project owner confirmed may appear.
       const amounts = (await page.locator("main").innerText()).match(/£\d+/g) ?? [];
-      for (const amount of amounts) expect(["£12", "£35", "£130", "£79", "£40", "£65", "£85", "£48", "£96", "£144", "£8", "£31", "£59", "£10", "£8.13", "£7.08", "£7"]).toContain(amount);
+      for (const amount of amounts) expect(["£12", "£35", "£130", "£79", "£40", "£65", "£85", "£48", "£96", "£144", "£8", "£31", "£59", "£10", "£8.13", "£7.08", "£7", "£2", "£14", "£104", "£403", "£767"]).toContain(amount); // last five: pay-as-you-go extra (week / 4 weeks / year), calculated from the prices
       // No unfilled placeholders anywhere.
       await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
     });
@@ -775,6 +775,9 @@ test("home: each membership card has its own action, and class times appear once
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  const extra = payg.getByRole("table", { name: "Extra vs a membership" });
+  await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
+  await expect(extra.getByRole("row")).toHaveCount(4);
   await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
   await expect(page.locator("#practical-heading")).toHaveText("Find us and book");
 });

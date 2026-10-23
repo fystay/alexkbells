@@ -1,4 +1,4 @@
-import type { MembershipPlan } from "@/content/memberships";
+import { BILLING_WEEKS, type MembershipPlan } from "@/content/memberships";
 
 /** Everything a membership card shows beyond its price, in whole pence. */
 export interface PlanFigures {
@@ -34,4 +34,14 @@ export function formatPenceShort(pence: number): string {
 /** The biggest saving any plan offers over pay as you go, in pence (every credit used). */
 export function maxSavingPence(plans: readonly MembershipPlan[], payAsYouGoGbp: number): number {
   return Math.max(...plans.map((p) => planFigures(p, payAsYouGoGbp).savingPence));
+}
+
+/**
+ * What pay as you go costs on top of a plan, for someone who goes to as many
+ * classes as the plan has credits: per week, per billing period and per
+ * 52-week year (13 periods), in pence.
+ */
+export function extraCostPence(plan: MembershipPlan, payAsYouGoGbp: number): { week: number; period: number; year: number } {
+  const period = planFigures(plan, payAsYouGoGbp).savingPence;
+  return { week: Math.round(period / BILLING_WEEKS), period, year: (period * 52) / BILLING_WEEKS };
 }

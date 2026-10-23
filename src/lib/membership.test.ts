@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { formatPenceShort, maxSavingPence, planFigures } from "./membership";
+import { extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "./membership";
 
 const payg = getService("group-classes").prices[0].amountGbp;
 
@@ -42,5 +42,17 @@ describe("maxSavingPence", () => {
   it("is the Dedicated plan's £59 against £12 a class", async () => {
     const { membershipPlans } = await import("@/content/memberships");
     expect(maxSavingPence(membershipPlans, 12)).toBe(5900);
+  });
+});
+
+describe("extra cost of pay as you go", () => {
+  it.each([
+    ["starter", "£2", "£8", "£104"],
+    ["regular", "£7.75", "£31", "£403"],
+    ["dedicated", "£14.75", "£59", "£767"],
+  ])("%s: per week, per 4 weeks, per year", (id, week, period, year) => {
+    const plan = membershipPlans.find((p) => p.id === id)!;
+    const x = extraCostPence(plan, payg);
+    expect([formatPenceShort(x.week), formatPenceShort(x.period), formatPenceShort(x.year)]).toEqual([week, period, year]);
   });
 });
