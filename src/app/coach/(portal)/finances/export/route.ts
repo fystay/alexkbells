@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="alexkbells-payments-${range.from}-to-${range.to}${service ? `-${service}` : ""}.csv"`,
+      "Content-Disposition": `attachment; filename="raeng-payments-${range.from}-to-${range.to}${service ? `-${service}` : ""}.csv"`,
       "Cache-Control": "no-store",
     },
   });

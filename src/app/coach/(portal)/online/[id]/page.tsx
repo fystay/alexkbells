@@ -23,7 +23,7 @@ export default function SubscriptionPage({ params }: PageProps<"/coach/online/[i
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/online">← Online coaching</TextLink>
+        <TextLink href="/coach/online">Online coaching</TextLink>
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading the plan…</p>}>
         <SubscriptionView params={params} />

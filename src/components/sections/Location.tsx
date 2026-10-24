@@ -1,10 +1,10 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { Section, SectionHeading } from "@/components/ui/Section";
+import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 
-export function Location({ headingId = "location-heading" }: { headingId?: string }) {
+export function Location({ headingId = "location-heading", tone = "white" }: { headingId?: string; tone?: SectionTone }) {
   return (
-    <Section tone="surface" labelledBy={headingId}>
+    <Section tone={tone} labelledBy={headingId}>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end">
         <div className="lg:col-span-7">
           <SectionHeading
@@ -20,7 +20,7 @@ export function Location({ headingId = "location-heading" }: { headingId?: strin
           />
         </div>
         <div className="lg:col-span-5">
-          <address className="border-t-2 border-ink pt-6 text-lg not-italic leading-relaxed">
+          <address className="border-t border-grey pt-6 text-lg not-italic leading-relaxed">
             {formatAddressLines().map((line) => (
               <span key={line} className="block">
                 {line}

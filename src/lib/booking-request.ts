@@ -15,6 +15,7 @@ import { emailError, isValidEmail, messageError, nameError, phoneError, singleLi
 import { formatLongDate, fromDateKey, toDateKey, type DateKey } from "./availability/dates";
 import { isClassDate } from "./availability/timetable";
 import type { PublishedClass } from "./class-sessions";
+import { BILLING_WEEKS, membershipPlans, type MembershipPlan } from "../content/memberships";
 
 /**
  * Booking requests from /book: server-side validation, spam checks, the
@@ -68,6 +69,8 @@ export interface BookingRequest {
   days: PreferredDay[];
   times: PreferredTime[];
   experience: BookingExperience;
+  /** The membership plan chosen on the plan cards, for group classes; "" for none. */
+  plan: MembershipPlan["id"] | "";
   name: string;
   email: string;
   phone: string;
@@ -105,6 +108,9 @@ export function parseBookingRequest(
   const days = values(source, "days").filter((d): d is PreferredDay => PREFERRED_DAYS.some((o) => o.value === d));
   const times = values(source, "times").filter((t): t is PreferredTime => PREFERRED_TIMES.some((o) => o.value === t));
   const experience = text(source, "experience");
+  // Only a real plan, and only with a group class; anything else is dropped, not an error.
+  const planId = text(source, "plan");
+  const plan = service === "group-class" ? (membershipPlans.find((p) => p.id === planId)?.id ?? "") : "";
   const name = singleLine(text(source, "name"));
   const email = singleLine(text(source, "email")).toLowerCase();
   const phone = singleLine(text(source, "phone"));
@@ -133,6 +139,7 @@ export function parseBookingRequest(
       days: usesSessions ? [] : days,
       times: usesSessions ? [] : times,
       experience: experience as BookingExperience,
+      plan,
       name,
       email,
       phone,
@@ -162,6 +169,12 @@ export function describeWhen(data: Pick<BookingRequest, "session" | "classDate" 
   return data.session ? describeClass(data) : describePreferences(data.days, data.times);
 }
 
+/** "Regular membership (£65 every 4 weeks, 8 class credits)", or "" for no plan. */
+export function describePlan(planId: string): string {
+  const plan = membershipPlans.find((p) => p.id === planId);
+  return plan ? `${plan.name} membership (£${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} class credits)` : "";
+}
+
 /** The email Alex receives. Plain text: nothing from the visitor is rendered as HTML. */
 export function bookingEmail(data: BookingRequest): { subject: string; text: string } {
   const service = labelFor(BOOKABLE_SERVICES, data.service);
@@ -170,6 +183,7 @@ export function bookingEmail(data: BookingRequest): { subject: string; text: str
     "",
     `Service: ${service}`,
     data.session ? `Class: ${describeClass(data)}` : `Preferred: ${describePreferences(data.days, data.times)}`,
+    ...(data.plan ? [`Membership: ${describePlan(data.plan)}`] : []),
     `Experience: ${labelFor(BOOKING_EXPERIENCE, data.experience)}`,
     `Name: ${data.name}`,
     `Email: ${data.email}`,

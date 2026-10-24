@@ -12,7 +12,7 @@ const emailEnv = {
   RESEND_API_KEY: "re_e2e_test_key",
   RESEND_API_URL: `http://localhost:${mockEmailPort}/emails`,
   BOOKING_NOTIFY_EMAIL: "alex-e2e@example.com",
-  BOOKING_FROM_EMAIL: "Alex K Bells <bookings-e2e@example.com>",
+  BOOKING_FROM_EMAIL: "RAENG <bookings-e2e@example.com>",
   // Authorises GET /api/cron/request-alerts (tests/e2e/booking.spec.ts).
   CRON_SECRET: "e2e-cron-secret-0123456789",
 };
@@ -31,6 +31,12 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${port}`,
     launchOptions: { executablePath },
+    // Tests start as returning visitors, so the first-visit opening curtain
+    // (lib/reveal.ts) doesn't play; tests/e2e/site.spec.ts covers it separately.
+    storageState: {
+      cookies: [],
+      origins: [port, productionPort].map((p) => ({ origin: `http://localhost:${p}`, localStorage: [{ name: "raeng-intro", value: "1" }] })),
+    },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [

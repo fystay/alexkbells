@@ -1,141 +1,143 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/metadata";
-import { site } from "@/content/site";
 import Link from "next/link";
-import type { Service } from "@/content/types";
+import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { getOnlineCoachingAction, getPrimaryCtaFor } from "@/lib/booking";
+import { images } from "@/content/images";
+import { site } from "@/content/site";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
-import { cn } from "@/lib/cn";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
-import { Section } from "@/components/ui/Section";
+import { Section, SectionHeading } from "@/components/ui/Section";
+import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
+import { Location } from "@/components/sections/Location";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { KeepHyphens } from "@/components/ui/KeepHyphens";
+import { revealDelay } from "@/lib/reveal";
 
 export const metadata: Metadata = pageMetadata({
-  title: "One-to-One & Online Kettlebell Coaching",
+  title: "1:1 Kettlebell Coaching",
   description:
-    "Face-to-face kettlebell coaching in Cumbernauld tailored to you, or online coaching with personalised programming, support and progression.",
+    "Face-to-face 1:1 kettlebell coaching in Cumbernauld, Glasgow, tailored to your goals, experience and development.",
   path: "/coaching",
 });
 
-function ServiceDetail({
-  service,
-  index,
-  tone,
-  intro,
-}: {
-  service: Service;
-  index: string;
-  tone: "paper" | "ink";
-  intro: string;
-}) {
-  const online = service.id === "online-coaching";
-  // One-to-one books a session; online coaching is an enquiry Alex replies to.
-  const enquiry = online ? getOnlineCoachingAction() : getPrimaryCtaFor("one-to-one");
-  const headingId = `${service.id}-heading`;
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
-  const rule = tone === "ink" ? "border-line-inverse" : "border-line";
-
-  return (
-    <Section tone={tone} id={service.id === "online-coaching" ? "online" : service.id} labelledBy={headingId}>
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-6">
-          <p className={cn("eyebrow", muted)}>{index}</p>
-          <h2 id={headingId} className="mt-4 font-display text-h2 text-balance">
-            <KeepHyphens>{service.name}</KeepHyphens>
-          </h2>
-          <p className={cn("mt-6 max-w-xl text-lede", muted)}>{intro}</p>
-          <StartTraining
-            href={enquiry.href}
-            label={enquiry.label}
-            srSuffix={online ? undefined : ` (${service.name.toLowerCase()})`}
-            external={enquiry.external}
-            tone={tone === "ink" ? "dark" : "light"}
-            className="mt-10 w-full sm:w-[22rem]"
-          />
-          {!online && enquiry.kind === "booking" ? <InstagramAlternative tone={tone} className="mt-4" /> : null}
-        </div>
-        <div className="space-y-10 lg:col-span-5 lg:col-start-8">
-          {service.points.length > 0 ? (
-            <div>
-              <h3 className={cn("eyebrow", muted)}>What it involves</h3>
-              <ul className={cn("mt-4 divide-y border-y", rule, tone === "ink" ? "divide-line-inverse" : "divide-line")}>
-                {service.points.map((point) => (
-                  <li key={point} className="py-4 font-semibold">
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          <div>
-            <h3 className={cn("eyebrow mb-4", muted)}>Pricing</h3>
-            <PriceList prices={service.prices} tone={tone} />
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
+// What individual coaching gives you. Descriptions of the approach, not promises of results.
+const focus = [
+  { title: "Strength", body: "Build it progressively, with loads that suit you today and a plan for what comes next." },
+  { title: "Technique", body: "A coach watching every rep, with feedback you can use straight away." },
+  { title: "Movement", body: "Move well first. Better movement makes harder training safer and more effective." },
+];
 
 export default function CoachingPage() {
-  const oneToOne = getService("one-to-one");
-  const online = getService("online-coaching");
+  const service = getService("one-to-one");
+  const lead = publishable(service.prices)[0];
+  const booking = getPrimaryCtaFor("one-to-one");
+  const open = booking.kind === "booking";
+
+  const steps = [
+    {
+      title: open ? "Send a booking request" : "Message Alex",
+      body: open
+        ? "Tell Alex the days and times that suit you and a little about your training."
+        : "Message Alex on Instagram with what you want from your training and when you're free.",
+    },
+    { title: "Alex confirms your session", body: "Alex replies to arrange a time that works." },
+    { title: "Train face to face", body: "Sessions take place at Media House in Cumbernauld, built around you." },
+  ];
 
   return (
     <>
       <PageHeader
-        image={site.pageImages.coaching}
-        eyebrow="Personal coaching"
+        image={images.oneToOne}
+        eyebrow="1:1 Coaching"
         title="Coaching built around you"
-        intro="Train face to face with Alex in Cumbernauld, or follow a personalised programme online."
+        intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."
       >
-        <nav aria-label="Coaching options" className="flex flex-wrap gap-3">
-          <ButtonLink href="#one-to-one" variant="secondary">
-            One-to-one
-          </ButtonLink>
-          <ButtonLink href="#online" variant="secondary">
-            Online
-          </ButtonLink>
-        </nav>
+        <StartTraining
+          href={booking.href}
+          label={booking.label}
+          srSuffix=" (1:1 coaching)"
+          external={booking.external}
+         
+          className="w-full sm:w-[22rem]"
+        />
       </PageHeader>
 
-      <ServiceDetail
-        service={oneToOne}
-        index="01"
-        tone="paper"
-        intro={
-          getPrimaryCtaFor("one-to-one").kind === "booking"
-            ? "One-to-one kettlebell coaching, face to face and tailored to you as an individual. Send a booking request with the days and times that suit you, and Alex confirms your session."
-            : "One-to-one kettlebell coaching, face to face and tailored to you as an individual. Get in touch to arrange a session or talk through what you want from your training."
-        }
-      />
-      <ServiceDetail
-        service={online}
-        index="02"
-        tone="ink"
-        intro="Online coaching with personalised programming, support and progression, so you can train with a plan wherever you are. Tell Alex about your goals and he'll reply personally to talk it through."
-      />
-
-      <Section tone="surface" spacing="compact" labelledBy="classes-link-heading">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 id="classes-link-heading" className="text-lg font-bold">
-            Prefer training in a group?
-          </h2>
-          <Link
-            href="/classes"
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline underline-offset-[6px] hover:no-underline"
-          >
-            See group classes <span aria-hidden="true">→</span>
-          </Link>
+      <Section tone="white" id="who-for" labelledBy="who-heading">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
+            <SectionHeading
+              id="who-heading"
+              eyebrow="Who it's for"
+              title="Attention that stays on you"
+              intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
+            />
+          </div>
+          <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-7">
+            {focus.map((f, i) => (
+              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
+                <h3 className="font-display text-h3">{f.title}</h3>
+                <p className="mt-3 ">{f.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
-      <CtaBand />
+      <Section id="how-it-works" labelledBy="how-heading">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
+            <SectionHeading
+              id="how-heading"
+              eyebrow="How it works"
+              title="From first message to first session"
+             
+            />
+            <StartTraining
+              href={booking.href}
+              label={booking.label}
+              srSuffix=" (1:1 coaching)"
+              external={booking.external}
+             
+              className="mt-8 w-full sm:w-[22rem]"
+            />
+            {open ? <InstagramAlternative className="mt-4" /> : null}
+          </div>
+          <Steps steps={steps} className="lg:col-span-7" />
+        </div>
+      </Section>
+
+      <Section tone="white" id="pricing" labelledBy="pricing-heading">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
+            <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Sessions and monthly coaching" />
+          </div>
+          <div className="lg:col-span-6 lg:col-start-7">
+            <PriceList prices={service.prices} />
+            <p className="mt-6 ">
+              Prefer to train in a group?{" "}
+              <Link href="/classes" className="font-semibold  underline underline-offset-4 hover:no-underline">
+                See group classes
+              </Link>
+              . Further from Cumbernauld?{" "}
+              <Link href="/online-coaching" className="font-semibold  underline underline-offset-4 hover:no-underline">
+                See online coaching
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Location tone="plain" />
+      <CtaBand
+        title="Ready to train 1:1?"
+        body={lead ? `Sessions ${lead.prefix ? `${lead.prefix.toLowerCase()} ` : ""}${formatGbp(lead.amountGbp)} at ${site.location.venue}, ${site.location.town}.` : undefined}
+        service="one-to-one"
+      />
     </>
   );
 }

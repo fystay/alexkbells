@@ -16,7 +16,7 @@ export default function NewSubscriptionPage({ searchParams }: PageProps<"/coach/
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/online">← Online coaching</TextLink>
+        <TextLink href="/coach/online">Online coaching</TextLink>
       </p>
       <div className="mt-4">
         <PageHeader title="Set up online coaching" />

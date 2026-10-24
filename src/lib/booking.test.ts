@@ -21,9 +21,9 @@ const formEnv = {
 };
 
 describe("PRIMARY_CTA", () => {
-  it("is an honest 'Get in touch' link to the contact page, for when nothing can be booked", () => {
-    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Get in touch", href: "/contact", external: false });
-    expect(PRIMARY_CTA.label).not.toMatch(/book|pay|checkout/i);
+  it("always says 'Book now' (never 'Get in touch') and opens /book, which is honest when nothing can be booked", () => {
+    expect(PRIMARY_CTA).toEqual({ kind: "enquiry", label: "Book now", href: "/book", external: false });
+    expect(PRIMARY_CTA.label).not.toMatch(/get in touch|pay|checkout/i);
   });
 });
 
@@ -49,7 +49,7 @@ describe("getPrimaryCta", () => {
     const env = { VERCEL_ENV: "production", ...supabase };
     expect(getPrimaryCtaFor("group-class", env).href).toBe("/book/group-class");
     expect(getPrimaryCtaFor("one-to-one", env).href).toBe("/book/one-to-one");
-    expect(getPrimaryCtaFor("group-class", {}).href).toBe("/contact");
+    expect(getPrimaryCtaFor("group-class", {})).toMatchObject({ label: "Book now", href: "/book" });
   });
 
   it("always opens the booking page on Vercel previews", () => {
@@ -104,9 +104,9 @@ describe("onlineEnquiryMode", () => {
 describe("getBookingAction", () => {
   it("falls back to an honest enquiry when nothing is configured", () => {
     const action = getClassBookingAction({});
-    expect(action).toMatchObject({ kind: "enquiry", href: ENQUIRY_HREF, external: false });
-    expect(action.label).not.toMatch(/book/i);
-    expect(getBookingAction("any", {}).label).not.toMatch(/book/i);
+    expect(action).toMatchObject({ kind: "enquiry", label: "Book now", href: "/book", external: false });
+    expect(getBookingAction("any", {}).label).toBe("Book now");
+    expect(getBookingAction("any", {}).label).not.toMatch(/get in touch/i);
   });
 
   it("points each service at its own step of the on-site flow", () => {
@@ -125,7 +125,7 @@ describe("getBookingAction", () => {
 
 describe("getOnlineCoachingAction", () => {
   it("links to the onboarding journey only when it can be completed", () => {
-    expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching");
+    expect(getOnlineCoachingAction(formEnv).href).toBe("/online-coaching/enquire");
     expect(getOnlineCoachingAction({}).href).toBe(ENQUIRY_HREF);
     // Always worded as an enquiry, never as signing up or starting.
     expect(getOnlineCoachingAction(formEnv).label).toBe("Enquire about online coaching");

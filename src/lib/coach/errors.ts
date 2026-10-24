@@ -7,6 +7,7 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   akb_class_attendance_class_session_id_client_id_key: "They're already on the list for that class.",
   akb_charges_subscription_id_period_start_key: "This period has already been charged.",
   akb_payment_allocations_payment_id_charge_id_key: "That payment is already set against this charge.",
+  akb_memberships_one_current: "This client already has a current membership. Open it instead.",
 };
 
 /** A message the coach can act on. Nothing in it comes from the database text. */

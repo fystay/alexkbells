@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
 
-export const DEFAULT_TITLE = `${site.name} | Kettlebell Coaching in Cumbernauld`;
+export const DEFAULT_TITLE = `${site.name} ${site.descriptor} | Kettlebell Classes in Cumbernauld, Glasgow`;
 
 /** Social preview image (generated from the logo by scripts/brand_assets.py). */
 const shareImage = {
   url: "/og-image.png",
   width: 1200,
   height: 630,
-  alt: `${site.name}, ${site.descriptor} logo`,
+  alt: `${site.name}: ${site.descriptor}`,
   type: "image/png",
 };
 

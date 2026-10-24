@@ -61,18 +61,13 @@ export interface FaqItem {
   status: ContentStatus;
 }
 
-export interface Logo {
-  src: string;
-  width: number;
-  height: number;
-  alt: string;
-}
-
 export interface Photo {
   src: string;
   width: number;
   height: number;
   alt: string;
+  /** CSS object-position for cropped frames, e.g. "50% 20%". Defaults to centre. */
+  position?: string;
 }
 
 /** One chapter of Alex's story, e.g. "Where it started". */

@@ -3,100 +3,47 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /**
- * "action": the split "Book now" button (2026-10-18; "Start your training" until 2026-10-20): a filled bar
- * with the label, and the arrow in an inverse square at its right end.
+ * primary: black. secondary: outlined. text: underlined link. action: the
+ * solid "action" bar. No arrows anywhere on the site (owner, 2026-10-22).
+ * Hover inverts black and white (a fourth colour would be needed for anything
+ * else, and white on the grey fails contrast).
  */
 type Variant = "primary" | "secondary" | "text" | "action";
-type Tone = "light" | "dark";
 
 interface ButtonLinkProps {
   href: string;
   children: ReactNode;
   variant?: Variant;
-  /** The surface the button sits on. */
-  tone?: Tone;
   external?: boolean;
+  /** Over the dark film: white outline and text. */
+  onDark?: boolean;
   className?: string;
-  /** "action" only: extra classes for the arrow square (e.g. responsive tone overrides). */
-  arrowClassName?: string;
 }
 
 const base =
-  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-[color,background-color,border-color,text-decoration-color] duration-200";
-
-// The focus ring takes the surface's text colour, not the button's, so it
-// stays visible outside a filled button; it is not transitioned, so it shows
-// at full contrast immediately. Filled buttons press down slightly.
+  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]";
 const press = "active:translate-y-px";
-const ring: Record<Tone, string> = {
-  light: "focus-visible:outline-ink",
-  dark: "focus-visible:outline-paper",
+
+const styles: Record<Variant, string> = {
+  primary: `min-h-12 rounded-md border border-ink bg-ink px-6 text-white hover:bg-white hover:text-ink ${press}`,
+  secondary: `min-h-12 rounded-md border border-ink px-6 text-ink hover:bg-ink hover:text-white ${press}`,
+  text: "min-h-11 text-ink underline-offset-[6px] decoration-1 hover:underline",
+  action: `min-h-14 rounded-md border border-ink bg-ink text-white hover:bg-white hover:text-ink ${press}`,
 };
 
-const styles: Record<Tone, Record<Variant, string>> = {
-  light: {
-    primary: `min-h-12 px-6 bg-ink text-paper hover:bg-ink-soft ${press}`,
-    secondary: `min-h-12 px-6 border border-ink text-ink hover:bg-ink hover:text-paper ${press}`,
-    text: "min-h-11 text-ink underline-offset-[6px] decoration-1 hover:underline",
-    action: `min-h-14 bg-ink text-paper hover:bg-ink-soft ${press}`,
-  },
-  dark: {
-    primary: `min-h-12 px-6 bg-paper text-ink hover:bg-white ${press}`,
-    secondary: `min-h-12 px-6 border border-paper/70 text-paper hover:bg-paper hover:text-ink ${press}`,
-    text: "min-h-11 text-paper underline-offset-[6px] decoration-1 hover:underline",
-    action: `min-h-14 bg-paper text-ink hover:bg-white ${press}`,
-  },
-};
+const darkSecondary = `min-h-12 rounded-md border border-white px-6 text-white hover:bg-white hover:text-ink ${press}`;
 
-/** The arrow square of an "action" button: the inverse of its bar. */
-const actionArrow: Record<Tone, string> = {
-  light: "bg-paper text-ink",
-  dark: "bg-ink text-paper",
-};
-
-function Arrow() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
-      className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <path d="M1 8h13M9 3l5 5-5 5" />
-    </svg>
-  );
+/** The same look for a real `<button>` (e.g. the proceed button under selectable cards). */
+export function buttonClasses(variant: Variant = "primary", className?: string): string {
+  return cn(base, styles[variant], "justify-center", className);
 }
 
-export function ButtonLink({
-  href,
-  children,
-  variant = "primary",
-  tone = "light",
-  external = false,
-  className,
-  arrowClassName,
-}: ButtonLinkProps) {
-  const action = variant === "action";
-  const classes = cn(base, styles[tone][variant], ring[tone], action ? "justify-between gap-4 p-1" : "justify-center", className);
-  const content = action ? (
-    <>
-      <span className="flex-1 pl-4 text-left sm:pl-5">{children}</span>
-      <span
-        aria-hidden="true"
-        className={cn("flex w-12 shrink-0 items-center justify-center self-stretch", actionArrow[tone], arrowClassName)}
-      >
-        <Arrow />
-      </span>
-    </>
-  ) : null;
-
+export function ButtonLink({ href, children, variant = "primary", external = false, onDark = false, className }: ButtonLinkProps) {
+  const classes = cn(base, onDark && variant === "secondary" ? darkSecondary : styles[variant], "justify-center", className);
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
-        {action ? content : children}
-        {action ? null : <Arrow />}
+        {children}
         <span className="sr-only">(opens in a new tab)</span>
       </a>
     );
@@ -104,8 +51,7 @@ export function ButtonLink({
 
   return (
     <Link href={href} className={classes}>
-      {action ? content : children}
-      {action ? null : <Arrow />}
+      {children}
     </Link>
   );
 }

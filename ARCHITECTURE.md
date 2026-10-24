@@ -1,4 +1,4 @@
-# ARCHITECTURE — Alex K Bells
+# ARCHITECTURE — RAENG
 
 ## Stack
 
@@ -53,6 +53,8 @@ The coach area grew into a portal for running the business: Dashboard, Requests,
 
 Rules enforced in the database (so no browser or stale page can break them): one client per email; one place per person per class; capacity counted under a row lock; package places counted under a lock (a session holds at most one place, so it can't be deducted twice; cancellations give it back, no-shows don't); no overlapping one-to-ones; one charge per subscription period; payments and refunds can't be edited or deleted (only a payment's status can change to `failed`/`void`, which releases its allocations, logged).
 
+**Memberships** (`20261023000000_akb_memberships.sql`, `lib/coach/memberships.ts`, applied 2026-10-23). `akb_memberships` (one current membership per client, unique partial index; plan name, price and credits copied from `content/memberships.ts` at start) and `akb_membership_periods` (four weeks each, one per membership and start date, each linked to one charge). A class place can carry `membership_period_id`; a trigger checks the period is the member's own and covers the class date, and counts used credits under a lock (booked, attended, no-show, and places cancelled under 24 h before the class, flagged `late_cancel`). Functions: `akb_start_membership`, `akb_renew_memberships` (idempotent; daily cron), `akb_set_membership_status`, `akb_use_membership_credit` (cancels the place's unpaid pay-as-you-go charge), `akb_return_credit`. View `akb_membership_period_balances`. No Square Subscriptions: billing is the period charge in the ledger. Confirming a member's class request uses a credit (`periodOn` is checked before anything is saved, then `akb_use_membership_credit`); renewals also catch up on portal visits (`catchUpRenewals`). **Cancelling a class** (`20261024000000_akb_cancel_class.sql`): `akb_cancel_class` cancels every booked place with `akb.return_credit` on (credits back, never a late cancellation), unpaid charges cancelled through `akb_set_attendance`; a trigger refuses new or restored places on a cancelled class; `akb_class_overview` gains `cancelled_at`/`cancel_reason`, and `/api/classes/full` returns `cancelled` keys, which the booking calendar leaves out and the booking action refuses.
+
 **Atomic operations** (Postgres functions, one transaction each, called as RPC): `akb_confirm_request` (pick or create the client, book the class place or session with its charge, mark confirmed, log), `akb_add_attendee`, `akb_add_pt_session`, `akb_reschedule_pt_session`, `akb_set_pt_status`, `akb_set_attendance` (cancelling also cancels an unpaid charge), `akb_add_package`, `akb_charge_subscription_period`, `akb_record_payment` (idempotent on a per-form key), `akb_allocate_payment`, `akb_record_refund`, `akb_void_charge`, `akb_set_payment_status`.
 
 **Matching returning clients.** A trigger links a new request to the client with the same email (case-insensitive), and a new or edited client picks up earlier requests with their email. A matching phone (last 10 digits) or name is only offered to the coach as a possible match; nothing ambiguous is merged.
@@ -104,6 +106,8 @@ grade, writing `public/journey/before.jpg`, `after.jpg` and
 `public/images/alex/about.jpg` (committed).
 
 ### Hero video
+
+**Current (2026-10-22, latest):** `scripts/hero_edit.py` (Python + ffmpeg, OpenCV for face tracking so the crop keeps heads in frame) cuts the JD Gyms-style hero: varied rhythm, slow motion and speed-ups inside shots, whip-pan swipes with motion blur, push-in zooms, landscape and 9:16 versions. Before that, `scripts/hero_montage.sh` (ffmpeg only) cuts a fast montage of twelve short shots (faces in frame, one grade, seamless loop) with cross/whip transitions and a few slow-mo shots, in a landscape and a 9:16 phone version from the owner's phone clips: landscape crop, slight warmth, silent, H.264 MP4 + VP9 WebM + poster. The paragraph below describes the earlier, superseded pipeline.
 
 `scripts/hero_video.py` (Python + OpenCV + numpy + ffmpeg, run manually)
 cuts the hero loop from Alex's reel. It removes his own caption/handle

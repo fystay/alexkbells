@@ -1,21 +1,30 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — see DESIGN.md. Monochrome only.
- * Measured contrast (WCAG 2.x): ink/paper 17.9:1, muted/paper 6.9:1,
- * muted/surface 6.2:1, muted-inverse/ink 8.0:1, muted-inverse/ink-soft 7.0:1.
- * `line` is decorative only (1.4:1) — never use it for text.
+ * Design tokens, see DESIGN.md. The UI uses exactly four colours (client
+ * brief 2026-10-22), and nothing else: no tints, opacities, gradients, extra
+ * greys, hover colours or pure black.
+ *
+ *   ink    #171717  headings, text, buttons
+ *   paper  #F5F2EB  the page background (warm off-white cream)
+ *   white  #FFFFFF  alternate sections, cards, selected surfaces
+ *   grey   #777873  borders, dividers, large type, supporting details
+ *
+ * Measured contrast (WCAG 2.x): ink/paper 16.0:1, ink/white 17.9:1,
+ * white/ink 17.9:1. The grey is 3.98:1 on paper and 4.45:1 on white, which is
+ * below the 4.5:1 AA threshold for small text, so grey is NEVER used for body
+ * or small text: only for borders, dividers and large type (24px, or 18.7px
+ * bold, where 3:1 is enough). Secondary text is ink in a lighter weight.
  */
 @theme {
-  --color-ink: #0b0b0b;
-  --color-ink-soft: #1c1c1b;
-  --color-paper: #f6f4ef;
+  --color-ink: #171717;
+  --color-paper: #f5f2eb;
   --color-white: #ffffff;
-  --color-surface: #ece9e2;
-  --color-line: #d6d2c9;
-  --color-line-inverse: #333331;
-  --color-muted: #57544e;
-  --color-muted-inverse: #a9a59d;
+  --color-grey: #777873;
+  /* Role names kept so existing components keep working; each is one of the four. */
+  --color-surface: #ffffff;
+  --color-line: #777873;
+  --color-muted: #171717;
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
@@ -35,7 +44,7 @@
   --text-lede--line-height: 1.55;
 
   --tracking-display: -0.02em;
-  --tracking-eyebrow: 0.16em;
+  --tracking-eyebrow: 0.22em;
 
   --breakpoint-2xs: 22.5rem;
   --breakpoint-xs: 26rem;
@@ -98,16 +107,17 @@
   }
 }
 
+/* Refined, not shouting: medium weight, expanded width, a little air between letters. */
 @utility font-display {
-  font-weight: 800;
+  font-weight: 500;
   font-stretch: 112%;
-  letter-spacing: var(--tracking-display);
+  letter-spacing: 0.01em;
   text-transform: uppercase;
 }
 
 @utility eyebrow {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
 }
@@ -126,73 +136,138 @@
 }
 
 /*
- * Hero headline: a soft halo and a slow sheen, like light moving across
- * polished steel. Monochrome only. Unlayered so it sets the headline colour
- * outright. Without background-clip: text it is plain paper (ink on desktop).
- * The sheen crosses in about 2.5 s, then rests; under reduced motion it never runs.
- */
-.hero-headline {
-  color: var(--color-paper);
-}
-
-@media (width >= 64rem) {
-  .hero-headline {
-    color: var(--color-ink);
-  }
-}
-
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .hero-headline {
-    /* Base #d4d1ca keeps over 12:1 against the ink fade; the band of pure white is the sheen. */
-    background-image: linear-gradient(105deg, #d4d1ca 0%, #d4d1ca 36%, #ffffff 50%, #d4d1ca 64%, #d4d1ca 100%);
-    background-size: 250% 100%;
-    background-position: 100% 0;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.4)) drop-shadow(0 0 22px rgb(246 244 239 / 0.35));
-    animation: hero-sheen 7s cubic-bezier(0.4, 0, 0.2, 1) 0.8s infinite;
-  }
-
-  /* Desktop: ink on paper, so a graphite sheen and no halo. */
-  @media (width >= 64rem) {
-    .hero-headline {
-      background-image: linear-gradient(105deg, var(--color-ink) 0%, var(--color-ink) 40%, #6b6862 50%, var(--color-ink) 60%, var(--color-ink) 100%);
-      filter: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-headline {
-      animation: none;
-    }
-  }
-}
-
-@keyframes hero-sheen {
-  0% {
-    background-position: 100% 0;
-  }
-  35%,
-  100% {
-    background-position: 0% 0;
-  }
-}
-
-/*
  * Scroll reveal (lib/reveal.ts). Elements marked data-reveal fade up the
  * first time they enter the viewport. Only active once the head script has
  * set html[data-reveal-ready], which it never does under reduced motion or
  * without IntersectionObserver, so content is never hidden by default.
  */
 @media (prefers-reduced-motion: no-preference) {
+  /* Cinematic (owner's pick C, 2026-10-23): blocks come into focus from a soft
+     blur, slowly; photos settle from a slight zoom. */
   html[data-reveal-ready] [data-reveal] {
     transition:
-      opacity 700ms cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0ms),
-      transform 700ms cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0ms);
+      opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+      filter 1400ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+      transform 1400ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
   }
   html[data-reveal-ready] [data-reveal]:not([data-revealed]) {
     opacity: 0;
-    transform: translateY(24px);
+    filter: blur(10px);
+    transform: translateY(14px);
+  }
+  html[data-reveal-ready] [data-reveal-photo] img {
+    transition: transform 2400ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+  }
+  html[data-reveal-ready] [data-reveal-photo]:not([data-revealed]) img {
+    transform: scale(1.1);
+  }
+}
+
+/* Opening curtain (lib/reveal.ts INTRO_SCRIPT): first visit only. The logo is
+   the supplied black artwork on the cream page colour (never recoloured). */
+.intro {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-intro] .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    background: var(--color-paper);
+    pointer-events: none;
+    transition: transform 1100ms cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  html[data-intro] .intro img {
+    width: min(46vw, 13rem);
+    height: auto;
+    animation: intro-logo 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  html[data-intro="out"] .intro {
+    transform: translateY(-100%);
+  }
+}
+@keyframes intro-logo {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* From lg the footer groups are always open: show the content of closed <details>. */
+@media (min-width: 64rem) {
+  .footer-group::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+}
+
+/* Hero headline: a soft white halo so it glows off the film without a box,
+   tint or extra colour, over a tight ink shadow that keeps the letter edges
+   crisp on bright frames (palette colours only; the blur does the fading). */
+@utility hero-glow {
+  text-shadow:
+    0 1px 3px var(--color-ink),
+    0 0 14px var(--color-white);
+}
+
+/* Selected item in the header (current page in the menu, Book now in the
+   booking flow): a soft dark halo, ink letters lifted by a blurred grey
+   shadow. Palette colours only; the blur does the fading. */
+@utility ink-glow {
+  text-shadow:
+    0 0 1px var(--color-ink),
+    0 2px 14px var(--color-grey);
+}
+
+/* Header menu (2026-10-22): a slow, premium reveal. The panel unrolls from
+   the header line, then each link rises into place one after another.
+   Off for Reduce Motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-panel:not([hidden]) {
+    animation: menu-unroll 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .menu-panel:not([hidden]) .menu-rise {
+    animation: menu-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(160ms + var(--i, 0) * 70ms);
+  }
+}
+@keyframes menu-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes menu-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Section titles (the small spaced label above a page or section heading,
+   e.g. "Group kettlebell classes", "Ways to train") are underlined (owner,
+   2026-10-22), except in the site header and the home hero. Headings
+   themselves are not. */
+@layer base {
+  main .eyebrow:has(+ :is(h1, h2)),
+  main .eyebrow:has(+ * > :is(h1, h2):first-child) {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.45em;
+  }
+  main section[aria-labelledby="hero-heading"] .eyebrow {
+    text-decoration-line: none;
   }
 }

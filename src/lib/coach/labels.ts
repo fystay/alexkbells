@@ -85,6 +85,7 @@ export const CONTACT_METHOD: Record<Exclude<ContactMethod, "">, string> = {
 /** Messages for the portal's own database rules ("akb:<rule>"). */
 export const RULE_MESSAGES: Record<string, string> = {
   class_full: "That class is full. Raise its capacity or choose another date.",
+  class_cancelled: "That class has been cancelled, so nobody can be booked onto it.",
   package_used_up: "That package has no sessions left.",
   package_inactive: "That package is cancelled.",
   package_other_client: "That package belongs to another client.",
@@ -110,4 +111,15 @@ export const RULE_MESSAGES: Record<string, string> = {
   invalid_environment: "Square isn't set up correctly for this site.",
   sandbox_in_production: "Square test payments can't be recorded in the live database.",
   live_in_test: "Live Square payments can't be recorded in a test database.",
+  no_credits: "No credits left in this membership period. Book the place as pay as you go instead.",
+  no_membership: "They have no membership period covering that class date.",
+  credit_outside_period: "That class is outside the membership period.",
+  credit_not_theirs: "That credit belongs to someone else.",
+  membership_cancelled: "This membership is cancelled. Start a new one instead.",
+};
+
+export const MEMBERSHIP_STATUS: Record<"active" | "paused" | "cancelled", string> = {
+  active: "Active",
+  paused: "Paused",
+  cancelled: "Cancelled",
 };

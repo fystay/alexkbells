@@ -8,6 +8,7 @@ import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { BookingWizard, type ClassInfo } from "./BookingWizard";
+import { ChosenPlan } from "./ChosenPlan";
 import { DemoNotice, InstagramFallback } from "./ui";
 
 interface BookingPageProps {
@@ -42,6 +43,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
           </h1>
           <p className="mt-4 text-lede text-muted">{intro}</p>
         </header>
+        {initialService !== "one-to-one" ? <ChosenPlan /> : null}
 
         {mode === "demo" ? (
           <div className="mt-5 max-w-2xl">
@@ -54,9 +56,9 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
 
         <div className="mt-8 lg:mt-10">
           {external ? (
-            <div className="max-w-2xl bg-ink p-8 text-paper sm:p-10">
-              <p className="text-lede text-muted-inverse">Bookings are taken on Alex&apos;s booking page.</p>
-              <ButtonLink href={external.toString()} external tone="dark" className="mt-6">
+            <div className="max-w-2xl rounded-lg border border-grey bg-white p-8 sm:p-10">
+              <p className="text-lede">Bookings are taken on Alex&apos;s booking page.</p>
+              <ButtonLink href={external.toString()} external className="mt-6">
                 Continue to booking
               </ButtonLink>
             </div>

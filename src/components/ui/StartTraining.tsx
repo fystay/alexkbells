@@ -1,59 +1,47 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-type Tone = "light" | "dark";
-
 interface StartTrainingProps {
   href: string;
   label: string;
-  /** Read after the label by screen readers only, e.g. " with online coaching". */
+  /** Read after the label by screen readers only, e.g. " (1:1 coaching)". */
   srSuffix?: string;
   external?: boolean;
-  /** The surface it sits on: "dark" draws a paper bar with an ink arrow square. */
-  tone?: Tone;
-  /** "bar": the full-size button on the pages. "button": the compact one in the header. */
+  /** "bar": the full-size button on the pages. "button": the compact one in the header (just the words in ink; underlined on hover). */
   variant?: "bar" | "button";
+  /** Over the dark film: white button, ink text. */
+  onDark?: boolean;
+  /** Marks the link as the current section (aria-current="page"). */
+  current?: boolean;
   className?: string;
-  /** Extra classes for the arrow square (e.g. responsive tone overrides). */
-  handleClassName?: string;
 }
 
-const bar: Record<Tone, string> = {
-  light: "bg-ink text-paper focus-visible:outline-ink",
-  dark: "bg-paper text-ink focus-visible:outline-paper",
-};
-const square: Record<Tone, string> = {
-  light: "bg-paper text-ink",
-  dark: "bg-ink text-paper",
-};
-
 /**
- * The main call to action ("Book now"; "Get in touch" when nothing can be booked): a plain link straight to the booking page (or
- * wherever the call to action points). A tap, click or Enter goes there at
- * once: no swipe and no intro screen (removed 2026-10-21 at the owner's
- * request). Works without JavaScript.
+ * The main booking call to action: a plain link, so a tap, click or Enter goes
+ * straight to the destination and it works without JavaScript. Black bar,
+ * hover inverts. No arrow.
  */
-export function StartTraining({ href, label, srSuffix, external = false, tone = "dark", variant = "bar", className, handleClassName }: StartTrainingProps) {
+export function StartTraining({ href, label, srSuffix, external = false, variant = "bar", onDark = false, current = false, className }: StartTrainingProps) {
   const large = variant === "bar";
   return (
     <Link
       href={href}
+      aria-current={current ? "page" : undefined}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group inline-flex items-center justify-between gap-3 p-1 text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-200 active:translate-y-px",
-        large ? "min-h-14" : "min-h-11",
-        bar[tone],
+        "group inline-flex items-center justify-center gap-3 rounded-md text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px",
+        large && "p-1",
+        large
+          ? onDark
+            ? "min-h-14 border border-white bg-white text-ink hover:bg-transparent hover:text-white"
+            : "min-h-14 border border-ink bg-ink text-white hover:bg-white hover:text-ink"
+          : "mr-[3.5px] min-h-11 bg-transparent text-ink underline-offset-8 hover:underline lg:min-h-12",
         className,
       )}
     >
-      <span className={cn("flex-1 text-left", large ? "pl-5" : "pl-4")}>
+      <span className={cn("text-center", large ? "px-5" : "whitespace-nowrap text-xs sm:text-sm")}>
         {label}
         {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
-      </span>
-      <span aria-hidden="true" className={cn("flex items-center justify-center self-stretch", large ? "w-12" : "w-9", square[tone], handleClassName)}>
-        <svg viewBox="0 0 16 16" className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M1 8h13M9 3l5 5-5 5" />
-        </svg>
       </span>
       {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
     </Link>

@@ -19,6 +19,15 @@ Read `CORE.md` (facts and their status), then the relevant `DESIGN.md`, `CONTENT
 - Unconfirmed items use `status: "provisional"` and must render through `Provisional`/`publishable()`. Never show internal uncertainty labels on production.
 - No fake booking or payment success flows.
 
+## Owner rules (non-negotiable)
+- **Never use the words "Get in touch"** on the site (buttons, links, headings, copy). The main button is always **"Book now"**, whether or not booking is switched on; where nothing can be booked it opens /book, which says so honestly. This holds even when the owner says "go ahead with your recommendation". Enforced by a unit test and an e2e test.
+
+- **The home page is the point of reference** (owner, 2026-10-23). Inner pages follow its information, wording, prices and design: reuse the home components (plan cards, class day cards, Why kettlebells) rather than writing second versions.
+
+- **Design phone first** (owner and Alex, 2026-10-24: most visitors are on phones). Design, review and preview every change at phone size (390 px wide) first, then desktop. Previews sent to the owner lead with phone photos.
+
+- **After every change that is pushed, give the owner the preview link** (the Vercel preview for the latest `raeng-rebrand` build, plus the always-latest branch link https://alexkbells-git-raeng-rebrand-fystay1.vercel.app).
+
 ## Code standards
 - TypeScript strict; no `any` without a commented justification.
 - Server components by default; `"use client"` only for interactivity.

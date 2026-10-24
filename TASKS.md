@@ -1,4 +1,4 @@
-# TASKS — Alex K Bells
+# TASKS — RAENG
 
 Priority: P0 blocks launch · P1 before/at launch · P2 later.
 
@@ -129,10 +129,12 @@ See Coach portal below.
 - [x] Public sign-ups off in Supabase (verified 2026-10-20)
 - [ ] **P0** Turn on leaked-password protection (Auth → Providers → Email; affects the shared project's other app too); change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
 - [x] Email alerts to Alex: outcome recorded per request, one immediate retry, daily cron retry inside the provider's idempotency window, shown in the portal (2026-10-20, code only)
-- [ ] **P0** Turn alerts on: apply `20261020000100_akb_request_alerts.sql`, Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
+- [x] `20261020000100_akb_request_alerts.sql` applied to the live database (2026-10-23)
+- [ ] **P0** Turn alerts on: Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
 - [ ] **P1** Alex adds retention periods for client and financial records to `/privacy`
 - [ ] **P1** Real-device pass of the portal on Alex's phone
-- [ ] **P2** Default class capacity per timetable slot (now set per date); public calendar showing full dates once capacities exist
+- [x] Public calendar hides full dates and the server refuses them, from capacities set per date (2026-10-23)
+- [ ] **P2** Default class capacity per timetable slot (now set per date)
 - [ ] **P2** Anonymise-on-request for former clients with financial history (now: set to Former)
 - [x] Square card payments built (2026-10-21): payment links per charge, signed webhooks re-read from Square, duplicate-event table, idempotent ledger functions, refunds mirrored from Square, daily reconciliation, sandbox/production guard (code + migration `20261021000000_akb_square.sql`, not applied)
 - [x] Test-environment options and costs checked; database + app safeguards against Sandbox records in the live database (2026-10-21)
@@ -140,5 +142,40 @@ See Coach portal below.
 - [ ] **P0** Owner: Square Sandbox access token, location id and webhook subscription; run the local setup and Sandbox test plan (DEPLOYMENT.md → Square Sandbox test environment)
 - [ ] **P1** Owner: Square Developer Console app, Sandbox credentials + webhook subscription; run the Sandbox test plan (DEPLOYMENT.md → Square); then live credentials
 - [ ] **P2** Delete a cancelled charge's payment link at Square automatically (today: Dashboard)
+- [ ] **P2** Flaky e2e: "the coach signs in, stays signed in after the access token expires" fails about 1 run in 10, also on code from before 2026-10-23: after the access cookie is cleared, /coach sometimes lands on the login page. Suspect concurrent refreshes (the navigation and link prefetches each swapping the refresh token). Fix the proxy; don't just retry the test
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
+
+## Master redesign (2026-10-22)
+- [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
+- [x] Memberships in the coach portal (2026-10-23, migration `20261023000000_akb_memberships.sql` applied live): plan carried on the booking request, start from the request, four-week periods with credits and one charge each, daily renewal cron (`/api/cron/membership-renewals`), pay class places with credits, 24-hour rule enforced in the database, give a credit back, pause/resume/cancel
+- [x] Owner decided (2026-10-24): **manual membership billing for now**. Each four-week period's charge is owed in the portal; Alex records the payment or sends a Square payment link. Nothing charges a card automatically
+- [ ] P3 Later, if wanted: Square Subscriptions for automatic card billing (needs the plan in Square and the API checked against current docs)
+- [x] Coach cancels a whole class (2026-10-24, `20261024000000_akb_cancel_class.sql`): every place cancelled in one step, members' credits back whatever the time, unpaid class charges cancelled, no one can be booked onto it again, and the booking calendar stops offering it
+- [ ] P0 Apply `20261024000000_akb_cancel_class.sql` to the live database (no deletes; the MCP confirmation timed out on 2026-10-24). Until then "Cancel class" says the tables aren't set up, and the public calendar marks nothing full or cancelled
+- [x] Member requests confirmed on a credit: the confirm form ticks "Pay with their membership credit" when their period covers the class (no £12 charge) (2026-10-24)
+- [x] Client record: Membership tab (plan, credits left, renewal) (2026-10-24)
+- [x] Dashboard: "No credits left" for members who have used every credit this period; renewals caught up on every visit to the dashboard or Memberships, so they still happen without `CRON_SECRET` (2026-10-24)
+- [ ] P0 Confirm class capacity (set per class in the coach portal; blank means not full)
+- [ ] P1 Square Sandbox end-to-end test of payment links (DEPLOYMENT.md), then live credentials
+- [ ] P1 Confirm brand name on the site (RAENG Kettlebell Club vs Alex K Bells)
+
+## Kettlebell Club redesign (2026-10-21, later)
+- [x] New logo (black/cream), cream-led palette, hero video support, /memberships (cards, terms, cancellation policy), coach + before/after on home, minimal imagery, £12 class price, tests
+- [x] Hero film cut from supplied footage (2026-10-21)
+- [ ] P0 Confirm everyone in the hero film, hero still and before/after photos agrees to appear; a higher-resolution clip would look sharper on large screens
+- [x] Credits/renewals built (see Master redesign). The auto-renew and "credit returned" wording now matches the portal: renewal creates the period, credits and charge; an in-time cancellation returns the credit
+- [ ] P1 Check the £12 price in the coach portal's stored data (`akb_` tables keep their own per-class price if one was saved)
+
+## RAENG rebrand (2026-10-21)
+
+### Done
+- [x] Brand, nav, wordmark, share image and icons; dark-first home (six sections); /about; /coaching 1:1 only; /online-coaching service page + /online-coaching/enquire; classes page restructured; supplied photos optimised into `public/images/raeng/` with a central manifest
+- [x] Removed hero video, carousel, old logo artwork and scripts; e2e rewritten for the new structure
+
+### Open (needs the owner)
+- [ ] P0 Confirm the venue, timetable, prices and coach details are unchanged under RAENG; confirm everyone in the supplied photos agrees to appear (and replace any frame that isn't OK)
+- [ ] P1 RAENG Instagram/Facebook handles, email, phone, domain (`SITE_URL`), a verified Resend sending domain named RAENG
+- [ ] P1 Alex's own words: background, qualifications, philosophy, motivation, brand story; a current portrait
+- [ ] P1 Booking/payment decision unchanged (see CORE.md open decisions): on-site request flow stays; Square not live
+- [ ] P2 Real RAENG logo artwork if one exists; Online coaching feature list, capacity/cancellation policy, testimonials

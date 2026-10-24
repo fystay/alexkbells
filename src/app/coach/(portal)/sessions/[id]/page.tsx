@@ -23,7 +23,7 @@ export default function SessionPage({ params, searchParams }: PageProps<"/coach/
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/sessions">← PT sessions</TextLink>
+        <TextLink href="/coach/sessions">PT sessions</TextLink>
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading the session…</p>}>
         <SessionView params={params} searchParams={searchParams} />

@@ -3,6 +3,7 @@ import {
   MIN_FILL_MS,
   bookingDeliveryConfig,
   bookingEmail,
+  describePlan,
   describePreferences,
   isBookingFormEnabled,
   parseBookingRequest,
@@ -103,6 +104,29 @@ describe("parseBookingRequest", () => {
   it("treats a filled honeypot or an instant submission as spam", () => {
     expect(parseBookingRequest(form({ ...valid, website: "http://spam" }), { now: NOW }).kind).toBe("spam");
     expect(parseBookingRequest(form({ ...valid, startedAt: String(NOW - MIN_FILL_MS + 1) }), { now: NOW }).kind).toBe("spam");
+  });
+
+  it("keeps a real membership plan with a group class, and drops anything else", () => {
+    const group = { ...valid, service: "group-class" };
+    const with_ = (plan: string, fields = group) => {
+      const r = parseBookingRequest(form({ ...fields, plan }), { now: NOW });
+      return r.kind === "valid" ? r.data.plan : `not valid: ${r.kind}`;
+    };
+    expect(with_("regular")).toBe("regular");
+    expect(with_("platinum")).toBe("");
+    expect(with_("<script>")).toBe("");
+    expect(with_("regular", valid)).toBe(""); // one-to-one: no membership
+    expect(describePlan("regular")).toBe("Regular membership (£65 every 4 weeks, 8 class credits)");
+    expect(describePlan("nope")).toBe("");
+  });
+
+  it("puts the chosen plan in Alex's email", () => {
+    const r = parseBookingRequest(form({ ...valid, service: "group-class", plan: "dedicated" }), { now: NOW });
+    if (r.kind !== "valid") throw new Error(r.kind);
+    expect(bookingEmail(r.data).text).toContain("Membership: Dedicated membership (£85 every 4 weeks, 12 class credits)");
+    const none = parseBookingRequest(form(valid), { now: NOW });
+    if (none.kind !== "valid") throw new Error(none.kind);
+    expect(bookingEmail(none.data).text).not.toContain("Membership:");
   });
 
   it("never accepts a demonstration slot", () => {

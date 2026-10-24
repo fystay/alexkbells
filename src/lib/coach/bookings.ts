@@ -25,6 +25,11 @@ export async function updateClassSession(db: Db, id: string, patch: { capacity: 
   return result.ok ? { ok: true, data: null } : result;
 }
 
+/** Cancels a whole class: every booked place, with members' credits returned. Returns how many places. */
+export function cancelClass(db: Db, id: string, reason: string): Promise<DbResult<number>> {
+  return rpc<number>(db, "akb_cancel_class", { p_session: id, p_reason: reason });
+}
+
 export function listAttendance(db: Db, opts: { sessionIds?: string[]; clientId?: string }): Promise<DbResult<Attendance[]>> {
   const query: [string, string][] = [];
   if (opts.sessionIds) query.push(["class_session_id", inList(opts.sessionIds)]);

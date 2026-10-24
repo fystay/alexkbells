@@ -130,11 +130,11 @@ export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
     return (
       <div className="animate-step-in" role="status">
         <div className="bg-ink p-8 text-paper sm:p-12">
-          <p className="eyebrow text-muted-inverse">{demo ? "Demonstration complete" : "Enquiry sent"}</p>
+          <p className="eyebrow text-white">{demo ? "Demonstration complete" : "Enquiry sent"}</p>
           <h2 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-h2 text-balance focus:outline-none">
             {demo ? "Nothing was sent" : "Thanks — Alex will reply personally"}
           </h2>
-          <p className="mt-5 max-w-xl text-lede text-muted-inverse">
+          <p className="mt-5 max-w-xl text-lede text-white">
             {demo
               ? "This was a demonstration, so your answers weren't sent. Once sending is switched on, they go straight to Alex."
               : `Alex will read your answers and get back to you${

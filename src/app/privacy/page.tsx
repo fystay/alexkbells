@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Notice",
-  description: "How Alex K Bells uses the details you send through the website.",
+  description: "How RAENG uses the details you send through the website.",
   path: "/privacy",
 });
 
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
           {sections.map((s) => (
             <section key={s.heading}>
               <h3 className="text-lg font-bold">{s.heading}</h3>
-              <div className="mt-2 text-muted">{s.body}</div>
+              <div className="mt-2 ">{s.body}</div>
             </section>
           ))}
         </div>

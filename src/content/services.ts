@@ -3,7 +3,7 @@ import type { Service } from "./types";
 /**
  * Coaching offers. Descriptions use only previously published wording.
  * Prices confirmed by the project owner on 2026-10-15 (the figures from the
- * original brief); the group class price (£10 per person) on 2026-10-17.
+ * original brief); the group class price (£10 per person) on 2026-10-17, raised to £12 per class by the owner on 2026-10-21 (memberships brief).
  */
 export const services: Service[] = [
   {
@@ -18,16 +18,16 @@ export const services: Service[] = [
       {
         status: "confirmed",
         label: "Per class",
-        amountGbp: 10,
+        amountGbp: 12,
         unit: "per person",
       },
     ],
   },
   {
     id: "one-to-one",
-    name: "One-to-one coaching",
-    shortName: "One-to-one",
-    href: "/coaching#one-to-one",
+    name: "1:1 coaching",
+    shortName: "1:1",
+    href: "/coaching",
     summary:
       "Face-to-face kettlebell coaching, tailored to you as an individual.",
     points: [
@@ -54,7 +54,7 @@ export const services: Service[] = [
     id: "online-coaching",
     name: "Online coaching",
     shortName: "Online",
-    href: "/coaching#online",
+    href: "/online-coaching",
     summary:
       "Personalised kettlebell programming with ongoing support and progression, wherever you train.",
     points: ["Personalised programming", "Ongoing support", "Progression"],

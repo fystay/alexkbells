@@ -249,7 +249,7 @@ export function RadioGroup({ name, legend, options, defaultValue, hint }: { name
 }
 
 const buttonStyles = {
-  primary: "bg-ink text-paper hover:bg-ink-soft",
+  primary: "bg-ink text-paper border border-ink hover:bg-white hover:text-ink",
   secondary: "border border-ink bg-transparent text-ink hover:bg-ink hover:text-paper",
   quiet: "text-ink underline underline-offset-4 hover:no-underline px-0",
 } as const;

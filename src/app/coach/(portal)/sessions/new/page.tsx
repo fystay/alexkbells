@@ -17,7 +17,7 @@ export default function NewSessionPage({ searchParams }: PageProps<"/coach/sessi
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/sessions">← PT sessions</TextLink>
+        <TextLink href="/coach/sessions">PT sessions</TextLink>
       </p>
       <div className="mt-4">
         <PageHeader title="Book a one-to-one" />

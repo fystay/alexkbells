@@ -1,10 +1,33 @@
-# CORE — Alex K Bells
+# CORE — RAENG
 
 Source of truth for the business, goals, constraints and open decisions.
 Values that appear on the website live in code (`src/content/`) — this file
 records *status*, not duplicate values.
 
 Last reviewed: 2026-10-19
+
+## Kettlebell Club redesign (2026-10-21, later)
+
+New logo supplied (`assets/brand/raeng-logo-source.jpg`: R monogram with kettlebell, RAENG, Thai แรง, KETTLEBELL CLUB, STRENGTH · COMMUNITY · DISCIPLINE); transparent black and cream versions in `public/brand/`. Descriptor is now **Fitness**: the brand is **RAENG Fitness** (owner confirmed 2026-10-23, matching the logo); earlier "Kettlebell Club". Owner's memberships brief (supersedes the earlier dark-first direction and the £10 class price):
+
+| Item | Status | Notes |
+|---|---|---|
+| Pay as you go | C | **£12 per class** (was £10; changed by the owner 2026-10-21). Shown wherever the class price appears, including the booking flow and the coach portal's default |
+| Starter £40 / 4 weeks, 4 credits · Regular £65, 8 credits · Dedicated £85, 12 credits | C | Per-class cost (£10 / £8.13 / £7.08) and savings (£8 / £31 / £59) are **calculated** from price × credits against £12 (`lib/membership.ts`, tested against the owner's figures) |
+| Membership terms and cancellation policy | C | Published as written in `content/policy.ts` |
+| Membership sign-up, auto-renewal billing, credit accounts | C | **Built 2026-10-23, run by Alex in the coach portal** (applied to the live database). Choosing a plan sends a booking request carrying the plan; Alex starts the membership from the request. Each four-week period gets its credits and one charge automatically (daily renewal job); Alex records the payment (or sends a Square link once Square is live). Credits pay for class places; cancelling 24 h or more before returns the credit, later or a no-show uses it, and Alex can give one back. Billing is **manual by the owner's decision (2026-10-24)**: each period's charge is owed in the portal and Alex records the payment or sends a Square link; nothing charges a card automatically (Square Subscriptions not built) |
+| Hero film | C | Supplied 2026-10-21 (12 vertical phone clips, 464×832 or 576×1024). Used: one, cut to 8.8 s, silent (`public/media/hero.mp4/.webm`, poster `hero-poster.jpg`, `content/media.ts`). It shows a class swinging together; no signage in frame; people shown must be happy to appear. The other 11 are unused: most show another gym's APEX | FREQUENCY signage and are low-resolution |
+
+## Master redesign brief (2026-10-22)
+
+- Class schedule changed by the owner: **Monday 6:30 pm, Wednesday 6:30 pm, Saturday 9:00 am** (Saturday was 10:15). Single source: `content/classes.ts`.
+- The brief is titled "Alex K Bells" and names the old Lovable site; the owner's earlier instruction and supplied logo make the brand **RAENG Kettlebell Club**, which is kept. Confirm.
+- Regular's cost per class is £8.125; the site shows £8.13 (nearest penny), Dedicated £7.08.
+- Square: subscriptions (four-weekly billing), member credits and self-service booking are **not built**. The Square developer docs could not be reached from the build environment, so the Subscriptions API was not verified; nothing is faked. What exists and is tested: bookings as requests that Alex confirms (capacity enforced in the database when set per class), Square payment links per charge with verified webhooks (sandbox only), manual subscriptions and check-ins in the coach portal.
+
+## RAENG rebrand (2026-10-21)
+
+The business is now **RAENG** (brand themes STRENGTH · COMMUNITY · DISCIPLINE; descriptor "Strength & Kettlebell Coaching"). Name and descriptor live in `src/content/site.ts`. Everything confirmed below (venue, timetable, prices, coach name, Instagram/Facebook) is carried over unchanged, **on the assumption that the rebrand did not change them**: confirm with the owner. The social handles are still `@alex.kbells`; no RAENG handle, email, phone, domain or logo artwork has been supplied. The wordmark is typeset (no image logo). The photographs in `public/images/raeng/` were supplied 2026-10-21 and show real people (consent to appear to be confirmed); four supplied frames showing another gym's signage were not used.
 
 ## Business
 
@@ -59,7 +82,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | Hero footage | C | Alex's own Instagram reel (supplied 2026-10-15), used for the homepage hero loop. Filmed at several gyms, some visibly not Media House (e.g. "APEX" signage), and shows other people training. Confirm Alex is happy for it to represent his coaching and that people shown are fine appearing on the website |
 | Bio, qualifications, history, testimonials | U | Do not invent |
 | Bookings | C | Live on production from 2026-10-18 at the owner's request: "Book now" opens /book. Group classes: real dates from the timetable; one-to-one: preferred days. Each is a **request** stored in Supabase (`akb_booking_requests`) and listed in the coach area; Alex confirms. Payment: bank transfer or cash (Alex's listing, 2026-10-17); no online payment |
-| Live availability: capacity, one-to-one slots | U | Class dates come from the confirmed timetable; capacity is unknown, so no date shows as full. Nothing invented |
+| Live availability: capacity, one-to-one slots | U | Class dates come from the confirmed timetable. When Alex sets a capacity on a class date in the portal and it fills, the booking calendar shows that date as unavailable and the server refuses it (`lib/class-capacity.ts`). No capacity is set yet, so no date shows as full. Nothing invented |
 | Booking-request inbox / Resend account | U | Needed to switch on `/book`; must be Alex's own |
 | Privacy notice | P | `/privacy` drafted 2026-10-15 for booking requests and online enquiries; Alex to review |
 | Square | P | Account created; owner says Square is the payment provider (2026-10-21). Rate quoted as 1.4% + 25p per online card payment — unverified. Enabled products unknown. Payment links per charge built in the portal (not live, not yet tested in Square Sandbox) |

@@ -3,35 +3,29 @@ import type { Price } from "@/content/types";
 import { Provisional } from "@/components/ui/Provisional";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
-import { cn } from "@/lib/cn";
 
 interface PriceListProps {
   prices: Price[];
-  tone?: "paper" | "ink";
-  /** Link "Get in touch" to /contact. Off where a contact button sits right below. */
+  /** Link "Send a message" to /contact. Off where a contact button sits right below. */
   linkContact?: boolean;
 }
 
 /**
  * Shows only publishable prices. When none can be published (e.g. all are
- * provisional on production) it shows a neutral "get in touch" line instead.
+ * provisional on production) it shows a neutral "send a message" line instead.
  */
-export function PriceList({ prices, tone = "paper", linkContact = true }: PriceListProps) {
-  const muted = tone === "ink" ? "text-muted-inverse" : "text-muted";
+export function PriceList({ prices, linkContact = true }: PriceListProps) {
   const visible = publishable(prices);
 
   if (visible.length === 0) {
     return (
-      <p className={cn("text-sm", muted)}>
+      <p className="text-sm ">
         {linkContact ? (
-          <Link
-            href="/contact"
-            className={cn("font-semibold underline underline-offset-4", tone === "ink" ? "text-paper" : "text-ink")}
-          >
-            Get in touch
+          <Link href="/contact" className="font-semibold  underline underline-offset-4">
+            Send a message
           </Link>
         ) : (
-          <span className={cn("font-semibold", tone === "ink" ? "text-paper" : "text-ink")}>Get in touch</span>
+          <span className="font-semibold ">Send a message</span>
         )}{" "}
         for current pricing.
       </p>
@@ -39,20 +33,17 @@ export function PriceList({ prices, tone = "paper", linkContact = true }: PriceL
   }
 
   const status = visible.every((p) => p.status === "confirmed") ? "confirmed" : "provisional";
-  const line = tone === "ink" ? "divide-line-inverse border-line-inverse" : "divide-line border-line";
 
   return (
     <Provisional status={status}>
-      <dl className={cn("divide-y border-y", line)}>
+      <dl data-reveal className="divide-y divide-grey border-y border-grey">
         {visible.map((price) => (
-          <div key={price.label} className="flex items-baseline justify-between gap-4 py-4">
-            <dt className={cn("text-sm", muted)}>{price.label}</dt>
+          <div key={price.label} className="flex items-baseline justify-between gap-4 py-5">
+            <dt className="text-sm ">{price.label}</dt>
             <dd className="text-right">
-              {price.prefix ? (
-                <span className={cn("mr-1.5 text-sm", muted)}>{price.prefix}</span>
-              ) : null}
-              <span className="text-2xl font-bold tabular-nums">{formatGbp(price.amountGbp)}</span>
-              <span className={cn("ml-1.5 text-sm", muted)}>{price.unit}</span>
+              {price.prefix ? <span className="mr-1.5 text-sm">{price.prefix}</span> : null}
+              <span className="text-2xl font-medium tabular-nums">{formatGbp(price.amountGbp)}</span>
+              <span className="ml-1.5 text-sm ">{price.unit}</span>
             </dd>
           </div>
         ))}

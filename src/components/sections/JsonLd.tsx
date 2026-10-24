@@ -13,8 +13,7 @@ export function JsonLd() {
     name: site.name,
     description: site.description,
     url: siteUrl(),
-    // Generated from the supplied logo (src/app/icon.png, dark square).
-    ...(site.logo ? { logo: `${siteUrl()}/icon.png` } : {}),
+    logo: `${siteUrl()}/icon.png`,
     sameAs: [site.social.instagram.url, site.social.facebook.url],
     address: {
       "@type": "PostalAddress",

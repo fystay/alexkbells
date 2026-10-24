@@ -1,6 +1,6 @@
-import { getImageProps } from "next/image";
 import type { ReactNode } from "react";
 import type { Photo } from "@/content/types";
+import { PhotoFrame } from "@/components/ui/PhotoFrame";
 
 interface PageHeaderProps {
   eyebrow: string;
@@ -8,61 +8,37 @@ interface PageHeaderProps {
   intro?: ReactNode;
   children?: ReactNode;
   /**
-   * Desktop only (lg+), beside the text, where the header otherwise leaves the
-   * right half empty. Hidden on phones and tablets so the page's information
-   * comes first.
+   * Beside the text from 1024px; below the text and buttons on phones, so the
+   * page's information and call to action still come first (2026-10-23: every
+   * inner page opens like the home page, with a picture).
    */
   image?: Photo | null;
+  /** Shown in the image's place when a page has no photo (e.g. the "Train anywhere" panel). */
+  panel?: ReactNode;
 }
 
-const SIZES = "(min-width: 1248px) 360px, 30vw";
-/** 1x1 transparent GIF: below lg the <picture> picks this, so nothing is downloaded. */
-const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-
-/**
- * Art direction (see Next's getImageProps docs): on desktop the image is in
- * the first view and usually the largest element, so it loads eagerly at high
- * priority; on smaller screens the <source> doesn't match and only BLANK is used.
- */
-function HeaderImage({ image }: { image: Photo }) {
-  const {
-    props: { srcSet, alt, ...rest },
-  } = getImageProps({
-    src: image.src,
-    alt: image.alt,
-    width: image.width,
-    height: image.height,
-    sizes: SIZES,
-    loading: "eager",
-    fetchPriority: "high",
-  });
+/** Opening block for the inner pages. The page's only <h1>. */
+export function PageHeader({ eyebrow, title, intro, children, image, panel }: PageHeaderProps) {
+  const aside = image || panel;
   return (
-    <picture>
-      <source media="(min-width: 64rem)" srcSet={srcSet} sizes={SIZES} />
-      {/* src={BLANK} replaces the optimised fallback URL in rest. */}
-      <img {...rest} alt={alt} src={BLANK} className="aspect-[4/5] w-full object-cover" />
-    </picture>
-  );
-}
-
-/** Opening block for inner pages. The page's only <h1>. */
-export function PageHeader({ eyebrow, title, intro, children, image }: PageHeaderProps) {
-  return (
-    <div className="border-b border-line bg-paper">
-      <div className="container-page pt-14 pb-12 sm:pt-20 sm:pb-16 lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10 lg:pt-16 lg:pb-0">
-        <div className={image ? "lg:col-span-7 lg:pb-16" : "lg:col-span-12 lg:pb-16"}>
-          <p className="eyebrow text-muted">{eyebrow}</p>
+    <header className="bg-paper">
+      <div className="container-page pt-14 pb-12 sm:pt-20 sm:pb-16 lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-24">
+        <div className={aside ? "lg:col-span-7" : "lg:col-span-12"}>
+          <p className="eyebrow">{eyebrow}</p>
           <h1 className="mt-4 max-w-4xl font-display text-h1 text-balance">{title}</h1>
-          {intro ? <div className="mt-6 max-w-2xl text-lede text-muted">{intro}</div> : null}
+          {intro ? <div className="mt-6 max-w-2xl text-lede">{intro}</div> : null}
           {children ? <div className="mt-8 flex flex-wrap gap-3">{children}</div> : null}
         </div>
-        {image ? (
-          // Sits on the header's bottom rule, so it reads as part of the page rather than a card.
-          <div className="hidden lg:col-span-4 lg:col-start-9 lg:block">
-            <HeaderImage image={image} />
+        {aside ? (
+          <div className="mt-10 lg:col-span-5 lg:mt-0">
+            {image ? (
+              <PhotoFrame photo={image} sizes="(min-width: 1248px) 480px, (min-width: 1024px) 38vw, 100vw" priority className="aspect-[4/3] w-full lg:aspect-[4/5]" />
+            ) : (
+              panel
+            )}
           </div>
         ) : null}
       </div>
-    </div>
+    </header>
   );
 }

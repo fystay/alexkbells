@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
-import { timetable } from "@/content/classes";
+import { timetable, groupClass } from "@/content/classes";
+import { faqAnswer } from "@/content/faq";
+import { images } from "@/content/images";
 import { site } from "@/content/site";
 import { isPublishable } from "@/lib/publish";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { Timetable } from "@/components/sections/Timetable";
+import { ClassWeekCards } from "@/components/home/QuickFacts";
 import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
+import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
@@ -22,7 +27,7 @@ export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
   description: bookingOpen
     ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
-    : "Group kettlebell classes at Media House, Cumbernauld. Get in touch to join a session.",
+    : "Group kettlebell classes at Media House, Cumbernauld. Book now to join a session.",
   path: "/classes",
 });
 
@@ -40,7 +45,7 @@ export default function ClassesPage() {
       title: "Choose a session",
       body: timesPublished
         ? "Pick the class time that suits you from the timetable above."
-        : "Class times are being finalised. Get in touch to hear about current sessions.",
+        : "Class times are being finalised. Send a message to hear about current sessions.",
     },
     open
       ? {
@@ -48,7 +53,7 @@ export default function ClassesPage() {
           body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose Beginner.",
         }
       : {
-          title: "Get in touch to book",
+          title: "Message Alex to book",
           body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
         },
     open
@@ -56,60 +61,69 @@ export default function ClassesPage() {
       : { title: "Come to Media House", body: `Classes take place at ${venue}.` },
   ];
 
+  // Everything below is Alex's class listing or the confirmed FAQ answers.
+  const involves = [
+    { title: "The sessions", body: groupClass.description },
+    { title: "Who they're for", body: "All experience levels. Exercises are scaled to your ability." },
+    { title: "Your first session", body: faqAnswer("first-session") },
+    { title: "What to bring", body: faqAnswer("bring") },
+  ];
+
   return (
     <>
       <PageHeader
-        image={site.pageImages.classes}
-        eyebrow="Group classes"
-        title="Kettlebell classes in Cumbernauld"
-        intro={classes.summary}
+        image={images.classes}
+        eyebrow="Classes"
+        title="Group kettlebell training"
+        intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
       >
-        <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="light" className="w-full sm:w-[22rem]" />
-        <ButtonLink href="#book" variant="text" className="self-center sm:ml-4">
+        <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
+        <ButtonLink href="#join" variant="text" className="self-center sm:ml-4">
           How to join
         </ButtonLink>
       </PageHeader>
 
+      <Section tone="white" id="what-to-expect" labelledBy="expect-heading">
+        <SectionHeading id="expect-heading" eyebrow="What to expect" title="Purposeful training, together" />
+        <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {involves.map((item) => (
+            <div key={item.title} data-reveal className="border-t border-grey pt-4">
+              <dt className="font-display text-h3">{item.title}</dt>
+              <dd className="mt-3 ">{item.body}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
       <Section id="timetable" labelledBy="timetable-heading">
         <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
-        <div className="mt-10">
-          <Timetable labelledBy="timetable-heading" />
-        </div>
+        {/* The home page's day cards (owner, 2026-10-23: the home page is the reference). */}
+        <ClassWeekCards className="mt-10 max-w-3xl" />
         {classes.prices.length > 0 ? (
           <div className="mt-12 max-w-md">
             <PriceList prices={classes.prices} />
+            <p className="mt-3 text-sm ">{groupClass.payment}</p>
+            <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em]  underline underline-offset-[6px] hover:no-underline">
+              Save with a membership
+            </Link>
           </div>
         ) : null}
       </Section>
 
-      <Section tone="ink" id="book" labelledBy="join-heading">
+      <Section tone="white" id="join" labelledBy="join-heading">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" tone="ink" />
-            <StartTraining href={booking.href} label={booking.label} external={booking.external} tone="dark" className="mt-8 w-full sm:w-[22rem]" />
-            {open ? <InstagramAlternative tone="ink" className="mt-4" /> : null}
+            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" />
+            <StartTraining href={booking.href} label={booking.label} external={booking.external} className="mt-8 w-full sm:w-[22rem]" />
+            {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
-          <ol className="grid grid-cols-1 gap-8 lg:col-span-7">
-            {joinSteps.map((step, i) => (
-              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line-inverse pt-5">
-                <span className="eyebrow pt-1 text-muted-inverse" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="text-lg font-bold">{step.title}</h3>
-                  <p className="mt-2 text-muted-inverse">{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <Steps steps={joinSteps} className="lg:col-span-7" />
         </div>
       </Section>
 
-      <Location />
-      <CtaBand
-        title="Prefer personal coaching?"
-        body="Personal coaching is available face to face in Cumbernauld or online."
-      />
+      <Location tone="plain" />
+      <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
+      <CtaBand body="Prefer personal coaching? Train face to face or online." tone="plain" />
     </>
   );
 }

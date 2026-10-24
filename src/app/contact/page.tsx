@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/sections/PageHeader";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Get in touch with Alex K Bells about group kettlebell classes, one-to-one coaching or online coaching in Cumbernauld.",
+    "Contact RAENG Fitness about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
   path: "/contact",
 });
 
@@ -22,29 +22,29 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
-        image={site.pageImages.contact}
         eyebrow="Contact"
-        title="Get in touch"
-        intro="Ask about group classes, one-to-one coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
+        title="Contact RAENG"
+        intro="Ask about group classes, memberships, 1:1 coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
       >
         {/* The page's one action, in the first screen at every width. */}
         <ButtonLink
           href={site.social.instagram.url}
           external
+         
           className="w-full whitespace-normal text-center sm:w-auto sm:whitespace-nowrap"
         >
           Message Alex on Instagram
         </ButtonLink>
       </PageHeader>
 
-      <Section labelledBy="methods-heading">
+      <Section tone="white" labelledBy="methods-heading">
         <h2 id="methods-heading" className="sr-only">
-          Ways to get in touch
+          Ways to reach us
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div id="enquire" className="bg-ink p-8 text-paper sm:p-12">
-              <p className="eyebrow text-muted-inverse">Message on Instagram</p>
+            <div id="enquire" className="rounded-lg border border-grey bg-white p-8 sm:p-12">
+              <p className="eyebrow ">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">
                 <a
                   href={site.social.instagram.url}
@@ -56,20 +56,20 @@ export default function ContactPage() {
                   <span className="sr-only"> on Instagram (opens in a new tab)</span>
                 </a>
               </p>
-              <p className="mt-4 max-w-md text-muted-inverse">
+              <p className="mt-4 max-w-md ">
                 Send a direct message on Instagram. It helps to include:
               </p>
-              <ul className="mt-3 max-w-md list-disc space-y-1 pl-5 text-muted-inverse marker:text-muted-inverse">
-                <li>What you are interested in: group classes, one-to-one or online coaching</li>
+              <ul className="mt-3 max-w-md list-disc space-y-1 pl-5  marker:">
+                <li>What you are interested in: group classes, a membership, 1:1 or online coaching</li>
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>
               {/* A plain, always-visible link to the profile for class news and updates. */}
-              <div className="mt-8 border-t border-paper/20 pt-6">
+              <div className="mt-8 border-t border-grey pt-6">
                 <ButtonLink
                   href={site.social.instagram.url}
                   external
-                  tone="dark"
+                 
                   variant="secondary"
                   className="w-full py-3 sm:w-auto"
                 >
@@ -79,13 +79,13 @@ export default function ContactPage() {
                 </ButtonLink>
               </div>
             </div>
-            <p className="mt-6 text-muted">
+            <p className="mt-6 ">
               Also on Facebook:{" "}
               <a
                 href={site.social.facebook.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center font-semibold text-ink underline underline-offset-4 hover:no-underline"
+                className="inline-flex min-h-11 items-center font-semibold  underline underline-offset-4 hover:no-underline"
               >
                 {site.social.facebook.name}
                 <span className="sr-only"> (opens in a new tab)</span>
@@ -93,10 +93,10 @@ export default function ContactPage() {
             </p>
 
             {email || phone ? (
-              <dl className="mt-10 divide-y divide-line border-y border-line">
+              <dl className="mt-10 divide-y divide-grey border-y border-grey">
                 {email ? (
                   <div className="flex flex-wrap justify-between gap-2 py-4">
-                    <dt className="eyebrow text-muted">Email</dt>
+                    <dt className="eyebrow ">Email</dt>
                     <dd>
                       <a href={`mailto:${email}`} className="font-semibold underline underline-offset-4">
                         {email}
@@ -106,7 +106,7 @@ export default function ContactPage() {
                 ) : null}
                 {phone ? (
                   <div className="flex flex-wrap justify-between gap-2 py-4">
-                    <dt className="eyebrow text-muted">Phone</dt>
+                    <dt className="eyebrow ">Phone</dt>
                     <dd>
                       <a href={`tel:${phone.replace(/\s+/g, "")}`} className="font-semibold underline underline-offset-4">
                         {phone}
@@ -119,9 +119,9 @@ export default function ContactPage() {
 
             {/* Booking is a request on the website when the form is open; this page is for messaging. */}
             {booking.kind === "booking" ? (
-              <p className="mt-8 text-muted">
+              <p className="mt-8 ">
                 Ready to book a group class or a one-to-one session?{" "}
-                <Link href={booking.href} className="font-semibold text-ink underline underline-offset-4">
+                <Link href={booking.href} className="font-semibold  underline underline-offset-4">
                   Send a booking request
                 </Link>{" "}
                 and Alex confirms your place.
@@ -130,9 +130,9 @@ export default function ContactPage() {
 
             {/* Only when the online enquiry form can actually send. */}
             {online.href !== "/contact" ? (
-              <p className="mt-8 text-muted">
+              <p className="mt-8 ">
                 Interested in online coaching? Answer a few quick questions and Alex replies personally:{" "}
-                <Link href={online.href} className="font-semibold text-ink underline underline-offset-4">
+                <Link href={online.href} className="font-semibold  underline underline-offset-4">
                   enquire about online coaching
                 </Link>
                 .
@@ -141,8 +141,8 @@ export default function ContactPage() {
           </div>
 
           <div className="lg:col-span-4 lg:col-start-9">
-            <h2 className="eyebrow text-muted">Training location</h2>
-            <address className="mt-4 border-t-2 border-ink pt-6 text-lg not-italic leading-relaxed">
+            <h2 className="eyebrow ">Training location</h2>
+            <address className="mt-4 border-t-2 border-grey pt-6 text-lg not-italic leading-relaxed">
               {formatAddressLines().map((line) => (
                 <span key={line} className="block">
                   {line}

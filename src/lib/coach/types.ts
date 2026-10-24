@@ -84,6 +84,9 @@ export interface ClassSessionRow {
   notes: string;
   booked: number;
   attended: number;
+  /** Set when the coach cancelled the whole class (akb_cancel_class). */
+  cancelled_at: string | null;
+  cancel_reason: string;
 }
 
 export interface Attendance {
@@ -94,6 +97,10 @@ export interface Attendance {
   request_id: string | null;
   status: AttendanceStatus;
   notes: string;
+  /** Paid with a credit from this membership period (migration 20261023000000). */
+  membership_period_id?: string | null;
+  /** Cancelled within 24 hours of the class: the credit is forfeited. */
+  late_cancel?: boolean;
 }
 
 export interface Package {

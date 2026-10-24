@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/coach/requests", label: "Requests" },
   { href: "/coach/clients", label: "Clients" },
   { href: "/coach/classes", label: "Classes" },
+  { href: "/coach/memberships", label: "Memberships" },
   { href: "/coach/sessions", label: "PT sessions" },
   { href: "/coach/online", label: "Online coaching" },
   { href: "/coach/finances", label: "Finances" },

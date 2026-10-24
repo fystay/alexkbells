@@ -1,4 +1,13 @@
-# CONTENT — Alex K Bells
+# CONTENT — RAENG
+
+## RAENG editable slots (2026-10-21)
+
+Fill in with Alex's words, set `status: "confirmed"` once approved; empty or provisional slots are never shown on production (guarded by `content.test.ts`).
+- `src/content/coach.ts`: background, qualifications, philosophy, motivation (shown on home "Meet your coach" and About).
+- `src/content/about.ts`: `aboutStory` (why RAENG exists, how it started) — adds an "Our story" band on /about.
+- `src/content/community.ts`: `testimonials` (written permission first; none exist).
+- `src/content/images.ts`: every photograph by role; replace files in `public/images/raeng/`.
+- Online coaching: only the three confirmed points (personalised programming, ongoing support, progression) are published; add further features to `services.ts` and `/online-coaching` only once confirmed.
 
 ## Where content lives (single source of truth)
 
@@ -106,3 +115,8 @@ Contact
 | Date | Item | Approved by |
 |---|---|---|
 | — | — | — |
+
+## Home page slots awaiting content (2026-10-22)
+
+- **Member quotes:** `content/community.ts` (`testimonials`). The "In their words" section appears on the home page once an entry is `confirmed` (written permission, attribution as agreed). Empty now.
+- **Your first class:** `content/firstClass.ts`. Short beginner reassurance points in Alex's own words; the section appears under the at-a-glance strip once `confirmed`. Null now.

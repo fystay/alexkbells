@@ -35,9 +35,9 @@ export function Panel({ title, id, children, actions, className }: { title: Reac
 export function Metric({ label, value, note, href, emphasis }: { label: string; value: ReactNode; note?: ReactNode; href?: string; emphasis?: boolean }) {
   const body = (
     <>
-      <span className={cn("eyebrow", emphasis ? "text-muted-inverse" : "text-muted")}>{label}</span>
+      <span className={cn("eyebrow", emphasis ? "text-white" : "text-muted")}>{label}</span>
       <span className="mt-2 block text-xl font-bold tabular-nums break-words sm:text-3xl">{value}</span>
-      {note ? <span className={cn("mt-1 block text-sm", emphasis ? "text-muted-inverse" : "text-muted")}>{note}</span> : null}
+      {note ? <span className={cn("mt-1 block text-sm", emphasis ? "text-white" : "text-muted")}>{note}</span> : null}
     </>
   );
   const classes = cn("block h-full p-3 sm:p-5", emphasis ? "bg-ink text-paper" : "border border-line bg-white");
@@ -88,7 +88,7 @@ export function Notice({ children }: { children: ReactNode }) {
 }
 
 const linkStyles = {
-  primary: "bg-ink text-paper hover:bg-ink-soft",
+  primary: "bg-ink text-paper border border-ink hover:bg-white hover:text-ink",
   secondary: "border border-ink text-ink hover:bg-ink hover:text-paper",
 } as const;
 
@@ -167,7 +167,7 @@ export function SearchBar({ action, children, label = "Search" }: { action: stri
   return (
     <form action={action} method="get" role="search" aria-label={label} className="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-end">
       {children}
-      <button type="submit" className="inline-flex min-h-11 items-center justify-center bg-ink px-5 text-sm font-semibold uppercase tracking-[0.1em] text-paper hover:bg-ink-soft">
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center bg-ink px-5 text-sm font-semibold uppercase tracking-[0.1em] text-paper border border-ink hover:bg-white hover:text-ink">
         Apply
       </button>
     </form>

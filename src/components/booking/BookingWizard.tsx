@@ -21,6 +21,7 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
+import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
 import {
   ActionBar,
   ChoiceGroup,
@@ -83,6 +84,13 @@ const getServerToday = () => null;
 
 export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
   const demo = mode === "demo";
+  const chosenPlan = useChosenPlan();
+  // The class chosen on a class card (`?class=<timetable id>`): its next date is preselected.
+  const classParam = useQueryParam("class");
+  const [preselected, setPreselected] = useState(false);
+  const [full, setFull] = useState<{ full: string[]; cancelled: string[] }>({ full: [], cancelled: [] });
+  const fullSet = new Set(full.full);
+  const cancelledSet = new Set(full.cancelled);
   const initialStep = initialService ? 1 : 0;
   const [step, setStepState] = useState(initialStep);
   // The first step appears without the fade; later steps fade in so the change is noticed.
@@ -149,7 +157,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       ? loaded.window
       : null
     : usesSessions && today
-      ? classAvailability(classes, today)
+      ? classAvailability(classes, today, fullSet, cancelledSet)
       : null;
   const chosenSlot = avail?.days.find((d) => d.date === date)?.slots.find((s) => s.id === slotId && s.available) ?? null;
   const chosenClass =
@@ -158,6 +166,35 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       : null;
 
   const done = demo ? demoDone : serverState.status === "success";
+
+  // Once, as soon as the dates are known (state adjusted while rendering, not in an effect).
+  if (!preselected && usesSessions && avail && classParam) {
+    setPreselected(true);
+    const wanted = classes.find((c) => c.id === classParam);
+    const day = wanted ? avail.days.find((d) => WEEKDAY_NAMES[weekdayIndex(d.date)] === wanted.day && d.slots.some((s) => s.time === wanted.start && s.available)) : undefined;
+    const slot = day?.slots.find((s) => s.time === wanted?.start && s.available);
+    if (day && slot) {
+      setDate(day.date);
+      setSlotId(slot.id);
+    }
+  }
+
+  // Live classes: which dates are full (capacity reached in the coach portal) or cancelled by Alex.
+  // Best effort: if it can't be read, every date stays open and Alex confirms.
+  useEffect(() => {
+    if (demo || service !== "group-class") return;
+    let live = true;
+    fetch("/api/classes/full")
+      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown; cancelled?: unknown }>) : { full: [], cancelled: [] }))
+      .then((body) => {
+        const keys = (list: unknown) => (Array.isArray(list) ? list.filter((k): k is string => typeof k === "string") : []);
+        if (live) setFull({ full: keys(body.full), cancelled: keys(body.cancelled) });
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [demo, service]);
 
   useEffect(() => {
     if (!demo || !service || !today) return;
@@ -331,7 +368,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                   href="/online-coaching"
                   className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
                 >
-                  Explore online coaching <span aria-hidden="true">→</span>
+                  Explore online coaching
                 </Link>
               </div>
               <ActionBar
@@ -521,6 +558,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                     <input type="hidden" name="classDate" value={date} />
                   </>
                 ) : null}
+                {/* The membership plan chosen on the plan cards (?plan=), group classes only. */}
+                {chosenPlan && service === "group-class" ? <input type="hidden" name="plan" value={chosenPlan.id} /> : null}
                 {!demo && !usesSessions ? days.map((d) => <input key={d} type="hidden" name="days" value={d} />) : null}
                 {!demo && !usesSessions ? times.map((t) => <input key={t} type="hidden" name="times" value={t} />) : null}
                 <SubmissionMeta meta={meta} />
@@ -659,22 +698,22 @@ function Outcome({
   return (
     <div className="animate-step-in" role="status">
       <div className="bg-ink p-8 text-paper sm:p-12">
-        <p className="eyebrow text-muted-inverse">{demo ? "Demonstration complete" : "Request sent"}</p>
+        <p className="eyebrow text-white">{demo ? "Demonstration complete" : "Request sent"}</p>
         <h2 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-h2 text-balance focus:outline-none">
           {demo ? "No booking has been made" : "Thanks — Alex will be in touch"}
         </h2>
-        <p className="mt-5 max-w-xl text-lede text-muted-inverse">
+        <p className="mt-5 max-w-xl text-lede text-white">
           {demo
             ? `This was sample availability, so nothing was booked or sent. Once real availability is connected, this screen would confirm ${service.toLowerCase()} on ${longWhen}.`
             : `Your request is with Alex. He'll reply to ${email} to confirm a time. Your place is booked once he confirms.`}
         </p>
-        <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-line-inverse sm:grid-cols-2">
-          <div className="border-b border-line-inverse py-4 sm:border-b-0">
-            <dt className="eyebrow text-muted-inverse">Service</dt>
+        <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-white sm:grid-cols-2">
+          <div className="border-b border-white py-4 sm:border-b-0">
+            <dt className="eyebrow text-white">Service</dt>
             <dd className="mt-1 font-semibold">{service}</dd>
           </div>
           <div className="py-4">
-            <dt className="eyebrow text-muted-inverse">{demo ? "Sample time" : "When"}</dt>
+            <dt className="eyebrow text-white">{demo ? "Sample time" : "When"}</dt>
             <dd className="mt-1 font-semibold">{when}</dd>
           </div>
         </dl>
@@ -684,7 +723,7 @@ function Outcome({
           <button
             type="button"
             onClick={onRestart}
-            className="inline-flex min-h-12 items-center justify-center bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors hover:bg-ink-soft"
+            className="inline-flex min-h-12 items-center justify-center bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors border border-ink hover:bg-white hover:text-ink"
           >
             Try another booking
           </button>

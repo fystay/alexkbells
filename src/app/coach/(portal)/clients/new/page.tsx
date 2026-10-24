@@ -12,7 +12,7 @@ export default function NewClientPage() {
   return (
     <>
       <p className="text-sm">
-        <TextLink href="/coach/clients">← Clients</TextLink>
+        <TextLink href="/coach/clients">Clients</TextLink>
       </p>
       <div className="mt-4">
         <PageHeader title="Add a client" />
