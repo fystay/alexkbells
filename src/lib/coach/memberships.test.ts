@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { addAttendee, setAttendance } from "./bookings";
+import { addAttendee, cancelClass, getClassSession, setAttendance } from "./bookings";
 import { createClient } from "./clients";
 import { select, type Db } from "./db";
 import { addCharge } from "./ledger";
-import { listMemberships, listPeriods, periodOn, renewMemberships, returnCredit, setMembershipStatus, startMembership, payWithCredit } from "./memberships";
+import { currentPeriods, listMemberships, listPeriods, periodOn, renewMemberships, returnCredit, setMembershipStatus, startMembership, payWithCredit } from "./memberships";
 import { testDb } from "./test-support";
 
 // Memberships against the real schema (PGlite): periods, charges, credits and
@@ -164,5 +164,48 @@ describe("class credits", () => {
     expect((await payWithCredit(db, a)).ok).toBe(true);
     const r = await select<{ voided_at: string | null }>(db, "akb_charges", [["id", `eq.${extra.ok ? extra.data.id : ""}`]]);
     expect(r.ok && r.data[0].voided_at).toBeNull();
+  });
+});
+
+describe("the coach cancels a whole class", () => {
+  it("cancels every place, returns members' credits even inside 24 hours, cancels unpaid charges and closes the class", async () => {
+    const member = await newClient();
+    const payg = await newClient();
+    const m = await start(member, "starter");
+    const slot = `cancel-${Math.random()}`;
+    const onCredit = await place(member, day(0), { hoursAway: 3, slot });
+    expect((await payWithCredit(db, onCredit)).ok).toBe(true);
+    const paying = await place(payg, day(0), { hoursAway: 3, slot, price: 1200 });
+    expect((await periods(m))[0].credits_used).toBe(1);
+
+    const session = await getClassSession(db, slot, day(0));
+    expect(session.ok && session.data).toBeTruthy();
+    const id = session.ok && session.data ? session.data.id : "";
+    expect(await cancelClass(db, id, "Venue closed")).toEqual({ ok: true, data: 2 });
+
+    const rows = await sql("select id, status, late_cancel from akb_class_attendance where id = any($1::uuid[])", [[onCredit, paying]]);
+    expect(rows.every((r) => r.status === "cancelled" && r.late_cancel === false)).toBe(true);
+    expect((await periods(m))[0]).toMatchObject({ credits_used: 0, credits_left: 4 });
+    const [charge] = await sql("select voided_at is not null as voided from akb_charges where attendance_id = $1", [paying]);
+    expect(charge).toEqual({ voided: true });
+
+    const after = await getClassSession(db, slot, day(0));
+    expect(after.ok && after.data).toMatchObject({ cancel_reason: "Venue closed" });
+    expect(after.ok && after.data?.cancelled_at).toBeTruthy();
+    // Nobody can be booked onto it again, or put back on it.
+    const late = await addAttendee(db, { clientId: await newClient(), slot, date: day(0), startsAt: new Date(Date.now() + 3 * 3_600_000).toISOString(), duration: 60, pricePence: 1200, description: "Group class" });
+    expect(late).toMatchObject({ ok: false, error: { rule: "class_cancelled" } });
+    expect(await setAttendance(db, paying, "booked")).toMatchObject({ ok: false, error: { rule: "class_cancelled" } });
+    // Cancelling again changes nothing.
+    expect(await cancelClass(db, id, "")).toEqual({ ok: true, data: 0 });
+  });
+});
+
+describe("current periods", () => {
+  it("lists every period covering a date, with credits left", async () => {
+    const c = await newClient();
+    await start(c, "regular");
+    const r = await currentPeriods(db, day(0));
+    expect(r.ok && r.data.find((p) => p.client_id === c)).toMatchObject({ credits: 8, credits_left: 8 });
   });
 });

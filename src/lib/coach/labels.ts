@@ -85,6 +85,7 @@ export const CONTACT_METHOD: Record<Exclude<ContactMethod, "">, string> = {
 /** Messages for the portal's own database rules ("akb:<rule>"). */
 export const RULE_MESSAGES: Record<string, string> = {
   class_full: "That class is full. Raise its capacity or choose another date.",
+  class_cancelled: "That class has been cancelled, so nobody can be booked onto it.",
   package_used_up: "That package has no sessions left.",
   package_inactive: "That package is cancelled.",
   package_other_client: "That package belongs to another client.",

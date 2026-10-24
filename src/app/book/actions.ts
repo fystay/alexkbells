@@ -48,12 +48,15 @@ export async function submitBookingRequest(
   }
 
   const { data } = parsed;
-  // Never trust the calendar: a class that has reached its capacity can't be requested.
+  // Never trust the calendar: a class that is full or cancelled can't be requested.
   const slot = publishedClasses().find((c) => c.label === data.session);
   if (data.service === "group-class" && data.classDate && slot) {
     const full = await fullClasses(londonToday());
     if (full.known && full.keys.includes(fullKey(slot.id, data.classDate))) {
       return { status: "error", message: "Please check the highlighted fields.", errors: { when: "That class is now full. Choose another date." } };
+    }
+    if (full.known && full.cancelled.includes(fullKey(slot.id, data.classDate))) {
+      return { status: "error", message: "Please check the highlighted fields.", errors: { when: "That class has been cancelled. Choose another date." } };
     }
   }
   const key = await idempotencyKey([

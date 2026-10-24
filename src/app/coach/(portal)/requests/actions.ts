@@ -9,6 +9,7 @@ import { actionContext } from "@/lib/coach/context";
 import { dbMessage } from "@/lib/coach/errors";
 import { confirmRequest, getRequest, markNotified, setRequestStatus, type ConfirmBooking } from "@/lib/coach/requests";
 import { addDays, londonToUtc } from "@/lib/coach/time";
+import { payWithCredit, periodOn } from "@/lib/coach/memberships";
 import { FormReader } from "@/lib/coach/validate";
 
 /**
@@ -55,10 +56,19 @@ export async function confirmRequestAction(_prev: ActionState, formData: FormDat
 
   // What: a class place, a one-to-one session, or nothing yet.
   let booking: ConfirmBooking = { kind: "none" };
+  let useCredit = false;
   if (bookingKind === "class") {
     const [date = "", slotId = ""] = String(formData.get("class") ?? "").split("|");
     const slot = findSlot(slotId);
-    const price = form.pounds("class_price", { label: "the class price", allowZero: true, required: true });
+    useCredit = formData.get("credit") === "on";
+    const price = useCredit ? 0 : form.pounds("class_price", { label: "the class price", allowZero: true, required: true });
+    if (useCredit) {
+      // Checked before anything is saved: their period must cover the class and have a credit left.
+      const period = clientId && date ? await periodOn(db, clientId, date) : null;
+      if (period && !period.ok) return failure(dbMessage(period.error));
+      if (!period?.data) form.error("credit", "They have no membership period covering that class. Untick to charge the price.");
+      else if (period.data.credits_left <= 0) form.error("credit", "No credits left in their current period. Untick to charge the price.");
+    }
     if (!slot || !isTimetableClass(date, slotId, today)) form.error("class", "Choose a class from the timetable.");
     else if (date < today) form.error("class", "That class has already happened. Choose an upcoming one.");
     if (form.ok && slot) {
@@ -83,6 +93,10 @@ export async function confirmRequestAction(_prev: ActionState, formData: FormDat
 
   const result = await confirmRequest(db, { requestId, clientId, newClient, booking, note });
   if (!result.ok) return failure(dbMessage(result.error));
+  if (useCredit && result.data.booked_id) {
+    const credit = await payWithCredit(db, result.data.booked_id);
+    redirect(`/coach/requests/${requestId}?done=${credit.ok ? "confirmed-credit" : "confirmed-no-credit"}`);
+  }
   redirect(`/coach/requests/${requestId}?done=confirmed`);
 }
 

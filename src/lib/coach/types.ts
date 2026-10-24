@@ -84,6 +84,9 @@ export interface ClassSessionRow {
   notes: string;
   booked: number;
   attended: number;
+  /** Set when the coach cancelled the whole class (akb_cancel_class). */
+  cancelled_at: string | null;
+  cancel_reason: string;
 }
 
 export interface Attendance {

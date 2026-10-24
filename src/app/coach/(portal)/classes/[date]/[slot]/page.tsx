@@ -16,7 +16,7 @@ import { addMinutesIso, formatClock, formatLongDate, formatStamp, toLondon } fro
 import type { AttendanceStatus } from "@/lib/coach/types";
 import { ActionForm, Checkbox, Field, MoneyField, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
 import { Badge, EmptyState, LoadError, Panel, TextLink } from "@/components/coach/ui";
-import { addAttendeeAction, setAttendanceAction, updateClassAction } from "../../actions";
+import { addAttendeeAction, cancelClassAction, setAttendanceAction, updateClassAction } from "../../actions";
 import { payWithCreditAction, returnCreditAction } from "../../../memberships/actions";
 import { creditsLine, periodsOn } from "@/lib/coach/memberships";
 
@@ -71,6 +71,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
   const booked = places.data.filter((p) => p.status === "booked" || p.status === "attended").length;
   const full = row?.capacity ? booked >= row.capacity : false;
   const classValue = `${date}|${slot.id}`;
+  const cancelled = Boolean(row?.cancelled_at);
 
   return (
     <>
@@ -85,10 +86,17 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
             · {booked}
             {row?.capacity ? ` of ${row.capacity}` : ""} booked
           </span>
-          {full ? <Badge tone="strong">Full</Badge> : null}
+          {cancelled ? <Badge tone="strong">Cancelled</Badge> : full ? <Badge tone="strong">Full</Badge> : null}
           {date < today ? <Badge tone="muted">Past</Badge> : null}
         </p>
       </div>
+
+      {cancelled && row ? (
+        <p role="note" className="mt-6 border-2 border-ink bg-white p-4 text-sm">
+          <strong>You cancelled this class</strong> on {formatStamp(row.cancelled_at ?? "")}
+          {row.cancel_reason ? `: ${row.cancel_reason}` : ""}. Members got their credits back and unpaid class charges were cancelled. It no longer shows on the booking calendar.
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-x-12 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -172,23 +180,25 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
         </div>
 
         <div>
-          <Panel title="Add someone" id="add-heading">
-            {addable.length ? (
-              <ActionForm action={addAttendeeAction} label="Add someone to this class">
-                <input type="hidden" name="class" value={classValue} />
-                <SelectField name="client" label="Client" required placeholder="Choose a client" options={addable.map((c) => ({ value: c.id, label: c.full_name }))} />
-                <MoneyField name="price" label="Price" defaultValue={penceToInput(defaultPrices().classPence)} required hint="0 for a free place." />
-                <Checkbox name="credit" label="Pay with their membership credit" hint="For members: no class charge; one credit from their current period is used." />
-                <div>
-                  <SubmitButton variant="secondary">Add to class</SubmitButton>
-                </div>
-              </ActionForm>
-            ) : (
-              <p className="text-sm text-muted">
-                Everyone is already on the list. <TextLink href="/coach/clients/new">Add a client</TextLink> first.
-              </p>
-            )}
-          </Panel>
+          {cancelled ? null : (
+            <Panel title="Add someone" id="add-heading">
+              {addable.length ? (
+                <ActionForm action={addAttendeeAction} label="Add someone to this class">
+                  <input type="hidden" name="class" value={classValue} />
+                  <SelectField name="client" label="Client" required placeholder="Choose a client" options={addable.map((c) => ({ value: c.id, label: c.full_name }))} />
+                  <MoneyField name="price" label="Price" defaultValue={penceToInput(defaultPrices().classPence)} required hint="0 for a free place." />
+                  <Checkbox name="credit" label="Pay with their membership credit" hint="For members: no class charge; one credit from their current period is used." />
+                  <div>
+                    <SubmitButton variant="secondary">Add to class</SubmitButton>
+                  </div>
+                </ActionForm>
+              ) : (
+                <p className="text-sm text-muted">
+                  Everyone is already on the list. <TextLink href="/coach/clients/new">Add a client</TextLink> first.
+                </p>
+              )}
+            </Panel>
+          )}
           <Panel title="Class settings" id="settings-heading">
             <ActionForm action={updateClassAction} label="Class settings">
               <input type="hidden" name="class" value={classValue} />
@@ -199,6 +209,22 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
               </div>
             </ActionForm>
           </Panel>
+          {!cancelled && date >= today ? (
+            <Panel title="Cancel this class" id="cancel-heading">
+              <ActionForm
+                action={cancelClassAction}
+                label="Cancel this class"
+                confirm={`Cancel this class for everyone? ${booked} booked ${booked === 1 ? "place is" : "places are"} cancelled, members get their credit back, and unpaid class charges are cancelled. This can't be undone.`}
+              >
+                <input type="hidden" name="class" value={classValue} />
+                <p className="text-sm text-muted">For a class you can&apos;t run. Members always get their credit back, however close to the class. Let each person know yourself.</p>
+                <TextArea name="reason" label="Reason (for your records)" rows={2} maxLength={500} />
+                <div>
+                  <SubmitButton variant="secondary" pendingLabel="Cancelling…">Cancel class</SubmitButton>
+                </div>
+              </ActionForm>
+            </Panel>
+          ) : null}
         </div>
       </div>
     </>

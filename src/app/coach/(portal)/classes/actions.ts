@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { failure, success, type ActionState } from "@/lib/coach/action-state";
-import { addAttendee, ATTENDANCE_STATUSES, ensureClassSession, getAttendance, setAttendance, updateClassSession } from "@/lib/coach/bookings";
+import { addAttendee, ATTENDANCE_STATUSES, cancelClass, ensureClassSession, getAttendance, setAttendance, updateClassSession } from "@/lib/coach/bookings";
 import { classChargeDescription, classDurationMinutes, findSlot, isTimetableClass, occurrence } from "@/lib/coach/classes";
 import { getClient } from "@/lib/coach/clients";
 import { actionContext } from "@/lib/coach/context";
@@ -78,6 +78,24 @@ export async function setAttendanceAction(_prev: ActionState, formData: FormData
   if (!result.ok) return failure(dbMessage(result.error));
   refresh();
   return success(`Marked ${ATTENDANCE_STATUS[status].toLowerCase()}${status === "cancelled" ? ". An unpaid charge for it was cancelled too" : ""}.`);
+}
+
+/** Cancels the whole class (coach's decision): places cancelled, credits returned, unpaid charges cancelled. */
+export async function cancelClassAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const ctx = await actionContext();
+  if ("error" in ctx) return ctx.error;
+  const form = new FormReader(formData);
+  const chosen = readClass(form, String(formData.get("class") ?? ""), ctx.today);
+  const reason = form.text("reason", { label: "the reason", max: 500, multiline: true });
+  if (!form.ok || !chosen) return failure(CHECK, form.errors);
+  const occ = occurrence(chosen.date, chosen.slot);
+  const id = await ensureClassSession(ctx.db, { slot: chosen.slot.id, date: chosen.date, startsAt: occ.startsAt, duration: classDurationMinutes(chosen.slot) });
+  if (!id.ok) return failure(dbMessage(id.error));
+  const result = await cancelClass(ctx.db, id.data, reason);
+  if (!result.ok) return failure(dbMessage(result.error));
+  refresh();
+  const n = result.data;
+  return success(`Class cancelled. ${n === 0 ? "Nobody was booked." : `${n} ${n === 1 ? "place" : "places"} cancelled; members' credits are back and unpaid class charges are cancelled. Let each person know.`}`);
 }
 
 export async function updateClassAction(_prev: ActionState, formData: FormData): Promise<ActionState> {

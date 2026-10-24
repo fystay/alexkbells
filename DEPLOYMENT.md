@@ -122,6 +122,8 @@ Retries: a transient failure (no answer, 429, 5xx) is retried once straight away
 
 - `/api/cron/membership-renewals` runs daily (06:11 UTC, `CRON_SECRET` bearer) and creates each active membership's next period, credits and charge once (re-running creates nothing). Without `CRON_SECRET` no renewals happen; Alex can still start memberships, and the next run catches up.
 - Billing is manual: each period's charge appears in Finances as owed; record the payment, or send a Square link once Square is live. Nothing charges a card automatically.
+- Renewals also catch up whenever Alex opens the dashboard or Memberships (the database creates each period once), so a missing `CRON_SECRET` or a missed run only delays them.
+- Cancelling a whole class (class page → Cancel this class): needs `supabase/migrations/20261024000000_akb_cancel_class.sql` (two columns, a trigger, one function, two view columns; no deletes; **not yet applied**, the MCP confirmation timed out 2026-10-24: paste it into the SQL Editor). Places with an unpaid pay-as-you-go charge also need the payment functions above (`akb_void_charge`), or the cancellation stops with "not set up" and changes nothing.
 - Capacity: set a class date's capacity in the portal; once full, the public calendar shows it unavailable (`/api/classes/full`, cached 30 s) and the server refuses requests for it.
 
 Data kept: client details, bookings, payments and notes, all in Supabase (EU West). Alex should add retention to the privacy notice (e.g. delete former clients' records after N years; financial records are usually kept six years in the UK). A former client with no bookings or payments can be deleted from their record; anyone with history is kept (set them to Former).

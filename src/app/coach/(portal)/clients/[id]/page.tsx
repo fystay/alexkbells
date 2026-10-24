@@ -8,7 +8,9 @@ import { clientBalances, clientEvents, getClient, listConsents, listFollowUps } 
 import { portalContext } from "@/lib/coach/context";
 import { collect, type Db } from "@/lib/coach/db";
 import { loadMessage } from "@/lib/coach/errors";
-import { ATTENDANCE_STATUS, CLIENT_STATUS, CONSENT_KIND, CONTACT_METHOD, PAYMENT_METHOD, PAYMENT_STATUS, PT_STATUS, REQUEST_STATUS, SERVICE, SUBSCRIPTION_STATUS } from "@/lib/coach/labels";
+import { ATTENDANCE_STATUS, CLIENT_STATUS, CONSENT_KIND, CONTACT_METHOD, MEMBERSHIP_STATUS, PAYMENT_METHOD, PAYMENT_STATUS, PT_STATUS, REQUEST_STATUS, SERVICE, SUBSCRIPTION_STATUS } from "@/lib/coach/labels";
+import { BILLING_WEEKS } from "@/content/memberships";
+import { creditsLine, listMemberships, listPeriods } from "@/lib/coach/memberships";
 import { listCharges, listPayments } from "@/lib/coach/ledger";
 import { formatPence, penceToInput } from "@/lib/coach/money";
 import { listCheckIns, listSubscriptions } from "@/lib/coach/online";
@@ -41,6 +43,7 @@ export const metadata: Metadata = { title: "Client" };
 const TABS = [
   { value: "overview", label: "Overview" },
   { value: "bookings", label: "Bookings" },
+  { value: "membership", label: "Membership" },
   { value: "payments", label: "Payments" },
   { value: "packages", label: "Packages" },
   { value: "online", label: "Online coaching" },
@@ -126,6 +129,7 @@ async function ClientView({ params, searchParams }: { params: PageProps<"/coach/
 
       {tab === "overview" ? <Overview db={db} client={client} today={today} /> : null}
       {tab === "bookings" ? <Bookings db={db} client={client} today={today} /> : null}
+      {tab === "membership" ? <Memberships db={db} client={client} today={today} /> : null}
       {tab === "payments" ? <Payments db={db} client={client} today={today} /> : null}
       {tab === "packages" ? <Packages db={db} client={client} today={today} /> : null}
       {tab === "online" ? <Online db={db} client={client} /> : null}
@@ -513,6 +517,43 @@ async function Packages({ db, client, today }: TabProps) {
           </ActionForm>
         </div>
       </div>
+    </Panel>
+  );
+}
+
+async function Memberships({ db, client, today }: TabProps) {
+  const memberships = await listMemberships(db, { clientId: client.id });
+  if (!memberships.ok) return <LoadError message={loadMessage(memberships.error)} />;
+  const periods = memberships.data.length ? await listPeriods(db, memberships.data.map((m) => m.id)) : { ok: true as const, data: [] };
+  if (!periods.ok) return <LoadError message={loadMessage(periods.error)} />;
+  const hasCurrent = memberships.data.some((m) => m.status !== "cancelled");
+  return (
+    <Panel
+      title="Membership"
+      id="membership-heading"
+      actions={hasCurrent ? undefined : <TextLink href={`/coach/memberships/new?client=${client.id}`}>Start a membership</TextLink>}
+    >
+      {memberships.data.length ? (
+        <ul className="divide-y divide-line border-y border-line text-sm">
+          {memberships.data.map((m) => {
+            const current = periods.data.find((p) => p.membership_id === m.id && p.period_start <= today && p.period_end >= today);
+            return (
+              <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <span>
+                  <TextLink href={`/coach/memberships/${m.id}`}>{m.plan_name}</TextLink> · {formatPence(m.price_pence)} every {BILLING_WEEKS} weeks · {m.credits} credits
+                  <span className="block text-muted">
+                    {current ? `${creditsLine(current)} until ${formatDate(current.period_end)}` : "No period covers today"}
+                    {m.status === "active" ? ` · renews ${formatDate(m.next_period_on)}` : ""}
+                  </span>
+                </span>
+                <Badge tone={m.status === "active" ? "strong" : "muted"}>{MEMBERSHIP_STATUS[m.status]}</Badge>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted">Not a member. Classes are pay as you go.</p>
+      )}
     </Panel>
   );
 }

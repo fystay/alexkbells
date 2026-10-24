@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { portalContext } from "@/lib/coach/context";
 import { loadDashboard, type AttentionItem } from "@/lib/coach/dashboard";
+import { catchUpRenewals } from "@/lib/coach/memberships";
 import { loadMessage } from "@/lib/coach/errors";
 import { formatPence } from "@/lib/coach/money";
 import { formatLongDate } from "@/lib/coach/time";
@@ -38,6 +39,7 @@ const ATTENTION_LABEL: Record<AttentionItem["kind"], string> = {
   "check-in": "Check-in",
   renewal: "Renewal",
   package: "Package",
+  membership: "Membership",
   "follow-up": "Follow-up",
 };
 
@@ -57,6 +59,7 @@ async function Dashboard() {
   );
   if (!db) return <>{account}<LoadError message="The database isn't configured for this deployment (SUPABASE_URL and SUPABASE_SECRET_KEY)." /></>;
 
+  await catchUpRenewals(db, today);
   const result = await loadDashboard(db, today);
   if (!result.ok) {
     return (

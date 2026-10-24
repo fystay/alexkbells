@@ -149,7 +149,11 @@ See Coach portal below.
 - [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
 - [x] Memberships in the coach portal (2026-10-23, migration `20261023000000_akb_memberships.sql` applied live): plan carried on the booking request, start from the request, four-week periods with credits and one charge each, daily renewal cron (`/api/cron/membership-renewals`), pay class places with credits, 24-hour rule enforced in the database, give a credit back, pause/resume/cancel
 - [ ] P0 Owner: confirm manual membership billing (portal charge each period, paid by Square link or recorded by hand) is acceptable, or ask for Square Subscriptions (automatic card billing; needs the plan in Square and the API checked against current docs)
-- [ ] P1 Coach cancels a whole class: return every member's credit in one step (today: "Give credit back" per place)
+- [x] Coach cancels a whole class (2026-10-24, `20261024000000_akb_cancel_class.sql`): every place cancelled in one step, members' credits back whatever the time, unpaid class charges cancelled, no one can be booked onto it again, and the booking calendar stops offering it
+- [ ] P0 Apply `20261024000000_akb_cancel_class.sql` to the live database (no deletes; the MCP confirmation timed out on 2026-10-24). Until then "Cancel class" says the tables aren't set up, and the public calendar marks nothing full or cancelled
+- [x] Member requests confirmed on a credit: the confirm form ticks "Pay with their membership credit" when their period covers the class (no £12 charge) (2026-10-24)
+- [x] Client record: Membership tab (plan, credits left, renewal) (2026-10-24)
+- [x] Dashboard: "No credits left" for members who have used every credit this period; renewals caught up on every visit to the dashboard or Memberships, so they still happen without `CRON_SECRET` (2026-10-24)
 - [ ] P0 Confirm class capacity (set per class in the coach portal; blank means not full)
 - [ ] P1 Square Sandbox end-to-end test of payment links (DEPLOYMENT.md), then live credentials
 - [ ] P1 Confirm brand name on the site (RAENG Kettlebell Club vs Alex K Bells)

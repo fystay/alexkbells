@@ -14,7 +14,8 @@ import { decisionMessage, mailtoLink } from "@/lib/coach/notify";
 import { getRequest, relatedRequests, requestDetails } from "@/lib/coach/requests";
 import { addDays, formatDate, formatDateTime, formatStamp } from "@/lib/coach/time";
 import type { BookingRequest, Client } from "@/lib/coach/types";
-import { ActionForm, Field, MoneyField, RadioGroup, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
+import { ActionForm, Checkbox, Field, MoneyField, RadioGroup, SelectField, SubmitButton, TextArea } from "@/components/coach/form";
+import { creditsLine, periodOn } from "@/lib/coach/memberships";
 import { Flash } from "@/components/coach/Flash";
 import { ActionLink, Badge, Details, LoadError, Notice, Panel, TextLink } from "@/components/coach/ui";
 import { awaitingAction, cancelAction, completeAction, confirmRequestAction, declineAction, notifiedAction } from "../actions";
@@ -36,6 +37,8 @@ export default function RequestPage({ params, searchParams }: PageProps<"/coach/
 
 const DONE = {
   confirmed: "Confirmed. Now let them know: use the message below.",
+  "confirmed-credit": "Confirmed, paid with a membership credit. Now let them know: use the message below.",
+  "confirmed-no-credit": "Confirmed, but the membership credit couldn't be used (none left by the time it was saved), so the place is pay as you go. Use “Pay with a credit” on the class once they have one, or record the payment.",
   awaiting: "Marked as awaiting their response.",
   declined: "Declined. Let them know: use the message below.",
   cancelled: "Cancelled, with its booking.",
@@ -241,6 +244,9 @@ async function Decide({ request, today, known, possible }: { request: BookingReq
     return { value: `${o.date}|${o.slot.id}`, label: `${formatDate(o.date)}, ${slotLabel(o.slot).split(" ").slice(1).join(" ")}${count}${full ? " · full" : ""}` };
   });
   const requestedValid = classOptions.some((o) => o.value === requested);
+  // A member's place is paid with a credit when their current period covers the class.
+  const memberPeriod = known ? await periodOn(db, known.id, details.classDate || today) : { ok: true as const, data: null };
+  const period = memberPeriod.ok ? memberPeriod.data : null;
 
   return (
     <Panel title="Decide" id="decide-heading">
@@ -279,7 +285,17 @@ async function Decide({ request, today, known, possible }: { request: BookingReq
                   placeholder={requestedValid ? undefined : "Choose a class"}
                   hint={details.classDate && !requestedValid ? `They asked for ${request.summary}, which isn't an upcoming class.` : "Capacity is only enforced where you've set one."}
                 />
-                <MoneyField name="class_price" label="Price" defaultValue={penceToInput(prices.classPence)} required />
+                <MoneyField name="class_price" label="Price" defaultValue={penceToInput(prices.classPence)} required hint={period ? "Ignored when a credit is used." : undefined} />
+                {period ? (
+                  <div className="sm:col-span-3">
+                    <Checkbox
+                      name="credit"
+                      label={`Pay with their ${period.plan_name} membership credit`}
+                      defaultChecked={period.credits_left > 0}
+                      hint={`${creditsLine(period)} until ${formatDate(period.period_end)}. No class charge; one credit is used.`}
+                    />
+                  </div>
+                ) : null}
               </fieldset>
               <fieldset className="grid grid-cols-1 gap-4 border border-line bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
                 <legend className="px-1 text-sm font-semibold">One-to-one session</legend>

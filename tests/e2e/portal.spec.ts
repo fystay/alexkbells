@@ -448,6 +448,61 @@ test("memberships: start the plan chosen on the site, pay places with credits, 2
   expect(periods).toEqual([{ n: 1 }]);
 });
 
+test("memberships: a member's request is confirmed on a credit, the client record shows it, and cancelling the class gives it back", async ({ page, request }) => {
+  const person = unique("Member Cancel");
+  const clientId = await seedClient(request, person);
+  // A Wednesday no other test books (and not one the booking-page tests look at).
+  const date = next(2, 2);
+  const requestId = await seedRequest(request, person, { summary: `Wednesday class`, details: { classDate: date, classSlot: "wed-evening" } });
+  await signIn(page);
+  await page.goto("/coach/memberships/new");
+  await page.getByRole("combobox", { name: "Client" }).selectOption(clientId);
+  await page.getByRole("radio", { name: /Regular/ }).check();
+  await page.getByRole("button", { name: "Start membership" }).click();
+  await expect(page.getByRole("status")).toContainText("Membership started");
+  const membershipUrl = page.url();
+
+  try {
+    // Confirming their class request uses a credit (ticked by default), not the £12 price.
+    await page.goto(`/coach/requests/${requestId}`);
+    const confirm = page.getByRole("form", { name: "Confirm request" });
+    await confirm.getByRole("radio", { name: new RegExp(`${person.name} \\(existing client\\)`) }).check();
+    await expect(confirm.getByLabel("Pay with their Regular membership credit")).toBeChecked();
+    await confirm.getByRole("button", { name: "Confirm request" }).click();
+    await expect(page.getByRole("status")).toContainText("paid with a membership credit");
+    const charges = await sql<{ n: number }>(request, "select count(*)::int as n from akb_charges where client_id = $1 and service = 'group' and voided_at is null and description not like '%membership%'", [clientId]);
+    expect(charges).toEqual([{ n: 0 }]);
+    await page.goto(membershipUrl);
+    await expect(page.getByText("7 of 8 credits left").first()).toBeVisible();
+
+    // The client record shows the membership.
+    await page.goto(`/coach/clients/${clientId}?tab=membership`);
+    await expect(page.getByRole("region", { name: "Membership" })).toContainText("Regular");
+    await expect(page.getByRole("region", { name: "Membership" })).toContainText("7 of 8 credits left");
+
+    // Alex cancels the whole class: the place is cancelled and the credit comes back.
+    await page.goto(`/coach/classes/${date}/wed-evening`);
+    page.once("dialog", (d) => void d.accept());
+    const cancel = page.getByRole("form", { name: "Cancel this class" });
+    await cancel.getByLabel("Reason (for your records)").fill("Venue closed");
+    await cancel.getByRole("button", { name: "Cancel class" }).click();
+    // The form gives way to a lasting notice on the class.
+    await expect(page.getByRole("note")).toContainText("You cancelled this class");
+    await page.reload();
+    await expect(page.getByRole("note")).toContainText("Venue closed");
+    await expect(page.getByRole("form", { name: "Add someone to this class" })).toHaveCount(0);
+    await expect(page.getByRole("listitem").filter({ hasText: person.name }).getByText("Credit returned")).toBeVisible();
+    await page.goto(membershipUrl);
+    await expect(page.getByText("8 of 8 credits left").first()).toBeVisible();
+
+    // The public calendar stops offering it.
+    const full = (await (await request.get("/api/classes/full")).json()) as { cancelled: string[] };
+    expect(full.cancelled).toContain(`wed-evening|${date}`);
+  } finally {
+    await sql(request, "update akb_class_sessions set cancelled_at = null, cancel_reason = '' where slot = 'wed-evening' and class_date = $1", [date]);
+  }
+});
+
 test("a database outage shows an error, not empty data", async ({ page }) => {
   await signIn(page);
   await page.goto("/coach/clients?q=FAIL-TEST");

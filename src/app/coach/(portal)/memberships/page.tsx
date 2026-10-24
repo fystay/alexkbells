@@ -7,7 +7,7 @@ import { portalContext } from "@/lib/coach/context";
 import { collect } from "@/lib/coach/db";
 import { loadMessage } from "@/lib/coach/errors";
 import { MEMBERSHIP_STATUS } from "@/lib/coach/labels";
-import { creditsLine, listMemberships, listPeriods, MEMBERSHIP_STATUSES, type MembershipStatus } from "@/lib/coach/memberships";
+import { catchUpRenewals, creditsLine, listMemberships, listPeriods, MEMBERSHIP_STATUSES, type MembershipStatus } from "@/lib/coach/memberships";
 import { formatPence } from "@/lib/coach/money";
 import { addDays, formatDate } from "@/lib/coach/time";
 import { ActionLink, Badge, EmptyState, FilterLinks, LoadError, Metric, PageHeader } from "@/components/coach/ui";
@@ -34,6 +34,7 @@ async function Memberships({ searchParams }: { searchParams: PageProps<"/coach/m
   const params = await searchParams;
   const status = (MEMBERSHIP_STATUSES as readonly string[]).includes(String(params.status)) ? (params.status as MembershipStatus) : "active";
   if (!db) return <LoadError message="The database isn't configured for this deployment." />;
+  await catchUpRenewals(db, today);
   const loaded = collect(await Promise.all([listMemberships(db), listClients(db)] as const));
   if (!loaded.ok) return <LoadError message={loadMessage(loaded.error)} />;
   const [all, clients] = loaded.data;

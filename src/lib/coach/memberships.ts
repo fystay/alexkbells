@@ -133,6 +133,21 @@ export function periodsOn(db: Db, clientIds: readonly string[], date: string): P
   ]);
 }
 
+/**
+ * Catches up renewals the daily job hasn't made yet (no CRON_SECRET, or a
+ * missed run): safe to call on every portal visit, since the database creates
+ * each period once. A failure only logs; the pages still load.
+ */
+export async function catchUpRenewals(db: Db, today: string): Promise<void> {
+  const result = await renewMemberships(db, today);
+  if (!result.ok) console.error(`Membership renewals catch-up failed (${result.error.kind})`);
+}
+
+/** Every membership period covering a date (for the dashboard). */
+export function currentPeriods(db: Db, date: string): Promise<DbResult<MembershipPeriod[]>> {
+  return select<MembershipPeriod>(db, "akb_membership_period_balances", [["period_start", `lte.${date}`], ["period_end", `gte.${date}`], ["limit", "1000"]]);
+}
+
 /** Gives back a forfeited credit (the coach cancelled the class, or goodwill). */
 export function returnCredit(db: Db, attendanceId: string): Promise<DbResult<null>> {
   return rpc<null>(db, "akb_return_credit", { p_attendance: attendanceId });

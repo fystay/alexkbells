@@ -3,6 +3,7 @@ import { CLASS_NAME, findSlot } from "./classes";
 import { listClients, listFollowUps } from "./clients";
 import { collect, select, type Db, type DbError } from "./db";
 import { listCharges, listPayments, listRefunds } from "./ledger";
+import { currentPeriods, listMemberships } from "./memberships";
 import { formatPence } from "./money";
 import { listSubscriptions } from "./online";
 import { listRequests } from "./requests";
@@ -11,7 +12,7 @@ import { addDays, addMonths, endOfMonth, formatDate, formatDateTime, londonToUtc
 import type { BookingRequest, Charge, Client, Payment, ServiceKey } from "./types";
 
 export interface AttentionItem {
-  kind: "request" | "payment-due" | "payment-failed" | "upcoming" | "check-in" | "renewal" | "package" | "follow-up";
+  kind: "request" | "payment-due" | "payment-failed" | "upcoming" | "check-in" | "renewal" | "package" | "membership" | "follow-up";
   title: string;
   detail: string;
   href: string;
@@ -34,7 +35,7 @@ export interface DashboardData {
   attention: AttentionItem[];
 }
 
-const ATTENTION_ORDER: AttentionItem["kind"][] = ["request", "payment-failed", "payment-due", "follow-up", "check-in", "upcoming", "renewal", "package"];
+const ATTENTION_ORDER: AttentionItem["kind"][] = ["request", "payment-failed", "payment-due", "follow-up", "check-in", "upcoming", "renewal", "membership", "package"];
 
 /** Everything the dashboard shows, loaded in parallel. Fails as a whole if any part can't be read. */
 export async function loadDashboard(db: Db, today: DateKey, now: Date = new Date()): Promise<{ ok: true; data: DashboardData } | { ok: false; error: DbError }> {
@@ -58,10 +59,12 @@ export async function loadDashboard(db: Db, today: DateKey, now: Date = new Date
       listPackages(db, { activeOnly: true }),
       listFollowUps(db, { open: true, dueBy: today }),
       listPayments(db, { status: "failed", from: addDays(today, -60) }),
+      listMemberships(db, { status: "active" }),
+      currentPeriods(db, today),
     ] as const),
   );
   if (!loaded.ok) return loaded;
-  const [requests, active, payments, refunds, charges, classes, pt, subscriptions, packages, followUps, failed] = loaded.data;
+  const [requests, active, payments, refunds, charges, classes, pt, subscriptions, packages, followUps, failed, members, periods] = loaded.data;
 
   // Refunds in the window may belong to older payments: load those too, so each refund knows its service.
   const known = new Set(payments.map((p) => p.id));
@@ -86,6 +89,7 @@ export async function loadDashboard(db: Db, today: DateKey, now: Date = new Date
   for (const f of followUps) clientIds.add(f.client_id);
   for (const p of pt) clientIds.add(p.client_id);
   for (const p of failed) clientIds.add(p.client_id);
+  for (const m of members) clientIds.add(m.client_id);
   const clients = clientIds.size ? await listClients(db, { ids: [...clientIds] }) : { ok: true as const, data: [] as Client[] };
   if (!clients.ok) return clients;
   const name = (id: string) => clients.data.find((c) => c.id === id)?.full_name ?? "Client";
@@ -124,6 +128,13 @@ export async function loadDashboard(db: Db, today: DateKey, now: Date = new Date
       date: k.purchased_on,
       urgent: false,
     });
+  }
+  // Members who have used every credit in this period: worth a word (an upgrade, or pay as you go until renewal).
+  for (const m of members) {
+    const p = periods.find((x) => x.membership_id === m.id);
+    if (p && p.credits_left === 0) {
+      attention.push({ kind: "membership", title: `No credits left: ${name(m.client_id)}`, detail: `${m.plan_name}, new credits ${formatDate(m.next_period_on)}`, href: `/coach/memberships/${m.id}`, date: p.period_end, urgent: false });
+    }
   }
   const upcomingPt = pt.filter((p) => p.status === "scheduled" && p.starts_at >= nowIso && p.starts_at < londonToUtc(addDays(today, 2), "00:00"));
   for (const p of upcomingPt) {

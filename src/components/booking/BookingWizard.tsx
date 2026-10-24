@@ -88,8 +88,9 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
   // The class chosen on a class card (`?class=<timetable id>`): its next date is preselected.
   const classParam = useQueryParam("class");
   const [preselected, setPreselected] = useState(false);
-  const [full, setFull] = useState<string[]>([]);
-  const fullSet = new Set(full);
+  const [full, setFull] = useState<{ full: string[]; cancelled: string[] }>({ full: [], cancelled: [] });
+  const fullSet = new Set(full.full);
+  const cancelledSet = new Set(full.cancelled);
   const initialStep = initialService ? 1 : 0;
   const [step, setStepState] = useState(initialStep);
   // The first step appears without the fade; later steps fade in so the change is noticed.
@@ -156,7 +157,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       ? loaded.window
       : null
     : usesSessions && today
-      ? classAvailability(classes, today, fullSet)
+      ? classAvailability(classes, today, fullSet, cancelledSet)
       : null;
   const chosenSlot = avail?.days.find((d) => d.date === date)?.slots.find((s) => s.id === slotId && s.available) ?? null;
   const chosenClass =
@@ -178,15 +179,16 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
     }
   }
 
-  // Live classes: which dates are full (capacity reached in the coach portal).
+  // Live classes: which dates are full (capacity reached in the coach portal) or cancelled by Alex.
   // Best effort: if it can't be read, every date stays open and Alex confirms.
   useEffect(() => {
     if (demo || service !== "group-class") return;
     let live = true;
     fetch("/api/classes/full")
-      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown }>) : { full: [] }))
+      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown; cancelled?: unknown }>) : { full: [], cancelled: [] }))
       .then((body) => {
-        if (live && Array.isArray(body.full)) setFull(body.full.filter((k): k is string => typeof k === "string"));
+        const keys = (list: unknown) => (Array.isArray(list) ? list.filter((k): k is string => typeof k === "string") : []);
+        if (live) setFull({ full: keys(body.full), cancelled: keys(body.cancelled) });
       })
       .catch(() => {});
     return () => {

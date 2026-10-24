@@ -22,15 +22,16 @@ export function classSlotId(date: DateKey, time: TimeOfDay): string {
 /**
  * `full`: "slot|date" keys of classes that have reached the capacity Alex set
  * (lib/class-capacity.ts); they show as fully booked and can't be chosen.
+ * `cancelled`: classes Alex cancelled; they aren't offered at all.
  */
-export function classAvailability(sessions: readonly ClassSlot[], today: DateKey, full: ReadonlySet<string> = new Set()): AvailabilityWindow {
+export function classAvailability(sessions: readonly ClassSlot[], today: DateKey, full: ReadonlySet<string> = new Set(), cancelled: ReadonlySet<string> = new Set()): AvailabilityWindow {
   const from = addDays(today, 1);
   const to = addDays(today, CLASS_WINDOW_DAYS);
   const days: DayAvailability[] = [];
   for (let i = 1; i <= CLASS_WINDOW_DAYS; i++) {
     const date = addDays(today, i);
     const day = WEEKDAYS[weekdayIndex(date)];
-    const todays = sessions.filter((s) => s.day === day).sort((a, b) => a.start.localeCompare(b.start));
+    const todays = sessions.filter((s) => s.day === day && !(s.id && cancelled.has(`${s.id}|${date}`))).sort((a, b) => a.start.localeCompare(b.start));
     if (todays.length === 0) continue;
     days.push({ date, slots: todays.map((s) => ({ id: classSlotId(date, s.start), time: s.start, available: !(s.id && full.has(`${s.id}|${date}`)) })) });
   }
