@@ -24,6 +24,8 @@ Read `CORE.md` (facts and their status), then the relevant `DESIGN.md`, `CONTENT
 
 - **The home page is the point of reference** (owner, 2026-10-23). Inner pages follow its information, wording, prices and design: reuse the home components (plan cards, class day cards, Why kettlebells) rather than writing second versions.
 
+- **Design phone first** (owner and Alex, 2026-10-24: most visitors are on phones). Design, review and preview every change at phone size (390 px wide) first, then desktop. Previews sent to the owner lead with phone photos.
+
 - **After every change that is pushed, give the owner the preview link** (the Vercel preview for the latest `raeng-rebrand` build, plus the always-latest branch link https://alexkbells-git-raeng-rebrand-fystay1.vercel.app).
 
 ## Code standards
