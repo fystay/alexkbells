@@ -148,7 +148,8 @@ See Coach portal below.
 ## Master redesign (2026-10-22)
 - [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
 - [x] Memberships in the coach portal (2026-10-23, migration `20261023000000_akb_memberships.sql` applied live): plan carried on the booking request, start from the request, four-week periods with credits and one charge each, daily renewal cron (`/api/cron/membership-renewals`), pay class places with credits, 24-hour rule enforced in the database, give a credit back, pause/resume/cancel
-- [ ] P0 Owner: confirm manual membership billing (portal charge each period, paid by Square link or recorded by hand) is acceptable, or ask for Square Subscriptions (automatic card billing; needs the plan in Square and the API checked against current docs)
+- [x] Owner decided (2026-10-24): **manual membership billing for now**. Each four-week period's charge is owed in the portal; Alex records the payment or sends a Square payment link. Nothing charges a card automatically
+- [ ] P3 Later, if wanted: Square Subscriptions for automatic card billing (needs the plan in Square and the API checked against current docs)
 - [x] Coach cancels a whole class (2026-10-24, `20261024000000_akb_cancel_class.sql`): every place cancelled in one step, members' credits back whatever the time, unpaid class charges cancelled, no one can be booked onto it again, and the booking calendar stops offering it
 - [ ] P0 Apply `20261024000000_akb_cancel_class.sql` to the live database (no deletes; the MCP confirmation timed out on 2026-10-24). Until then "Cancel class" says the tables aren't set up, and the public calendar marks nothing full or cancelled
 - [x] Member requests confirmed on a credit: the confirm form ticks "Pay with their membership credit" when their period covers the class (no £12 charge) (2026-10-24)

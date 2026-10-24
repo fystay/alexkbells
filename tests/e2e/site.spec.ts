@@ -486,6 +486,26 @@ test("homepage: services, memberships and the coach's story are there, and no te
   await expect(coach.getByText("Now", { exact: true })).toBeVisible();
 });
 
+test("home coach: 1% better leads, and the before-and-after frame drags and works with arrow keys", async ({ page }) => {
+  await page.goto("/");
+  const coach = page.locator("#coach");
+  await expect(coach.getByRole("heading", { level: 2 })).toHaveText("1% better, every day");
+  await expect(coach.getByRole("heading", { name: "Alex Robertson" })).toBeVisible();
+  const slider = coach.getByRole("slider", { name: "Compare before and now" });
+  await expect(slider).toHaveAttribute("aria-valuetext", "50% before");
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveAttribute("aria-valuetext", "51% before");
+  const frame = coach.locator("figure > div").first();
+  await frame.scrollIntoViewIfNeeded();
+  const box = (await frame.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, { steps: 4 });
+  await page.mouse.up();
+  await expect(slider).toHaveAttribute("aria-valuetext", "20% before");
+});
+
 test("the home page keeps imagery in check: four why tiles, two training cards and the before-and-after pair", async ({ page }) => {
   await page.goto("/");
   const imgs = await page.$$eval("main img", (els) => els.length);
