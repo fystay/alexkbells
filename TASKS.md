@@ -142,6 +142,7 @@ See Coach portal below.
 - [ ] **P0** Owner: Square Sandbox access token, location id and webhook subscription; run the local setup and Sandbox test plan (DEPLOYMENT.md → Square Sandbox test environment)
 - [ ] **P1** Owner: Square Developer Console app, Sandbox credentials + webhook subscription; run the Sandbox test plan (DEPLOYMENT.md → Square); then live credentials
 - [ ] **P2** Delete a cancelled charge's payment link at Square automatically (today: Dashboard)
+- [ ] **P2** Flaky e2e: "the coach signs in, stays signed in after the access token expires" fails about 1 run in 10, also on code from before 2026-10-23: after the access cookie is cleared, /coach sometimes lands on the login page. Suspect concurrent refreshes (the navigation and link prefetches each swapping the refresh token). Fix the proxy; don't just retry the test
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
 
