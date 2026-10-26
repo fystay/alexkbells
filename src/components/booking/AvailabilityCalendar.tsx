@@ -82,8 +82,10 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                 className={cn(
                   "relative flex h-12 items-center justify-center rounded-xl text-sm transition-colors duration-150 sm:h-14",
                   // Bookable dates stand out as white rounded squares in bold; the rest stay plain on the page (warm tech, 2026-10-26).
-                  selectable && "cursor-pointer bg-white font-bold hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-ink",
-                  selected && "bg-ink text-paper hover:bg-ink",
+                  // Only one background per state: white when bookable, ink once chosen (both at once let white win).
+                  selectable && "cursor-pointer font-bold hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-ink",
+                  selectable && !selected && "bg-white",
+                  selected && "bg-ink text-paper",
                   // Dates that can't be booked recede (disabled controls are exempt from text contrast).
                   !selectable && "text-grey",
                   status === "full" && "line-through decoration-1",

@@ -555,20 +555,20 @@ test.describe("memberships", () => {
       await card(p.name).click({ position: { x: 120, y: 20 } });
       await expect(section.getByRole("radio", { name: new RegExp(`^${p.name},`) })).toBeChecked();
       // A membership's button says Join <plan> (owner, 2026-10-26); pay as you go keeps Book now.
-      await expect(section.getByRole("link", { name: `Join ${p.name}` })).toHaveAttribute("href", `/book/group-class?plan=${p.name.toLowerCase()}`);
+      await expect(section.getByRole("link", { name: `Join ${p.name}` })).toHaveAttribute("href", `/memberships/join?plan=${p.name.toLowerCase()}`);
     }
     await card("Pay as you go").click({ position: { x: 120, y: 20 } });
     await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await card("Regular").click({ position: { x: 120, y: 20 } });
     await expect.poll(() => card("Regular").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
     await expect.poll(() => card("Starter").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
-    await expect(section).toContainText("Regular plan selected. Next, pick your first class.");
+    await expect(section).toContainText("Regular plan selected. Next, your first class and details. Nothing to pay now.");
     // Choosing doesn't leave the page; the button does.
     await expect(page).toHaveURL(/\/memberships$/);
     await section.getByRole("link", { name: "Join Regular" }).click();
-    await expect(page).toHaveURL(/\/book\/group-class\?plan=regular$/);
-    await expect(page.getByText("Regular · £65 / 4 weeks · 8 class credits")).toBeVisible();
-    await expect(page.getByText("Starter · £40 / 4 weeks · 4 class credits")).toBeHidden();
+    // Joining has its own journey (2026-10-26), starting on the chosen plan.
+    await expect(page).toHaveURL(/\/memberships\/join\?plan=regular$/);
+    await expect(page.getByRole("radio", { name: /^Regular · £65 \/ 4 weeks/ })).toBeChecked();
     // No payment step: only the reassurance that nothing is paid now.
     await expect(page.locator("main")).not.toContainText(/checkout|card number|(?<!nothing to )pay now/i);
   });

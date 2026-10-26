@@ -18,20 +18,23 @@ const payg = getService("group-classes").prices[0];
  * cost per class on the second with the saving as an ink tag, Pay as you go
  * last. Choose a card (it turns ink), then the button (select, then continue,
  * as everywhere on the site): "Join <plan>" for a membership (owner,
- * 2026-10-26), "Book now" for pay as you go. Either way the calendar opens
- * next, with the plan carried over (`?plan=`); Alex sets the membership up
- * when he confirms the first class. Home and /memberships share it.
+ * 2026-10-26), "Book now" for pay as you go. Join opens the membership
+ * journey (/memberships/join?plan=, owner 2026-10-26); Book now opens the
+ * class calendar. Alex sets the membership up when he confirms. Home and
+ * /memberships share it.
  */
 export function PlanList({ className }: { className?: string }) {
   const book = getPrimaryCtaFor("group-class");
-  const planHref = (id: string) => (book.kind === "booking" && !book.external ? `${book.href}?plan=${id}` : book.href);
+  // Joining has its own journey (owner, 2026-10-26): plan, first class, details, terms. Where booking
+  // goes to an outside page or isn't open, Join follows Book now instead.
+  const planHref = (id: string) => (book.kind === "booking" && !book.external ? `/memberships/join?plan=${id}` : book.href);
   const choices: Choice[] = [
     ...membershipPlans.map((plan) => ({
       value: plan.id,
       label: `${plan.name} plan`,
       href: planHref(plan.id),
       action: `Join ${plan.name}`,
-      next: "Next, pick your first class.",
+      next: "Next, your first class and details. Nothing to pay now.",
       external: book.external,
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },

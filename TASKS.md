@@ -202,3 +202,5 @@ See Coach portal below.
 - [ ] **P1, needs Alex** Max class capacity, and what's included in 1:1 coaching (he mentioned confirming both; never guessed)
 - [ ] **P1, needs Alex** 2–3 member quotes with permission (the section is built and hidden until then)
 - [ ] **P2** Alex's layout references (ChatGPT images, 21 Oct) and his 25 Oct voice note weren't in the chat export: compare once received
+- [x] Membership join flow (`/memberships/join`, 2026-10-26): plan → optional first class → details → terms agreed → request to Alex; nothing paid online
+- [ ] **P1** Member accounts (stage 2, owner chose member login 2026-10-26): email-link sign-in, credits left and renewal date, book and cancel with credits. Needs a migration (member identities + RLS), the privacy notice updated, and the owner's go-ahead before it is applied to the live database

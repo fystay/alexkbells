@@ -431,6 +431,82 @@ test.describe("production configuration", () => {
     expect(sent!.payload.text).toContain("Membership: Regular membership (£65 every 4 weeks, 8 class credits)");
   });
 
+  test("joining a membership with a first class: stored with the plan, emailed, and ready to start in the coach area", async ({ page, request }) => {
+    await page.goto(`${PROD}/memberships/join?plan=dedicated`);
+    await expect(page.getByRole("heading", { level: 1, name: "Join a membership." })).toBeVisible();
+    // The plan tapped on the plan list arrives chosen, and can be changed.
+    await expect(page.getByRole("radio", { name: /^Dedicated · £85 \/ 4 weeks/ })).toBeChecked();
+    await choose(page, "Regular · £65 / 4 weeks");
+    await continueButton(page).click();
+
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeFocused();
+    await expect(continueButton(page)).toBeDisabled();
+    const day = classAvailability(timetable.sessions, toDateKey(new Date())).days[0];
+    await pickDate(page, `${formatLongDate(day.date)}, available`);
+    await page.locator("#times label").first().click();
+    await continueButton(page).click();
+
+    await expect(page.getByRole("heading", { name: "Your details" })).toBeFocused();
+    await continueButton(page).click();
+    await expect(page.getByText("Enter your name.")).toBeVisible();
+    await page.getByRole("textbox", { name: "Name" }).fill("Join Tester");
+    await page.getByRole("textbox", { name: "Email" }).fill("join@example.com");
+    await continueButton(page).click();
+
+    await expect(page.getByRole("heading", { name: "Check and send" })).toBeFocused();
+    await expect(page.getByText("Unused credits expire at the end of each membership period and do not roll over.")).toBeVisible();
+    await expect(page.getByText("Less than 24 hours before class:")).toBeVisible();
+    await expect(page.getByText(/tells you how to pay for your first 4 weeks \(£65\)/)).toBeVisible();
+    await page.waitForTimeout(3100);
+    // Agreeing to the terms is required.
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByText("Please confirm you've read and agree").first()).toBeVisible();
+    await expect(page.getByRole("status")).toHaveCount(0);
+    await page.getByLabel(/I've read and agree to the membership terms/).check();
+    await page.getByRole("button", { name: "Send request" }).click();
+
+    const status = page.getByRole("status");
+    await expect(status).toContainText("Thanks. Alex will reply to confirm.");
+    await expect(status).toContainText("join@example.com");
+    await expect(status).toContainText("Regular membership");
+
+    const year = new Date(`${day.date}T12:00:00`).getFullYear();
+    const row = (await stored(request)).find((r) => r.name === "Join Tester");
+    expect(row).toMatchObject({ kind: "booking", service: "Membership", email: "join@example.com", details: { plan: "regular", membership: "Regular membership (£65 every 4 weeks, 8 class credits)", classDate: day.date, experience: "Beginner" } });
+    expect(row!.details.terms).toMatch(/^Agreed to the membership terms and class cancellation policy \(/);
+    expect(row!.summary).toBe(`Regular membership · first class ${formatLongDate(day.date)} ${year}, ${row!.summary.split(", ").pop()}`);
+    const sent = (await emails(request)).find((e) => e.payload.subject === "Regular membership request: Join Tester");
+    expect(sent!.payload.text).toContain("Nothing has been paid.");
+    expect(sent!.headers.idempotencyKey).toBe(row!.idempotency_key);
+
+    // Alex can start the membership straight from the request.
+    await page.goto(`${PROD}/coach/login`);
+    await page.getByLabel("Email").fill("coach-e2e@example.com");
+    await page.getByLabel("Password").fill("correct-horse");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/coach$/);
+    await page.goto(`${PROD}/coach/requests`);
+    await page.getByRole("link", { name: /Join Tester/ }).first().click();
+    await expect(page.getByRole("link", { name: "Start this membership" })).toHaveAttribute("href", /plan=regular/);
+  });
+
+  test("joining without a first class: book later", async ({ page, request }) => {
+    await page.goto(`${PROD}/memberships/join?plan=starter`);
+    await continueButton(page).click();
+    await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
+    await page.getByRole("textbox", { name: "Name" }).fill("Later Joiner");
+    await page.getByRole("textbox", { name: "Email" }).fill("later@example.com");
+    await continueButton(page).click();
+    await expect(page.locator("main dl").getByText("Book later").first()).toBeVisible();
+    await page.getByLabel(/I've read and agree to the membership terms/).check();
+    await page.waitForTimeout(3100);
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByRole("status")).toContainText("You'll book it later");
+    const row = (await stored(request)).find((r) => r.name === "Later Joiner");
+    expect(row).toMatchObject({ service: "Membership", summary: "Starter membership · first class to book later", details: { plan: "starter" } });
+    expect(row!.details.classDate).toBeUndefined();
+  });
+
   test("a made-up plan in the link is ignored", async ({ page }) => {
     await page.goto(`${PROD}/book/group-class?plan=platinum`);
     await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
@@ -587,5 +663,46 @@ test.describe("going back in the booking wizard", () => {
     await page.getByRole("button", { name: "Back" }).click();
     await expect(page.getByRole("heading", { name: "Choose a service" })).toBeVisible();
     await expect(page).toHaveURL(/\/book$/);
+  });
+});
+
+test.describe("membership join (preview demonstration)", () => {
+  test("walks every step, sends nothing and says so", async ({ page, request }) => {
+    await page.goto("/memberships/join?plan=regular");
+    await expect(page.getByRole("radio", { name: /^Regular · £65 \/ 4 weeks/ })).toBeChecked();
+    await continueButton(page).click();
+    await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
+    await page.getByRole("textbox", { name: "Name" }).fill("Join Demo");
+    await page.getByRole("textbox", { name: "Email" }).fill("join-demo@example.com");
+    await continueButton(page).click();
+    await expect(page.getByRole("note", { name: "Demonstration" })).toBeVisible();
+    await page.getByLabel(/I've read and agree to the membership terms/).check();
+    await page.getByRole("button", { name: "Finish demo" }).click();
+    await expect(page.getByRole("status")).toContainText("Nothing has been sent.");
+    expect((await emails(request)).some((e) => e.payload.text.includes("Join Demo"))).toBe(false);
+    expect((await stored(request)).some((r) => r.name === "Join Demo")).toBe(false);
+  });
+
+  test("the browser's Back moves between the steps", async ({ page }) => {
+    await page.goto("/memberships/join?plan=starter");
+    await continueButton(page).click();
+    await expect(page).toHaveURL(/#first-class$/);
+    await page.goBack();
+    await expect(page.getByRole("heading", { name: "Choose your plan" })).toBeVisible();
+    await expect(page.getByRole("radio", { name: /^Starter/ })).toBeChecked();
+  });
+
+  test("the plan step and the check step have no automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/memberships/join?plan=regular");
+    // Let the step's fade-in finish: mid-fade text is briefly translucent.
+    await page.waitForTimeout(1300);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await continueButton(page).click();
+    await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
+    await page.getByRole("textbox", { name: "Name" }).fill("Axe Joiner");
+    await page.getByRole("textbox", { name: "Email" }).fill("axe@example.com");
+    await continueButton(page).click();
+    await page.waitForTimeout(1300);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 });
