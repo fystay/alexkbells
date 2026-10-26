@@ -65,9 +65,9 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
             </span>
           ))}
         </div>
-        <div className="grid grid-cols-7 border-t border-l border-line" data-testid="calendar-grid">
+        <div className="grid grid-cols-7 gap-1" data-testid="calendar-grid">
           {cells.map((key, i) => {
-            if (!key) return <span key={`pad-${i}`} className="border-r border-b border-line" />;
+            if (!key) return <span key={`pad-${i}`} />;
             const status = statusOf(key);
             const selectable = status === "available";
             const selected = key === date;
@@ -80,9 +80,9 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                 key={key}
                 data-status={status}
                 className={cn(
-                  "relative flex h-12 items-center justify-center border-r border-b border-line text-sm transition-colors duration-150 sm:h-14",
-                  // Bookable dates stand out as white squares in bold; the rest stay plain on the page (2026-10-26).
-                  selectable && "cursor-pointer bg-white font-bold hover:bg-surface",
+                  "relative flex h-12 items-center justify-center rounded-xl text-sm transition-colors duration-150 sm:h-14",
+                  // Bookable dates stand out as white rounded squares in bold; the rest stay plain on the page (warm tech, 2026-10-26).
+                  selectable && "cursor-pointer bg-white font-bold hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-ink",
                   selected && "bg-ink text-paper hover:bg-ink",
                   // Dates that can't be booked recede (disabled controls are exempt from text contrast).
                   !selectable && "text-grey",
@@ -111,7 +111,7 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
         </div>
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted" aria-label="Key">
           <li className="flex items-center gap-2">
-            <span aria-hidden="true" className="flex size-4 items-center justify-center border border-line bg-white">
+            <span aria-hidden="true" className="flex size-4 items-center justify-center rounded bg-white">
               <span className="size-1 rounded-full bg-ink" />
             </span>{" "}
             Available
@@ -122,7 +122,7 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
             </li>
           ) : null}
           <li className="flex items-center gap-2">
-            <span aria-hidden="true" className="size-3 bg-ink" /> Selected
+            <span aria-hidden="true" className="size-3 rounded-sm bg-ink" /> Selected
           </li>
         </ul>
       </fieldset>
@@ -137,9 +137,9 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
               <label
                 key={slot.id}
                 className={cn(
-                  "flex min-h-12 items-center justify-between gap-2 border px-4 text-sm font-semibold transition-colors duration-150",
+                  "flex min-h-12 items-center justify-between gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors duration-150",
                   slot.available
-                    ? "cursor-pointer border-muted bg-white hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper"
+                    ? "cursor-pointer border-white bg-white hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper"
                     : "cursor-not-allowed border-line text-muted",
                   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink",
                 )}

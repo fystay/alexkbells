@@ -38,7 +38,7 @@ export function PlanList({ className }: { className?: string }) {
   ];
   const card = cn("card relative px-5 py-5 sm:px-6", choiceCard);
   return (
-    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} idle="Book now" prompt="Choose a plan to continue." className={className}>
+    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} idle="Book now" prompt="Tap a plan to choose it." className={className}>
       <ul aria-label="Membership plans" className="grid grid-cols-1 gap-3">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
@@ -46,12 +46,15 @@ export function PlanList({ className }: { className?: string }) {
             <li key={plan.id} className={card}>
               <ChoiceCover name="plan" value={plan.id} label={`${plan.name}, £${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} classes, save ${formatPenceShort(f.savingPence)}`} />
               <div className="flex items-baseline justify-between gap-4">
-                <h3 className="text-h3 font-semibold">{plan.name}</h3>
+                <h3 className="flex items-center gap-3 text-h3 font-semibold">
+                  <PlanDot />
+                  {plan.name}
+                </h3>
                 <p className="shrink-0 text-sm">
                   <span className="text-h3 font-semibold tabular-nums">£{plan.priceGbp}</span> / {BILLING_WEEKS} weeks
                 </p>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-4">
+              <div className="mt-3 flex items-center justify-between gap-4 pl-8">
                 <p className="text-sm">
                   {plan.credits} classes · {formatPenceShort(f.perClassPence)} each
                 </p>
@@ -67,15 +70,25 @@ export function PlanList({ className }: { className?: string }) {
         <li className={card}>
           <ChoiceCover name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
           <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-h3 font-semibold">Pay as you go</h3>
+            <h3 className="flex items-center gap-3 text-h3 font-semibold">
+              <PlanDot />
+              Pay as you go
+            </h3>
             <p className="shrink-0 text-sm">
               <span className="text-h3 font-semibold tabular-nums">£{payg.amountGbp}</span> / class
             </p>
           </div>
-          <p className="mt-3 text-sm">No membership needed</p>
+          <p className="mt-3 pl-8 text-sm">No membership needed</p>
         </li>
       </ul>
     </ChoiceCards>
+  );
+}
+
+/** The card's choice mark: an empty circle, filled once the card is chosen, so the cards read as tappable. */
+function PlanDot() {
+  return (
+    <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current"><span className="size-2.5 scale-0 rounded-full bg-current motion-safe:transition-transform group-has-[:checked]/choice:scale-100" /></span>
   );
 }
 

@@ -21,7 +21,7 @@ export function ChosenPlan() {
         <div
           key={plan.id}
           data-plan-box={plan.id}
-          className="mt-5 hidden max-w-2xl flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-2xl border border-ink bg-white px-5 py-4"
+          className="mt-5 hidden max-w-2xl flex-wrap items-baseline justify-between gap-x-6 gap-y-1 card px-5 py-4"
         >
           <p>
             <span className="eyebrow block">Your plan</span>

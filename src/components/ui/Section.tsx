@@ -30,7 +30,7 @@ export function Section({ children, tone = "plain", id, labelledBy, className, s
     <section
       id={id}
       aria-labelledby={labelledBy}
-      className={cn(toneClasses[tone], spacing === "default" ? "py-16 sm:py-24 lg:py-32" : "py-10 sm:py-14", className)}
+      className={cn(toneClasses[tone], spacing === "default" ? "py-12 sm:py-24 lg:py-32" : "py-10 sm:py-14", className)}
     >
       <div className="container-page">{children}</div>
     </section>

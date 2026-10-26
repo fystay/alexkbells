@@ -33,6 +33,10 @@ export function MoreWays() {
                 <span className="block text-h3 font-semibold">{w.title}</span>
                 <span className="mt-1 block">{w.body}</span>
                 {w.price ? <span className="mt-1 block text-sm font-semibold">{w.price}</span> : null}
+                {/* A plain cue that the card is a link (no arrows on the site). */}
+                <span aria-hidden="true" className="mt-4 inline-block text-sm font-semibold underline underline-offset-4 group-hover:no-underline">
+                  Explore
+                </span>
               </Link>
             </li>
           ))}

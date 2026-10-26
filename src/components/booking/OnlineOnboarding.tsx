@@ -333,7 +333,7 @@ export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
               {serverState.status === "error" ? (
                 <ErrorSummary focusRef={summaryRef} message={serverState.message} errors={[]} />
               ) : null}
-              <dl className="divide-y divide-line border-y border-ink">
+              <dl className="card divide-y divide-paper px-5">
                 {[
                   { label: "Main goal", value: goalText, step: 0, field: "goal" as const },
                   {

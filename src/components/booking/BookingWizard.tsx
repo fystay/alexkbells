@@ -350,7 +350,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                   onChange={chooseService}
                 />
               </div>
-              <div className="mt-6 flex flex-col gap-1 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <p className="text-sm text-muted">Coaching online, wherever you train?</p>
                 <Link
                   href="/online-coaching"
@@ -576,7 +576,7 @@ function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey;
   const end = minutes ? `–${formatTime(addMinutes(session.start, minutes))}` : "";
   const year = fromDateKey(date).getFullYear();
   return (
-    <div aria-live="polite" className="border-t border-ink pt-5">
+    <div aria-live="polite" className="card p-5 sm:p-6">
       <p className="eyebrow text-muted">
         {formatLongDate(date)} {year} · {formatTime(session.start)}
         {end}
@@ -604,12 +604,12 @@ function Summary({
   onEdit: (step: number) => void;
 }) {
   return (
-    <div className="border border-ink bg-white">
-      <p className="flex items-center justify-between border-b border-ink px-5 py-3 eyebrow">
+    <div className="card overflow-hidden">
+      <p className="flex items-center justify-between px-5 pt-5 pb-2 font-semibold">
         <span>{demo ? "Your selection" : "Your request"}</span>
-        {demo ? <span className="bg-ink px-2 py-0.5 text-paper">Demo</span> : null}
+        {demo ? <span className="rounded-full bg-ink px-2.5 py-0.5 text-sm text-paper">Demo</span> : null}
       </p>
-      <dl className="divide-y divide-line">
+      <dl className="divide-y divide-paper">
         {rows.map((row) => (
           <div key={row.label} className="relative min-h-14 px-5 py-3">
             <dt className="text-xs text-muted">{row.label}</dt>
@@ -628,7 +628,7 @@ function Summary({
           </div>
         ))}
       </dl>
-      <p className="border-t border-line px-5 py-3 text-sm text-muted">
+      <p className="border-t-2 border-paper px-5 py-4 text-sm text-muted">
         {demo ? "Demonstration only. Nothing is booked." : "Alex confirms every place personally by email."}
       </p>
     </div>
@@ -646,7 +646,7 @@ function CompactSummary({
   onEdit: (step: number) => void;
 }) {
   return (
-    <dl aria-label={demo ? "Your selection (demonstration)" : "Your request so far"} className="divide-y divide-line border-y border-ink">
+    <dl aria-label={demo ? "Your selection (demonstration)" : "Your request so far"} className="card divide-y divide-paper px-4">
       {items.map((item) => (
         <div key={item.label} className="flex items-center gap-2 py-1">
           <dt className="shrink-0 text-xs text-muted">{item.label}</dt>
@@ -688,7 +688,7 @@ function Outcome({
 }) {
   return (
     <div className="animate-step-in" role="status">
-      <div className="bg-ink p-8 text-paper sm:p-12">
+      <div className="rounded-3xl bg-ink p-8 text-paper sm:p-12">
         <p className="eyebrow text-white">{demo ? "Demonstration complete" : "Request sent"}</p>
         <h2 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-h2 text-balance focus:outline-none">
           {demo ? "No booking has been made" : "Thanks. Alex will reply to confirm"}
@@ -703,17 +703,17 @@ function Outcome({
             Nothing to pay now: Alex confirms your place first{plan ? ", sets up your membership" : ""} and tells you how to pay.
           </p>
         )}
-        <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-white sm:grid-cols-2">
-          <div className="border-b border-white py-4 sm:border-b-0">
+        <dl className="mt-8 grid max-w-xl grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+          <div>
             <dt className="eyebrow text-white">Service</dt>
             <dd className="mt-1 font-semibold">{service}</dd>
           </div>
-          <div className="py-4">
+          <div>
             <dt className="eyebrow text-white">{demo ? "Sample time" : "When"}</dt>
             <dd className="mt-1 font-semibold">{when}</dd>
           </div>
           {plan ? (
-            <div className="border-t border-white py-4 sm:col-span-2">
+            <div className="sm:col-span-2">
               <dt className="eyebrow text-white">Plan</dt>
               <dd className="mt-1 font-semibold">{plan}</dd>
             </div>

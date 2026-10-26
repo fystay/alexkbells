@@ -12,6 +12,7 @@ import { FirstSession } from "@/components/home/FirstSession";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { PracticalInfo } from "@/components/home/PracticalInfo";
+import { Testimonials } from "@/components/home/Testimonials";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
@@ -58,6 +59,7 @@ export default function HomePage() {
         </div>
       </Section>
       <CoachStory tone="plain" />
+      <Testimonials />
       <MoreWays />
       <PracticalInfo />
     </>

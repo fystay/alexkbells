@@ -18,7 +18,7 @@ export interface Option {
 }
 
 const tile =
-  "relative flex cursor-pointer items-center gap-4 rounded-2xl border border-muted bg-white text-ink transition-colors duration-150 " +
+  "relative flex cursor-pointer items-center gap-4 rounded-2xl border border-white bg-white text-ink transition-colors duration-150 " +
   "hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink " +
   "has-[:disabled]:cursor-not-allowed has-[:disabled]:border-line has-[:disabled]:bg-transparent has-[:disabled]:text-muted";
@@ -266,7 +266,7 @@ export function Stepper({
               <span
                 aria-hidden="true"
                 className={cn(
-                  "block h-1 w-full transition-colors duration-200",
+                  "block h-1.5 w-full rounded-full transition-colors duration-200",
                   state === "todo" ? "bg-line" : "bg-ink",
                 )}
               />
@@ -297,7 +297,7 @@ export function Stepper({
 }
 
 const primaryButton =
-  "inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-ink px-6 text-base font-semibold text-paper transition-[background-color,transform] duration-150 border border-ink hover:bg-white hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-ink px-6 text-base font-semibold text-paper transition-[background-color,transform] duration-150 border border-ink hover:bg-white hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:border-grey disabled:bg-transparent disabled:text-grey disabled:active:scale-100";
 
 /**
  * Back / next controls. Sticks to the bottom of the screen on phones so the

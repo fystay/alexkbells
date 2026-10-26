@@ -454,7 +454,8 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   await expect(hero.locator("h1")).toContainText("Train with purpose.");
-  await expect(hero.locator("h1")).toContainText("Build with discipline.");
+  await expect(hero.locator("h1")).toHaveText("Train with purpose.");
+  await expect(hero.locator("h1 + p")).toHaveText("Build with discipline. Coached classes, 1:1 and online coaching.");
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);
@@ -547,7 +548,7 @@ test.describe("memberships", () => {
     const card = (name: string) => cards.filter({ has: page.getByRole("heading", { name, exact: true }) });
     // Nothing chosen yet: the button waits, and nothing is ink.
     await expect(section.getByRole("button", { name: "Book now" })).toBeDisabled();
-    await expect(section).toContainText("Choose a plan to continue.");
+    await expect(section).toContainText("Tap a plan to choose it.");
     for (const p of PLANS) {
       // Clicking anywhere on the row (here over its name) chooses it.
       await card(p.name).click({ position: { x: 120, y: 20 } });
@@ -772,9 +773,9 @@ test("header Book now is a black pill, white only in the booking flow", async ({
 });
 
 test("header: the Book now pill sits on the page margin, like the content below", async ({ page }) => {
+  await page.goto("/");
   for (const [width, gutter] of [[320, 16], [390, 16], [768, 24], [1440, (1440 - 1248) / 2 + 40]]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto("/");
     const right = await page.evaluate(() => window.innerWidth - document.querySelector("header .justify-self-end a")!.getBoundingClientRect().right);
     expect(Math.abs(right - gutter), `at ${width}px`).toBeLessThan(1);
   }
