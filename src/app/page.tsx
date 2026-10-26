@@ -40,7 +40,7 @@ export default function HomePage() {
         <div className={split}>
           {/* A cleaner title (owner, 2026-10-26): the class count is in the rows of step 1. */}
           <SectionHeading id="classes-heading" className="lg:col-span-5" eyebrow="Classes" title={firstClassSteps.title} />
-          <JoinSteps className="mt-8 lg:col-span-7 lg:mt-0" />
+          <JoinSteps swipe className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
       <Section id="memberships" labelledBy="memberships-heading">

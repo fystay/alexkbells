@@ -159,6 +159,14 @@
   padding-block: 1rem;
 }
 
+/* A sideways-scrolling row without a visible scrollbar (it still scrolls by swipe, trackpad and keys). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* A white rounded card on the cream page. Now only for forms and the booking flow. */
 @utility card {
   background-color: var(--color-white);
