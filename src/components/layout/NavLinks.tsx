@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
-import { coachLoginNav, mainNav, pageNav } from "@/content/site";
+import { coachLoginNav, mainNav, memberSignInNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
 import type { CallToAction } from "@/lib/booking";
 
@@ -96,8 +96,17 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
           </Link>
           <Link
-            href={coachLoginNav.href}
+            href={memberSignInNav.href}
             style={{ "--i": mainNav.length + pageNav.length + 1 } as CSSProperties}
+            onClick={() => setOpen(false)}
+            aria-current={currentFor(pathname, "/account")}
+            className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-full border border-ink px-6 text-base font-semibold hover:bg-ink hover:text-white"
+          >
+            {memberSignInNav.label}
+          </Link>
+          <Link
+            href={coachLoginNav.href}
+            style={{ "--i": mainNav.length + pageNav.length + 2 } as CSSProperties}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, coachLoginNav.href)}
             className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-full border border-grey px-6 text-base font-semibold hover:border-ink"

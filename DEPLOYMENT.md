@@ -128,6 +128,19 @@ Retries: a transient failure (no answer, 429, 5xx) is retried once straight away
 
 Data kept: client details, bookings, payments and notes, all in Supabase (EU West). Alex should add retention to the privacy notice (e.g. delete former clients' records after N years; financial records are usually kept six years in the UK). A former client with no bookings or payments can be deleted from their record; anyone with history is kept (set them to Former).
 
+### Member accounts (2026-10-26, built; database change not yet applied)
+
+Members sign in at `/account/sign-in` with a one-time emailed link (owner's choices, docs/MEMBER_ACCOUNTS_DRAFT.md). Until the steps below are done, `/account/sign-in` says signing in isn't available and nothing else changes.
+
+1. **Apply the cancel-class migration first** (`20261024000000_akb_cancel_class.sql`, above): the member functions read its `cancelled_at` column.
+2. **Apply `supabase/migrations/20261027000000_akb_member_accounts.sql`** (with the owner's go-ahead): two tables (RLS on, no policies, `anon`/`authenticated` revoked) and functions for `service_role` only. It changes no existing table or row and is safe to run again; the undo SQL is in docs/MEMBER_ACCOUNTS_DRAFT.md. Check afterwards: Advisors shows no new warnings; `select has_table_privilege('authenticated','public.akb_member_sessions','select')` is false.
+3. **Email must be on in production** (Email alerts above: `RESEND_API_KEY`, `BOOKING_FROM_EMAIL` on a verified domain, `BOOKING_NOTIFY_EMAIL`): sign-in links go out through the same Resend account, to the member's address, with replies going to `BOOKING_NOTIFY_EMAIL`.
+4. Links point at `SITE_URL` (else the Vercel production URL) on production and at the preview's own address on previews; never at the request's Host header. Set `SITE_URL` once the domain is chosen.
+5. Clean-up runs with the daily membership renewals (`akb_member_cleanup`: links after a day, ended sessions after 30 days).
+6. To test end to end: in the coach area, start a membership for a client whose email you can read, request a link at `/account/sign-in`, press Sign in, book and cancel a class (the coach area shows the place and credit).
+
+Alex can sign a member out of every device with `select akb_member_end_sessions('<client id>')` (no button in the coach area yet).
+
 ### Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.

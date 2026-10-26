@@ -397,6 +397,9 @@ test("finances: totals by period and service, and a safe CSV export", async ({ p
 test("memberships: start the plan chosen on the site, pay places with credits, 24-hour rule, renewals", async ({ page, request }) => {
   const person = unique("Member Flow");
   const clientId = await seedClient(request, person);
+  // Someone else who isn't on the class, so its "Add someone" form (and the
+  // confirmation shown in it) stays on the page whatever other tests have run.
+  await seedClient(request, unique("Bystander"));
   const requestId = await seedRequest(request, person, {
     details: { plan: "starter", membership: "Starter membership (£40 every 4 weeks, 4 class credits)" },
   });
@@ -442,7 +445,10 @@ test("memberships: start the plan chosen on the site, pay places with credits, 2
     const renew = await request.get("/api/cron/membership-renewals", { headers: { authorization: "Bearer e2e-cron-secret-0123456789" } });
     expect(renew.status()).toBe(200);
     expect(renew.headers()["cache-control"]).toContain("no-store");
-    expect(Object.keys((await renew.json()) as object).sort()).toEqual(["ok", "periodsCreated"]);
+    const body = (await renew.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["ok", "periodsCreated", "signInsRemoved"]);
+    // The same daily run tidies member sign-ins (a count, not null: the clean-up ran).
+    expect(typeof body.signInsRemoved).toBe("number");
   }
   const periods = await sql<{ n: number }>(request, "select count(*)::int as n from akb_membership_periods p join akb_memberships m on m.id = p.membership_id where m.client_id = $1", [clientId]);
   expect(periods).toEqual([{ n: 1 }]);

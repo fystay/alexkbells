@@ -203,4 +203,8 @@ See Coach portal below.
 - [ ] **P1, needs Alex** 2–3 member quotes with permission (the section is built and hidden until then)
 - [ ] **P2** Alex's layout references (ChatGPT images, 21 Oct) and his 25 Oct voice note weren't in the chat export: compare once received
 - [x] Membership join flow (`/memberships/join`, 2026-10-26): plan → optional first class → details → terms agreed → request to Alex; nothing paid online
-- [ ] **P1** Member accounts (stage 2, owner chose member login 2026-10-26): **drafted for review** in `docs/MEMBER_ACCOUNTS_DRAFT.md` (database change + tests in `supabase/drafts/`, tested on a local Postgres only; privacy wording proposed). Waiting on: the owner's decisions in that doc, Resend set up in production, then apply and build the `/account` pages
+- [x] Member accounts built (2026-10-26, owner approved the recommended choices): `/account/sign-in`, `/account/confirm`, `/account`; migration `20261027000000_akb_member_accounts.sql`; privacy notice updated; tests (SQL on Postgres 16, unit, e2e)
+- [ ] **P0, needs the owner** Go-ahead to apply `20261024000000_akb_cancel_class.sql` then `20261027000000_akb_member_accounts.sql` to the live database (DEPLOYMENT.md → Member accounts)
+- [ ] **P0, needs Alex** Resend in production (also turns on booking alerts); without it members can't get sign-in links
+- [ ] **P1, needs Alex** Confirm the privacy wording; a retention period and a contact email if he wants one listed
+- [ ] **P2** A "Sign out everywhere" button for a member in the coach area (today: `select akb_member_end_sessions('<client id>')`)

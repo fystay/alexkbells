@@ -1,4 +1,4 @@
--- Tests for the member accounts DRAFT, run against a throwaway local
+-- Tests for the member accounts migration, run against a throwaway local
 -- Postgres 16 with every migration and the draft applied (see
 -- docs/MEMBER_ACCOUNTS_DRAFT.md → "How it was tested"). Everything runs in
 -- one transaction and is rolled back. Any failed check raises an error.

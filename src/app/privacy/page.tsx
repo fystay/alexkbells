@@ -12,7 +12,10 @@ export const metadata: Metadata = pageMetadata({
 
 // Describes what this website actually does. Review with Alex before the
 // booking form goes live (see DEPLOYMENT.md); update if anything changes.
-const LAST_UPDATED = "18 October 2026";
+// 2026-10-26: membership requests and member accounts added (wording from
+// docs/MEMBER_ACCOUNTS_DRAFT.md, approved by the owner; Alex to confirm,
+// with a retention period and contact email if he wants one).
+const LAST_UPDATED = "26 October 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
@@ -38,8 +41,12 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         give one), the service and class date or times you choose, your kettlebell experience and any note you
         write. When you send an online coaching enquiry we receive your answers (your goal,
         experience and where you train), your name, email address, how you&apos;d like to be
-        contacted and the phone number or Instagram username you give for that. We don&apos;t ask
-        about your health; please don&apos;t include medical details.
+        contacted and the phone number or Instagram username you give for that. When you send a
+        membership request we also receive the plan you choose, your first class if you pick one, and the
+        date and time you agreed to the membership terms and cancellation policy. If you&apos;re a member and
+        sign in to your account, we keep a record of each sign-in: a coded copy of the sign-in link and of
+        your session, and when they were created, last used and ended. We don&apos;t record where you are or
+        what device you use. We don&apos;t ask about your health; please don&apos;t include medical details.
       </p>
     ),
   },
@@ -47,8 +54,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Why we use it",
     body: (
       <p>
-        Only to reply to your request or enquiry and arrange your coaching, because you asked us to
-        (UK GDPR Article 6(1)(b)). We don&apos;t use it for marketing and we don&apos;t sell or share it.
+        To reply to your request or enquiry and arrange your coaching, and to run your membership and your
+        account, because you asked us to (UK GDPR Article 6(1)(b)); and to keep your account secure, which is
+        in both our interests (Article 6(1)(f)). We don&apos;t use it for marketing and we don&apos;t sell or share it.
       </p>
     ),
   },
@@ -58,7 +66,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
       <p>
         What you send is stored in our database (Supabase, hosted in the EU, Ireland) so Alex can see
         it in his password-protected coach area, and may also be sent to him by email using our email
-        provider (Resend). These providers handle it on our behalf. The website is hosted by Vercel, which processes
+        provider (Resend). Sign-in links are emailed to you by the same provider. These providers handle it on our behalf. The website is hosted by Vercel, which processes
         standard technical information such as IP addresses to deliver and protect the site. These
         providers may process data outside the UK under appropriate safeguards.
       </p>
@@ -66,14 +74,21 @@ const sections: { heading: string; body: React.ReactNode }[] = [
   },
   {
     heading: "How long we keep it",
-    body: <p>Only as long as we need it to arrange and run your coaching, then we delete it.</p>,
+    body: (
+      <p>
+        Only as long as we need it to arrange and run your coaching, then we delete it. Sign-in links are
+        deleted after a day, and records of your sessions 30 days after you sign out or they expire.
+      </p>
+    ),
   },
   {
     heading: "Cookies",
     body: (
       <p>
-        This website does not use analytics, advertising or tracking cookies. The coach login sets
-        two cookies that keep the coach signed in; they are only used on the coach&apos;s pages.
+        This website does not use analytics, advertising or tracking cookies. If you&apos;re a member and sign
+        in, we set one cookie that keeps you signed in for up to 30 days; it&apos;s only used on your account
+        pages, and signing out removes it. The coach login sets two cookies that keep the coach signed in;
+        they are only used on the coach&apos;s pages.
       </p>
     ),
   },
@@ -82,7 +97,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         You can ask to see, correct or delete the details we hold about you by contacting us on
-        Instagram. If you&apos;re unhappy with how we&apos;ve handled your information, you can complain to
+        Instagram. Members can sign out of every device from their account page, or ask Alex to. If you&apos;re unhappy with how we&apos;ve handled your information, you can complain to
         the Information Commissioner&apos;s Office at{" "}
         <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
           ico.org.uk<span className="sr-only"> (opens in a new tab)</span>

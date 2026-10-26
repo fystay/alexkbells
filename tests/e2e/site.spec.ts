@@ -1,11 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { coachRoutes, publicRoutes } from "../../src/lib/routes";
+import { coachRoutes, memberRoutes, publicRoutes } from "../../src/lib/routes";
 
 // Includes the 414–430px large phones and in-between tablet widths.
 const widths = [320, 360, 375, 390, 414, 430, 480, 540, 600, 640, 700, 768, 900, 1024, 1280, 1600];
 
-for (const route of [...publicRoutes, ...coachRoutes]) {
+for (const route of [...publicRoutes, ...memberRoutes, ...coachRoutes]) {
   test.describe(`route ${route}`, () => {
     test("responds, has one h1 and a title", async ({ page }) => {
       const res = await page.goto(route);

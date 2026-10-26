@@ -4,6 +4,8 @@ export interface OutgoingEmail {
   subject: string;
   text: string;
   replyTo: string;
+  /** Someone other than Alex, e.g. a member's sign-in link. Defaults to BOOKING_NOTIFY_EMAIL. */
+  to?: string;
   /** Same key for a retried identical request, so it is only sent once. */
   idempotencyKey: string;
 }
@@ -29,7 +31,7 @@ export async function sendEmail(
       },
       body: JSON.stringify({
         from: config.from,
-        to: [config.to],
+        to: [email.to ?? config.to],
         reply_to: email.replyTo,
         subject: email.subject,
         text: email.text,

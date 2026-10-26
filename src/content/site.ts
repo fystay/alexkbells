@@ -80,13 +80,17 @@ export const mainNav = [
 /** Extra page listed in the phone menu and footer, after mainNav. */
 export const pageNav = [{ label: "Contact", href: "/contact" }] as const;
 
+/** Members' sign-in (2026-10-26): in the menu and the footer, before Alex's. */
+export const memberSignInNav = { label: "Member sign-in", href: "/account/sign-in" } as const;
+
 /** Alex's sign-in: last in the phone menu and the footer. */
 export const coachLoginNav = { label: "Coach login", href: "/coach/login" } as const;
 
-/** Footer links: every page except Home (the logo links home), plus the coach sign-in. */
+/** Footer links: every page except Home (the logo links home), plus the member and coach sign-ins. */
 export const footerNav = [
   ...mainNav.filter((item) => item.href !== "/"),
   ...pageNav,
+  memberSignInNav,
   coachLoginNav,
 ] as const;
 

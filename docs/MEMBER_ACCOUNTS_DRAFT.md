@@ -1,10 +1,10 @@
 # Member accounts: draft for review
 
-**Status: draft, nothing applied.** The database change is written and tested on a throwaway local database only. It has not touched the live Supabase project, and no website pages for it are built yet. Approve (or change) the decisions below first.
+**Status: approved 2026-10-26 (the recommended choices below) and built.** The migration is in `supabase/migrations/20261027000000_akb_member_accounts.sql` but **not yet applied to the live project**; the account pages are built (DEPLOYMENT.md → Member accounts for the go-live steps).
 
 Files:
-- `supabase/drafts/20261027000000_akb_member_accounts.sql`: the database change (outside `supabase/migrations/`, so the CLI never runs it).
-- `supabase/drafts/20261027000000_akb_member_accounts.test.sql`: its tests (run in one transaction, rolled back).
+- `supabase/migrations/20261027000000_akb_member_accounts.sql`: the database change.
+- `supabase/tests/20261027000000_akb_member_accounts.test.sql`: its tests (run in one transaction, rolled back).
 
 ## What members get
 
@@ -81,7 +81,7 @@ Changes to `/privacy` (the first bullet also covers the membership join form tha
 
 On a throwaway local PostgreSQL 16 with Supabase's `anon`, `authenticated` and `service_role` roles: every migration in `supabase/migrations/` applied in order, then the draft, twice (it's safe to run again). The test file then checks, in one transaction that is rolled back: who counts as a member (active, paused, cancelled with credits left, former, none); links (case-insensitive email, non-members and unknown addresses refused, the 5-an-hour limit, single use, expiry, stored hashed); sessions (sign out one device, everywhere, by the coach, expiry); booking (credit used, no pay-as-you-go charge, already booked, class started, outside the current period, non-member, running out of credits, full and cancelled classes); cancelling (in time returns the credit, late keeps it used, someone else's place refused, re-booking a cancelled place); the overview's figures; clean-up; and that `anon` and `authenticated` are refused everywhere. **Result: all checks passed.** Not yet tested: the website pages (not built) and the live project.
 
-To run it again: start a local Postgres, create the three roles, apply `supabase/migrations/*.sql` in order and the draft, then `psql -v ON_ERROR_STOP=1 -f supabase/drafts/20261027000000_akb_member_accounts.test.sql`. It ends with `ALL MEMBER ACCOUNT CHECKS PASSED`.
+To run it again: start a local Postgres, create the three roles, apply `supabase/migrations/*.sql` in order and the draft, then `psql -v ON_ERROR_STOP=1 -f supabase/tests/20261027000000_akb_member_accounts.test.sql`. It ends with `ALL MEMBER ACCOUNT CHECKS PASSED`.
 
 ## Undoing it
 

@@ -1,6 +1,7 @@
--- DRAFT FOR REVIEW: not applied anywhere. Lives outside supabase/migrations/
--- so the CLI never runs it. Move it into supabase/migrations/ only once the
--- owner has approved docs/MEMBER_ACCOUNTS_DRAFT.md.
+-- Approved by the owner 2026-10-26 (docs/MEMBER_ACCOUNTS_DRAFT.md: own
+-- one-time email links; current members; 15-minute single-use links, 5 an
+-- hour, 30-day sessions). Apply to the live project only with the owner's
+-- go-ahead (DEPLOYMENT.md). Tests: supabase/tests/20261027000000_akb_member_accounts.test.sql.
 --
 -- Member accounts (stage 2 of memberships; owner's choice, 2026-10-26):
 -- members sign in with a one-time link sent to the email on their client
