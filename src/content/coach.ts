@@ -14,6 +14,8 @@ export interface CoachField {
 
 export const coach = {
   name: "Alex Robertson",
+  /** One line under his name in the home page's "Coached by" strip; from the confirmed summary. */
+  role: "Kettlebell coach in Cumbernauld",
   summary:
     "Kettlebell coach based in Cumbernauld, running group classes and one-to-one sessions, and coaching people further afield online.",
   /** Where Alex trained and coached before RAENG. */

@@ -74,7 +74,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
                     href={item.href}
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
-                    className={cn("relative flex min-h-14 items-center justify-between font-display text-2xl", active ? "ink-glow" : "hover:underline")}
+                    className={cn("relative flex min-h-14 items-center justify-between font-display text-2xl", active ? "underline decoration-2 underline-offset-8" : "hover:underline hover:underline-offset-8")}
                   >
                     {/* A bar in the gutter marks where you are. */}
                     {active ? <span aria-hidden="true" className="absolute inset-y-3 -left-4 w-1 bg-ink sm:-left-6 lg:-left-6" /> : null}

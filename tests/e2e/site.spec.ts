@@ -473,7 +473,13 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await page.goto("/");
   // Alex's order (WhatsApp 15 Oct 2026): book, what I offer, why kettlebells, about me.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "classes", "first-class", "memberships", "more-ways", "why-kettlebells", "coach", "practical-info"]);
+  expect(order).toEqual(["hero-heading", "coach-intro", "classes", "first-class", "memberships", "more-ways", "why-kettlebells", "coach", "book"]);
+  // A face early, without moving "About me" up: the "Coached by" card under the hero jumps to his story.
+  const intro = page.getByRole("region", { name: "Your coach" });
+  await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
+  // Where the classes are sits with the times, not at the end.
+  await expect(page.locator("#classes").locator("address")).toContainText("Cumbernauld");
+  await expect(page.locator("#classes").getByRole("link", { name: /Get directions/ })).toBeVisible();
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");
@@ -792,7 +798,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
-  await expect(page.locator("#practical-heading")).toHaveText("Find us.");
+  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toBeVisible();
   // No sticky Book now bar: the header's Book now is always on screen.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });

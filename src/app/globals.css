@@ -230,15 +230,6 @@
     0 0 14px var(--color-white);
 }
 
-/* Selected item in the header (current page in the menu, Book now in the
-   booking flow): a soft dark halo, ink letters lifted by a blurred grey
-   shadow. Palette colours only; the blur does the fading. */
-@utility ink-glow {
-  text-shadow:
-    0 0 1px var(--color-ink),
-    0 2px 14px var(--color-grey);
-}
-
 /* Header menu (2026-10-22): a slow, premium reveal. The panel unrolls from
    the header line, then each link rises into place one after another.
    Off for Reduce Motion. */

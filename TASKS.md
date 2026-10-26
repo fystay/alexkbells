@@ -157,6 +157,8 @@ See Coach portal below.
 ## Mobile-first redesign (2026-10-24, approved 2026-10-26)
 - [x] Audit at 375/390/430/768/1024/1440: home was 7.5 phone screens with three card choice sections and five Book now buttons
 - [x] Home rebuilt phone first: hero (what RAENG is, one action) → timetable → plan list → coach → more ways → find us (5.3 screens); /classes and /memberships share the timetable and plan list
+- [x] Home reorganised in Alex's order with a face early (2026-10-26): "Coached by Alex" card under the hero, the address with the class times, a closing Book now band instead of Find us
+- [x] Header menu: the current page is underlined instead of glowing (2026-10-26)
 - [ ] P1 Restyle /coaching, /online-coaching, /about and /contact to the same system (fewer bands and labels, phone first)
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
 
