@@ -551,17 +551,18 @@ test.describe("memberships", () => {
       // Clicking anywhere on the row (here over its name) chooses it.
       await card(p.name).click({ position: { x: 120, y: 20 } });
       await expect(section.getByRole("radio", { name: new RegExp(`^${p.name},`) })).toBeChecked();
-      await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", `/book/group-class?plan=${p.name.toLowerCase()}`);
+      // A membership's button says Join <plan> (owner, 2026-10-26); pay as you go keeps Book now.
+      await expect(section.getByRole("link", { name: `Join ${p.name}` })).toHaveAttribute("href", `/book/group-class?plan=${p.name.toLowerCase()}`);
     }
     await card("Pay as you go").click({ position: { x: 120, y: 20 } });
     await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await card("Regular").click({ position: { x: 120, y: 20 } });
     await expect.poll(() => card("Regular").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
     await expect.poll(() => card("Starter").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
-    await expect(section).toContainText("Regular plan selected.");
+    await expect(section).toContainText("Regular plan selected. Next, pick your first class.");
     // Choosing doesn't leave the page; the button does.
     await expect(page).toHaveURL(/\/memberships$/);
-    await section.getByRole("link", { name: "Book now" }).click();
+    await section.getByRole("link", { name: "Join Regular" }).click();
     await expect(page).toHaveURL(/\/book\/group-class\?plan=regular$/);
     await expect(page.locator("main")).toContainText("Regular · £65 / 4 weeks · 8 class credits");
     await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);

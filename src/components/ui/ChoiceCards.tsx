@@ -12,6 +12,8 @@ export interface Choice {
   href: string;
   /** The button's text once this card is chosen, e.g. "Book now". */
   action: string;
+  /** Said under the button once chosen, after "… selected.", e.g. what happens next. */
+  next?: string;
   external?: boolean;
 }
 
@@ -104,7 +106,7 @@ export function ChoiceCards({
           aria-live="polite"
           className="mt-2 min-h-5 text-sm"
         >
-          {chosen ? `${chosen.label} selected.` : prompt}
+          {chosen ? `${chosen.label} selected.${chosen.next ? ` ${chosen.next}` : ""}` : prompt}
         </p>
       </div>
       {/* Without JavaScript the button can't follow the choice: plain links instead. */}

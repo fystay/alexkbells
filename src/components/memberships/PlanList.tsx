@@ -12,15 +12,24 @@ const payg = getService("group-classes").prices[0];
 /**
  * The plans as one vertical list (mobile-first redesign, 2026-10-24): price,
  * credits and the cost per class on each row, compared top to bottom, with
- * Pay as you go last. Choose a row, then Book now (select, then continue, as
- * everywhere on the site); the calendar opens with the plan (`?plan=`). Home
- * and /memberships share it.
+ * Pay as you go last. Choose a row, then the button (select, then continue, as
+ * everywhere on the site): "Join <plan>" for a membership (owner, 2026-10-26),
+ * "Book now" for pay as you go. Either way the calendar opens next, with the
+ * plan carried over (`?plan=`); Alex sets the membership up when he confirms
+ * the first class. Home and /memberships share it.
  */
 export function PlanList({ className }: { className?: string }) {
   const book = getPrimaryCtaFor("group-class");
   const planHref = (id: string) => (book.kind === "booking" && !book.external ? `${book.href}?plan=${id}` : book.href);
   const choices: Choice[] = [
-    ...membershipPlans.map((plan) => ({ value: plan.id, label: `${plan.name} plan`, href: planHref(plan.id), action: "Book now", external: book.external })),
+    ...membershipPlans.map((plan) => ({
+      value: plan.id,
+      label: `${plan.name} plan`,
+      href: planHref(plan.id),
+      action: `Join ${plan.name}`,
+      next: "Next, pick your first class.",
+      external: book.external,
+    })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
   const row = "flex items-center gap-4 border-b border-grey bg-white px-4 py-4 sm:px-5";

@@ -11,8 +11,8 @@ function leadPrice(id: "one-to-one" | "online-coaching") {
 
 /**
  * The other two ways to train, after the classes (mobile-first redesign,
- * 2026-10-24): two plain rows, each the way into its own page. Only
- * confirmed prices are shown.
+ * 2026-10-24): two white boxes (owner, 2026-10-26: instead of ruled lines),
+ * each the way into its own page. Only confirmed prices are shown.
  */
 export function MoreWays() {
   const ways = [
@@ -23,11 +23,14 @@ export function MoreWays() {
     <Section id="more-ways" labelledBy="more-ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
         <SectionHeading id="more-ways-heading" className="lg:col-span-5" title="More ways to train" />
-        <ul className="mt-6 border-t border-ink lg:col-span-7 lg:mt-0">
+        <ul className="mt-6 grid grid-cols-1 gap-3 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
-            <li key={w.href} className="border-b border-grey">
-              <Link href={w.href} className="group block py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
-                <span className="block font-display text-h3 underline-offset-[6px] group-hover:underline">{w.title}</span>
+            <li key={w.href}>
+              <Link
+                href={w.href}
+                className="group block rounded-lg border border-ink bg-white px-4 py-5 hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:transition-colors sm:px-5"
+              >
+                <span className="block font-display text-h3">{w.title}</span>
                 <span className="mt-1 block">{w.body}</span>
                 {w.price ? <span className="mt-1 block text-sm font-semibold">{w.price}</span> : null}
               </Link>
