@@ -36,7 +36,7 @@ export function Hero() {
             {/* Option C (owner, 2026-10-22): a stacked statement beside a thin white rule,
                 the second line in spaced capitals like the logo's tagline. */}
             <h1 id="hero-heading" className="border-l-2 border-white pl-4 sm:pl-5">
-              <span className="hero-glow block hero-display text-[clamp(2.75rem,1.9rem+3.6vw,4.75rem)] leading-[0.95]">
+              <span className="hero-glow block hero-display text-[clamp(2.25rem,0.3rem+9.6vw,4.75rem)] leading-[0.95]">
                 {hero.headline.split(" ").map((word) => (
                   <span key={word} className="block">
                     {word}{" "}

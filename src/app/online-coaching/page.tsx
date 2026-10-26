@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { site } from "@/content/site";
@@ -40,16 +39,6 @@ export default function OnlineCoachingPage() {
   return (
     <>
       <PageHeader
-        panel={
-          // No photo for online coaching yet: a light typographic card (mobile pass, 2026-10-26; the
-          // full black panel was the heaviest block on the site). Short on phones so the page reads on.
-          <div aria-hidden="true" className="card flex aspect-[2/1] w-full flex-col justify-end rounded-3xl p-6 lg:aspect-[4/5] lg:p-8">
-            <span className="font-display text-[clamp(2.25rem,1.4rem+2.2vw,3.25rem)] leading-none">
-              Train
-              <span className="block">anywhere.</span>
-            </span>
-          </div>
-        }
         eyebrow="Online coaching"
         title="Coaching that goes where you train."
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."
@@ -60,16 +49,19 @@ export default function OnlineCoachingPage() {
         </p>
       </PageHeader>
 
+      {/* No decorative panel and no cards (2026-10-26): rows between thin rules, as on the home page. */}
       <Section tone="white" id="included" labelledBy="included-heading">
-        <SectionHeading id="included-heading" eyebrow="What you get" title="Structure, support and progress" />
-        <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
-          {included.map((item, i) => (
-            <li key={item.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-              <h3 className="card-title">{item.title}</h3>
-              <p className="mt-1.5">{item.body}</p>
-            </li>
-          ))}
-        </ul>
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="What you get" title="Structure, support and progress" />
+          <ul className="rule-list mt-8 lg:col-span-7 lg:mt-0">
+            {included.map((item, i) => (
+              <li key={item.title} data-reveal style={revealDelay(i)} className="rule-row">
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-0.5">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </Section>
 
       <Section id="how-it-works" labelledBy="how-heading">
@@ -88,17 +80,6 @@ export default function OnlineCoachingPage() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7">
             <PriceList prices={service.prices} />
-            <p className="mt-6 ">
-              Prefer to train in person?{" "}
-              <Link href="/coaching" className="font-semibold  underline underline-offset-4 hover:no-underline">
-                See 1:1 coaching
-              </Link>{" "}
-              or{" "}
-              <Link href="/classes" className="font-semibold  underline underline-offset-4 hover:no-underline">
-                group classes
-              </Link>
-              .
-            </p>
           </div>
         </div>
       </Section>

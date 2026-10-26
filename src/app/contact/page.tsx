@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/metadata";
-import { formatAddressLines, mapsUrl, site } from "@/content/site";
+import { site } from "@/content/site";
 import Link from "next/link";
 import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
+import { AddressCard } from "@/components/sections/AddressCard";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -44,7 +45,8 @@ export default function ContactPage() {
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div id="enquire" className="card p-6 sm:p-10">
+            {/* No box, and Instagram linked once more only (the handle): the header's button is the action (2026-10-26). */}
+            <div id="enquire">
               <p className="eyebrow ">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">
                 <a
@@ -65,20 +67,6 @@ export default function ContactPage() {
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>
-              {/* A plain, always-visible link to the profile for class news and updates. */}
-              <div className="mt-8">
-                <ButtonLink
-                  href={site.social.instagram.url}
-                  external
-                 
-                  variant="secondary"
-                  className="w-full py-3 sm:w-auto"
-                >
-                  <span className="whitespace-normal text-center">
-                    Follow {site.social.instagram.handle} for updates
-                  </span>
-                </ButtonLink>
-              </div>
             </div>
             <p className="mt-6 ">
               Also on Facebook:{" "}
@@ -94,9 +82,9 @@ export default function ContactPage() {
             </p>
 
             {email || phone ? (
-              <dl className="card mt-6 px-5 sm:px-6">
+              <dl className="rule-list mt-6">
                 {email ? (
-                  <div className="flex flex-wrap justify-between gap-2 py-4">
+                  <div className="flex flex-wrap justify-between gap-2 border-b border-line py-4">
                     <dt className="eyebrow ">Email</dt>
                     <dd>
                       <a href={`mailto:${email}`} className="font-semibold underline underline-offset-4">
@@ -106,7 +94,7 @@ export default function ContactPage() {
                   </div>
                 ) : null}
                 {phone ? (
-                  <div className="flex flex-wrap justify-between gap-2 py-4">
+                  <div className="flex flex-wrap justify-between gap-2 border-b border-line py-4">
                     <dt className="eyebrow ">Phone</dt>
                     <dd>
                       <a href={`tel:${phone.replace(/\s+/g, "")}`} className="font-semibold underline underline-offset-4">
@@ -143,23 +131,7 @@ export default function ContactPage() {
 
           <div className="lg:col-span-4 lg:col-start-9">
             <h2 className="eyebrow ">Training location</h2>
-            <div className="card mt-4 px-5 py-5 sm:px-6">
-              <address className="text-lg not-italic leading-relaxed">
-                {formatAddressLines().map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))}
-              </address>
-              <a
-                href={mapsUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:no-underline"
-              >
-                Get directions<span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            </div>
+            <AddressCard large className="mt-4" />
           </div>
         </div>
       </Section>

@@ -210,11 +210,13 @@ test("the contact page leads to Alex's Instagram", async ({ page }) => {
   }
 });
 
-test("the Instagram card links straight to Alex's profile for updates", async ({ page }) => {
+test("contact links straight to Alex's Instagram profile, once beside the header button", async ({ page }) => {
   await page.goto("/contact");
-  const follow = page.locator("#enquire").getByRole("link", { name: /follow @alex\.kbells for updates/i });
-  await expect(follow).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
-  await expect(follow).toHaveAttribute("target", "_blank");
+  const handle = page.locator("#enquire").getByRole("link", { name: /@alex\.kbells on Instagram/i });
+  await expect(handle).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+  await expect(handle).toHaveAttribute("target", "_blank");
+  // No second "Follow" button repeating it (2026-10-26).
+  await expect(page.locator("#enquire").getByRole("link", { name: /follow/i })).toHaveCount(0);
 });
 
 test("header: menu at the left, logo centred, Book Now at the right, none overlapping", async ({ page }) => {
@@ -373,9 +375,9 @@ for (const [server, base] of [
   test(`${server}: booking CTAs reach the right service, with Instagram as the labelled alternative`, async ({ page }) => {
     await page.goto(base + "/classes");
     const join = page.locator("#join");
-    await expect(join.getByRole("heading", { name: "Send a booking request" })).toBeVisible();
-    await expect(join.getByRole("heading", { name: "Alex confirms your place" })).toBeVisible();
-    // The page opens with Book now and the timetable has it; the steps don't repeat it (2026-10-26).
+    // The home page's three steps, ending in Book now (2026-10-26).
+    for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { name: step })).toBeVisible();
+    await expect(join.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await expect(page.locator("#main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
     await expect(join.getByRole("link", { name: /Message Alex on Instagram/ })).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
 
@@ -453,8 +455,9 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
 test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
-  await expect(hero.locator("h1")).toContainText("Train with purpose.");
-  await expect(hero.locator("h1")).toContainText("Build with discipline.");
+  // What and where (owner's pick A, 2026-10-26).
+  await expect(hero.locator("h1")).toContainText("Get stronger.");
+  await expect(hero.locator("h1")).toContainText("Kettlebell classes in Cumbernauld");
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);

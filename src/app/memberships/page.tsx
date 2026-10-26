@@ -3,8 +3,6 @@ import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { pageMetadata } from "@/lib/metadata";
-import { getPrimaryCtaFor } from "@/lib/booking";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -22,23 +20,17 @@ export const metadata: Metadata = pageMetadata({
 const payg = getService("group-classes").prices[0];
 
 // Follows the home page's memberships section (owner, 2026-10-23): the same
-// heading, wording and cards, then the terms and the full cancellation policy.
+// heading, wording and plan rows, then only what belongs here: the extra cost
+// of pay as you go, Alex's full terms and the cancellation policy. No cards
+// and no buttons above the plans (2026-10-26): choosing a plan is the action.
 export default function MembershipsPage() {
-  const booking = getPrimaryCtaFor("group-class");
   return (
     <>
       <PageHeader
         eyebrow="Kettlebell memberships"
         title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
-        intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class. Every membership costs less per class.`}
-      >
-        <ButtonLink href="#memberships" variant="action" className="w-full sm:w-72">
-          Compare memberships
-        </ButtonLink>
-        <ButtonLink href={booking.href} external={booking.external} variant="text" className="self-center sm:ml-4">
-          Or book a single class
-        </ButtonLink>
-      </PageHeader>
+        intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class.`}
+      />
       <Section id="memberships" labelledBy="plans-heading">
         <h2 id="plans-heading" className="sr-only">
           Membership plans
@@ -49,7 +41,7 @@ export default function MembershipsPage() {
       </Section>
       <MembershipTerms />
       <CancellationPolicy />
-      <CtaBand tone="plain" />
+      <CtaBand body={null} tone="plain" />
     </>
   );
 }

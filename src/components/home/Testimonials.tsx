@@ -18,7 +18,7 @@ export function Testimonials() {
         {quotes.map((t) => (
           <li key={t.quote}>
             <Provisional status={t.status}>
-              <figure className="card h-full p-6">
+              <figure className="h-full border-l-2 border-ink pl-5">
                 <blockquote className="text-lg">“{t.quote}”</blockquote>
                 <figcaption className="mt-4 text-sm font-semibold">{t.attribution}</figcaption>
               </figure>

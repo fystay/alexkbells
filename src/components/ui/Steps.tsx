@@ -7,18 +7,21 @@ interface Step {
   body: ReactNode;
 }
 
-/** Numbered steps, one white card each. Decorative numbers; the list is ordered for screen readers. */
+/**
+ * Numbered steps, as on the home page: a number in a circle beside each step,
+ * no cards (2026-10-26). Decorative numbers; the list is ordered for screen readers.
+ */
 export function Steps({ steps, className }: { steps: Step[]; className?: string }) {
   return (
-    <ol className={cn("grid grid-cols-1 gap-3", className)}>
+    <ol className={cn("space-y-6", className)}>
       {steps.map((step, i) => (
-        <li key={step.title} data-reveal style={revealDelay(i)} className="card grid grid-cols-[2rem_1fr] gap-x-3 px-5 py-5 sm:px-6">
-          <span className="card-title tabular-nums" aria-hidden="true">
+        <li key={step.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.5rem_1fr] items-start">
+          <span aria-hidden="true" className="inline-flex size-7 items-center justify-center rounded-full border-[1.5px] border-ink text-sm font-bold">
             {i + 1}
           </span>
           <div>
             <h3 className="card-title">{step.title}</h3>
-            <p className="mt-1.5">{step.body}</p>
+            <p className="mt-1">{step.body}</p>
           </div>
         </li>
       ))}

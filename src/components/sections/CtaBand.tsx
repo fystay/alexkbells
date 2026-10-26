@@ -28,7 +28,7 @@ interface CtaBandProps {
  * own), one booking button and Instagram as a quieter link. No arrow (owner rule). Nothing here books anything: the button opens
  * the booking request flow.
  */
-export function CtaBand({ title = "Ready to get stronger?", body, headingId = "cta-heading", id, service = "group-class", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
+export function CtaBand({ title = "Ready to start?", body, headingId = "cta-heading", id, service = "group-class", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCtaFor(service);
   const times = isPublishable(timetable.status) ? groupedSessions(timetable.sessions) : [];

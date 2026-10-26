@@ -3,9 +3,6 @@ import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
 import { images } from "@/content/images";
-import { site } from "@/content/site";
-import { publishable } from "@/lib/publish";
-import { formatGbp } from "@/lib/schedule";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -13,7 +10,6 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
-import { Location } from "@/components/sections/Location";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { revealDelay } from "@/lib/reveal";
 
@@ -33,7 +29,6 @@ const focus = [
 
 export default function CoachingPage() {
   const service = getService("one-to-one");
-  const lead = publishable(service.prices)[0];
   const booking = getPrimaryCtaFor("one-to-one");
   const open = booking.kind === "booking";
 
@@ -76,11 +71,11 @@ export default function CoachingPage() {
               intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
             />
           </div>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-7">
+          <ul className="rule-list lg:col-span-7">
             {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-                <h3 className="card-title">{f.title}</h3>
-                <p className="mt-1.5">{f.body}</p>
+              <li key={f.title} data-reveal style={revealDelay(i)} className="rule-row">
+                <h3 className="font-semibold">{f.title}</h3>
+                <p className="mt-0.5">{f.body}</p>
               </li>
             ))}
           </ul>
@@ -125,12 +120,8 @@ export default function CoachingPage() {
         </div>
       </Section>
 
-      <Location tone="plain" />
-      <CtaBand
-        title="Ready to train 1:1?"
-        body={lead ? `Sessions ${lead.prefix ? `${lead.prefix.toLowerCase()} ` : ""}${formatGbp(lead.amountGbp)} at ${site.location.venue}, ${site.location.town}.` : undefined}
-        service="one-to-one"
-      />
+      {/* No location section or price line here: the steps say where, the prices are just above, and the footer has the address (2026-10-26). */}
+      <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" />
     </>
   );
 }

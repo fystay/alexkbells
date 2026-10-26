@@ -3,8 +3,9 @@
  * words here and nothing else needs to change. Keep it short.
  */
 export const hero = {
-  headline: "Train with purpose.",
-  headlineSecondary: "Build with discipline.",
+  // What Alex does and where, in two lines (owner's pick A, 2026-10-26; was "Train with purpose. / Build with discipline.").
+  headline: "Get stronger.",
+  headlineSecondary: "Kettlebell classes in Cumbernauld",
   primaryLabel: "Book now",
   secondaryLabel: "Explore coaching",
 } as const;

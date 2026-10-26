@@ -14,10 +14,10 @@ export function CancellationPolicy() {
         </div>
         <div className="lg:col-span-7">
           <h3 className="card-title">Cancellations</h3>
-          <dl data-reveal className="mt-4 grid grid-cols-1 gap-3">
+          <dl data-reveal className="rule-list mt-4">
             {policy.cancellations.map((c) => (
-              <div key={c.when} className="card grid grid-cols-1 gap-1 px-5 py-5 sm:grid-cols-[14rem_1fr] sm:gap-6 sm:px-6">
-                <dt className="card-title">{c.when}</dt>
+              <div key={c.when} className="rule-row grid grid-cols-1 gap-1 sm:grid-cols-[14rem_1fr] sm:gap-6">
+                <dt className="font-semibold">{c.when}</dt>
                 <dd>{c.outcome}</dd>
               </div>
             ))}

@@ -165,7 +165,7 @@ See Coach portal below.
 - [x] Join and pay online with no confirmation by Alex (2026-10-26): Square checkout, membership starts on the verified payment, first class booked then, renewal pay links, credits wait for payment; tested (SQL, unit, e2e with a Square stand-in)
 - [ ] Go live with online joining: apply migrations 20261020 → 20261028, Square Sandbox test then live, Resend, SITE_URL (DEPLOYMENT.md)
 - [ ] Alex to confirm: wording of the renewal email ("To stop your membership, reply to this email") and whether unpaid renewals should pause a membership automatically
-- [ ] P1 Restyle /coaching, /online-coaching, /about and /contact to the same system (fewer bands and labels, phone first)
+- [x] Restyle /classes, /memberships, /coaching, /online-coaching, /about and /contact to the home system: no cards, nothing repeated, shorter (2026-10-26); hero wording A "Get stronger. / Kettlebell classes in Cumbernauld"
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
 
 ## Master redesign (2026-10-22)

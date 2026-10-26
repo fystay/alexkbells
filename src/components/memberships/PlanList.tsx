@@ -142,7 +142,7 @@ export function PaygExtra({ className }: { className?: string }) {
         Pay as you go costs more
       </h3>
       <p className="mt-2 text-sm">What you&apos;d pay on top, going pay as you go instead of each plan, using every credit.</p>
-      <div className="card mt-5 max-w-lg px-5 py-3 sm:px-6">
+      <div className="rule-list mt-5 max-w-lg">
       <table aria-labelledby="payg-extra" className="w-full text-sm tabular-nums">
         <thead>
           <tr>
@@ -158,7 +158,7 @@ export function PaygExtra({ className }: { className?: string }) {
           {membershipPlans.map((plan) => {
             const x = extraCostPence(plan, payg.amountGbp);
             return (
-              <tr key={plan.id}>
+              <tr key={plan.id} className="border-t border-line">
                 <th scope="row" className="py-2 text-left font-normal">{plan.name}</th>
                 <td className="py-2 text-right">{formatPenceShort(x.week)}</td>
                 <td className="py-2 text-right">{formatPenceShort(x.period)}</td>

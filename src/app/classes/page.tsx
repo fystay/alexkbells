@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
-import { timetable, groupClass } from "@/content/classes";
-import { faqAnswer } from "@/content/faq";
+import { groupClass } from "@/content/classes";
 import { images } from "@/content/images";
-import { site } from "@/content/site";
-import { isPublishable } from "@/lib/publish";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { ClassTimes, classFacts } from "@/components/home/ClassTimes";
-import { Location } from "@/components/sections/Location";
-import { CtaBand } from "@/components/sections/CtaBand";
+import { JoinSteps } from "@/components/home/JoinSteps";
+import { firstClassSteps } from "@/content/home";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
 // Read at build time like every booking setting: the request form when it's open, else a message.
@@ -28,42 +23,16 @@ export const metadata: Metadata = pageMetadata({
   path: "/classes",
 });
 
+/**
+ * The class page in the home page's style (2026-10-26: no cards, nothing said
+ * twice): what the classes are and Alex's photo, then the home page's three
+ * steps (times, booking, where, the first session and what to bring) with how
+ * to pay, then Book now. The steps hold everything the old timetable, "What
+ * to expect", "How to join" and location sections said.
+ */
 export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
-  const timesPublished = isPublishable(timetable.status);
-  const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;
-
-  // Steps only describe what is confirmed. With the booking form open, step 2
-  // is a request (Alex still confirms each place); otherwise a message.
   const open = booking.kind === "booking";
-  const joinSteps = [
-    {
-      title: "Choose a session",
-      body: timesPublished
-        ? "Pick the class time that suits you from the timetable above."
-        : "Class times are being finalised. Send a message to hear about current sessions.",
-    },
-    open
-      ? {
-          title: "Send a booking request",
-          body: "Pick the class date you'd like and send your request in a minute. New to kettlebells? Choose Beginner.",
-        }
-      : {
-          title: "Message Alex to book",
-          body: "Message Alex on Instagram with the session you would like to join. New to kettlebells? Say so in your message.",
-        },
-    open
-      ? { title: "Alex confirms your place", body: `Then you come along to ${venue}.` }
-      : { title: "Come to Media House", body: `Classes take place at ${venue}.` },
-  ];
-
-  // Everything below is Alex's class listing or the confirmed FAQ answers.
-  const involves = [
-    { title: "The sessions", body: groupClass.description },
-    { title: "Who they're for", body: "All experience levels. Exercises are scaled to your ability." },
-    { title: "Your first session", body: faqAnswer("first-session") },
-    { title: "What to bring", body: faqAnswer("bring") },
-  ];
 
   return (
     <>
@@ -79,45 +48,41 @@ export default function ClassesPage() {
         </ButtonLink>
       </PageHeader>
 
-      {/* Second pass (2026-10-26): the times first, then what a class is like,
-          how to join and where. The price is said once (in the timetable), and the
-          FAQ is gone: every answer it gave is already on this page. */}
-      <Section id="timetable" labelledBy="timetable-heading">
-        <SectionHeading id="timetable-heading" title="Class times" intro={classFacts()} />
-        {/* The home page's timetable (the home page is the reference). */}
-        <ClassTimes className="mt-8 max-w-2xl" />
-        <p className="mt-4 max-w-2xl text-sm">
-          {groupClass.payment}{" "}
-          <Link href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
-            Save with a membership
-          </Link>
-        </p>
-      </Section>
-
-      <Section tone="white" id="what-to-expect" labelledBy="expect-heading">
-        <SectionHeading id="expect-heading" title="What to expect" />
-        <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {involves.map((item) => (
-            <div key={item.title} data-reveal className="card px-5 py-5 sm:px-6">
-              <dt className="card-title">{item.title}</dt>
-              <dd className="mt-1.5">{item.body}</dd>
-            </div>
-          ))}
-        </dl>
-      </Section>
-
       <Section id="join" labelledBy="join-heading">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <div className="lg:col-span-5">
-            <SectionHeading id="join-heading" title="How to join a class" />
+            <SectionHeading id="join-heading" title={firstClassSteps.title} />
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
-          <Steps steps={joinSteps} className="lg:col-span-7" />
+          {/* The home page's steps (the home page is the reference). */}
+          <JoinSteps
+            className="mt-8 lg:col-span-7 lg:mt-0"
+            paymentNote={
+              <>
+                {groupClass.payment}{" "}
+                <Link href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
+                  Save with a membership
+                </Link>
+              </>
+            }
+          />
         </div>
       </Section>
 
-      <Location />
-      <CtaBand body="Prefer personal coaching? Train face to face or online." tone="plain" />
+      {/* The steps end with Book now, so no closing band repeating it: one line to the other ways to train. */}
+      <Section spacing="compact" className="pt-0 sm:pt-0">
+        <p className="max-w-2xl">
+          Prefer personal coaching?{" "}
+          <Link href="/coaching" className="font-semibold underline underline-offset-4 hover:no-underline">
+            1:1 coaching
+          </Link>{" "}
+          or{" "}
+          <Link href="/online-coaching" className="font-semibold underline underline-offset-4 hover:no-underline">
+            online coaching
+          </Link>
+          .
+        </p>
+      </Section>
     </>
   );
 }

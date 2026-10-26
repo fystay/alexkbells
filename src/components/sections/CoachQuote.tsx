@@ -10,8 +10,9 @@ import { StartTraining } from "@/components/ui/StartTraining";
 
 /**
  * Alex's line in his own words, the class facts and Book now (owner's pick C,
- * 2026-10-26). No photo: his before-and-after is further down /about, and he
- * asked for few pictures. Each fact shows only when its content is confirmed.
+ * 2026-10-26; boxes removed the same day: the quote stands on the page, the
+ * facts sit in one row between thin rules). No photo: his before-and-after is
+ * further down /about. Each fact shows only when its content is confirmed.
  */
 export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
   if (!aboutQuote || !isPublishable(aboutQuote.status)) return null;
@@ -31,7 +32,7 @@ export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
         <h2 id="story-heading" className="sr-only">
           In {coach.name.split(" ")[0]}&apos;s words
         </h2>
-        <figure data-reveal className="card px-6 py-7 sm:px-10 sm:py-10">
+        <figure data-reveal>
           <blockquote className="font-display text-[1.875rem] leading-[1.15] text-balance sm:text-[2.5rem]">
             <p>&ldquo;{aboutQuote.text}&rdquo;</p>
           </blockquote>
@@ -40,9 +41,9 @@ export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
             <span className="block text-sm">{coach.role}</span>
           </figcaption>
         </figure>
-        <ul aria-label="Classes at a glance" className="mt-3 grid grid-cols-3 gap-2 text-center sm:gap-3">
+        <ul aria-label="Classes at a glance" className="mt-8 grid grid-cols-3 border-y border-line text-center">
           {facts.map((f) => (
-            <li key={f.label} className="card px-1.5 py-4">
+            <li key={f.label} className="px-1.5 py-4 [&+&]:border-l [&+&]:border-line">
               <span className="block font-display text-[1.625rem] leading-tight">{f.value}</span>
               <span className="block text-[0.8125rem] leading-snug">{f.label}</span>
             </li>

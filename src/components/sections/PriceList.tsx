@@ -36,9 +36,9 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
 
   return (
     <Provisional status={status}>
-      <dl data-reveal className="grid grid-cols-1 gap-3">
+      <dl data-reveal className="rule-list">
         {visible.map((price) => (
-          <div key={price.label} className="card flex items-baseline justify-between gap-4 px-5 py-5 sm:px-6">
+          <div key={price.label} className="rule-row flex items-baseline justify-between gap-4">
             <dt className="text-sm ">{price.label}</dt>
             <dd className="text-right">
               {price.prefix ? <span className="mr-1.5 text-sm">{price.prefix}</span> : null}

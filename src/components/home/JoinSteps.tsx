@@ -36,7 +36,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
  * timetable cards, the address card and "Your first class" with the same
  * information and no cards. Goes inside the #classes section.
  */
-export function JoinSteps({ className }: { className?: string }) {
+export function JoinSteps({ className, paymentNote }: { className?: string; /** Extra line under the price (e.g. /classes: how to pay). */ paymentNote?: ReactNode }) {
   const cta = getPrimaryCtaFor("group-class");
   // The membership figures are in the plans straight below, so only the class price here.
   const price = publishable(getService("group-classes").prices)[0];
@@ -52,6 +52,7 @@ export function JoinSteps({ className }: { className?: string }) {
         </Step>
         <Step n={2} title={steps.book}>
           {price ? <p>£{price.amountGbp} a class, or save with a membership.</p> : null}
+          {paymentNote ? <p>{paymentNote}</p> : null}
           {beginners ? <p>{beginners}</p> : null}
         </Step>
         <Step n={3} title={steps.turnUp}>

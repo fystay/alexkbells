@@ -5,10 +5,8 @@ import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { CoachStory } from "@/components/home/CoachStory";
-import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { CoachQuote } from "@/components/sections/CoachQuote";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { Location } from "@/components/sections/Location";
 import { PageHeader } from "@/components/sections/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
@@ -45,11 +43,11 @@ export default function AboutPage() {
           title="Strength. Community. Discipline."
           intro="A training space that feels purposeful rather than commercial: focused, uncluttered and built around the people in it."
         />
-        <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <ul className="rule-list mt-8 max-w-2xl">
           {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-              <h3 className="card-title">{p.title}</h3>
-              <p className="mt-1.5">{p.body}</p>
+            <li key={p.title} data-reveal style={revealDelay(i)} className="rule-row">
+              <h3 className="font-semibold">{p.title}</h3>
+              <p className="mt-0.5">{p.body}</p>
             </li>
           ))}
         </ul>
@@ -57,10 +55,7 @@ export default function AboutPage() {
 
       <CoachStory showAboutLink={false} tone={tone()} />
 
-      {/* The home page is the reference (owner, 2026-10-23): the same section, word for word. */}
-      <WhyKettlebells tone={tone()} />
-
-      <Location tone={tone()} />
+      {/* Why kettlebells and the location are on the home page and in the footer: not repeated here (2026-10-26). */}
       <CtaBand body="Come and train with us." tone={tone()} />
     </>
   );
