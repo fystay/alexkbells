@@ -61,17 +61,14 @@ export default function AboutPage() {
           title="Strength. Community. Discipline."
           intro="A training space that feels purposeful rather than commercial: focused, uncluttered and built around the people in it."
         />
-        <ol className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
           {pillars.map((p, i) => (
             <li key={p.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-              <p className="eyebrow " aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </p>
-              <h3 className="mt-2 font-display text-h3">{p.title}</h3>
-              <p className="mt-3 ">{p.body}</p>
+              <h3 className="card-title">{p.title}</h3>
+              <p className="mt-1.5">{p.body}</p>
             </li>
           ))}
-        </ol>
+        </ul>
       </Section>
 
       <CoachStory showAboutLink={false} tone={tone()} />

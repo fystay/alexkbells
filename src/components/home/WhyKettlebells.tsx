@@ -22,11 +22,11 @@ export function WhyKettlebells({ tone = "plain" }: { tone?: SectionTone }) {
               style={revealDelay(i)}
               className="card grid grid-cols-[2.25rem_1fr] items-baseline content-center px-5 py-5 sm:px-6 lg:flex-1 lg:grid-cols-[3rem_1fr]"
             >
-              <span aria-hidden="true" className="text-lg font-semibold tabular-nums">
+              <span aria-hidden="true" className="card-title tabular-nums">
                 {i + 1}
               </span>
               <div>
-                <h3 className="text-h3 font-semibold">{b.title}</h3>
+                <h3 className="card-title">{b.title}</h3>
                 <p className="mt-1.5">{b.body}</p>
               </div>
             </li>

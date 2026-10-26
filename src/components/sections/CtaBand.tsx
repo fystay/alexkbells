@@ -5,6 +5,7 @@ import { isPublishable } from "@/lib/publish";
 import { groupedSessions } from "@/lib/schedule";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { TitleBar } from "@/components/ui/TitleBar";
+import { statement } from "@/lib/title";
 import { Section, type SectionTone } from "@/components/ui/Section";
 import { hero } from "@/content/home";
 import type { BookableService } from "@/lib/booking-options";
@@ -33,7 +34,7 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end lg:gap-16">
         <div data-reveal className="lg:col-span-7">
           <h2 id={headingId} className="font-display text-h1 text-balance">
-            {title}
+            {statement(title)}
           </h2>
           <TitleBar />
           <p className="mt-5 max-w-xl text-lede">

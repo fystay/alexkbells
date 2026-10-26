@@ -41,11 +41,12 @@ export default function OnlineCoachingPage() {
     <>
       <PageHeader
         panel={
-          // No photo for online coaching yet: the same typographic panel as its card on the home page.
-          <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end rounded-3xl bg-ink p-6 text-white lg:aspect-[4/5] lg:p-8">
-            <span className="font-display text-[clamp(2.25rem,1.4rem+2.2vw,3.25rem)] leading-[0.9]">
+          // No photo for online coaching yet: a light typographic card (mobile pass, 2026-10-26; the
+          // full black panel was the heaviest block on the site). Short on phones so the page reads on.
+          <div aria-hidden="true" className="card flex aspect-[2/1] w-full flex-col justify-end rounded-3xl p-6 lg:aspect-[4/5] lg:p-8">
+            <span className="font-display text-[clamp(2.25rem,1.4rem+2.2vw,3.25rem)] leading-none">
               Train
-              <span className="block">anywhere</span>
+              <span className="block">anywhere.</span>
             </span>
           </div>
         }
@@ -64,11 +65,8 @@ export default function OnlineCoachingPage() {
         <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
           {included.map((item, i) => (
             <li key={item.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-              <p className="eyebrow " aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </p>
-              <h3 className="mt-2 text-h3 font-semibold">{item.title}</h3>
-              <p className="mt-3 ">{item.body}</p>
+              <h3 className="card-title">{item.title}</h3>
+              <p className="mt-1.5">{item.body}</p>
             </li>
           ))}
         </ul>

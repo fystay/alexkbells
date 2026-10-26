@@ -79,8 +79,8 @@ export default function CoachingPage() {
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-7">
             {focus.map((f, i) => (
               <li key={f.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
-                <h3 className="text-h3 font-semibold">{f.title}</h3>
-                <p className="mt-3 ">{f.body}</p>
+                <h3 className="card-title">{f.title}</h3>
+                <p className="mt-1.5">{f.body}</p>
               </li>
             ))}
           </ul>

@@ -143,16 +143,23 @@ export default function ContactPage() {
 
           <div className="lg:col-span-4 lg:col-start-9">
             <h2 className="eyebrow ">Training location</h2>
-            <address className="card mt-4 px-5 py-5 text-lg not-italic leading-relaxed sm:px-6">
-              {formatAddressLines().map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </address>
-            <ButtonLink href={mapsUrl()} external variant="secondary" className="mt-8">
-              Get directions
-            </ButtonLink>
+            <div className="card mt-4 px-5 py-5 sm:px-6">
+              <address className="text-lg not-italic leading-relaxed">
+                {formatAddressLines().map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <a
+                href={mapsUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:no-underline"
+              >
+                Get directions<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
           </div>
         </div>
       </Section>

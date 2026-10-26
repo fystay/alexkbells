@@ -99,8 +99,8 @@ export default function ClassesPage() {
         <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {involves.map((item) => (
             <div key={item.title} data-reveal className="card px-5 py-5 sm:px-6">
-              <dt className="text-h3 font-semibold">{item.title}</dt>
-              <dd className="mt-3">{item.body}</dd>
+              <dt className="card-title">{item.title}</dt>
+              <dd className="mt-1.5">{item.body}</dd>
             </div>
           ))}
         </dl>

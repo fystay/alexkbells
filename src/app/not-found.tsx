@@ -12,7 +12,7 @@ export default function NotFound() {
     <>
     <div className="container-page py-24 sm:py-32">
       <p className="eyebrow ">404</p>
-      <h1 className="mt-4 font-display text-h1">Page not found</h1>
+      <h1 className="mt-4 font-display text-h1">Page not found.</h1>
       <TitleBar />
       <p className="mt-6 max-w-lg text-lede ">
         That page doesn&apos;t exist. Try the class times or coaching options instead.

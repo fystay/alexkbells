@@ -21,8 +21,8 @@ export function FirstSession() {
           {items.map((f) =>
             f ? (
               <div key={f.id} className="card px-5 py-5 sm:px-6">
-                <dt className="font-semibold">{f.question}</dt>
-                <dd className="mt-1">{f.answer}</dd>
+                <dt className="card-title">{f.question}</dt>
+                <dd className="mt-1.5">{f.answer}</dd>
               </div>
             ) : null,
           )}

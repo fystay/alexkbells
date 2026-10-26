@@ -1,5 +1,6 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { TitleBar } from "@/components/ui/TitleBar";
+import { statement } from "@/lib/title";
 import { bookingMode, parseBookingUrl } from "@/lib/booking";
 import type { BookableService } from "@/lib/booking-options";
 import { groupClass } from "@/content/classes";
@@ -40,7 +41,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
         <header className="max-w-2xl">
           <p className="eyebrow text-muted">Book · {site.location.venue}, {site.location.town}</p>
           <h1 id="book-heading" className="mt-3 font-display text-h2 text-balance">
-            {title}
+            {statement(title)}
           </h1>
           <TitleBar />
           <p className="mt-5 text-lede text-muted">{intro}</p>

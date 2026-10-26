@@ -547,7 +547,9 @@ test.describe("memberships", () => {
     const cards = section.getByRole("list", { name: "Membership plans" }).locator("> li");
     const card = (name: string) => cards.filter({ has: page.getByRole("heading", { name, exact: true }) });
     // Nothing chosen yet: the button waits, and nothing is ink.
-    await expect(section.getByRole("button", { name: "Book now" })).toBeDisabled();
+    // No greyed-out button: the prompt sits in its place until a card is chosen.
+    await expect(section.getByRole("button", { name: "Book now" })).toHaveCount(0);
+    await expect(section.getByRole("link", { name: "Book now" })).toHaveCount(0);
     await expect(section).toContainText("Tap a plan to choose it.");
     for (const p of PLANS) {
       // Clicking anywhere on the row (here over its name) chooses it.

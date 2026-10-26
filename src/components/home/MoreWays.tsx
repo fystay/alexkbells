@@ -30,7 +30,7 @@ export function MoreWays() {
                 href={w.href}
                 className="group card block px-5 py-5 hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:transition-colors sm:px-5"
               >
-                <span className="block text-h3 font-semibold">{w.title}</span>
+                <span className="card-title block">{w.title}</span>
                 <span className="mt-1 block">{w.body}</span>
                 {w.price ? <span className="mt-1 block text-sm font-semibold">{w.price}</span> : null}
                 {/* A plain cue that the card is a link (no arrows on the site). */}

@@ -29,7 +29,7 @@ export default function OnlineCoachingPage() {
           <header className="lg:col-span-5">
             <p className="eyebrow text-muted">Online coaching · Enquiry</p>
             <h1 id="online-heading" className="mt-3 font-display text-h2 text-balance">
-              Ask about online coaching
+              Ask about online coaching.
             </h1>
             <TitleBar />
             <p className="mt-5 text-lede text-muted">

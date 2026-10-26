@@ -62,13 +62,13 @@ export function CoachStory({
             </figure>
           ) : null}
           <div className="lg:col-span-6 lg:mt-8 lg:self-start">
-            {showJourney ? <Sub className="font-display text-h3">{coach.name}</Sub> : null}
+            {showJourney ? <Sub className="card-title text-xl">{coach.name}</Sub> : null}
             <p className="mt-2 max-w-xl text-lede">{coach.summary}</p>
             {details.length > 0 ? (
               <dl className="mt-8 max-w-xl space-y-6">
                 {details.map((d) => (
                   <div key={d.label}>
-                    <dt className="font-semibold">{d.label}</dt>
+                    <dt className="card-title">{d.label}</dt>
                     {d.paragraphs.map((text) => (
                       <dd key={text} className="mt-2">
                         {text}

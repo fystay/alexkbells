@@ -1,5 +1,4 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 
 export function Location({ headingId = "location-heading", tone = "white" }: { headingId?: string; tone?: SectionTone }) {
@@ -13,23 +12,31 @@ export function Location({ headingId = "location-heading", tone = "white" }: { h
             title={
               <>
                 {site.location.venue},<br />
-                {site.location.town}
+                {site.location.town}.
               </>
             }
             intro="Group classes and one-to-one sessions take place in Cumbernauld, just outside Glasgow."
           />
         </div>
         <div className="lg:col-span-5">
-          <address className="card px-5 py-5 text-lg not-italic leading-relaxed sm:px-6">
-            {formatAddressLines().map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </address>
-          <ButtonLink href={mapsUrl()} external variant="secondary" className="mt-8">
-            Get directions
-          </ButtonLink>
+          {/* The same address card as "Find us" on the home page: address, then Get directions as a link. */}
+          <div className="card px-5 py-5 sm:px-6">
+            <address className="text-lg not-italic leading-relaxed">
+              {formatAddressLines().map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </address>
+            <a
+              href={mapsUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4 hover:no-underline"
+            >
+              Get directions<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </div>
         </div>
       </div>
     </Section>

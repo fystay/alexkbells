@@ -23,7 +23,7 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white" }: { headin
               <li key={item.id} data-reveal style={revealDelay(i)} className="card px-5 sm:px-6">
                 <Provisional status={item.status}>
                   <details className="group">
-                    <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+                    <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 card-title [&::-webkit-details-marker]:hidden">
                       {item.question}
                       <span
                         aria-hidden="true"

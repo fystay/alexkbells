@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Photo } from "@/content/types";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { TitleBar } from "@/components/ui/TitleBar";
+import { statement } from "@/lib/title";
 
 interface PageHeaderProps {
   eyebrow: string;
@@ -26,10 +27,11 @@ export function PageHeader({ eyebrow, title, intro, children, image, panel }: Pa
       <div className="container-page pt-14 pb-12 sm:pt-20 sm:pb-16 lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:py-24">
         <div className={aside ? "lg:col-span-7" : "lg:col-span-12"}>
           <p className="eyebrow">{eyebrow}</p>
-          <h1 className="mt-4 max-w-4xl font-display text-h1 text-balance">{title}</h1>
+          <h1 className="mt-4 max-w-4xl font-display text-h1 text-balance">{statement(title)}</h1>
           <TitleBar />
           {intro ? <div className="mt-5 max-w-2xl text-lede">{intro}</div> : null}
-          {children ? <div className="mt-8 flex flex-wrap gap-3">{children}</div> : null}
+          {/* Phones: stacked, so a text link sits centred under the full-width button (self-center) rather than stranded at the left. */}
+          {children ? <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">{children}</div> : null}
         </div>
         {aside ? (
           <div className="mt-10 lg:col-span-5 lg:mt-0">

@@ -21,8 +21,6 @@ interface ChoiceCardsProps {
   name: string;
   legend: string;
   choices: readonly Choice[];
-  /** The button's text before anything is chosen. */
-  idle: string;
   /** Under the button until a card is chosen, e.g. "Choose a plan to continue." */
   prompt: string;
   children: ReactNode;
@@ -38,7 +36,6 @@ export function ChoiceCards({
   name,
   legend,
   choices,
-  idle,
   prompt,
   children,
   className,
@@ -89,24 +86,16 @@ export function ChoiceCards({
             </Link>
           )
         ) : (
-          <button
-            type="button"
-            disabled
-            aria-describedby={`${name}-choice`}
-            className={cn(
-              button,
-              "disabled:cursor-not-allowed disabled:border-grey disabled:bg-transparent disabled:text-grey disabled:active:translate-y-0",
-            )}
-          >
-            {idle}
-          </button>
+          // Nothing chosen yet: no greyed-out button (it read as broken, mobile pass
+          // 2026-10-26), just the prompt in the button's place, so nothing moves when it appears.
+          <p className="flex min-h-14 items-center justify-center text-center font-semibold">{prompt}</p>
         )}
         <p
           id={`${name}-choice`}
           aria-live="polite"
           className="mt-2 min-h-5 text-sm"
         >
-          {chosen ? `${chosen.label} selected.${chosen.next ? ` ${chosen.next}` : ""}` : prompt}
+          {chosen ? `${chosen.label} selected.${chosen.next ? ` ${chosen.next}` : ""}` : ""}
         </p>
       </div>
       {/* Without JavaScript the button can't follow the choice: plain links instead. */}
