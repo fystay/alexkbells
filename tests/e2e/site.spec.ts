@@ -449,16 +449,15 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
   }
 });
 
-test("homepage hero: says what RAENG is, with one call to action", async ({ page }) => {
+test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   await expect(hero.locator("h1")).toContainText("Train with purpose.");
   await expect(hero.locator("h1")).toContainText("Build with discipline.");
-  await expect(hero).toContainText("Kettlebell classes in Cumbernauld.");
-  await expect(hero.getByRole("link")).toHaveCount(1);
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await hero.getByRole("link", { name: "Explore coaching" }).click();
+  await expect(page).toHaveURL(/\/coaching$/);
 });
-
 test("homepage hero and its call to action are in the first screen on phones and desktop", async ({ page }) => {
   for (const [width, height] of [[360, 640], [390, 844], [768, 1024], [1024, 768], [1440, 900]]) {
     await page.setViewportSize({ width, height });
