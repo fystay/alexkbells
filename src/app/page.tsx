@@ -3,12 +3,11 @@ import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { timetable } from "@/content/classes";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
-import { isPublishable } from "@/lib/publish";
 import { CoachIntro } from "@/components/home/CoachIntro";
 import { CoachStory } from "@/components/home/CoachStory";
 import { JoinSteps } from "@/components/home/JoinSteps";
+import { firstClassSteps } from "@/content/home";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
@@ -33,19 +32,15 @@ const payg = getService("group-classes").prices[0];
 // heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
-  const sessions = isPublishable(timetable.status) ? timetable.sessions.length : 0;
   return (
     <>
       <Hero />
       <CoachIntro />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
-          <SectionHeading
-            id="classes-heading"
-            className="lg:col-span-5"
-            title={sessions ? `${sessions} ${sessions === 1 ? "class" : "classes"} a week.` : "Kettlebell classes."}
-          />
-          <JoinSteps className="mt-4 lg:col-span-7 lg:mt-0" />
+          {/* A cleaner title (owner, 2026-10-26): the class count is in the rows of step 1. */}
+          <SectionHeading id="classes-heading" className="lg:col-span-5" eyebrow="Classes" title={firstClassSteps.title} />
+          <JoinSteps className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
       <Section id="memberships" labelledBy="memberships-heading">
@@ -67,7 +62,7 @@ export default function HomePage() {
       <WhyKettlebells />
       <CoachStory tone="plain" />
       <Testimonials />
-      <CtaBand id="book" tone="plain" />
+      <CtaBand id="book" body={null} tone="plain" />
     </>
   );
 }

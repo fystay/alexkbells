@@ -43,8 +43,7 @@ export function JoinSteps({ className }: { className?: string }) {
   const bring = confirmed("bring", steps.bring);
   return (
     <div className={className}>
-      <p className="text-lede">{steps.intro}</p>
-      <ol className="mt-6 space-y-6">
+      <ol className="space-y-6">
         <Step n={1} title={steps.pick}>
           <p>{classFacts()}</p>
           <ClassTimes showPrice={false} className="pt-1 text-base" />

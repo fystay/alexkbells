@@ -18,13 +18,13 @@ export const whyKettlebells = [
 ] as const;
 
 /**
- * "Your first class in three steps" under the timetable (option 1 of the card
+ * "Start in three steps." on the home page's classes section (option 1 of the card
  * overhaul, owner 2026-10-26). The step lines restate the confirmed FAQ
  * answers (content/faq.ts) more tightly; each shows only while its FAQ
  * answer is confirmed. Keep them in step with faq.ts.
  */
 export const firstClassSteps = {
-  intro: "Your first class in three steps.",
+  title: "Start in three steps.",
   pick: "Pick a class",
   book: "Book your place",
   turnUp: "Turn up and train",

@@ -11,7 +11,8 @@ import type { BookableService } from "@/lib/booking-options";
 
 interface CtaBandProps {
   title?: string;
-  body?: string;
+  /** The line under the title; the class times unless given. `null` shows no line (home: the times are already at the top). */
+  body?: string | null;
   headingId?: string;
   /** Section id, for in-page links and the home page's order test. */
   id?: string;
@@ -37,9 +38,11 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
           <h2 id={headingId} className="font-display text-h1 text-balance">
             {statement(title)}
           </h2>
-          <p className="mt-5 max-w-xl text-lede">
-            {body ?? (times.length > 0 ? `Classes run ${times.map((t) => `${t.days} ${t.time}`).join(", ")}.` : "Book now to join a class.")}
-          </p>
+          {body === null ? null : (
+            <p className="mt-5 max-w-xl text-lede">
+              {body ?? (times.length > 0 ? `Classes run ${times.map((t) => `${t.days} ${t.time}`).join(", ")}.` : "Book now to join a class.")}
+            </p>
+          )}
         </div>
         <div data-reveal className="lg:col-span-5">
           <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="w-full" />

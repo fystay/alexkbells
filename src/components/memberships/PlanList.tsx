@@ -4,7 +4,7 @@ import { getService } from "@/content/services";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { extraCostPence, formatPenceShort, planFigures } from "@/lib/membership";
 import { ChoiceCards, type Choice } from "@/components/ui/ChoiceCards";
-import { ChoiceCover, choiceBadge, choiceCard } from "@/components/ui/choice";
+import { ChoiceCover, choiceCard } from "@/components/ui/choice";
 import { cn } from "@/lib/cn";
 import { timetable } from "@/content/classes";
 import { isPublishable } from "@/lib/publish";
@@ -13,14 +13,15 @@ import { sortSessions } from "@/lib/schedule";
 const payg = getService("group-classes").prices[0];
 
 /**
- * The plans as cards (warm tech, owner's pick C, 2026-10-26): one white
- * rounded card per plan, name and price on the first line, classes and the
- * cost per class on the second with the saving as an ink tag, Pay as you go
- * last. Choose a card (it turns ink), then the button (select, then continue,
- * as everywhere on the site): "Join <plan>" for a membership (owner,
- * 2026-10-26), "Book now" for pay as you go. Join opens the membership
- * journey (/memberships/join?plan=, owner 2026-10-26); Book now opens the
- * class calendar. Alex sets the membership up when he confirms. Home and
+ * The plans as rows between thin rules (card overhaul, owner 2026-10-26), with
+ * each plan's rules set out as in Alex's plan layout: name and price, then
+ * "Every 4 weeks · 4 class credits", the cost per class and the saving, and
+ * the pay-as-you-go equivalent. Pay as you go last. Choose a row (it turns
+ * ink), then the button (select, then continue, as everywhere on the site):
+ * "Join <plan>" for a membership, "Book now" for pay as you go. Join opens the
+ * membership journey (/memberships/join?plan=); Book now opens the class
+ * calendar. Alex sets the membership up when he confirms. Every figure is
+ * calculated from the price and credits (lib/membership.ts). Home and
  * /memberships share it.
  */
 export function PlanList({ className }: { className?: string }) {
@@ -39,56 +40,65 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  const card = cn("card relative px-5 py-5 sm:px-6", choiceCard);
+  // Straight rules inset to the text (the row itself is rounded so the chosen row reads as one ink block).
+  const row = cn(
+    "relative rounded-2xl px-3 py-4 after:pointer-events-none after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-line has-[:checked]:after:hidden",
+    choiceCard,
+  );
   return (
     <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it." className={className}>
-      <ul aria-label="Membership plans" className="grid grid-cols-1 gap-3">
+      <ul aria-label="Membership plans" className="relative -mx-3 before:absolute before:inset-x-3 before:top-0 before:h-px before:bg-line">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
-            <li key={plan.id} className={card}>
-              <ChoiceCover name="plan" value={plan.id} label={`${plan.name}, £${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} classes, save ${formatPenceShort(f.savingPence)}`} />
+            <li key={plan.id} className={row}>
+              <ChoiceCover
+                name="plan"
+                value={plan.id}
+                label={`${plan.name}, £${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} class credits, ${formatPenceShort(f.perClassPence)} per class, save ${formatPenceShort(f.savingPence)}, pay-as-you-go equivalent ${formatPenceShort(f.payAsYouGoPence)}`}
+              />
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="card-title flex items-center gap-3 text-xl">
                   <PlanDot />
                   {plan.name}
                 </h3>
-                <p className="shrink-0 text-sm">
-                  <span className="text-xl font-bold tabular-nums">£{plan.priceGbp}</span> / {BILLING_WEEKS} weeks
-                </p>
+                <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-4 pl-8">
-                <p className="text-sm">
-                  {plan.credits} classes · {formatPenceShort(f.perClassPence)} each
+              <div className="mt-1 space-y-0.5 pl-8 text-sm">
+                <p>
+                  Every {BILLING_WEEKS} weeks · {plan.credits} class credits
                 </p>
-                {f.savingPence > 0 ? (
-                  <span className={cn("shrink-0 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-white", choiceBadge)}>
-                    Save {formatPenceShort(f.savingPence)}
-                  </span>
-                ) : null}
+                <p>
+                  {formatPenceShort(f.perClassPence)} per class
+                  {f.savingPence > 0 ? (
+                    <>
+                      {" · "}
+                      <span className="font-semibold">Save {formatPenceShort(f.savingPence)}</span>
+                    </>
+                  ) : null}
+                </p>
+                <p>Pay-as-you-go equivalent {formatPenceShort(f.payAsYouGoPence)}</p>
               </div>
             </li>
           );
         })}
-        <li className={card}>
+        <li className={row}>
           <ChoiceCover name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="card-title flex items-center gap-3 text-xl">
               <PlanDot />
               Pay as you go
             </h3>
-            <p className="shrink-0 text-sm">
-              <span className="text-xl font-bold tabular-nums">£{payg.amountGbp}</span> / class
-            </p>
+            <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
           </div>
-          <p className="mt-3 pl-8 text-sm">No membership needed</p>
+          <p className="mt-1 pl-8 text-sm">Per class. No membership needed.</p>
         </li>
       </ul>
     </ChoiceCards>
   );
 }
 
-/** The card's choice mark: an empty circle, filled once the card is chosen, so the cards read as tappable. */
+/** The row's choice mark: an empty circle, filled once the row is chosen, so the rows read as tappable. */
 function PlanDot() {
   return (
     <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-current"><span className="size-2.5 scale-0 rounded-full bg-current motion-safe:transition-transform group-has-[:checked]/choice:scale-100" /></span>
@@ -110,6 +120,7 @@ export function PlanTerms({ className }: { className?: string }) {
   ];
   return (
     <div className={cn("text-sm", className)}>
+      <h3 className="eyebrow mb-2">Membership rules</h3>
       <ul className="space-y-1">
         {points.map((p) => (
           <li key={p} className="flex gap-2">
