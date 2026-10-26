@@ -25,7 +25,7 @@ export function SiteHeader() {
       {/* The logo's tagline, as in the artwork: the line above is part of the logo image.
           From tablet up only: on phones the header stays one slim row (mobile-first redesign, 2026-10-24). */}
       <p className="-mt-1 hidden pb-2 text-center sm:block text-[0.625rem] font-medium uppercase tracking-[0.3em] sm:pb-3 sm:text-xs">
-        {site.themes.join(" · ")}
+        {site.themes.join(" • ")}
       </p>
     </header>
   );

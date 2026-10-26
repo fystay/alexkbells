@@ -54,7 +54,8 @@ describe("content approval state", () => {
   it("keeps unsupplied RAENG content out of the site", () => {
     // Nothing has been supplied for these slots; none may be published until Alex confirms it.
     expect(testimonials.filter((t) => t.status === "confirmed")).toEqual([]);
-    expect(aboutStory).toBeNull();
+    // The story is Alex's own launch post (Instagram, 26 Oct 2026), word for word.
+    expect(aboutStory?.paragraphs.at(-1)).toBe("The next chapter starts here. Welcome to RAENG.");
     for (const field of [coach.background, coach.qualifications, coach.philosophy, coach.motivation]) {
       expect(field === null || field.status === "provisional").toBe(true);
     }

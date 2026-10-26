@@ -658,7 +658,7 @@ test("class pages link to the how-to-join section", async ({ page }) => {
   await expect(page).toHaveURL(/#join$/);
 });
 
-test("About RAENG: Facebook and Instagram open safely in a new tab, and no story is invented", async ({ page }) => {
+test("About RAENG: Facebook and Instagram open safely in a new tab, and the story is Alex's own words", async ({ page }) => {
   await page.goto("/about");
   for (const scope of [page.getByRole("contentinfo"), page.locator("#coach")]) {
     const fb = scope.getByRole("link", { name: /Facebook/ });
@@ -666,7 +666,10 @@ test("About RAENG: Facebook and Instagram open safely in a new tab, and no story
     await expect(fb).toHaveAttribute("target", "_blank");
     await expect(fb).toHaveAttribute("rel", /noopener/);
   }
-  await expect(page.locator("#story")).toHaveCount(0);
+  // From his launch post (Instagram, 26 Oct 2026), nothing written for him.
+  const story = page.locator("#story");
+  await expect(story.getByRole("heading", { level: 2 })).toHaveText("Introducing RAENG Fitness.");
+  await expect(story).toContainText("progress at their own pace");
 });
 
 test("online coaching page leads to the enquiry form, which is not a booking", async ({ page }) => {

@@ -123,9 +123,15 @@
 }
 
 /* The small label above a heading ("Meet your coach"): plain sentence case, semibold so it reads as a label. */
+/* Labels above titles, set like the tagline under Alex's logo
+   ("STRENGTH • COMMUNITY • DISCIPLINE", launch post 2026-10-26): small,
+   spaced capitals, medium weight. */
 @utility eyebrow {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
 }
 
 /*

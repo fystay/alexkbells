@@ -159,6 +159,7 @@ See Coach portal below.
 - [x] Home rebuilt phone first: hero (what RAENG is, one action) → timetable → plan list → coach → more ways → find us (5.3 screens); /classes and /memberships share the timetable and plan list
 - [x] Home reorganised in Alex's order with a face early (2026-10-26): "Coached by Alex" card under the hero, the address with the class times, a closing Book now band instead of Find us
 - [x] Header menu: the current page is underlined instead of glowing (2026-10-26)
+- [x] Alex's launch post as reference (2026-10-26): /about story in his words, spaced-capital labels, "•" in the tagline
 - [ ] P1 Restyle /coaching, /online-coaching, /about and /contact to the same system (fewer bands and labels, phone first)
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
 

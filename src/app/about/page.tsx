@@ -41,7 +41,7 @@ export default function AboutPage() {
         <Section tone={tone()} id="story" labelledBy="story-heading">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
-              <SectionHeading id="story-heading" eyebrow="Our story" title={story.title} />
+              <SectionHeading id="story-heading" eyebrow="From Alex" title={story.title} />
             </div>
             <div className="max-w-2xl space-y-5 text-lede  lg:col-span-7">
               {story.paragraphs.map((text) => (

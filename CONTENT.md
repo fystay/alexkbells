@@ -4,7 +4,7 @@
 
 Fill in with Alex's words, set `status: "confirmed"` once approved; empty or provisional slots are never shown on production (guarded by `content.test.ts`).
 - `src/content/coach.ts`: background, qualifications, philosophy, motivation (shown on home "Meet your coach" and About).
-- `src/content/about.ts`: `aboutStory` (why RAENG exists, how it started) — adds an "Our story" band on /about.
+- `src/content/about.ts`: `aboutStory` (why RAENG exists) — the "From Alex" band on /about. Filled 2026-10-26 from Alex's RAENG launch post on Instagram, in his words.
 - `src/content/community.ts`: `testimonials` (written permission first; none exist).
 - `src/content/images.ts`: every photograph by role; replace files in `public/images/raeng/`.
 - Online coaching: only the three confirmed points (personalised programming, ongoing support, progression) are published; add further features to `services.ts` and `/online-coaching` only once confirmed.

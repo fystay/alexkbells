@@ -31,7 +31,7 @@ export function CoachIntro() {
             />
           ) : null}
           <span className="min-w-0 flex-1">
-            <span className="block text-sm">Coached by</span>
+            <span className="eyebrow block">Coached by</span>
             <span className="card-title block">{coach.name}</span>
             <span className="block text-sm">{coach.role}</span>
           </span>
