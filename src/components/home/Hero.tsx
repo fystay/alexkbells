@@ -19,7 +19,7 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="bg-paper sm:pt-5 sm:pb-8">
       <div className="relative sm:container-page">
-        <div className="relative h-[calc(100svh-8rem)] min-h-[28.75rem] sm:h-[24rem] lg:h-[min(30rem,calc(100svh-14rem))]">
+        <div className="relative h-[calc(100svh-6.75rem)] min-h-[30rem] sm:h-[24rem] lg:h-[min(30rem,calc(100svh-14rem))]">
           {heroVideo ? (
             <HeroVideo
               sources={heroVideo.sources}

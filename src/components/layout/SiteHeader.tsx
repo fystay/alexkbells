@@ -1,4 +1,3 @@
-import { site } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { HeaderBook } from "./HeaderBook";
 import { Logo } from "./Logo";
@@ -6,7 +5,8 @@ import { MobileNav } from "./NavLinks";
 
 /**
  * Three parts, the same at every width: the Menu dropdown at the left, the
- * logo centred, the booking button at the right.
+ * whole logo centred (tagline included, in the artwork's own proportions:
+ * owner, 2026-10-26), the booking button at the right.
  */
 export function SiteHeader() {
   const cta = getPrimaryCtaFor("group-class");
@@ -22,11 +22,6 @@ export function SiteHeader() {
           <HeaderBook cta={cta} />
         </div>
       </div>
-      {/* The logo's tagline, as in the artwork: the line above is part of the logo image.
-          At every width (owner, 2026-10-26: it's part of the logo, so phones show it too). */}
-      <p className="-mt-1 pb-2 text-center text-[0.625rem] font-medium uppercase tracking-[0.3em] sm:pb-3 sm:text-xs">
-        {site.themes.join(" • ")}
-      </p>
     </header>
   );
 }

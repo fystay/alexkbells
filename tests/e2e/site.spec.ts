@@ -763,8 +763,7 @@ test("hero film covers the phone screen edge to edge with the vertical cut", asy
   const box = (await page.locator("section[aria-labelledby=hero-heading] video").boundingBox())!;
   expect(Math.round(box.x)).toBe(0);
   expect(Math.round(box.width)).toBe(390);
-  // The screen less the header (logo row and tagline, 104 px) and a little cream below.
-  expect(box.height).toBeGreaterThan(844 - 128 - 4);
+  expect(box.height).toBeGreaterThan(844 - 108 - 4);
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator("section[aria-labelledby=hero-heading] video source").first()).toHaveAttribute("src", "/media/hero.mp4");
 });

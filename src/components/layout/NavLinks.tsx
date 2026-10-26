@@ -62,7 +62,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="menu-panel absolute inset-x-0 top-full h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-3xl lg:bg-white lg:pt-2 lg:pb-6"
+        className="menu-panel absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-3xl lg:bg-white lg:pt-2 lg:pb-6"
       >
         <nav aria-label="Main" className="px-4 sm:px-6">
           <ul>

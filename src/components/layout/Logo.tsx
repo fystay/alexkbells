@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import { cn } from "@/lib/cn";
 
 interface LogoProps {
-  /** header: the top of the supplied artwork (monogram, RAENG, Thai). lockup: the whole logo. */
+  /** header: the whole logo, sized for the header. lockup: the whole logo, larger (footer). */
   variant?: "header" | "lockup";
   className?: string;
   priority?: boolean;
@@ -12,8 +12,7 @@ interface LogoProps {
 
 /**
  * Always the supplied artwork (black on the cream page): never retyped, never
- * recoloured. The header uses its top three lines at a size where they stay
- * crisp; the footer shows the whole logo.
+ * recoloured. Header and footer both show the whole logo, tagline included.
  */
 export function Logo({ variant = "header", className, priority = false }: LogoProps) {
   const { logo } = site;
@@ -27,13 +26,15 @@ export function Logo({ variant = "header", className, priority = false }: LogoPr
         <Image src={logo.lockup.src} alt="" width={logo.lockup.width} height={logo.lockup.height} sizes="240px" className="h-auto w-48 sm:w-56" />
       ) : (
         <Image
-          src={logo.header.src}
+          src={logo.lockup.src}
           alt=""
-          width={logo.header.width}
-          height={logo.header.height}
+          width={logo.lockup.width}
+          height={logo.lockup.height}
           priority={priority}
           sizes="160px"
-          className="h-[68px] w-auto max-w-none shrink-0 sm:h-[92px]"
+          // The whole artwork, so STRENGTH • COMMUNITY • DISCIPLINE keeps its proportions under
+          // RAENG (owner, 2026-10-26). Heights keep the mark the size it was (68 / 92 px for the top part).
+          className="h-[74px] w-auto max-w-none shrink-0 sm:h-[101px]"
         />
       )}
     </Link>
