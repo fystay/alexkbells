@@ -375,13 +375,14 @@ for (const [server, base] of [
     const join = page.locator("#join");
     await expect(join.getByRole("heading", { name: "Send a booking request" })).toBeVisible();
     await expect(join.getByRole("heading", { name: "Alex confirms your place" })).toBeVisible();
-    await expect(join.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+    // The page opens with Book now and the timetable has it; the steps don't repeat it (2026-10-26).
+    await expect(page.locator("#main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
     await expect(join.getByRole("link", { name: /Message Alex on Instagram/ })).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
 
     await page.goto(base + "/coaching");
     const how = page.locator("#how-it-works");
     await expect(how.getByRole("heading", { name: "Send a booking request" })).toBeVisible();
-    await expect(how.getByRole("link", { name: /Book now/ })).toHaveAttribute("href", "/book/one-to-one");
+    await expect(page.locator("#main").getByRole("link", { name: /Book now/ }).first()).toHaveAttribute("href", "/book/one-to-one");
     await expect(how.getByRole("link", { name: /Message Alex on Instagram/ })).toBeVisible();
 
     // Online coaching stays an enquiry, with no booking wording.
@@ -470,9 +471,9 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Mobile-first order (2026-10-24): hero, classes, memberships, coach, more ways, find us.
+  // Mobile-first order (2026-10-24; first class added 2026-10-26).
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "classes", "memberships", "coach", "more-ways", "practical-info"]);
+  expect(order).toEqual(["hero-heading", "classes", "first-class", "memberships", "coach", "more-ways", "practical-info"]);
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");
@@ -563,8 +564,10 @@ test.describe("memberships", () => {
     await expect(page).toHaveURL(/\/memberships$/);
     await section.getByRole("link", { name: "Join Regular" }).click();
     await expect(page).toHaveURL(/\/book\/group-class\?plan=regular$/);
-    await expect(page.locator("main")).toContainText("Regular · £65 / 4 weeks · 8 class credits");
-    await expect(page.locator("main")).not.toContainText(/pay now|checkout|card number/i);
+    await expect(page.getByText("Regular · £65 / 4 weeks · 8 class credits")).toBeVisible();
+    await expect(page.getByText("Starter · £40 / 4 weeks · 4 class credits")).toBeHidden();
+    // No payment step: only the reassurance that nothing is paid now.
+    await expect(page.locator("main")).not.toContainText(/checkout|card number|(?<!nothing to )pay now/i);
   });
 
   test("terms and the cancellation policy are published as supplied", async ({ page }) => {
@@ -612,8 +615,8 @@ test("every image loads and none is stretched", async ({ page }) => {
   }
 });
 
-test("the FAQ opens and closes with the keyboard", async ({ page }) => {
-  await page.goto("/classes");
+test("the FAQ (on /contact) opens and closes with the keyboard", async ({ page }) => {
+  await page.goto("/contact");
   const summary = page.locator("main details summary").first();
   const details = page.locator("main details").first();
   await summary.focus();

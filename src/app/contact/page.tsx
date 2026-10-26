@@ -6,6 +6,7 @@ import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
+import { Faq } from "@/components/sections/Faq";
 
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
@@ -155,6 +156,8 @@ export default function ContactPage() {
           </div>
         </div>
       </Section>
+      {/* Every common question in one place (2026-10-26), instead of repeated on each page. */}
+      <Faq tone="plain" />
     </>
   );
 }

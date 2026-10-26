@@ -78,7 +78,6 @@ export default function OnlineCoachingPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading id="how-heading" eyebrow="How it works" title="Start with a conversation" />
-            <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className="mt-8 w-full sm:w-[22rem]" />
           </div>
           <Steps steps={steps} className="lg:col-span-7" />
         </div>

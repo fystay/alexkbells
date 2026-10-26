@@ -96,14 +96,7 @@ export default function CoachingPage() {
               title="From first message to first session"
              
             />
-            <StartTraining
-              href={booking.href}
-              label={booking.label}
-              srSuffix=" (1:1 coaching)"
-              external={booking.external}
-             
-              className="mt-8 w-full sm:w-[22rem]"
-            />
+            {/* The page opens and ends with Book now; the steps don't repeat it (2026-10-26). */}
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
           <Steps steps={steps} className="lg:col-span-7" />

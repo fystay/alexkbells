@@ -6,6 +6,9 @@ import { extraCostPence, formatPenceShort, planFigures } from "@/lib/membership"
 import { ChoiceCards, type Choice } from "@/components/ui/ChoiceCards";
 import { ChoiceDot, choiceCard } from "@/components/ui/choice";
 import { cn } from "@/lib/cn";
+import { timetable } from "@/content/classes";
+import { isPublishable } from "@/lib/publish";
+import { sortSessions } from "@/lib/schedule";
 
 const payg = getService("group-classes").prices[0];
 
@@ -70,16 +73,40 @@ export function PlanList({ className }: { className?: string }) {
   );
 }
 
-/** The terms in one line, with the full detail a tap away on /memberships. */
+/**
+ * How a membership works, in four short lines from the published terms
+ * (content/policy.ts), then the full detail a tap away on /memberships.
+ * Read before choosing, so nothing restricts the visitor unexpectedly.
+ */
 export function PlanTerms({ className }: { className?: string }) {
+  const days = isPublishable(timetable.status) ? listDays(sortSessions(timetable.sessions).map((s) => s.day)) : null;
+  const points = [
+    `One credit is one class${days ? `, on any ${days} class` : ""}.`,
+    `Renews automatically every ${BILLING_WEEKS} weeks, with new credits.`,
+    "Unused credits don't roll over.",
+    "Cancel 24 hours or more before class and your credit comes back.",
+  ];
   return (
-    <p className={cn("text-sm", className)}>
-      Renews every {BILLING_WEEKS} weeks · Credits expire at the end of each period · Cancel 24 hours ahead.{" "}
-      <Link href="/memberships#how-it-works" className="font-semibold underline underline-offset-4 hover:no-underline">
+    <div className={cn("text-sm", className)}>
+      <ul className="space-y-1">
+        {points.map((p) => (
+          <li key={p} className="flex gap-2">
+            <span aria-hidden="true">·</span>
+            {p}
+          </li>
+        ))}
+      </ul>
+      <Link href="/memberships#how-it-works" className="mt-2 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
         How memberships work
       </Link>
-    </p>
+    </div>
   );
+}
+
+/** "Monday, Wednesday or Saturday" */
+function listDays(days: string[]): string {
+  const unique = [...new Set(days)];
+  return unique.length > 1 ? `${unique.slice(0, -1).join(", ")} or ${unique[unique.length - 1]}` : (unique[0] ?? "");
 }
 
 /** What pay as you go costs on top of each plan (owner, 2026-10-23). Secondary: on /memberships only. */

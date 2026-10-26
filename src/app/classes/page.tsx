@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
-import { getService } from "@/content/services";
 import { timetable, groupClass } from "@/content/classes";
 import { faqAnswer } from "@/content/faq";
 import { images } from "@/content/images";
@@ -14,9 +13,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { ClassTimes } from "@/components/home/ClassTimes";
-import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
-import { Faq } from "@/components/sections/Faq";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
@@ -33,7 +30,6 @@ export const metadata: Metadata = pageMetadata({
 
 export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
-  const classes = getService("group-classes");
   const timesPublished = isPublishable(timetable.status);
   const venue = `${site.location.venue}, ${site.location.street}, ${site.location.town}`;
 
@@ -83,46 +79,44 @@ export default function ClassesPage() {
         </ButtonLink>
       </PageHeader>
 
+      {/* Second pass (2026-10-26): the times first, then what a class is like,
+          how to join and where. The price is said once (in the timetable), and the
+          FAQ is gone: every answer it gave is already on this page. */}
+      <Section id="timetable" labelledBy="timetable-heading">
+        <SectionHeading id="timetable-heading" title="Class times" />
+        {/* The home page's timetable (the home page is the reference). */}
+        <ClassTimes className="mt-6 max-w-2xl" />
+        <p className="mt-4 max-w-2xl text-sm">
+          {groupClass.payment}{" "}
+          <Link href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
+            Save with a membership
+          </Link>
+        </p>
+      </Section>
+
       <Section tone="white" id="what-to-expect" labelledBy="expect-heading">
-        <SectionHeading id="expect-heading" eyebrow="What to expect" title="Purposeful training, together" />
-        <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <SectionHeading id="expect-heading" title="What to expect" />
+        <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
           {involves.map((item) => (
             <div key={item.title} data-reveal className="border-t border-grey pt-4">
               <dt className="font-display text-h3">{item.title}</dt>
-              <dd className="mt-3 ">{item.body}</dd>
+              <dd className="mt-3">{item.body}</dd>
             </div>
           ))}
         </dl>
       </Section>
 
-      <Section id="timetable" labelledBy="timetable-heading">
-        <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
-        {/* The home page's timetable (the home page is the reference). */}
-        <ClassTimes className="mt-6 max-w-2xl" />
-        {classes.prices.length > 0 ? (
-          <div className="mt-12 max-w-md">
-            <PriceList prices={classes.prices} />
-            <p className="mt-3 text-sm ">{groupClass.payment}</p>
-            <Link href="/memberships" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em]  underline underline-offset-[6px] hover:no-underline">
-              Save with a membership
-            </Link>
-          </div>
-        ) : null}
-      </Section>
-
-      <Section tone="white" id="join" labelledBy="join-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <Section id="join" labelledBy="join-heading">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-5">
-            <SectionHeading id="join-heading" eyebrow="Joining" title="How to join a class" />
-            <StartTraining href={booking.href} label={booking.label} external={booking.external} className="mt-8 w-full sm:w-[22rem]" />
+            <SectionHeading id="join-heading" title="How to join a class" />
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
           <Steps steps={joinSteps} className="lg:col-span-7" />
         </div>
       </Section>
 
-      <Location tone="plain" />
-      <Faq ids={["where", "when", "beginners", "first-session", "bring", "length", "contact"]} />
+      <Location />
       <CtaBand body="Prefer personal coaching? Train face to face or online." tone="plain" />
     </>
   );

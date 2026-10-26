@@ -146,6 +146,14 @@ See Coach portal below.
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
 
+## Second-pass audit (2026-10-26)
+- [x] Booking journey walked on a phone end to end in request mode (plan on the plan list, Join, date, time, details, validation, send, confirmation): stored and emailed, no console errors
+- [x] Layout shift on /book/group-class measured and fixed: 0.111 to 0.011 (no plan), 0.156 to 0.024 (with a plan); throttled phone, 4x CPU, about 1.6 Mbps
+- [x] Membership terms explained under the plan list; "Your plan" box and confirmation say what happens next and that nothing is paid now
+- [x] Internal links and in-page anchors crawled on 13 public pages: none broken
+- [ ] P2 Inner pages still alternate white and cream bands with labels over headings (/coaching, /online-coaching, /about, /contact); bring them to the home page's single cream page
+- [ ] P3 JavaScript is about 517 KB uncompressed on every page, all Next.js and React runtime; nothing app-specific to trim
+
 ## Mobile-first redesign (2026-10-24, approved 2026-10-26)
 - [x] Audit at 375/390/430/768/1024/1440: home was 7.5 phone screens with three card choice sections and five Book now buttons
 - [x] Home rebuilt phone first: hero (what RAENG is, one action) → timetable → plan list → coach → more ways → find us (5.3 screens); /classes and /memberships share the timetable and plan list

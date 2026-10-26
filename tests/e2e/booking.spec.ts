@@ -331,7 +331,7 @@ test.describe("production configuration", () => {
     await continueButton(page).click();
 
     await expect(page.getByRole("radio", { name: "Beginner" })).toBeChecked();
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.getByText("Enter your name.")).toBeVisible();
     await choose(page, "Advanced");
     await page.getByRole("textbox", { name: "Name" }).fill("Prod Booker");
@@ -339,7 +339,7 @@ test.describe("production configuration", () => {
     await page.getByRole("button", { name: /add a note/i }).click();
     await page.getByLabel(/^Note/).fill("First class");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
 
     const status = page.getByRole("status");
     await expect(status).toContainText("Request sent");
@@ -385,7 +385,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("EMAIL-DOWN Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("email-down@example.com");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     // Stored, so the visitor is told it was sent; nothing claims a confirmed booking.
     await expect(page.getByRole("status")).toContainText("Request sent");
     await expect(page.getByRole("status")).toContainText("booked once he confirms");
@@ -422,7 +422,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Plan Chooser");
     await page.getByRole("textbox", { name: "Email" }).fill("plan-chooser@example.com");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.getByRole("status")).toContainText("Request sent");
     const row = (await stored(request)).find((r) => r.name === "Plan Chooser");
     expect(row).toMatchObject({ details: { plan: "regular", membership: "Regular membership (£65 every 4 weeks, 8 class credits)" } });
@@ -434,7 +434,7 @@ test.describe("production configuration", () => {
   test("a made-up plan in the link is ignored", async ({ page }) => {
     await page.goto(`${PROD}/book/group-class?plan=platinum`);
     await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
-    await expect(page.getByText("Your plan")).toHaveCount(0);
+    await expect(page.getByText("Your plan").filter({ visible: true })).toHaveCount(0);
   });
 
   test("a class that has reached its capacity shows as fully booked and can't be requested", async ({ page, request }) => {
@@ -499,7 +499,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("couldn't be sent");
     await expect(page.getByText("Request sent")).toHaveCount(0);
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue("FAIL-TEST Booker");
@@ -513,7 +513,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Speedy Bot");
     await page.getByRole("textbox", { name: "Email" }).fill("bot@example.com");
     await page.locator('input[name="startedAt"]').evaluate((el: HTMLInputElement) => (el.value = String(Date.now())));
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Please wait a few seconds");
     await expect(page.getByText("Request sent")).toHaveCount(0);
     expect((await emails(request)).some((e) => e.payload.subject.includes("Speedy Bot"))).toBe(false);
@@ -535,7 +535,7 @@ test.describe("production configuration", () => {
       form.appendChild(input);
     });
     await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "LET'S GET TO WORK" }).click();
+    await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Demonstration times can't be booked");
   });
 

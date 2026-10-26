@@ -81,9 +81,11 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                 data-status={status}
                 className={cn(
                   "relative flex h-12 items-center justify-center border-r border-b border-line text-sm transition-colors duration-150 sm:h-14",
-                  selectable && "cursor-pointer font-semibold hover:bg-surface",
+                  // Bookable dates stand out as white squares in bold; the rest stay plain on the page (2026-10-26).
+                  selectable && "cursor-pointer bg-white font-bold hover:bg-surface",
                   selected && "bg-ink text-paper hover:bg-ink",
-                  !selectable && "text-muted",
+                  // Dates that can't be booked recede (disabled controls are exempt from text contrast).
+                  !selectable && "text-grey",
                   status === "full" && "line-through decoration-1",
                   "has-[:focus-visible]:z-10 has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-ink",
                   selected && "has-[:focus-visible]:outline-paper",
@@ -109,7 +111,10 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
         </div>
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted" aria-label="Key">
           <li className="flex items-center gap-2">
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-ink" /> Available
+            <span aria-hidden="true" className="flex size-4 items-center justify-center border border-line bg-white">
+              <span className="size-1 rounded-full bg-ink" />
+            </span>{" "}
+            Available
           </li>
           {avail.days.some((d) => dayStatus(d) === "full") ? (
             <li className="flex items-center gap-2">

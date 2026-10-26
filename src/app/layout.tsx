@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { INTRO_SCRIPT, REVEAL_SCRIPT } from "@/lib/reveal";
+import { PLAN_SCRIPT } from "@/lib/plan-flag";
 import "./globals.css";
 
 // One variable family; the width axis gives the expanded display headings.
@@ -43,6 +44,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
         {/* Opening curtain, first visit only; see lib/reveal.ts. */}
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+        {/* The chosen plan's box on the booking page, shown without a shift; see lib/plan-flag.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: PLAN_SCRIPT }} />
       </head>
       <body className="flex min-h-dvh flex-col">
         <div className="intro" aria-hidden="true">

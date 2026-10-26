@@ -8,6 +8,7 @@ import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { isPublishable } from "@/lib/publish";
 import { CoachStory } from "@/components/home/CoachStory";
 import { ClassTimes } from "@/components/home/ClassTimes";
+import { FirstSession } from "@/components/home/FirstSession";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { PracticalInfo } from "@/components/home/PracticalInfo";
@@ -18,9 +19,9 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 
 const payg = getService("group-classes").prices[0];
 
-// Order (mobile-first redesign, 2026-10-24): what RAENG is and Book now, then
-// the classes and times, what they cost, who coaches them, the other ways to
-// train, and where to go. One idea per section, all on the cream page. Phones
+// Order (mobile-first redesign, 2026-10-24; first class added 2026-10-26): the
+// film and Book now, then the classes and times, what a first class is like,
+// what it costs, who coaches it, the other ways to train, and where to go. One idea per section, all on the cream page. Phones
 // read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
@@ -34,6 +35,7 @@ export default function HomePage() {
           <ClassTimes className="mt-6 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
+      <FirstSession />
       <Section id="memberships" labelledBy="memberships-heading">
         <div className={split}>
           <SectionHeading

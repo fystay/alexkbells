@@ -41,8 +41,9 @@ import {
 const loadCalendar = () => import("./AvailabilityCalendar");
 const AvailabilityCalendar = dynamic(() => loadCalendar().then((m) => m.AvailabilityCalendar), {
   ssr: false,
+  // The placeholder holds the calendar's height, so nothing jumps when it arrives (measured 2026-10-26).
   loading: () => (
-    <p className="text-muted" role="status">
+    <p className="min-h-[36rem] md:min-h-[29rem] text-muted" role="status">
       Loading dates…
     </p>
   ),
@@ -293,6 +294,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
         when={whenText}
         longWhen={calendar && date && chosenSlot ? `${formatLongDate(date)} at ${formatTime(chosenSlot.time)}` : whenText}
         email={demo ? details.email.trim() : serverState.message}
+        plan={service === "group-class" && chosenPlan ? `${chosenPlan.name} membership` : ""}
         onRestart={reset}
       />
     );
@@ -404,7 +406,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                         onSlot={setSlotId}
                       />
                     ) : (
-                      <p className="text-muted" role="status">
+                      <p className="min-h-[36rem] md:min-h-[29rem] text-muted" role="status">
                         Loading {demo ? "availability" : "class dates"}…
                       </p>
                     )}
@@ -553,7 +555,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                 <PrivacyLine action={demo ? "continuing" : "sending this request"} />
                 <ActionBar
                   onBack={() => setStep(1)}
-                  next={{ label: demo ? "Finish demo" : "LET'S GET TO WORK", type: "submit", pending }}
+                  next={{ label: demo ? "Finish demo" : "Send request", type: "submit", pending }}
                 />
               </form>
             </section>
@@ -671,9 +673,12 @@ function Outcome({
   when,
   longWhen,
   email,
+  plan,
   onRestart,
 }: {
   demo: boolean;
+  /** e.g. "Regular membership", when one was chosen on the plan list. */
+  plan: string;
   headingRef: React.Ref<HTMLHeadingElement>;
   service: string;
   when: string;
@@ -686,13 +691,18 @@ function Outcome({
       <div className="bg-ink p-8 text-paper sm:p-12">
         <p className="eyebrow text-white">{demo ? "Demonstration complete" : "Request sent"}</p>
         <h2 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-h2 text-balance focus:outline-none">
-          {demo ? "No booking has been made" : "Thanks — Alex will be in touch"}
+          {demo ? "No booking has been made" : "Thanks. Alex will reply to confirm"}
         </h2>
         <p className="mt-5 max-w-xl text-lede text-white">
           {demo
             ? `This was sample availability, so nothing was booked or sent. Once real availability is connected, this screen would confirm ${service.toLowerCase()} on ${longWhen}.`
-            : `Your request is with Alex. He'll reply to ${email} to confirm a time. Your place is booked once he confirms.`}
+            : `Your request is with Alex. He'll reply to ${email} to confirm. Your place is booked once he confirms.`}
         </p>
+        {demo ? null : (
+          <p className="mt-3 max-w-xl text-white">
+            Nothing to pay now: Alex confirms your place first{plan ? ", sets up your membership" : ""} and tells you how to pay.
+          </p>
+        )}
         <dl className="mt-8 grid max-w-xl grid-cols-1 border-t border-white sm:grid-cols-2">
           <div className="border-b border-white py-4 sm:border-b-0">
             <dt className="eyebrow text-white">Service</dt>
@@ -702,6 +712,12 @@ function Outcome({
             <dt className="eyebrow text-white">{demo ? "Sample time" : "When"}</dt>
             <dd className="mt-1 font-semibold">{when}</dd>
           </div>
+          {plan ? (
+            <div className="border-t border-white py-4 sm:col-span-2">
+              <dt className="eyebrow text-white">Plan</dt>
+              <dd className="mt-1 font-semibold">{plan}</dd>
+            </div>
+          ) : null}
         </dl>
       </div>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-8">
