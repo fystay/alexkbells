@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { coachLoginNav, mainNav, memberSignInNav, pageNav } from "@/content/site";
 import { cn } from "@/lib/cn";
-import type { CallToAction } from "@/lib/booking";
 
 /** "page" for the page you're on (a section's sub-pages count too); Home only matches exactly. */
 function currentFor(pathname: string, href: string): "page" | undefined {
@@ -17,7 +16,7 @@ function currentFor(pathname: string, href: string): "page" | undefined {
  * The one navigation, at every width: a Menu button at the top left that opens
  * a dropdown (full width on phones, a panel under the button from lg).
  */
-export function MobileNav({ cta }: { cta: CallToAction }) {
+export function MobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
@@ -85,28 +84,19 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
               );
             })}
           </ul>
-          <Link
-            href={cta.href}
-            style={{ "--i": mainNav.length + pageNav.length } as CSSProperties}
-            onClick={() => setOpen(false)}
-            {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="menu-rise mt-6 flex min-h-12 items-center justify-center rounded-full border border-ink bg-ink px-6 text-base font-semibold text-white hover:bg-white hover:text-ink active:translate-y-px"
-          >
-            {cta.label}
-            {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
-          </Link>
+          {/* No Book now here: the header's Book now is always on screen (owner, 2026-10-26). */}
           <Link
             href={memberSignInNav.href}
-            style={{ "--i": mainNav.length + pageNav.length + 1 } as CSSProperties}
+            style={{ "--i": mainNav.length + pageNav.length } as CSSProperties}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, "/account")}
-            className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-full border border-ink px-6 text-base font-semibold hover:bg-ink hover:text-white"
+            className="menu-rise mt-6 flex min-h-12 items-center justify-center rounded-full border border-ink px-6 text-base font-semibold hover:bg-ink hover:text-white"
           >
             {memberSignInNav.label}
           </Link>
           <Link
             href={coachLoginNav.href}
-            style={{ "--i": mainNav.length + pageNav.length + 2 } as CSSProperties}
+            style={{ "--i": mainNav.length + pageNav.length + 1 } as CSSProperties}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, coachLoginNav.href)}
             className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-full border border-grey px-6 text-base font-semibold hover:border-ink"
