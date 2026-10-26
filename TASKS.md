@@ -161,6 +161,7 @@ See Coach portal below.
 - [x] Header menu: the current page is underlined instead of glowing (2026-10-26)
 - [x] Alex's launch post as reference (2026-10-26): /about story in his words, spaced-capital labels, "•" in the tagline
 - [x] /about opens with Alex's quote, class facts and Book now (pick C); line under titles removed site-wide (2026-10-26)
+- [x] Home cards overhauled (option 1, 2026-10-26): Coached by line, classes as three steps with Book now, More ways as rows, Why kettlebells as a plain grid; same information, about 1,000 px less on phones
 - [ ] P1 Restyle /coaching, /online-coaching, /about and /contact to the same system (fewer bands and labels, phone first)
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
 

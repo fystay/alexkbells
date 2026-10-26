@@ -4,6 +4,7 @@
 
 Fill in with Alex's words, set `status: "confirmed"` once approved; empty or provisional slots are never shown on production (guarded by `content.test.ts`).
 - `src/content/coach.ts`: background, qualifications, philosophy, motivation (shown on home "Meet your coach" and About).
+- `src/content/home.ts`: `firstClassSteps` — the three-step wording under the home timetable; it restates the confirmed FAQ answers in `faq.ts`, so change both together.
 - `src/content/about.ts`: `aboutQuote` — Alex's line shown as a quote at the top of /about (from his RAENG launch post on Instagram, 26 Oct 2026, word for word).
 - `src/content/community.ts`: `testimonials` (written permission first; none exist).
 - `src/content/images.ts`: every photograph by role; replace files in `public/images/raeng/`.

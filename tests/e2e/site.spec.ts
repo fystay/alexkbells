@@ -473,13 +473,20 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await page.goto("/");
   // Alex's order (WhatsApp 15 Oct 2026): book, what I offer, why kettlebells, about me.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "coach-intro", "classes", "first-class", "memberships", "more-ways", "why-kettlebells", "coach", "book"]);
-  // A face early, without moving "About me" up: the "Coached by" card under the hero jumps to his story.
+  expect(order).toEqual(["hero-heading", "coach-intro", "classes", "memberships", "more-ways", "why-kettlebells", "coach", "book"]);
+  // A face early, without moving "About me" up: the "Coached by" line under the hero jumps to his story.
   const intro = page.getByRole("region", { name: "Your coach" });
   await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
   // Where the classes are sits with the times, not at the end.
   await expect(page.locator("#classes").locator("address")).toContainText("Cumbernauld");
   await expect(page.locator("#classes").getByRole("link", { name: /Get directions/ })).toBeVisible();
+  // Your first class in three steps, every answer still there, then Book now.
+  const classes = page.locator("#classes");
+  for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(classes.getByRole("heading", { level: 3, name: step })).toBeVisible();
+  await expect(classes).toContainText("Alex will take you through the basics");
+  await expect(classes).toContainText("goals and any injuries");
+  await expect(classes).toContainText("Flat shoes or bare feet work best");
+  await expect(classes.getByRole("link", { name: "Book now" })).toBeVisible();
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");

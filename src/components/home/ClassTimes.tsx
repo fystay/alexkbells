@@ -15,33 +15,35 @@ export function classFacts(): string {
   return [minutes ? `${minutes} minutes.` : null, "All levels, scaled to you."].filter(Boolean).join(" ");
 }
 
-/**
- * The week's classes (warm tech, owner's pick C, 2026-10-26): one white
- * rounded card per class, day left and time right, then the price in one
- * line. Choosing the date happens in the booking calendar, so the cards
- * aren't choices; the header's Book now is always on screen. Every figure
- * comes from content. Home and /classes share it.
- */
-export function ClassTimes({ className }: { className?: string }) {
-  const sessions = isPublishable(timetable.status) ? sortSessions(timetable.sessions) : [];
+/** "£12 a class, or from £7.08 with a membership." From content; null if the price isn't confirmed. */
+export function classPriceLine(): string | null {
   const price = publishable(getService("group-classes").prices)[0];
-  const lowest = price ? Math.min(...membershipPlans.map((p) => planFigures(p, price.amountGbp).perClassPence)) : null;
+  if (!price) return null;
+  const lowest = Math.min(...membershipPlans.map((p) => planFigures(p, price.amountGbp).perClassPence));
+  return `£${price.amountGbp} a class, or from ${formatPenceShort(lowest)} with a membership.`;
+}
+
+/**
+ * The week's classes (option 1 of the card overhaul, owner 2026-10-26): one
+ * row per class between thin rules, day left and time right, no cards.
+ * Choosing the date happens in the booking calendar, so the rows aren't
+ * choices. Every figure comes from content. Home and /classes share it.
+ */
+export function ClassTimes({ className, showPrice = true }: { className?: string; showPrice?: boolean }) {
+  const sessions = isPublishable(timetable.status) ? sortSessions(timetable.sessions) : [];
+  const price = showPrice ? classPriceLine() : null;
   if (sessions.length === 0) return null;
   return (
     <div className={className}>
-      <ul aria-label="Class times" className="grid grid-cols-1 gap-3">
+      <ul aria-label="Class times" className="border-t border-line">
         {sessions.map((s) => (
-          <li key={s.id} className="card flex min-h-16 items-center justify-between gap-4 px-5 py-4 text-lg">
+          <li key={s.id} className="flex min-h-12 items-center justify-between gap-4 border-b border-line py-2.5">
             <span className="font-semibold">{s.day}</span>
             <span className="tabular-nums">{formatTime(s.start)}</span>
           </li>
         ))}
       </ul>
-      {price ? (
-        <p className="mt-6">
-          £{price.amountGbp} a class{lowest !== null ? `, or from ${formatPenceShort(lowest)} with a membership` : ""}.
-        </p>
-      ) : null}
+      {price ? <p className="mt-4">{price}</p> : null}
     </div>
   );
 }

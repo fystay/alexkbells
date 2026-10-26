@@ -8,14 +8,12 @@ import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { isPublishable } from "@/lib/publish";
 import { CoachIntro } from "@/components/home/CoachIntro";
 import { CoachStory } from "@/components/home/CoachStory";
-import { ClassTimes, classFacts } from "@/components/home/ClassTimes";
-import { FirstSession } from "@/components/home/FirstSession";
+import { JoinSteps } from "@/components/home/JoinSteps";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
-import { AddressCard } from "@/components/sections/AddressCard";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
@@ -25,12 +23,13 @@ const payg = getService("group-classes").prices[0];
 
 // Alex's order (WhatsApp 15 Oct 2026): where and how to book, what I offer,
 // why kettlebells, about me. Reorganised 2026-10-26 (owner): the film and
-// Book now; a slim "Coached by Alex" card that jumps to his story (a face
-// early, without moving "About me" up); the classes, times and where they
-// are; what a first class is like; what Alex offers (memberships, then the
-// other ways to train); why kettlebells; who coaches it (and members' words,
-// once there are any); and a last Book now. One idea per section, all on the
-// cream page, separated by space. Phones read top to bottom; from lg the
+// Book now; a slim "Coached by Alex" line that jumps to his story (a face
+// early, without moving "About me" up); the classes as three steps (times,
+// booking, where and what a first class is like) ending in Book now; what
+// Alex offers (memberships, then the other ways to train); why kettlebells;
+// who coaches it (and members' words, once there are any); and a last Book
+// now. No cards on these sections (owner, 2026-10-26: less scrolling): rows
+// between thin rules and space. Phones read top to bottom; from lg the
 // heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
@@ -45,15 +44,10 @@ export default function HomePage() {
             id="classes-heading"
             className="lg:col-span-5"
             title={sessions ? `${sessions} ${sessions === 1 ? "class" : "classes"} a week.` : "Kettlebell classes."}
-            intro={sessions ? classFacts() : undefined}
           />
-          <div className="mt-8 lg:col-span-7 lg:mt-0">
-            <ClassTimes />
-            <AddressCard label="Where" className="mt-6" />
-          </div>
+          <JoinSteps className="mt-4 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
-      <FirstSession />
       <Section id="memberships" labelledBy="memberships-heading">
         <div className={split}>
           <SectionHeading
