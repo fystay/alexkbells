@@ -13,7 +13,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { ClassWeekCards } from "@/components/home/QuickFacts";
+import { ClassTimes } from "@/components/home/ClassTimes";
 import { PriceList } from "@/components/sections/PriceList";
 import { Location } from "@/components/sections/Location";
 import { Faq } from "@/components/sections/Faq";
@@ -97,8 +97,8 @@ export default function ClassesPage() {
 
       <Section id="timetable" labelledBy="timetable-heading">
         <SectionHeading id="timetable-heading" eyebrow="Timetable" title="Class times" />
-        {/* The home page's day cards (owner, 2026-10-23: the home page is the reference). */}
-        <ClassWeekCards className="mt-10 max-w-3xl" />
+        {/* The home page's timetable (the home page is the reference). */}
+        <ClassTimes className="mt-6 max-w-2xl" />
         {classes.prices.length > 0 ? (
           <div className="mt-12 max-w-md">
             <PriceList prices={classes.prices} />

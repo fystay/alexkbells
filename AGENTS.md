@@ -22,7 +22,7 @@ Read `CORE.md` (facts and their status), then the relevant `DESIGN.md`, `CONTENT
 ## Owner rules (non-negotiable)
 - **Never use the words "Get in touch"** on the site (buttons, links, headings, copy). The main button is always **"Book now"**, whether or not booking is switched on; where nothing can be booked it opens /book, which says so honestly. This holds even when the owner says "go ahead with your recommendation". Enforced by a unit test and an e2e test.
 
-- **The home page is the point of reference** (owner, 2026-10-23). Inner pages follow its information, wording, prices and design: reuse the home components (plan cards, class day cards, Why kettlebells) rather than writing second versions.
+- **The home page is the point of reference** (owner, 2026-10-23). Inner pages follow its information, wording, prices and design: reuse the home components (the plan list `PlanList`, the timetable `ClassTimes`, Why kettlebells) rather than writing second versions.
 
 - **Design phone first** (owner and Alex, 2026-10-24: most visitors are on phones). Design, review and preview every change at phone size (390 px wide) first, then desktop. Previews sent to the owner lead with phone photos.
 

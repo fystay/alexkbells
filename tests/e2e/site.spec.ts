@@ -321,7 +321,7 @@ test.describe("scroll reveal", () => {
   test("content below the fold fades in when scrolled to", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    const faq = page.locator("#main li[data-reveal]").last();
+    const faq = page.locator("#main [data-reveal]").last();
     await expect(faq).not.toHaveAttribute("data-revealed", "");
     expect(await faq.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
     await faq.scrollIntoViewIfNeeded();
@@ -333,12 +333,12 @@ test.describe("scroll reveal", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     expect(await page.evaluate(() => document.documentElement.hasAttribute("data-reveal-ready"))).toBe(false);
-    expect(await page.locator("#main li[data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    expect(await page.locator("#main [data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
 
     const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
     const noJs = await context.newPage();
     await noJs.goto("/");
-    expect(await noJs.locator("#main li[data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    expect(await noJs.locator("#main [data-reveal]").last().evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
     await context.close();
   });
 });
@@ -449,14 +449,14 @@ test("the RAENG wordmark is a labelled home link in the header and footer", asyn
   }
 });
 
-test("homepage hero: headline, copy and both calls to action work", async ({ page }) => {
+test("homepage hero: says what RAENG is, with one call to action", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   await expect(hero.locator("h1")).toContainText("Train with purpose.");
   await expect(hero.locator("h1")).toContainText("Build with discipline.");
+  await expect(hero).toContainText("Kettlebell classes in Cumbernauld.");
+  await expect(hero.getByRole("link")).toHaveCount(1);
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  await hero.getByRole("link", { name: "Explore coaching" }).click();
-  await expect(page).toHaveURL(/\/coaching$/);
 });
 
 test("homepage hero and its call to action are in the first screen on phones and desktop", async ({ page }) => {
@@ -469,16 +469,16 @@ test("homepage hero and its call to action are in the first screen on phones and
   }
 });
 
-test("homepage: services, memberships and the coach's story are there, and no testimonial is invented", async ({ page }) => {
+test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  const training = page.locator("#find-your-training");
-  // Choose a card, then the button under the cards opens its page.
-  await expect(training.getByRole("button", { name: "Continue" })).toBeDisabled();
-  for (const [card, link, href] of [["Kettlebell classes", "See memberships", "/memberships"], ["1:1 coaching", "Explore 1:1 Coaching", "/coaching"], ["Online coaching", "Explore Online Coaching", "/online-coaching"]]) {
-    await training.getByRole("list", { name: "Ways to train" }).locator("> li").filter({ has: page.getByRole("heading", { name: card, exact: true }) }).click({ position: { x: 30, y: 30 } });
-    await expect(training.getByRole("link", { name: link })).toHaveAttribute("href", href);
-  }
-  await expect(page.locator("#memberships")).toBeVisible();
+  // Mobile-first order (2026-10-24): hero, classes, memberships, coach, more ways, find us.
+  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["hero-heading", "classes", "memberships", "coach", "more-ways", "practical-info"]);
+  const more = page.locator("#more-ways");
+  await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
+  await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");
+  await expect(more).toContainText("From £35 per session");
+  await expect(more).toContainText("£79 per month");
   await expect(page.locator("blockquote")).toHaveCount(0);
   const coach = page.locator("#coach");
   await expect(coach.getByRole("link", { name: "About RAENG" })).toHaveAttribute("href", "/about");
@@ -519,44 +519,44 @@ test.describe("memberships", () => {
     { name: "Dedicated", price: "£85", credits: "12 class credits", perClass: "£7.08", payg: "£144", save: "£59" },
   ];
 
-  test("the page shows the home page's cards: price, credits, cost per class and saving", async ({ page }) => {
+  test("the page shows the home page's plan list: price, credits and cost per class, then what pay as you go costs extra", async ({ page }) => {
     await page.goto("/memberships");
     await expect(page.locator("h1")).toHaveText("Save up to £59 every 4 weeks");
-    const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
-    await expect(cards).toHaveCount(4);
+    const rows = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
+    await expect(rows).toHaveCount(4);
     for (const [i, p] of PLANS.entries()) {
-      const card = cards.nth(i);
-      await expect(card.getByRole("heading", { name: p.name })).toBeVisible();
-      await expect(card).toContainText(new RegExp(`${p.price}\\s*/\\s*4 weeks`));
-      await expect(card).toContainText(p.credits.replace("class ", ""));
-      await expect(card).toContainText(`${p.perClass} per class`);
-      await expect(card).toContainText(`Save ${p.save}`);
+      const row = rows.nth(i);
+      await expect(row.getByRole("heading", { name: p.name })).toBeVisible();
+      await expect(row).toContainText(new RegExp(`${p.price}\\s*/\\s*4 weeks`));
+      await expect(row).toContainText(p.credits.replace("class ", ""));
+      await expect(row).toContainText(`${p.perClass} a class`);
     }
-    const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
-    await expect(payg).toContainText("£12 per class");
+    const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
+    await expect(payg).toContainText(/£12\s*\/ class/);
     await expect(payg).toContainText("No membership needed");
-    await expect(payg.getByRole("table", { name: "Extra vs a membership" })).toBeVisible();
+    const extra = page.getByRole("table", { name: "Pay as you go costs more" });
+    await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
+    await expect(extra.getByRole("row")).toHaveCount(4);
   });
 
   test("select, then Book now: the chosen card turns ink and the button opens the calendar with the plan", async ({ page }) => {
     await page.goto("/memberships");
     const section = page.locator("#memberships");
     const cards = section.getByRole("list", { name: "Membership plans" }).locator("> li");
-    const card = (name: string) => cards.filter({ has: page.getByRole("heading", { name }) });
+    const card = (name: string) => cards.filter({ has: page.getByRole("heading", { name, exact: true }) });
     // Nothing chosen yet: the button waits, and nothing is ink.
     await expect(section.getByRole("button", { name: "Book now" })).toBeDisabled();
     await expect(section).toContainText("Choose a plan to continue.");
     for (const p of PLANS) {
-      // Clicking anywhere on the card (here near its top, over the price) chooses it.
-      await card(p.name).click({ position: { x: 40, y: 90 } });
+      // Clicking anywhere on the row (here over its name) chooses it.
+      await card(p.name).click({ position: { x: 120, y: 20 } });
       await expect(section.getByRole("radio", { name: new RegExp(`^${p.name},`) })).toBeChecked();
       await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", `/book/group-class?plan=${p.name.toLowerCase()}`);
     }
-    await card("Pay as you go").click({ position: { x: 40, y: 90 } });
+    await card("Pay as you go").click({ position: { x: 120, y: 20 } });
     await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-    await card("Regular").click({ position: { x: 40, y: 90 } });
+    await card("Regular").click({ position: { x: 120, y: 20 } });
     await expect.poll(() => card("Regular").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
-    await expect(card("Regular")).toContainText("Selected");
     await expect.poll(() => card("Starter").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
     await expect(section).toContainText("Regular plan selected.");
     // Choosing doesn't leave the page; the button does.
@@ -580,12 +580,12 @@ test.describe("memberships", () => {
     await expect(policy).toContainText("By booking a class, you agree to these cancellation terms.");
   });
 
-  test("cards fit phones without overflow and keep 44px buttons", async ({ page }) => {
+  test("the plan list fits phones without overflow, each row a 44px target", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 640 });
     await page.goto("/memberships");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
-    // Phones swipe through the same cards as the home page, one at a time.
-    const heights = await page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li label").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    const heights = await page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+    expect(heights).toHaveLength(4);
     for (const h of heights) expect(h).toBeGreaterThanOrEqual(44);
   });
 });
@@ -693,22 +693,22 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the class week shows one card per class, venue, from-price and Book", async ({ page }) => {
+test("home: the class week is a plain timetable with the facts and one Book now", async ({ page }) => {
   await page.goto("/");
   const facts = page.getByRole("region", { name: "3 classes a week" });
   await expect(facts.getByRole("heading", { level: 2 })).toHaveText(/3 classes\s*a week/);
-  const cards = facts.getByRole("list", { name: "Class times" }).locator("> li");
-  await expect(cards).toHaveCount(3);
-  await expect(cards.nth(0)).toContainText("Mon");
-  await expect(cards.nth(0)).toContainText("6:30 pm");
-  await expect(cards.nth(2)).toContainText("Sat");
-  await expect(cards.nth(2)).toContainText("9:00 am");
-  await expect(facts.getByRole("button", { name: "Book now" })).toBeDisabled();
-  await cards.nth(2).click({ position: { x: 20, y: 20 } });
-  await expect(facts.getByRole("radio", { name: "Saturday 9:00 am" })).toBeChecked();
-  await expect(facts.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class?class=sat-morning");
+  const rows = facts.getByRole("list", { name: "Class times" }).locator("> li");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("Monday");
+  await expect(rows.nth(0)).toContainText("6:30 pm");
+  await expect(rows.nth(2)).toContainText("Saturday");
+  await expect(rows.nth(2)).toContainText("9:00 am");
+  // The date is chosen in the calendar, so the rows aren't choices.
+  await expect(facts.getByRole("radio")).toHaveCount(0);
+  await expect(facts.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await expect(facts).toContainText("60 minutes");
   await expect(facts).toContainText("Media House, Cumbernauld");
-  await expect(facts).toContainText("£7.08 a class");
+  await expect(facts).toContainText("£7.08 with a membership");
 });
 
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
@@ -753,28 +753,6 @@ test("no arrows anywhere on the public pages", async ({ page }) => {
   }
 });
 
-test("home memberships: swipe cards with a counter and Previous / Next on phones, four across on desktop", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  const section = page.locator("#memberships");
-  const cards = section.getByRole("list", { name: "Membership plans" }).locator("> li");
-  await expect(cards).toHaveCount(4);
-  await expect(section.getByText("01 / 04")).toBeVisible();
-  await expect(section.getByRole("button", { name: "Previous" })).toBeDisabled();
-  await section.getByRole("button", { name: "Next" }).click();
-  await expect(section.getByText("02 / 04")).toBeVisible({ timeout: 5000 });
-  for (const [name, text] of [["Starter", "£40"], ["Regular", "£65"], ["Dedicated", "£85"]]) {
-    const card = cards.filter({ has: page.getByRole("heading", { name }) });
-    await expect(card).toContainText(text);
-  }
-  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(section.getByRole("button", { name: "Next" })).toBeHidden();
-  // Layout position (offsetTop), not the drawn box, which moves while the cards reveal.
-  const tops = await cards.evaluateAll((els) => els.map((e) => (e as HTMLElement).offsetTop));
-  expect(new Set(tops).size).toBe(1);
-});
-
 test("header Book now is underlined only in the booking flow", async ({ page }) => {
   const book = () => page.locator("header").first().getByRole("link", { name: "Book now" });
   await page.goto("/");
@@ -804,17 +782,7 @@ test("header: Book now sits as far from the right edge as the menu icon is from 
   }
 });
 
-test("section titles are underlined, headings are not", async ({ page }) => {
-  await page.goto("/");
-  const deco = (loc: ReturnType<typeof page.locator>) => loc.first().evaluate((el) => getComputedStyle(el).textDecorationLine);
-  expect(await deco(page.getByText("Group kettlebell classes", { exact: true }))).toBe("underline");
-  expect(await deco(page.getByText("Ways to train", { exact: true }))).toBe("underline");
-  expect(await deco(page.locator("#quick-facts-heading"))).toBe("none");
-  expect(await deco(page.locator("#training-heading"))).toBe("none");
-  expect(await deco(page.locator("section[aria-labelledby=hero-heading] h1"))).toBe("none");
-});
-
-test("home: each membership card is one choice, and class times appear once", async ({ page }) => {
+test("home: each plan row is one choice, class times appear once, and secondary detail lives elsewhere", async ({ page }) => {
   await page.goto("/");
   const cards = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
   for (const name of ["Starter", "Regular", "Dedicated"]) {
@@ -823,28 +791,12 @@ test("home: each membership card is one choice, and class times appear once", as
   }
   const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
   await expect(payg.getByRole("radio", { name: /^Pay as you go/ })).toHaveCount(1);
-  const extra = payg.getByRole("table", { name: "Extra vs a membership" });
-  await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
-  await expect(extra.getByRole("row")).toHaveCount(4);
+  // The extra-cost table and the full terms live on /memberships, not here.
+  await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
-  await expect(page.locator("#practical-heading")).toHaveText("Find us and book");
-});
-
-test("phones: a Book now bar appears after the hero and hides over the footer", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  const bar = page.getByRole("complementary", { name: "Book a class" });
-  await expect(bar).toHaveCount(0); // hidden (aria-hidden) at the top
-  await page.locator("#find-your-training").scrollIntoViewIfNeeded();
-  await expect(bar).toBeVisible();
-  await expect(bar.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  await expect(bar).toContainText(/^From only £\d+\.\d{2} a class/);
-  await expect(bar).not.toContainText("pm");
-  await page.locator("footer").scrollIntoViewIfNeeded();
-  await expect(bar).toHaveCount(0);
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.locator("#find-your-training").scrollIntoViewIfNeeded();
-  await expect(page.locator("aside[aria-label='Book a class']")).toBeHidden();
+  await expect(page.locator("#practical-heading")).toHaveText("Find us");
+  // No sticky Book now bar: the header's Book now is always on screen.
+  await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });
 
 test.describe("opening curtain", () => {

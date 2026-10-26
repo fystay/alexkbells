@@ -1,8 +1,8 @@
 import { hero } from "@/content/home";
+import { site } from "@/content/site";
 import { images } from "@/content/images";
 import { heroVideo } from "@/content/media";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import Link from "next/link";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { HeroVideo } from "./HeroVideo";
@@ -47,16 +47,10 @@ export function Hero() {
                 {hero.headlineSecondary}
               </span>
             </h1>
-            {/* One button; the second option is a quieter text link (owner, 2026-10-23). */}
-            <div className="mt-6 flex items-center gap-5 sm:mt-7 sm:gap-7">
-              <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} onDark className="flex-1 sm:w-56 sm:flex-none" />
-              <Link
-                href="/coaching"
-                className="inline-flex min-h-11 items-center text-xs font-semibold uppercase tracking-[0.08em] whitespace-nowrap text-white underline underline-offset-[6px] hover:no-underline sm:text-sm"
-              >
-                {hero.secondaryLabel}
-              </Link>
-            </div>
+            {/* What RAENG is, in one line (mobile-first redesign, 2026-10-24). */}
+            <p className="hero-glow mt-4 text-base sm:text-lg">Kettlebell classes in {site.location.town}.</p>
+            {/* One action on the first screen; the other services come further down. */}
+            <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} onDark className="mt-6 w-full sm:mt-7 sm:w-64" />
           </div>
         </div>
       </div>

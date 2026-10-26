@@ -146,6 +146,12 @@ See Coach portal below.
 - [ ] **P2** Emails to clients from the site (needs a verified sending domain); today Alex sends the prepared message himself
 
 
+## Mobile-first redesign (2026-10-24, approved 2026-10-26)
+- [x] Audit at 375/390/430/768/1024/1440: home was 7.5 phone screens with three card choice sections and five Book now buttons
+- [x] Home rebuilt phone first: hero (what RAENG is, one action) → timetable → plan list → coach → more ways → find us (5.3 screens); /classes and /memberships share the timetable and plan list
+- [ ] P1 Restyle /coaching, /online-coaching, /about and /contact to the same system (fewer bands and labels, phone first)
+- [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
+
 ## Master redesign (2026-10-22)
 - [x] Four-colour system (tokens, components, test), hero "Get stronger. Move better.", new home order, memberships with conditions, schedule Saturday 9:00, per-plan sign-up URLs
 - [x] Memberships in the coach portal (2026-10-23, migration `20261023000000_akb_memberships.sql` applied live): plan carried on the booking request, start from the request, four-week periods with credits and one charge each, daily renewal cron (`/api/cron/membership-renewals`), pay class places with credits, 24-hour rule enforced in the database, give a credit back, pause/resume/cancel

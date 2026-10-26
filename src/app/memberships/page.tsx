@@ -10,7 +10,7 @@ import { Section } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { CancellationPolicy } from "@/components/memberships/CancellationPolicy";
-import { PlanCards } from "@/components/memberships/MembershipSummary";
+import { PaygExtra, PlanList } from "@/components/memberships/PlanList";
 import { MembershipTerms } from "@/components/memberships/MembershipTerms";
 
 export const metadata: Metadata = pageMetadata({
@@ -41,11 +41,13 @@ export default function MembershipsPage() {
           Or book a single class
         </ButtonLink>
       </PageHeader>
-      <Section tone="white" id="memberships" labelledBy="plans-heading">
+      <Section id="memberships" labelledBy="plans-heading">
         <h2 id="plans-heading" className="sr-only">
           Membership plans
         </h2>
-        <PlanCards />
+        {/* The home page's plan list (the home page is the reference), then the detail that only belongs here. */}
+        <PlanList className="max-w-2xl" />
+        <PaygExtra className="mt-12" />
       </Section>
       <MembershipTerms />
       <CancellationPolicy />

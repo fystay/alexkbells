@@ -21,7 +21,7 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
-import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
+import { useChosenPlan } from "@/lib/chosen-plan";
 import {
   ActionBar,
   ChoiceGroup,
@@ -85,9 +85,6 @@ const getServerToday = () => null;
 export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
   const demo = mode === "demo";
   const chosenPlan = useChosenPlan();
-  // The class chosen on a class card (`?class=<timetable id>`): its next date is preselected.
-  const classParam = useQueryParam("class");
-  const [preselected, setPreselected] = useState(false);
   const [full, setFull] = useState<{ full: string[]; cancelled: string[] }>({ full: [], cancelled: [] });
   const fullSet = new Set(full.full);
   const cancelledSet = new Set(full.cancelled);
@@ -167,17 +164,6 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
 
   const done = demo ? demoDone : serverState.status === "success";
 
-  // Once, as soon as the dates are known (state adjusted while rendering, not in an effect).
-  if (!preselected && usesSessions && avail && classParam) {
-    setPreselected(true);
-    const wanted = classes.find((c) => c.id === classParam);
-    const day = wanted ? avail.days.find((d) => WEEKDAY_NAMES[weekdayIndex(d.date)] === wanted.day && d.slots.some((s) => s.time === wanted.start && s.available)) : undefined;
-    const slot = day?.slots.find((s) => s.time === wanted?.start && s.available);
-    if (day && slot) {
-      setDate(day.date);
-      setSlotId(slot.id);
-    }
-  }
 
   // Live classes: which dates are full (capacity reached in the coach portal) or cancelled by Alex.
   // Best effort: if it can't be read, every date stays open and Alex confirms.

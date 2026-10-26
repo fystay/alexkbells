@@ -170,8 +170,10 @@ test.describe("booking prototype (demo availability)", () => {
     await page.keyboard.press("Enter");
     await expect(page.getByRole("heading", { name: "Choose a date and time" })).toBeFocused();
 
-    // Arrow keys move between dates that can be chosen.
+    // Arrow keys move between dates that can be chosen. Late in a month the
+    // calendar can open with only one left, so use the next month then.
     const dates = page.locator('input[name="date"]:not([disabled])');
+    if ((await dates.count()) < 2) await page.getByRole("button", { name: "Next month" }).click();
     await dates.first().focus();
     await page.keyboard.press("Space");
     await expect(dates.first()).toBeChecked();
@@ -427,17 +429,6 @@ test.describe("production configuration", () => {
     expect(row!.summary).toContain("Regular membership");
     const sent = (await emails(request)).find((e) => e.payload.subject === "Group class booking request: Plan Chooser");
     expect(sent!.payload.text).toContain("Membership: Regular membership (£65 every 4 weeks, 8 class credits)");
-  });
-
-  test("a class chosen on the class cards opens the calendar on its next date", async ({ page }) => {
-    await page.goto(`${PROD}/`);
-    const facts = page.getByRole("region", { name: "3 classes a week" });
-    await facts.getByRole("list", { name: "Class times" }).locator("> li").filter({ hasText: "Wed" }).click({ position: { x: 20, y: 20 } });
-    await facts.getByRole("link", { name: "Book now" }).click();
-    await expect(page).toHaveURL(/\/book\/group-class\?class=wed-evening$/);
-    const next = classAvailability(timetable.sessions, toDateKey(new Date())).days.find((d) => new Date(`${d.date}T12:00:00`).getDay() === 3)!;
-    await expect(page.getByRole("radio", { name: new RegExp(`^${formatLongDate(next.date)}`) })).toBeChecked();
-    await expect(continueButton(page)).toBeEnabled();
   });
 
   test("a made-up plan in the link is ignored", async ({ page }) => {

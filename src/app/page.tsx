@@ -1,49 +1,56 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { CoachStory } from "@/components/home/CoachStory";
-import { FindYourTraining } from "@/components/home/FindYourTraining";
-import { Hero } from "@/components/home/Hero";
-import { FirstClass } from "@/components/home/FirstClass";
-import { Testimonials } from "@/components/home/Testimonials";
-import { QuickFacts } from "@/components/home/QuickFacts";
-import { PracticalInfo } from "@/components/home/PracticalInfo";
-import { WhyKettlebells } from "@/components/home/WhyKettlebells";
-import { StickyBook } from "@/components/home/StickyBook";
-import { hero } from "@/content/home";
-import { membershipPlans } from "@/content/memberships";
+import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { getPrimaryCtaFor } from "@/lib/booking";
-import { formatPenceShort, planFigures } from "@/lib/membership";
-import { publishable } from "@/lib/publish";
-import { MembershipSummary } from "@/components/memberships/MembershipSummary";
+import { timetable } from "@/content/classes";
+import { formatPenceShort, maxSavingPence } from "@/lib/membership";
+import { isPublishable } from "@/lib/publish";
+import { CoachStory } from "@/components/home/CoachStory";
+import { ClassTimes } from "@/components/home/ClassTimes";
+import { Hero } from "@/components/home/Hero";
+import { MoreWays } from "@/components/home/MoreWays";
+import { PracticalInfo } from "@/components/home/PracticalInfo";
+import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
+import { Section, SectionHeading } from "@/components/ui/Section";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
-// Order (owner, 2026-10-23): the film, then who Alex is (the strongest proof),
-// why kettlebells, the classes, what's on offer, memberships, then where to go.
-// Section backgrounds alternate cream / white down the page.
+const payg = getService("group-classes").prices[0];
+
+// Order (mobile-first redesign, 2026-10-24): what RAENG is and Book now, then
+// the classes and times, what they cost, who coaches them, the other ways to
+// train, and where to go. One idea per section, all on the cream page. Phones
+// read top to bottom; from lg the heading sits left of its content.
+const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
-  const cta = getPrimaryCtaFor("group-class");
-  const price = publishable(getService("group-classes").prices)[0];
-  const lowest = price ? Math.min(...membershipPlans.map((p) => planFigures(p, price.amountGbp).perClassPence)) : null;
+  const sessions = isPublishable(timetable.status) ? timetable.sessions.length : 0;
   return (
     <>
       <Hero />
-      <CoachStory />
-      <WhyKettlebells />
-      <QuickFacts />
-      <FirstClass />
-      <FindYourTraining />
-      <MembershipSummary />
-      <Testimonials />
+      <Section id="classes" labelledBy="classes-heading">
+        <div className={split}>
+          <SectionHeading id="classes-heading" className="lg:col-span-5" title={sessions ? `${sessions} ${sessions === 1 ? "class" : "classes"} a week` : "Kettlebell classes"} />
+          <ClassTimes className="mt-6 lg:col-span-7 lg:mt-0" />
+        </div>
+      </Section>
+      <Section id="memberships" labelledBy="memberships-heading">
+        <div className={split}>
+          <SectionHeading
+            id="memberships-heading"
+            className="lg:col-span-5"
+            title="Memberships"
+            intro={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks against pay as you go.`}
+          />
+          <div className="mt-6 lg:col-span-7 lg:mt-0">
+            <PlanList />
+            <PlanTerms className="mt-4" />
+          </div>
+        </div>
+      </Section>
+      <CoachStory tone="plain" />
+      <MoreWays />
       <PracticalInfo />
-      <StickyBook
-        href={cta.href}
-        label={cta.kind === "booking" ? hero.primaryLabel : cta.label}
-        external={cta.external}
-        price={lowest !== null ? `From only ${formatPenceShort(lowest)} a class` : null}
-      />
     </>
   );
 }

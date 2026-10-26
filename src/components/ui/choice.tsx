@@ -16,6 +16,22 @@ export const choiceCard =
 export const choiceBadge =
   "group-has-[:checked]/choice:bg-white group-has-[:checked]/choice:text-ink";
 
+/**
+ * For a selectable row (a list rather than cards): just the circle, at the
+ * start of the row, with the label stretched over the whole row.
+ */
+export function ChoiceDot({ name, value, label }: { name: string; value: string; label: string }) {
+  return (
+    <label className="flex shrink-0 cursor-pointer items-center after:absolute after:inset-0 after:content-['']">
+      <input type="radio" name={name} value={value} className="sr-only" />
+      <span aria-hidden="true" className="flex size-5 items-center justify-center rounded-full border border-current">
+        <span className="size-2.5 scale-0 rounded-full bg-current motion-safe:transition-transform group-has-[:checked]/choice:scale-100" />
+      </span>
+      <span className="sr-only">{label}</span>
+    </label>
+  );
+}
+
 /** The card's radio: a "Select" / "Selected" line whose label covers the whole card. */
 export function ChoiceMark({
   name,

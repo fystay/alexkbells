@@ -49,7 +49,7 @@ export function CoachStory({
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-0">
           <div className="lg:col-span-6 lg:self-end">
             <p className="eyebrow mb-4">Meet your coach</p>
-            <Heading id="coach-heading" className="font-display text-h1 leading-[0.95] text-balance">
+            <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>
           </div>
@@ -77,7 +77,7 @@ export function CoachStory({
               </dl>
             ) : null}
             {showAboutLink ? (
-              <ButtonLink href="/about" variant="secondary" className="mt-6 w-full sm:w-auto">
+              <ButtonLink href="/about" variant="text" className="mt-4 font-semibold underline">
                 About RAENG
               </ButtonLink>
             ) : null}
