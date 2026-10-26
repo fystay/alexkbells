@@ -471,9 +471,9 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Mobile-first order (2026-10-24; first class added 2026-10-26).
+  // Alex's order (WhatsApp 15 Oct 2026): book, what I offer, why kettlebells, about me.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "classes", "first-class", "memberships", "coach", "more-ways", "practical-info"]);
+  expect(order).toEqual(["hero-heading", "classes", "first-class", "memberships", "more-ways", "why-kettlebells", "coach", "practical-info"]);
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");

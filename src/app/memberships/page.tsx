@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { images } from "@/content/images";
 import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
@@ -29,7 +28,6 @@ export default function MembershipsPage() {
   return (
     <>
       <PageHeader
-        image={images.whyKettlebells}
         eyebrow="Kettlebell memberships"
         title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
         intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class. Every membership costs less per class.`}

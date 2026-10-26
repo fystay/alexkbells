@@ -193,3 +193,12 @@ See Coach portal below.
 - [ ] P1 Alex's own words: background, qualifications, philosophy, motivation, brand story; a current portrait
 - [ ] P1 Booking/payment decision unchanged (see CORE.md open decisions): on-site request flow stays; Square not live
 - [ ] P2 Real RAENG logo artwork if one exists; Online coaching feature list, capacity/cancellation policy, testimonials
+
+## From Alex's WhatsApp messages (reviewed 2026-10-26)
+- [x] Home page in Alex's order (book, what I offer, why kettlebells, about me); Why kettlebells back on the home page
+- [x] Pictures limited to the hero film, the before-and-after and one photo each on /classes and /coaching
+- [x] Booking requests are live in production (stored for the coach area; Alex confirms each one)
+- [ ] **P0, needs Alex** Square card payments: Alex's Square application credentials, then the Sandbox test plan in DEPLOYMENT.md → Square card payments, then live
+- [ ] **P1, needs Alex** Max class capacity, and what's included in 1:1 coaching (he mentioned confirming both; never guessed)
+- [ ] **P1, needs Alex** 2–3 member quotes with permission (the section is built and hidden until then)
+- [ ] **P2** Alex's layout references (ChatGPT images, 21 Oct) and his 25 Oct voice note weren't in the chat export: compare once received

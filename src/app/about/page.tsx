@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { aboutStory, pillars } from "@/content/about";
-import { images } from "@/content/images";
 import { isPublishable } from "@/lib/publish";
 import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
@@ -29,7 +28,6 @@ export default function AboutPage() {
   return (
     <>
       <PageHeader
-        image={images.hero}
         eyebrow="About RAENG"
         title="Strength is built through consistency."
         intro="RAENG is a kettlebell club in Cumbernauld, Glasgow: classes with flexible memberships, plus 1:1 and online coaching, built around good technique and a club that shows up."

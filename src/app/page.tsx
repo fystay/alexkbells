@@ -13,6 +13,7 @@ import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { PracticalInfo } from "@/components/home/PracticalInfo";
 import { Testimonials } from "@/components/home/Testimonials";
+import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
@@ -20,9 +21,11 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 
 const payg = getService("group-classes").prices[0];
 
-// Order (mobile-first redesign, 2026-10-24; first class added 2026-10-26): the
-// film and Book now, then the classes and times, what a first class is like,
-// what it costs, who coaches it, the other ways to train, and where to go. One
+// Order (Alex, WhatsApp 15 Oct 2026: where and how to book, what I offer, why
+// kettlebells, about me; applied 2026-10-26): the film and Book now, the classes
+// and times, what a first class is like, the memberships and the other ways to
+// train, why kettlebells, who coaches it (and members' words, once there are
+// any), and where to go. One
 // idea per section, all on the cream page, separated by space (warm tech,
 // 2026-10-26). Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
@@ -58,9 +61,10 @@ export default function HomePage() {
           </div>
         </div>
       </Section>
+      <MoreWays />
+      <WhyKettlebells />
       <CoachStory tone="plain" />
       <Testimonials />
-      <MoreWays />
       <PracticalInfo />
     </>
   );
