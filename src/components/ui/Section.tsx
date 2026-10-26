@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { statement } from "@/lib/title";
-import { TitleBar } from "./TitleBar";
 
 /**
  * Warm tech (owner's pick C, 2026-10-26): one cream page, sections separated by
@@ -54,7 +53,6 @@ export function SectionHeading({ id, eyebrow, title, intro, as: Heading = "h2", 
       <Heading id={id} className={cn("font-display text-balance", Heading === "h1" ? "text-h1" : "text-h2")}>
         {statement(title)}
       </Heading>
-      <TitleBar />
       {intro ? <div className="mt-5 max-w-xl text-lede">{intro}</div> : null}
     </div>
   );

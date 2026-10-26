@@ -267,14 +267,3 @@
   }
 }
 
-/* Title bar (components/ui/TitleBar.tsx): draws in from the left, just after
-   its block fades in. Only while scroll reveal is active, never with Reduce Motion. */
-@media (prefers-reduced-motion: no-preference) {
-  html[data-reveal-ready] [data-reveal] .title-bar {
-    transform-origin: left center;
-    transition: transform 900ms cubic-bezier(0.2, 0, 0, 1) calc(var(--reveal-delay, 0ms) + 250ms);
-  }
-  html[data-reveal-ready] [data-reveal]:not([data-revealed]) .title-bar {
-    transform: scaleX(0);
-  }
-}

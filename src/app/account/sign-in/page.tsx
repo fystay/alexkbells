@@ -6,7 +6,6 @@ import { ACCOUNT_PATH } from "@/lib/member-auth";
 import { currentMember } from "@/lib/member-session";
 import { SignInForm } from "@/components/account/SignInForm";
 import { Section } from "@/components/ui/Section";
-import { TitleBar } from "@/components/ui/TitleBar";
 
 export const metadata: Metadata = pageMetadata({
   title: "Member sign-in",
@@ -32,7 +31,6 @@ export default async function MemberSignInPage({ searchParams }: { searchParams:
         <h1 id="sign-in-heading" className="mt-3 font-display text-h1 text-balance">
           Sign in.
         </h1>
-        <TitleBar />
         <p className="mt-5 text-lede">See your credits and renewal date, and book or cancel classes. We&apos;ll email you a link: no password needed.</p>
         {note ? (
           <p role="status" className="card mt-8 px-5 py-4 font-semibold">

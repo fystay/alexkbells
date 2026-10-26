@@ -14,7 +14,6 @@ import { pageMetadata } from "@/lib/metadata";
 import { formatTime } from "@/lib/schedule";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
-import { TitleBar } from "@/components/ui/TitleBar";
 
 export const metadata: Metadata = pageMetadata({
   title: "Your membership",
@@ -99,7 +98,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <h1 id="account-heading" className="font-display text-h1">
           Your membership.
         </h1>
-        <TitleBar />
         <p className="mt-5 text-lede">Sorry, your account couldn&apos;t be loaded just now. Please try again in a minute.</p>
       </Section>
     );
@@ -119,7 +117,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <h1 id="account-heading" className="mt-3 font-display text-h1 text-balance">
             Your membership.
           </h1>
-          <TitleBar />
           {done || error ? (
             <p role={error ? "alert" : "status"} className={`mt-6 rounded-2xl px-5 py-4 font-semibold ${error ? "border-2 border-ink bg-white" : "bg-ink text-white"}`}>
               {error ?? done}

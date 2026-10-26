@@ -6,7 +6,6 @@ import { publishedClasses } from "@/lib/class-sessions";
 import { pageMetadata } from "@/lib/metadata";
 import { MembershipJoin } from "@/components/booking/MembershipJoin";
 import { InstagramFallback } from "@/components/booking/ui";
-import { TitleBar } from "@/components/ui/TitleBar";
 
 export const metadata: Metadata = pageMetadata({
   title: "Join a Membership",
@@ -31,7 +30,6 @@ export default function JoinMembershipPage() {
           <h1 id="join-heading" className="mt-3 font-display text-h2 text-balance">
             Join a membership.
           </h1>
-          <TitleBar />
           <p className="mt-5 text-lede">Choose your plan and first class. Alex confirms every membership personally, and there&apos;s nothing to pay now.</p>
         </header>
         <div className="mt-8 lg:mt-10">

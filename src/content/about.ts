@@ -1,20 +1,14 @@
 import type { ContentStatus } from "./types";
 
 /**
- * Longer-form brand story for /about, in Alex's own words: his RAENG launch
- * post on Instagram (@alex.kbells, 26 Oct 2026), published by him, so
- * confirmed. Left out: the opening teaser line and the paragraph promising
- * news "over the next few weeks" (it would date), and the closing emoji.
+ * Alex's line on what RAENG is for, word for word from his launch post on
+ * Instagram (@alex.kbells, 26 Oct 2026), published by him, so confirmed.
+ * Shown on /about as a quote with the class facts and Book now (owner's
+ * pick C, 2026-10-26: the full post read too casual to sell).
  */
-export const aboutStory: { status: ContentStatus; title: string; paragraphs: string[] } | null = {
+export const aboutQuote: { status: ContentStatus; text: string } | null = {
   status: "confirmed",
-  title: "Introducing RAENG Fitness.",
-  paragraphs: [
-    "Kettlebell training has become a big part of my life, and over time it’s grown into something I want to build beyond myself.",
-    "A place where people can challenge themselves, learn new skills, build confidence and be part of something bigger than just a workout.",
-    "I want to bring people together through training, create an environment where everyone can progress at their own pace, and help people enjoy the process of getting stronger, both inside and outside the gym.",
-    "The next chapter starts here. Welcome to RAENG.",
-  ],
+  text: "Be part of something bigger than just a workout.",
 };
 
 /** The three brand themes. Creative direction supplied in the RAENG brief. */

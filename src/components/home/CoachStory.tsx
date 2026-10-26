@@ -5,7 +5,6 @@ import { isPublishable } from "@/lib/publish";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
 import { Section, type SectionTone } from "@/components/ui/Section";
-import { TitleBar } from "@/components/ui/TitleBar";
 import { BeforeAfter } from "./BeforeAfter";
 
 /** The optional coach fields that are confirmed, in reading order. Empty slots are skipped. */
@@ -53,7 +52,6 @@ export function CoachStory({
             <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>
-            <TitleBar />
           </div>
           {photos ? (
             <figure className="lg:col-span-6 lg:row-span-2 lg:self-center">

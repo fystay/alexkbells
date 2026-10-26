@@ -5,7 +5,6 @@ import { pageMetadata } from "@/lib/metadata";
 import { isToken, SIGN_IN_PATH } from "@/lib/member-auth";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
-import { TitleBar } from "@/components/ui/TitleBar";
 
 export const metadata: Metadata = pageMetadata({
   title: "Sign in",
@@ -29,7 +28,6 @@ export default async function ConfirmSignInPage({ searchParams }: { searchParams
         <h1 id="confirm-heading" className="mt-3 font-display text-h1 text-balance">
           {valid ? "Sign in." : "Link not valid."}
         </h1>
-        <TitleBar />
         {valid ? (
           <form action={confirmSignIn} className="mt-8">
             <input type="hidden" name="token" value={token} />

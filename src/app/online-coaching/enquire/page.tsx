@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { TitleBar } from "@/components/ui/TitleBar";
 import { pageMetadata } from "@/lib/metadata";
 import { onlineEnquiryMode } from "@/lib/booking";
 import { site } from "@/content/site";
@@ -31,7 +30,6 @@ export default function OnlineCoachingPage() {
             <h1 id="online-heading" className="mt-3 font-display text-h2 text-balance">
               Ask about online coaching.
             </h1>
-            <TitleBar />
             <p className="mt-5 text-lede text-muted">
               Personalised kettlebell programming with ongoing support, wherever you train.{" "}
               {mode === "unavailable"

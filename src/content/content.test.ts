@@ -4,7 +4,7 @@ import { timetable } from "./classes";
 import { faq } from "./faq";
 import { journey } from "./journey";
 import { coach } from "./coach";
-import { aboutStory } from "./about";
+import { aboutQuote } from "./about";
 import { testimonials } from "./community";
 
 // Guards against accidental publication: anything not yet approved by the
@@ -54,8 +54,8 @@ describe("content approval state", () => {
   it("keeps unsupplied RAENG content out of the site", () => {
     // Nothing has been supplied for these slots; none may be published until Alex confirms it.
     expect(testimonials.filter((t) => t.status === "confirmed")).toEqual([]);
-    // The story is Alex's own launch post (Instagram, 26 Oct 2026), word for word.
-    expect(aboutStory?.paragraphs.at(-1)).toBe("The next chapter starts here. Welcome to RAENG.");
+    // The quote is Alex's own words from his launch post (Instagram, 26 Oct 2026).
+    expect(aboutQuote?.text).toBe("Be part of something bigger than just a workout.");
     for (const field of [coach.background, coach.qualifications, coach.philosophy, coach.motivation]) {
       expect(field === null || field.status === "provisional").toBe(true);
     }

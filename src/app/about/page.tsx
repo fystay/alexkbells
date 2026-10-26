@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { aboutStory, pillars } from "@/content/about";
-import { isPublishable } from "@/lib/publish";
+import { pillars } from "@/content/about";
 import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { CoachStory } from "@/components/home/CoachStory";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
+import { CoachQuote } from "@/components/sections/CoachQuote";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Location } from "@/components/sections/Location";
 import { PageHeader } from "@/components/sections/PageHeader";
@@ -19,9 +19,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function AboutPage() {
-  const story = aboutStory && isPublishable(aboutStory.status) ? aboutStory : null;
   // Sections alternate white / cream below the cream opening, as on the home page,
-  // whether or not the (optional) story is shown.
+  // whether or not the quote is shown.
   let n = 0;
   const tone = (): SectionTone => (n++ % 2 === 0 ? "white" : "plain");
 
@@ -37,20 +36,7 @@ export default function AboutPage() {
         </ButtonLink>
       </PageHeader>
 
-      {story ? (
-        <Section tone={tone()} id="story" labelledBy="story-heading">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <SectionHeading id="story-heading" eyebrow="From Alex" title={story.title} />
-            </div>
-            <div className="max-w-2xl space-y-5 text-lede  lg:col-span-7">
-              {story.paragraphs.map((text) => (
-                <p key={text}>{text}</p>
-              ))}
-            </div>
-          </div>
-        </Section>
-      ) : null}
+      <CoachQuote tone={tone()} />
 
       <Section tone={tone()} id="values" labelledBy="values-heading">
         <SectionHeading

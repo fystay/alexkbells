@@ -1,5 +1,4 @@
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
-import { TitleBar } from "@/components/ui/TitleBar";
 import { statement } from "@/lib/title";
 import { bookingMode, parseBookingUrl } from "@/lib/booking";
 import type { BookableService } from "@/lib/booking-options";
@@ -43,7 +42,6 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
           <h1 id="book-heading" className="mt-3 font-display text-h2 text-balance">
             {statement(title)}
           </h1>
-          <TitleBar />
           <p className="mt-5 text-lede text-muted">{intro}</p>
         </header>
         {initialService !== "one-to-one" ? <ChosenPlan /> : null}
