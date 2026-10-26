@@ -483,7 +483,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   // Start in three steps, every answer still there, then Book now.
   const classes = page.locator("#classes");
   for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(classes.getByRole("heading", { level: 3, name: step })).toBeVisible();
-  await expect(classes).toContainText("Alex will take you through the basics");
+  await expect(classes).toContainText("New? Say so when you book.");
   await expect(classes).toContainText("goals and any injuries");
   await expect(classes).toContainText("Flat shoes or bare feet work best");
   await expect(classes.getByRole("link", { name: "Book now" })).toBeVisible();
@@ -541,7 +541,9 @@ test.describe("memberships", () => {
       const row = rows.nth(i);
       await expect(row.getByRole("heading", { name: p.name })).toBeVisible();
       await expect(row).toContainText(p.price);
-      await expect(row).toContainText(`Every 4 weeks · ${p.credits}`);
+      await expect(row).toContainText(p.credits);
+      // "Every 4 weeks" is said once, in the intro, not on each plan.
+      await expect(row).not.toContainText("Every 4 weeks");
       await expect(row).toContainText(`${p.perClass} per class · Save ${p.save}`);
       await expect(row).toContainText(`Pay-as-you-go equivalent ${p.payg}`);
     }
@@ -730,7 +732,7 @@ test("home: the classes start in three steps, the first with the week's times as
   // The date is chosen in the calendar, so the rows aren't choices.
   await expect(facts.getByRole("radio")).toHaveCount(0);
   await expect(facts).toContainText("60 minutes. All levels, scaled to you.");
-  await expect(facts).toContainText("£7.08 with a membership");
+  await expect(facts).toContainText("£12 a class, or save with a membership.");
 });
 
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
@@ -814,8 +816,11 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(page.locator("#book")).not.toContainText("Classes run");
   // Each plan states its rules as in Alex's layout.
   const regular = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").filter({ has: page.getByRole("heading", { name: "Regular" }) });
-  for (const text of ["Every 4 weeks · 8 class credits", "£8.13 per class", "Save £31", "Pay-as-you-go equivalent £96"]) await expect(regular).toContainText(text);
+  for (const text of ["8 class credits", "£8.13 per class", "Save £31", "Pay-as-you-go equivalent £96"]) await expect(regular).toContainText(text);
   await expect(page.locator("#memberships").getByRole("heading", { name: "Membership rules" })).toBeVisible();
+  // Each fact once: the days only in the timetable, Instagram only in Meet your coach.
+  await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(1);
+  await expect(page.locator("#book").getByRole("link", { name: /Instagram/ })).toHaveCount(0);
   // No sticky Book now bar: the header's Book now is always on screen.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });

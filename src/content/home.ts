@@ -12,9 +12,9 @@ export const hero = {
 /** Practical benefits of kettlebell training, described, not promised. No medical or results claims. */
 export const whyKettlebells = [
   { title: "Strength", body: "Train the whole body at once." },
-  { title: "Conditioning", body: "Strength and fitness, together." },
+  { title: "Conditioning", body: "Fitness and stamina, built in." },
   { title: "Movement quality", body: "Balance, timing and coordination." },
-  { title: "Efficient and adaptable", body: "One bit of kit, scaled to you." },
+  { title: "Efficient and adaptable", body: "One bit of kit, trained anywhere." },
 ] as const;
 
 /**
@@ -28,7 +28,8 @@ export const firstClassSteps = {
   pick: "Pick a class",
   book: "Book your place",
   turnUp: "Turn up and train",
-  beginners: "New? Say so when you book and Alex will take you through the basics.",
+  // Step 3 says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
+  beginners: "New? Say so when you book.",
   firstSession: "Alex asks about your goals and any injuries, teaches the key movements and gets your technique solid before you go heavier.",
   bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Flat shoes or bare feet work best.",
 } as const;

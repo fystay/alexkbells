@@ -28,11 +28,9 @@ export function CoachIntro() {
               className="size-10 shrink-0 rounded-full object-cover object-top"
             />
           ) : null}
+          {/* Name only: his role is in Meet your coach (fewer repeats, owner 2026-10-26). */}
           <span className="min-w-0 flex-1 text-sm leading-snug">
-            <span className="block">
-              Coached by <span className="font-semibold">{coach.name}</span>
-            </span>
-            <span className="block">{coach.role}</span>
+            Coached by <span className="font-semibold">{coach.name}</span>
           </span>
           <span className="shrink-0 text-sm font-semibold underline underline-offset-4 group-hover:no-underline">Meet {coach.name.split(" ")[0]}</span>
         </a>

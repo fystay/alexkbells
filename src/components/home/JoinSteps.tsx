@@ -3,9 +3,10 @@ import { faq } from "@/content/faq";
 import { firstClassSteps as steps, hero } from "@/content/home";
 import { formatAddressLines, mapsUrl } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { isPublishable } from "@/lib/publish";
 import { StartTraining } from "@/components/ui/StartTraining";
-import { ClassTimes, classFacts, classPriceLine } from "./ClassTimes";
+import { getService } from "@/content/services";
+import { isPublishable, publishable } from "@/lib/publish";
+import { ClassTimes, classFacts } from "./ClassTimes";
 
 /** A step line, shown only while the FAQ answer it restates is confirmed. */
 function confirmed(id: "beginners" | "first-session" | "bring", text: string): string | null {
@@ -37,7 +38,8 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
  */
 export function JoinSteps({ className }: { className?: string }) {
   const cta = getPrimaryCtaFor("group-class");
-  const price = classPriceLine();
+  // The membership figures are in the plans straight below, so only the class price here.
+  const price = publishable(getService("group-classes").prices)[0];
   const beginners = confirmed("beginners", steps.beginners);
   const firstSession = confirmed("first-session", steps.firstSession);
   const bring = confirmed("bring", steps.bring);
@@ -49,7 +51,7 @@ export function JoinSteps({ className }: { className?: string }) {
           <ClassTimes showPrice={false} className="pt-1 text-base" />
         </Step>
         <Step n={2} title={steps.book}>
-          {price ? <p>{price}</p> : null}
+          {price ? <p>£{price.amountGbp} a class, or save with a membership.</p> : null}
           {beginners ? <p>{beginners}</p> : null}
         </Step>
         <Step n={3} title={steps.turnUp}>

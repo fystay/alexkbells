@@ -19,6 +19,8 @@ interface CtaBandProps {
   /** Where Book now goes: the page's own service (default group class), or "any" for the /book chooser. */
   service?: BookableService | "any";
   tone?: SectionTone;
+  /** The quieter Instagram link; off on home, where Meet your coach already links it. */
+  instagram?: boolean;
 }
 
 /**
@@ -26,7 +28,7 @@ interface CtaBandProps {
  * own), one booking button and Instagram as a quieter link. No arrow (owner rule). Nothing here books anything: the button opens
  * the booking request flow.
  */
-export function CtaBand({ title = "Ready to get stronger?", body, headingId = "cta-heading", id, service = "group-class", tone = "white" }: CtaBandProps) {
+export function CtaBand({ title = "Ready to get stronger?", body, headingId = "cta-heading", id, service = "group-class", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCtaFor(service);
   const times = isPublishable(timetable.status) ? groupedSessions(timetable.sessions) : [];
@@ -46,15 +48,17 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
         </div>
         <div data-reveal className="lg:col-span-5">
           <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="w-full" />
-          <a
-            href={instagram.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group mt-4 inline-flex min-h-11 items-center gap-2 font-semibold"
-          >
-            <span className="underline underline-offset-4 group-hover:no-underline">Message on Instagram</span>
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
+          {showInstagram ? (
+            <a
+              href={instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mt-4 inline-flex min-h-11 items-center gap-2 font-semibold"
+            >
+              <span className="underline underline-offset-4 group-hover:no-underline">Message on Instagram</span>
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          ) : null}
         </div>
       </div>
     </Section>

@@ -6,9 +6,6 @@ import { extraCostPence, formatPenceShort, planFigures } from "@/lib/membership"
 import { ChoiceCards, type Choice } from "@/components/ui/ChoiceCards";
 import { ChoiceCover, choiceCard } from "@/components/ui/choice";
 import { cn } from "@/lib/cn";
-import { timetable } from "@/content/classes";
-import { isPublishable } from "@/lib/publish";
-import { sortSessions } from "@/lib/schedule";
 
 const payg = getService("group-classes").prices[0];
 
@@ -65,9 +62,8 @@ export function PlanList({ className }: { className?: string }) {
                 <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
               </div>
               <div className="mt-1 space-y-0.5 pl-8 text-sm">
-                <p>
-                  Every {BILLING_WEEKS} weeks · {plan.credits} class credits
-                </p>
+                {/* "Every 4 weeks" is said once, in the section's intro (owner, 2026-10-26). */}
+                <p>{plan.credits} class credits</p>
                 <p>
                   {formatPenceShort(f.perClassPence)} per class
                   {f.savingPence > 0 ? (
@@ -111,9 +107,9 @@ function PlanDot() {
  * Read before choosing, so nothing restricts the visitor unexpectedly.
  */
 export function PlanTerms({ className }: { className?: string }) {
-  const days = isPublishable(timetable.status) ? listDays(sortSessions(timetable.sessions).map((s) => s.day)) : null;
+  // The class days are in the timetable above, so not repeated here (owner, 2026-10-26).
   const points = [
-    `One credit is one class${days ? `, on any ${days} class` : ""}.`,
+    "One credit books any one class.",
     `Renews automatically every ${BILLING_WEEKS} weeks, with new credits.`,
     "Unused credits don't roll over.",
     "Cancel 24 hours or more before class and your credit comes back.",
@@ -134,12 +130,6 @@ export function PlanTerms({ className }: { className?: string }) {
       </Link>
     </div>
   );
-}
-
-/** "Monday, Wednesday or Saturday" */
-function listDays(days: string[]): string {
-  const unique = [...new Set(days)];
-  return unique.length > 1 ? `${unique.slice(0, -1).join(", ")} or ${unique[unique.length - 1]}` : (unique[0] ?? "");
 }
 
 /** What pay as you go costs on top of each plan (owner, 2026-10-23). Secondary: on /memberships only. */

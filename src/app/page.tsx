@@ -62,7 +62,7 @@ export default function HomePage() {
       <WhyKettlebells />
       <CoachStory tone="plain" />
       <Testimonials />
-      <CtaBand id="book" body={null} tone="plain" />
+      <CtaBand id="book" body={null} instagram={false} tone="plain" />
     </>
   );
 }
