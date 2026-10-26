@@ -4,6 +4,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { isPublishable } from "@/lib/publish";
 import { groupedSessions } from "@/lib/schedule";
 import { StartTraining } from "@/components/ui/StartTraining";
+import { TitleBar } from "@/components/ui/TitleBar";
 import { Section, type SectionTone } from "@/components/ui/Section";
 import { hero } from "@/content/home";
 import type { BookableService } from "@/lib/booking-options";
@@ -34,6 +35,7 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
           <h2 id={headingId} className="font-display text-h1 text-balance">
             {title}
           </h2>
+          <TitleBar />
           <p className="mt-5 max-w-xl text-lede">
             {body ?? (times.length > 0 ? `Classes run ${times.map((t) => `${t.days} ${t.time}`).join(", ")}.` : "Book now to join a class.")}
           </p>

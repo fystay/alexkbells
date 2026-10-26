@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Photo } from "@/content/types";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { TitleBar } from "@/components/ui/TitleBar";
 
 interface PageHeaderProps {
   eyebrow: string;
@@ -26,7 +27,8 @@ export function PageHeader({ eyebrow, title, intro, children, image, panel }: Pa
         <div className={aside ? "lg:col-span-7" : "lg:col-span-12"}>
           <p className="eyebrow">{eyebrow}</p>
           <h1 className="mt-4 max-w-4xl font-display text-h1 text-balance">{title}</h1>
-          {intro ? <div className="mt-6 max-w-2xl text-lede">{intro}</div> : null}
+          <TitleBar />
+          {intro ? <div className="mt-5 max-w-2xl text-lede">{intro}</div> : null}
           {children ? <div className="mt-8 flex flex-wrap gap-3">{children}</div> : null}
         </div>
         {aside ? (

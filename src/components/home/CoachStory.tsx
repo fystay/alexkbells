@@ -5,6 +5,7 @@ import { isPublishable } from "@/lib/publish";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
 import { Section, type SectionTone } from "@/components/ui/Section";
+import { TitleBar } from "@/components/ui/TitleBar";
 import { BeforeAfter } from "./BeforeAfter";
 
 /** The optional coach fields that are confirmed, in reading order. Empty slots are skipped. */
@@ -47,11 +48,12 @@ export function CoachStory({
     <Provisional status={showJourney ? journey.status : "confirmed"}>
       <Section tone={tone} id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-0">
-          <div className="lg:col-span-6 lg:self-end">
+          <div data-reveal className="lg:col-span-6 lg:self-end">
             <p className="eyebrow mb-3">Meet your coach</p>
             <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>
+            <TitleBar />
           </div>
           {photos ? (
             <figure className="lg:col-span-6 lg:row-span-2 lg:self-center">
