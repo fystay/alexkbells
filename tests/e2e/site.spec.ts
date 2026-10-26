@@ -489,7 +489,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
 test("home coach: 1% better leads, and the before-and-after frame drags and works with arrow keys", async ({ page }) => {
   await page.goto("/");
   const coach = page.locator("#coach");
-  await expect(coach.getByRole("heading", { level: 2 })).toHaveText("1% better, every day");
+  await expect(coach.getByRole("heading", { level: 2 })).toHaveText("1% better, every day.");
   await expect(coach.getByRole("heading", { name: "Alex Robertson" })).toBeVisible();
   const slider = coach.getByRole("slider", { name: "Compare before and now" });
   await expect(slider).toHaveAttribute("aria-valuetext", "50% before");
@@ -521,15 +521,16 @@ test.describe("memberships", () => {
 
   test("the page shows the home page's plan list: price, credits and cost per class, then what pay as you go costs extra", async ({ page }) => {
     await page.goto("/memberships");
-    await expect(page.locator("h1")).toHaveText("Save up to £59 every 4 weeks");
+    await expect(page.locator("h1")).toHaveText("Save up to £59.");
     const rows = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
     await expect(rows).toHaveCount(4);
     for (const [i, p] of PLANS.entries()) {
       const row = rows.nth(i);
       await expect(row.getByRole("heading", { name: p.name })).toBeVisible();
       await expect(row).toContainText(new RegExp(`${p.price}\\s*/\\s*4 weeks`));
-      await expect(row).toContainText(p.credits.replace("class ", ""));
-      await expect(row).toContainText(`${p.perClass} a class`);
+      await expect(row).toContainText(p.credits.replace("class credits", "classes"));
+      await expect(row).toContainText(`${p.perClass} each`);
+      await expect(row).toContainText(`Save ${p.save}`);
     }
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText(/£12\s*\/ class/);
@@ -696,9 +697,9 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the class week is a plain timetable with the facts and one Book now", async ({ page }) => {
+test("home: the class week is a timetable of white cards with the facts", async ({ page }) => {
   await page.goto("/");
-  const facts = page.getByRole("region", { name: "3 classes a week" });
+  const facts = page.getByRole("region", { name: "3 classes a week." });
   await expect(facts.getByRole("heading", { level: 2 })).toHaveText(/3 classes\s*a week/);
   const rows = facts.getByRole("list", { name: "Class times" }).locator("> li");
   await expect(rows).toHaveCount(3);
@@ -708,9 +709,8 @@ test("home: the class week is a plain timetable with the facts and one Book now"
   await expect(rows.nth(2)).toContainText("9:00 am");
   // The date is chosen in the calendar, so the rows aren't choices.
   await expect(facts.getByRole("radio")).toHaveCount(0);
-  await expect(facts.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  await expect(facts).toContainText("60 minutes");
-  await expect(facts).toContainText("Media House, Cumbernauld");
+  // Warm tech (2026-10-26): no button here; the header's Book now is always on screen.
+  await expect(facts).toContainText("60 minutes. All levels, scaled to you.");
   await expect(facts).toContainText("£7.08 with a membership");
 });
 
@@ -734,15 +734,17 @@ test("no page says 'Get in touch': the main button is always 'Book now'", async 
   }
 });
 
-test("hero film covers the phone screen edge to edge with the vertical cut", async ({ page }) => {
+test("hero film sits under the words in a 4:5 rounded frame on phones, with the vertical cut", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const source = page.locator("section[aria-labelledby=hero-heading] video source").first();
   await expect(source).toHaveAttribute("src", "/media/hero-portrait.mp4");
   const box = (await page.locator("section[aria-labelledby=hero-heading] video").boundingBox())!;
-  expect(Math.round(box.x)).toBe(0);
-  expect(Math.round(box.width)).toBe(390);
-  expect(box.height).toBeGreaterThan(844 - 108 - 4);
+  const heading = (await page.locator("#hero-heading").boundingBox())!;
+  expect(box.y).toBeGreaterThan(heading.y + heading.height);
+  expect(Math.round(box.x)).toBe(16);
+  expect(Math.round(box.width)).toBe(358);
+  expect(Math.abs(box.height - box.width * 1.25)).toBeLessThan(2);
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator("section[aria-labelledby=hero-heading] video source").first()).toHaveAttribute("src", "/media/hero.mp4");
 });
@@ -756,32 +758,25 @@ test("no arrows anywhere on the public pages", async ({ page }) => {
   }
 });
 
-test("header Book now is underlined only in the booking flow", async ({ page }) => {
+test("header Book now is a black pill, white only in the booking flow", async ({ page }) => {
   const book = () => page.locator("header").first().getByRole("link", { name: "Book now" });
+  const bg = () => book().evaluate((el) => getComputedStyle(el).backgroundColor);
   await page.goto("/");
   await expect(book()).not.toHaveAttribute("aria-current", "page");
-  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("none");
+  expect(await bg()).toBe("rgb(23, 23, 23)");
   await page.goto("/book/group-class");
   await expect(book()).toHaveAttribute("aria-current", "page");
-  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("underline");
+  expect(await bg()).toBe("rgb(255, 255, 255)");
   await page.goto("/classes");
-  expect(await book().evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe("none");
+  expect(await bg()).toBe("rgb(23, 23, 23)");
 });
 
-test("header: Book now sits as far from the right edge as the menu icon is from the left", async ({ page }) => {
-  for (const width of [320, 390, 768, 1440]) {
+test("header: the Book now pill sits on the page margin, like the content below", async ({ page }) => {
+  for (const [width, gutter] of [[320, 16], [390, 16], [768, 24], [1440, (1440 - 1248) / 2 + 40]]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/");
-    const { left, right } = await page.evaluate(() => {
-      const h = document.querySelector("header")!;
-      const icon = h.querySelector("button svg path")!.getBoundingClientRect();
-      const text = h.querySelector("a[href^='/book'] span")!.firstChild!;
-      const range = document.createRange();
-      range.selectNodeContents(text);
-      return { left: icon.left, right: window.innerWidth - range.getBoundingClientRect().right };
-    });
-    // The text box includes the letter-spacing after the last letter (about 1px).
-    expect(Math.abs(right - left), `at ${width}px`).toBeLessThan(2.5);
+    const right = await page.evaluate(() => window.innerWidth - document.querySelector("header .justify-self-end a")!.getBoundingClientRect().right);
+    expect(Math.abs(right - gutter), `at ${width}px`).toBeLessThan(1);
   }
 });
 
@@ -797,7 +792,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
-  await expect(page.locator("#practical-heading")).toHaveText("Find us");
+  await expect(page.locator("#practical-heading")).toHaveText("Find us.");
   // No sticky Book now bar: the header's Book now is always on screen.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });

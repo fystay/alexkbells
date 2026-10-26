@@ -36,13 +36,13 @@ export function PriceList({ prices, linkContact = true }: PriceListProps) {
 
   return (
     <Provisional status={status}>
-      <dl data-reveal className="divide-y divide-grey border-y border-grey">
+      <dl data-reveal className="grid grid-cols-1 gap-3">
         {visible.map((price) => (
-          <div key={price.label} className="flex items-baseline justify-between gap-4 py-5">
+          <div key={price.label} className="card flex items-baseline justify-between gap-4 px-5 py-5 sm:px-6">
             <dt className="text-sm ">{price.label}</dt>
             <dd className="text-right">
               {price.prefix ? <span className="mr-1.5 text-sm">{price.prefix}</span> : null}
-              <span className="text-2xl font-medium tabular-nums">{formatGbp(price.amountGbp)}</span>
+              <span className="text-2xl font-semibold tabular-nums">{formatGbp(price.amountGbp)}</span>
               <span className="ml-1.5 text-sm ">{price.unit}</span>
             </dd>
           </div>

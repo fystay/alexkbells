@@ -58,7 +58,7 @@ export function ChoiceCards({
 
   const button = buttonClasses(
     "action",
-    cn("w-full px-6 sm:w-72", buttonClassName),
+    cn("w-full px-6", buttonClassName),
   );
   return (
     <fieldset

@@ -56,7 +56,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
 
         <div className="mt-8 lg:mt-10">
           {external ? (
-            <div className="max-w-2xl rounded-lg border border-grey bg-white p-8 sm:p-10">
+            <div className="card max-w-2xl p-8 sm:p-10">
               <p className="text-lede">Bookings are taken on Alex&apos;s booking page.</p>
               <ButtonLink href={external.toString()} external className="mt-6">
                 Continue to booking
@@ -81,7 +81,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
           )}
         </div>
 
-        <p className="mt-14 max-w-2xl border-t border-line pt-6 text-sm text-muted">
+        <p className="mt-10 max-w-2xl text-sm text-muted">
           Sessions take place at {formatAddressLines().join(", ")}.{" "}
           <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline underline-offset-4">
             Get directions<span className="sr-only"> (opens in a new tab)</span>

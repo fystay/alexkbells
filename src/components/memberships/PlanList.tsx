@@ -4,7 +4,7 @@ import { getService } from "@/content/services";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { extraCostPence, formatPenceShort, planFigures } from "@/lib/membership";
 import { ChoiceCards, type Choice } from "@/components/ui/ChoiceCards";
-import { ChoiceDot, choiceCard } from "@/components/ui/choice";
+import { ChoiceCover, choiceBadge, choiceCard } from "@/components/ui/choice";
 import { cn } from "@/lib/cn";
 import { timetable } from "@/content/classes";
 import { isPublishable } from "@/lib/publish";
@@ -13,13 +13,14 @@ import { sortSessions } from "@/lib/schedule";
 const payg = getService("group-classes").prices[0];
 
 /**
- * The plans as one vertical list (mobile-first redesign, 2026-10-24): price,
- * credits and the cost per class on each row, compared top to bottom, with
- * Pay as you go last. Choose a row, then the button (select, then continue, as
- * everywhere on the site): "Join <plan>" for a membership (owner, 2026-10-26),
- * "Book now" for pay as you go. Either way the calendar opens next, with the
- * plan carried over (`?plan=`); Alex sets the membership up when he confirms
- * the first class. Home and /memberships share it.
+ * The plans as cards (warm tech, owner's pick C, 2026-10-26): one white
+ * rounded card per plan, name and price on the first line, classes and the
+ * cost per class on the second with the saving as an ink tag, Pay as you go
+ * last. Choose a card (it turns ink), then the button (select, then continue,
+ * as everywhere on the site): "Join <plan>" for a membership (owner,
+ * 2026-10-26), "Book now" for pay as you go. Either way the calendar opens
+ * next, with the plan carried over (`?plan=`); Alex sets the membership up
+ * when he confirms the first class. Home and /memberships share it.
  */
 export function PlanList({ className }: { className?: string }) {
   const book = getPrimaryCtaFor("group-class");
@@ -35,38 +36,43 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  const row = "flex items-center gap-4 border-b border-grey bg-white px-4 py-4 sm:px-5";
+  const card = cn("card relative px-5 py-5 sm:px-6", choiceCard);
   return (
     <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} idle="Book now" prompt="Choose a plan to continue." className={className}>
-      <ul aria-label="Membership plans" className="overflow-hidden rounded-lg border border-ink">
+      <ul aria-label="Membership plans" className="grid grid-cols-1 gap-3">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
-            <li key={plan.id} className={cn(row, choiceCard)}>
-              <ChoiceDot name="plan" value={plan.id} label={`${plan.name}, £${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} credits`} />
-              <span className="min-w-0 flex-1">
-                <h3 className="font-display text-h3 leading-tight">{plan.name}</h3>
-                <span className="block text-sm">
-                  {plan.credits} credits · {formatPenceShort(f.perClassPence)} a class
-                </span>
-              </span>
-              <span className="text-right">
-                <span className="block font-display text-2xl tabular-nums">£{plan.priceGbp}</span>
-                <span className="block text-xs">/ {BILLING_WEEKS} weeks</span>
-              </span>
+            <li key={plan.id} className={card}>
+              <ChoiceCover name="plan" value={plan.id} label={`${plan.name}, £${plan.priceGbp} every ${BILLING_WEEKS} weeks, ${plan.credits} classes, save ${formatPenceShort(f.savingPence)}`} />
+              <div className="flex items-baseline justify-between gap-4">
+                <h3 className="text-h3 font-semibold">{plan.name}</h3>
+                <p className="shrink-0 text-sm">
+                  <span className="text-h3 font-semibold tabular-nums">£{plan.priceGbp}</span> / {BILLING_WEEKS} weeks
+                </p>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <p className="text-sm">
+                  {plan.credits} classes · {formatPenceShort(f.perClassPence)} each
+                </p>
+                {f.savingPence > 0 ? (
+                  <span className={cn("shrink-0 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-white", choiceBadge)}>
+                    Save {formatPenceShort(f.savingPence)}
+                  </span>
+                ) : null}
+              </div>
             </li>
           );
         })}
-        <li className={cn(row, "border-b-0", choiceCard)}>
-          <ChoiceDot name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
-          <span className="min-w-0 flex-1">
-            <h3 className="font-display text-h3 leading-tight">Pay as you go</h3>
-            <span className="block text-sm">No membership needed</span>
-          </span>
-          <span className="text-right">
-            <span className="block font-display text-2xl tabular-nums">£{payg.amountGbp}</span>
-            <span className="block text-xs">/ class</span>
-          </span>
+        <li className={card}>
+          <ChoiceCover name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="text-h3 font-semibold">Pay as you go</h3>
+            <p className="shrink-0 text-sm">
+              <span className="text-h3 font-semibold tabular-nums">£{payg.amountGbp}</span> / class
+            </p>
+          </div>
+          <p className="mt-3 text-sm">No membership needed</p>
         </li>
       </ul>
     </ChoiceCards>
@@ -117,9 +123,10 @@ export function PaygExtra({ className }: { className?: string }) {
         Pay as you go costs more
       </h3>
       <p className="mt-2 text-sm">What you&apos;d pay on top, going pay as you go instead of each plan, using every credit.</p>
-      <table aria-labelledby="payg-extra" className="mt-4 w-full max-w-lg text-sm tabular-nums">
+      <div className="card mt-5 max-w-lg px-5 py-3 sm:px-6">
+      <table aria-labelledby="payg-extra" className="w-full text-sm tabular-nums">
         <thead>
-          <tr className="border-b border-ink">
+          <tr>
             <th scope="col" className="py-2 text-left font-normal">
               <span className="sr-only">Plan</span>
             </th>
@@ -132,7 +139,7 @@ export function PaygExtra({ className }: { className?: string }) {
           {membershipPlans.map((plan) => {
             const x = extraCostPence(plan, payg.amountGbp);
             return (
-              <tr key={plan.id} className="border-b border-grey">
+              <tr key={plan.id}>
                 <th scope="row" className="py-2 text-left font-normal">{plan.name}</th>
                 <td className="py-2 text-right">{formatPenceShort(x.week)}</td>
                 <td className="py-2 text-right">{formatPenceShort(x.period)}</td>
@@ -142,6 +149,7 @@ export function PaygExtra({ className }: { className?: string }) {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

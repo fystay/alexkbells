@@ -42,7 +42,7 @@ export default function OnlineCoachingPage() {
       <PageHeader
         panel={
           // No photo for online coaching yet: the same typographic panel as its card on the home page.
-          <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end rounded-lg bg-ink p-6 text-white lg:aspect-[4/5] lg:p-8">
+          <div aria-hidden="true" className="flex aspect-[4/3] w-full flex-col justify-end rounded-3xl bg-ink p-6 text-white lg:aspect-[4/5] lg:p-8">
             <span className="font-display text-[clamp(2.25rem,1.4rem+2.2vw,3.25rem)] leading-[0.9]">
               Train
               <span className="block">anywhere</span>
@@ -50,7 +50,7 @@ export default function OnlineCoachingPage() {
           </div>
         }
         eyebrow="Online coaching"
-        title="Coaching that goes where you train"
+        title="Coaching that goes where you train."
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."
       >
         <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className="w-full sm:w-[22rem]" />
@@ -61,13 +61,13 @@ export default function OnlineCoachingPage() {
 
       <Section tone="white" id="included" labelledBy="included-heading">
         <SectionHeading id="included-heading" eyebrow="What you get" title="Structure, support and progress" />
-        <ul className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
           {included.map((item, i) => (
-            <li key={item.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
+            <li key={item.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
               <p className="eyebrow " aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
-              <h3 className="mt-3 font-display text-h3">{item.title}</h3>
+              <h3 className="mt-2 text-h3 font-semibold">{item.title}</h3>
               <p className="mt-3 ">{item.body}</p>
             </li>
           ))}

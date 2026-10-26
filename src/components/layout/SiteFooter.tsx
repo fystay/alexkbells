@@ -27,7 +27,7 @@ export function SiteFooter() {
   const { email, phone } = site.contact;
 
   return (
-    <footer className="border-t border-grey bg-white text-ink">
+    <footer className="bg-white text-ink">
       {/* Mobile: brand, then Explore (sized to its links) | Contact + Find us. */}
       <div className="container-page grid grid-cols-1 py-10 sm:py-12 lg:grid-cols-12 lg:gap-8">
         <div className="mb-8 lg:order-1 lg:col-span-5">

@@ -354,7 +354,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                 <p className="text-sm text-muted">Coaching online, wherever you train?</p>
                 <Link
                   href="/online-coaching"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
                 >
                   Explore online coaching
                 </Link>
@@ -725,12 +725,12 @@ function Outcome({
           <button
             type="button"
             onClick={onRestart}
-            className="inline-flex min-h-12 items-center justify-center bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors border border-ink hover:bg-white hover:text-ink"
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-6 text-base font-semibold text-paper transition-colors border border-ink hover:bg-white hover:text-ink"
           >
             Try another booking
           </button>
         ) : null}
-        <Link href="/" className="inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline">
+        <Link href="/" className="inline-flex min-h-11 items-center text-sm font-semibold underline-offset-4 hover:underline">
           Back to the homepage
         </Link>
       </div>

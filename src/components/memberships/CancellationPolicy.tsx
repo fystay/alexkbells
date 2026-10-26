@@ -13,10 +13,10 @@ export function CancellationPolicy() {
           <SectionHeading id="cancellation-heading" eyebrow="Class policy" title="Class cancellation policy" intro={policy.intro} />
         </div>
         <div className="lg:col-span-7">
-          <h3 className="eyebrow">Cancellations</h3>
-          <dl data-reveal className="mt-4 border-t border-ink">
+          <h3 className="text-h3 font-semibold">Cancellations</h3>
+          <dl data-reveal className="mt-4 grid grid-cols-1 gap-3">
             {policy.cancellations.map((c) => (
-              <div key={c.when} className="grid grid-cols-1 gap-1 border-b border-grey py-4 sm:grid-cols-[14rem_1fr] sm:gap-6">
+              <div key={c.when} className="card grid grid-cols-1 gap-1 px-5 py-5 sm:grid-cols-[14rem_1fr] sm:gap-6 sm:px-6">
                 <dt className="font-semibold">{c.when}</dt>
                 <dd>{c.outcome}</dd>
               </div>

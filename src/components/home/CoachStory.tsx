@@ -48,7 +48,7 @@ export function CoachStory({
       <Section tone={tone} id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-0">
           <div className="lg:col-span-6 lg:self-end">
-            <p className="eyebrow mb-4">Meet your coach</p>
+            <p className="eyebrow mb-3">Meet your coach</p>
             <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>
@@ -63,10 +63,10 @@ export function CoachStory({
             {showJourney ? <Sub className="font-display text-h3">{coach.name}</Sub> : null}
             <p className="mt-2 max-w-xl text-lede">{coach.summary}</p>
             {details.length > 0 ? (
-              <dl className="mt-8 max-w-xl space-y-6 border-t border-grey pt-6">
+              <dl className="mt-8 max-w-xl space-y-6">
                 {details.map((d) => (
                   <div key={d.label}>
-                    <dt className="eyebrow ">{d.label}</dt>
+                    <dt className="font-semibold">{d.label}</dt>
                     {d.paragraphs.map((text) => (
                       <dd key={text} className="mt-2">
                         {text}

@@ -14,9 +14,9 @@ export function PracticalInfo() {
   return (
     <Section id="practical-info" labelledBy="practical-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-        <SectionHeading id="practical-heading" className="lg:col-span-5" title="Find us" />
-        <div className="mt-6 grid grid-cols-1 gap-8 border-t border-ink pt-5 sm:grid-cols-2 lg:col-span-7 lg:mt-0 lg:gap-10">
-          <div>
+        <SectionHeading id="practical-heading" className="lg:col-span-5" title="Find us." />
+        <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-7 lg:mt-0">
+          <div className="card px-5 py-5 sm:px-6">
             <address className="not-italic leading-relaxed">
               {formatAddressLines().map((line) => (
                 <span key={line} className="block">
@@ -33,9 +33,9 @@ export function PracticalInfo() {
               Get directions<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </div>
-          <div>
+          <div className="card px-5 py-5 sm:px-6">
             <p>Pick a class and send your request. Alex confirms every place.</p>
-            <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="mt-5 w-full sm:w-64" />
+            <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="mt-5 w-full" />
           </div>
         </div>
       </div>

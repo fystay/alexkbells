@@ -62,10 +62,10 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
       <div
         id={panelId}
         hidden={!open}
-        className="menu-panel absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain border-t border-grey bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-b-lg lg:border lg:border-t-0 lg:pb-6"
+        className="menu-panel absolute inset-x-0 top-full h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain bg-paper pb-8 sm:h-[calc(100dvh-9rem)] lg:inset-x-auto lg:left-[max(2.5rem,calc((100vw-78rem)/2+2.5rem))] lg:h-auto lg:max-h-[calc(100dvh-10rem)] lg:w-[24rem] lg:rounded-3xl lg:bg-white lg:pt-2 lg:pb-6"
       >
         <nav aria-label="Main" className="px-4 sm:px-6">
-          <ul className="divide-y divide-grey">
+          <ul>
             {[...mainNav, ...pageNav].map((item, i) => {
               const active = Boolean(currentFor(pathname, item.href));
               return (
@@ -90,7 +90,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             style={{ "--i": mainNav.length + pageNav.length } as CSSProperties}
             onClick={() => setOpen(false)}
             {...(cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="menu-rise mt-6 flex min-h-12 items-center justify-center rounded-md border border-ink bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-white hover:text-ink active:translate-y-px"
+            className="menu-rise mt-6 flex min-h-12 items-center justify-center rounded-full border border-ink bg-ink px-6 text-base font-semibold text-white hover:bg-white hover:text-ink active:translate-y-px"
           >
             {cta.label}
             {cta.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
@@ -100,7 +100,7 @@ export function MobileNav({ cta }: { cta: CallToAction }) {
             style={{ "--i": mainNav.length + pageNav.length + 1 } as CSSProperties}
             onClick={() => setOpen(false)}
             aria-current={currentFor(pathname, coachLoginNav.href)}
-            className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-md border border-grey px-6 text-sm font-semibold uppercase tracking-[0.08em] hover:border-ink"
+            className="menu-rise mt-4 flex min-h-12 items-center justify-center rounded-full border border-grey px-6 text-base font-semibold hover:border-ink"
           >
             {coachLoginNav.label}
           </Link>

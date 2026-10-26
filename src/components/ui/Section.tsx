@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/** "plain" sits on the cream page; "white" is a white band for contrast. */
+/**
+ * Warm tech (owner's pick C, 2026-10-26): one cream page, sections separated by
+ * space, white rounded cards carry the contrast. "white" is kept so pages that
+ * alternated tones still compile, and renders on the cream page too (white
+ * cards would vanish on a white band).
+ */
 export type SectionTone = "plain" | "white";
 
 const toneClasses: Record<SectionTone, string> = {
   plain: "bg-paper text-ink",
-  white: "bg-white text-ink",
+  white: "bg-paper text-ink",
 };
 
 interface SectionProps {
@@ -24,7 +29,7 @@ export function Section({ children, tone = "plain", id, labelledBy, className, s
     <section
       id={id}
       aria-labelledby={labelledBy}
-      className={cn(toneClasses[tone], spacing === "default" ? "py-12 sm:py-16 lg:py-20" : "py-8 sm:py-12", className)}
+      className={cn(toneClasses[tone], spacing === "default" ? "py-16 sm:py-24 lg:py-32" : "py-10 sm:py-14", className)}
     >
       <div className="container-page">{children}</div>
     </section>
@@ -43,11 +48,11 @@ interface SectionHeadingProps {
 export function SectionHeading({ id, eyebrow, title, intro, as: Heading = "h2", className }: SectionHeadingProps) {
   return (
     <div data-reveal className={cn("max-w-3xl", className)}>
-      {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
+      {eyebrow ? <p className="eyebrow mb-3">{eyebrow}</p> : null}
       <Heading id={id} className={cn("font-display text-balance", Heading === "h1" ? "text-h1" : "text-h2")}>
         {title}
       </Heading>
-      {intro ? <div className="mt-5 max-w-xl text-lede">{intro}</div> : null}
+      {intro ? <div className="mt-3 max-w-xl text-lede">{intro}</div> : null}
     </div>
   );
 }

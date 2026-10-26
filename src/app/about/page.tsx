@@ -61,13 +61,13 @@ export default function AboutPage() {
           title="Strength. Community. Discipline."
           intro="A training space that feels purposeful rather than commercial: focused, uncluttered and built around the people in it."
         />
-        <ol className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3">
+        <ol className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
           {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
+            <li key={p.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
               <p className="eyebrow " aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </p>
-              <h3 className="mt-3 font-display text-h2">{p.title}</h3>
+              <h3 className="mt-2 font-display text-h3">{p.title}</h3>
               <p className="mt-3 ">{p.body}</p>
             </li>
           ))}

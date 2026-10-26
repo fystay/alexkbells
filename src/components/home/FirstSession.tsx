@@ -16,11 +16,11 @@ export function FirstSession() {
   return (
     <Section id="first-class" labelledBy="first-class-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-        <SectionHeading id="first-class-heading" className="lg:col-span-5" title="Your first class" />
-        <dl className="mt-6 border-t border-ink lg:col-span-7 lg:mt-0">
+        <SectionHeading id="first-class-heading" className="lg:col-span-5" title="Your first class." />
+        <dl className="mt-8 grid grid-cols-1 gap-3 lg:col-span-7 lg:mt-0">
           {items.map((f) =>
             f ? (
-              <div key={f.id} className="border-b border-grey py-4">
+              <div key={f.id} className="card px-5 py-5 sm:px-6">
                 <dt className="font-semibold">{f.question}</dt>
                 <dd className="mt-1">{f.answer}</dd>
               </div>

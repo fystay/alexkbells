@@ -22,7 +22,7 @@ export const journey: Journey = {
   // published at the project owner's request on 2026-10-15. Swap in Alex's
   // own words and chapters when he supplies them.
   status: "confirmed",
-  title: "1% better, every day",
+  title: "1% better, every day.",
   intro:
     "Alex didn't start out as a coach. His own change came from turning up and getting 1% better every day. Now he helps others do the same: build strength, move better and improve their fitness, in classes, one-to-one and online.",
   chapters: [],

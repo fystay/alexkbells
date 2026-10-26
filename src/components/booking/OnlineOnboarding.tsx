@@ -144,7 +144,7 @@ export function OnlineOnboarding({ mode }: { mode: "send" | "demo" }) {
         </div>
         <Link
           href="/"
-          className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
+          className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold underline-offset-4 hover:underline"
         >
           Back to the homepage
         </Link>

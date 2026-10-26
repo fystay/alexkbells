@@ -44,7 +44,7 @@ export default function ContactPage() {
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <div id="enquire" className="rounded-lg border border-grey bg-white p-8 sm:p-12">
+            <div id="enquire" className="card p-6 sm:p-10">
               <p className="eyebrow ">Message on Instagram</p>
               <p className="mt-4 font-display text-h2 break-words">
                 <a
@@ -66,7 +66,7 @@ export default function ContactPage() {
                 <li>Any questions you have</li>
               </ul>
               {/* A plain, always-visible link to the profile for class news and updates. */}
-              <div className="mt-8 border-t border-grey pt-6">
+              <div className="mt-8">
                 <ButtonLink
                   href={site.social.instagram.url}
                   external
@@ -94,7 +94,7 @@ export default function ContactPage() {
             </p>
 
             {email || phone ? (
-              <dl className="mt-10 divide-y divide-grey border-y border-grey">
+              <dl className="card mt-6 px-5 sm:px-6">
                 {email ? (
                   <div className="flex flex-wrap justify-between gap-2 py-4">
                     <dt className="eyebrow ">Email</dt>
@@ -143,7 +143,7 @@ export default function ContactPage() {
 
           <div className="lg:col-span-4 lg:col-start-9">
             <h2 className="eyebrow ">Training location</h2>
-            <address className="mt-4 border-t-2 border-grey pt-6 text-lg not-italic leading-relaxed">
+            <address className="card mt-4 px-5 py-5 text-lg not-italic leading-relaxed sm:px-6">
               {formatAddressLines().map((line) => (
                 <span key={line} className="block">
                   {line}

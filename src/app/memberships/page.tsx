@@ -31,8 +31,8 @@ export default function MembershipsPage() {
       <PageHeader
         image={images.whyKettlebells}
         eyebrow="Kettlebell memberships"
-        title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks`}
-        intro={`Pay as you go is £${payg.amountGbp} a class. Every membership costs less per class.`}
+        title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
+        intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class. Every membership costs less per class.`}
       >
         <ButtonLink href="#memberships" variant="action" className="w-full sm:w-72">
           Compare memberships

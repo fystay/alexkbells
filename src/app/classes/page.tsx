@@ -12,7 +12,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { ClassTimes } from "@/components/home/ClassTimes";
+import { ClassTimes, classFacts } from "@/components/home/ClassTimes";
 import { Location } from "@/components/sections/Location";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
@@ -70,7 +70,7 @@ export default function ClassesPage() {
       <PageHeader
         image={images.classes}
         eyebrow="Classes"
-        title="Group kettlebell training"
+        title="Group kettlebell training."
         intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
       >
         <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
@@ -83,9 +83,9 @@ export default function ClassesPage() {
           how to join and where. The price is said once (in the timetable), and the
           FAQ is gone: every answer it gave is already on this page. */}
       <Section id="timetable" labelledBy="timetable-heading">
-        <SectionHeading id="timetable-heading" title="Class times" />
+        <SectionHeading id="timetable-heading" title="Class times" intro={classFacts()} />
         {/* The home page's timetable (the home page is the reference). */}
-        <ClassTimes className="mt-6 max-w-2xl" />
+        <ClassTimes className="mt-8 max-w-2xl" />
         <p className="mt-4 max-w-2xl text-sm">
           {groupClass.payment}{" "}
           <Link href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
@@ -96,10 +96,10 @@ export default function ClassesPage() {
 
       <Section tone="white" id="what-to-expect" labelledBy="expect-heading">
         <SectionHeading id="expect-heading" title="What to expect" />
-        <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {involves.map((item) => (
-            <div key={item.title} data-reveal className="border-t border-grey pt-4">
-              <dt className="font-display text-h3">{item.title}</dt>
+            <div key={item.title} data-reveal className="card px-5 py-5 sm:px-6">
+              <dt className="text-h3 font-semibold">{item.title}</dt>
               <dd className="mt-3">{item.body}</dd>
             </div>
           ))}

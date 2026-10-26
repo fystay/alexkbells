@@ -3,8 +3,9 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /**
- * primary: black. secondary: outlined. text: underlined link. action: the
- * solid "action" bar. No arrows anywhere on the site (owner, 2026-10-22).
+ * primary: black pill. secondary: outlined pill. text: a plain link,
+ * underlined on hover. action: the full-size black pill. Sentence case
+ * (warm tech, owner's pick C, 2026-10-26). No arrows anywhere on the site (owner, 2026-10-22).
  * Hover inverts black and white (a fourth colour would be needed for anything
  * else, and white on the grey fails contrast).
  */
@@ -21,17 +22,17 @@ interface ButtonLinkProps {
 }
 
 const base =
-  "group inline-flex items-center gap-3 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]";
+  "group inline-flex items-center gap-3 whitespace-nowrap text-base font-semibold transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]";
 const press = "active:translate-y-px";
 
 const styles: Record<Variant, string> = {
-  primary: `min-h-12 rounded-md border border-ink bg-ink px-6 text-white hover:bg-white hover:text-ink ${press}`,
-  secondary: `min-h-12 rounded-md border border-ink px-6 text-ink hover:bg-ink hover:text-white ${press}`,
-  text: "min-h-11 text-ink underline-offset-[6px] decoration-1 hover:underline",
-  action: `min-h-14 rounded-md border border-ink bg-ink text-white hover:bg-white hover:text-ink ${press}`,
+  primary: `min-h-12 rounded-full border border-ink bg-ink px-6 text-white hover:bg-white hover:text-ink ${press}`,
+  secondary: `min-h-12 rounded-full border border-ink px-6 text-ink hover:bg-ink hover:text-white ${press}`,
+  text: "min-h-11 text-ink underline-offset-4 decoration-1 hover:underline",
+  action: `min-h-14 rounded-full border border-ink bg-ink text-white hover:bg-white hover:text-ink ${press}`,
 };
 
-const darkSecondary = `min-h-12 rounded-md border border-white px-6 text-white hover:bg-white hover:text-ink ${press}`;
+const darkSecondary = `min-h-12 rounded-full border border-white px-6 text-white hover:bg-white hover:text-ink ${press}`;
 
 /** The same look for a real `<button>` (e.g. the proceed button under selectable cards). */
 export function buttonClasses(variant: Variant = "primary", className?: string): string {

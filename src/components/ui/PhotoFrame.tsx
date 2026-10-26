@@ -25,7 +25,7 @@ export function PhotoFrame({ photo, sizes, className, priority = false, square =
     // priority photos (the first view) appear at once.
     <div
       {...(priority ? {} : { "data-reveal": "", "data-reveal-photo": "" })}
-      className={cn("overflow-hidden bg-white", !square && "rounded-lg", className)}
+      className={cn("overflow-hidden bg-white", !square && "rounded-3xl", className)}
     >
       <div className="relative size-full">
         <Image

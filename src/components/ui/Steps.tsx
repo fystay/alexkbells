@@ -7,14 +7,14 @@ interface Step {
   body: ReactNode;
 }
 
-/** Numbered steps on hairlines. Decorative numbers; the list is ordered for screen readers. */
+/** Numbered steps, one white card each. Decorative numbers; the list is ordered for screen readers. */
 export function Steps({ steps, className }: { steps: Step[]; className?: string }) {
   return (
-    <ol className={cn("grid grid-cols-1 gap-6", className)}>
+    <ol className={cn("grid grid-cols-1 gap-3", className)}>
       {steps.map((step, i) => (
-        <li key={step.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-grey pt-4">
-          <span className="eyebrow pt-1" aria-hidden="true">
-            {String(i + 1).padStart(2, "0")}
+        <li key={step.title} data-reveal style={revealDelay(i)} className="card grid grid-cols-[2rem_1fr] gap-x-3 px-5 py-5 sm:px-6">
+          <span className="pt-0.5 text-lg font-semibold tabular-nums" aria-hidden="true">
+            {i + 1}
           </span>
           <div>
             <h3 className="text-lg font-semibold">{step.title}</h3>

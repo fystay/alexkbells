@@ -44,9 +44,9 @@ export function CtaBand({ title = "Ready to get stronger?", body, headingId = "c
             href={instagram.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em]"
+            className="group mt-4 inline-flex min-h-11 items-center gap-2 font-semibold"
           >
-            <span className="underline underline-offset-[6px] group-hover:no-underline">Message on Instagram</span>
+            <span className="underline underline-offset-4 group-hover:no-underline">Message on Instagram</span>
             <span className="sr-only">(opens in a new tab)</span>
           </a>
         </div>

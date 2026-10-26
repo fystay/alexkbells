@@ -21,7 +21,7 @@ export function BeforeAfter({ before, after, beforeLabel, afterLabel }: { before
   };
   return (
     <div
-      className="relative aspect-[4/5] cursor-ew-resize touch-pan-y overflow-hidden rounded-lg bg-ink select-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-ink"
+      className="relative aspect-[4/5] cursor-ew-resize touch-pan-y overflow-hidden rounded-3xl bg-ink select-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-ink"
       onPointerDown={(e) => {
         dragging.current = true;
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -44,10 +44,10 @@ export function BeforeAfter({ before, after, beforeLabel, afterLabel }: { before
           <span className="h-3.5 w-0.5 bg-white" />
         </span>
       </div>
-      <span aria-hidden="true" className="eyebrow pointer-events-none absolute bottom-3 left-3 rounded bg-paper px-2 py-1 text-ink">
+      <span aria-hidden="true" className="eyebrow pointer-events-none absolute bottom-4 left-4 rounded-full bg-paper px-3 py-1 text-ink">
         {beforeLabel}
       </span>
-      <span aria-hidden="true" className="eyebrow pointer-events-none absolute right-3 bottom-3 rounded bg-paper px-2 py-1 text-ink">
+      <span aria-hidden="true" className="eyebrow pointer-events-none absolute right-4 bottom-4 rounded-full bg-paper px-3 py-1 text-ink">
         {afterLabel}
       </span>
       <input

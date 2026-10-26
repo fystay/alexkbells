@@ -60,7 +60,7 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
 
         <div className="mt-3 grid grid-cols-7" aria-hidden="true">
           {WEEKDAYS.map((d) => (
-            <span key={d} className="py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+            <span key={d} className="py-2 text-center text-xs font-semibold text-muted">
               {d}
             </span>
           ))}

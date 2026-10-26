@@ -18,7 +18,7 @@ export interface Option {
 }
 
 const tile =
-  "relative flex cursor-pointer items-center gap-4 border border-muted bg-white text-ink transition-colors duration-150 " +
+  "relative flex cursor-pointer items-center gap-4 rounded-2xl border border-muted bg-white text-ink transition-colors duration-150 " +
   "hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink " +
   "has-[:disabled]:cursor-not-allowed has-[:disabled]:border-line has-[:disabled]:bg-transparent has-[:disabled]:text-muted";
@@ -137,7 +137,7 @@ export function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 const input =
-  "mt-2 block w-full min-h-12 border border-muted bg-white px-4 py-3 text-base text-ink transition-colors duration-150 placeholder:text-grey hover:border-ink focus-visible:border-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-ink";
+  "mt-2 block w-full min-h-12 rounded-xl border border-muted bg-white px-4 py-3 text-base text-ink transition-colors duration-150 placeholder:text-grey hover:border-ink focus-visible:border-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-ink";
 
 interface TextFieldProps {
   name: string;
@@ -219,7 +219,7 @@ export function Disclosure({ label, children, initiallyOpen = false }: { label: 
     <button
       type="button"
       onClick={() => setOpen(true)}
-      className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
+      className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
     >
       <span aria-hidden="true">+</span> {label}
     </button>
@@ -270,7 +270,7 @@ export function Stepper({
                   state === "todo" ? "bg-line" : "bg-ink",
                 )}
               />
-              <span className={cn("mt-2 flex items-baseline gap-1.5 text-xs font-semibold uppercase tracking-[0.12em]", state === "todo" ? "text-muted" : "text-ink")}>
+              <span className={cn("mt-2 flex items-baseline gap-1.5 text-xs font-semibold", state === "todo" ? "text-muted" : "text-ink")}>
                 <span aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
                 <span className={cn("truncate", state !== "current" && "max-sm:sr-only")}>{step.label}</span>
               </span>
@@ -297,7 +297,7 @@ export function Stepper({
 }
 
 const primaryButton =
-  "inline-flex min-h-12 items-center justify-center gap-3 bg-ink px-6 text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-[background-color,transform] duration-150 border border-ink hover:bg-white hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-ink px-6 text-base font-semibold text-paper transition-[background-color,transform] duration-150 border border-ink hover:bg-white hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:active:scale-100";
 
 /**
  * Back / next controls. Sticks to the bottom of the screen on phones so the
@@ -321,7 +321,7 @@ export function ActionBar({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] underline-offset-[6px] hover:underline"
+            className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
           >
             {backLabel}
           </button>
@@ -347,7 +347,7 @@ export function ActionBar({
 
 export function ErrorSummary({ message, errors, focusRef }: { message: string; errors: [string, string][]; focusRef?: React.Ref<HTMLDivElement> }) {
   return (
-    <div ref={focusRef} tabIndex={-1} role="alert" className="border-2 border-ink bg-white p-5 focus:outline-none">
+    <div ref={focusRef} tabIndex={-1} role="alert" className="rounded-2xl border-2 border-ink bg-white p-5 focus:outline-none">
       <p className="font-bold">{message}</p>
       {errors.length > 0 ? (
         <ul className="mt-3 list-disc space-y-1 pl-5">
@@ -398,13 +398,13 @@ export function PrivacyLine({ action }: { action: string }) {
 
 export function InstagramFallback({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-ink p-8 text-paper sm:p-10">
+    <div className="rounded-3xl bg-ink p-8 text-paper sm:p-10">
       <p className="max-w-xl text-lede text-white">{children}</p>
       <a
         href={site.social.instagram.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-6 inline-flex min-h-12 items-center gap-3 bg-paper px-6 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-white"
+        className="mt-6 inline-flex min-h-12 items-center gap-3 rounded-full bg-paper px-6 text-base font-semibold text-ink transition-colors hover:bg-white"
       >
         Message Alex on Instagram
         <span className="sr-only">(opens in a new tab)</span>

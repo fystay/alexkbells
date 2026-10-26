@@ -15,12 +15,12 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white" }: { headin
     <Section tone={tone} labelledBy={headingId}>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <SectionHeading id={headingId} eyebrow="FAQ" title="Questions" />
+          <SectionHeading id={headingId} eyebrow="FAQ" title="Questions." />
         </div>
         <div className="lg:col-span-8">
-          <ul className="border-t border-grey">
+          <ul className="grid grid-cols-1 gap-3">
             {items.map((item, i) => (
-              <li key={item.id} data-reveal style={revealDelay(i)} className="border-b border-grey">
+              <li key={item.id} data-reveal style={revealDelay(i)} className="card px-5 sm:px-6">
                 <Provisional status={item.status}>
                   <details className="group">
                     <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
@@ -30,7 +30,7 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white" }: { headin
                         className="relative size-4 shrink-0 before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-current after:absolute after:inset-y-0 after:left-1/2 after:w-px after:bg-current after:transition-transform group-open:after:scale-y-0"
                       />
                     </summary>
-                    <p className="max-w-2xl pb-6 ">{item.answer}</p>
+                    <p className="max-w-2xl pb-5">{item.answer}</p>
                   </details>
                 </Provisional>
               </li>

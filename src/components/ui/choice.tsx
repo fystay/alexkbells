@@ -32,6 +32,19 @@ export function ChoiceDot({ name, value, label }: { name: string; value: string;
   );
 }
 
+/**
+ * For a card that is chosen by tapping anywhere on it, with no circle (warm
+ * tech plan cards, 2026-10-26): the chosen card turning ink is the mark.
+ */
+export function ChoiceCover({ name, value, label }: { name: string; value: string; label: string }) {
+  return (
+    <label className="absolute inset-0 z-10 cursor-pointer rounded-[inherit]">
+      <input type="radio" name={name} value={value} className="sr-only" />
+      <span className="sr-only">{label}</span>
+    </label>
+  );
+}
+
 /** The card's radio: a "Select" / "Selected" line whose label covers the whole card. */
 export function ChoiceMark({
   name,
@@ -50,7 +63,7 @@ export function ChoiceMark({
   return (
     <label
       className={cn(
-        "mt-5 flex min-h-11 cursor-pointer items-center gap-3 border-t border-current pt-3 text-sm font-semibold tracking-[0.08em] uppercase after:absolute after:inset-0 after:content-['']",
+        "mt-5 flex min-h-11 cursor-pointer items-center gap-3 pt-3 text-sm font-semibold after:absolute after:inset-0 after:content-['']",
         className,
       )}
     >

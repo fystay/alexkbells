@@ -28,23 +28,23 @@
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
-  /* Fluid type scale (min at 320px, max at ~1280px) */
-  --text-display: clamp(1.875rem, 0.9rem + 5vw, 5.25rem);
-  --text-display--line-height: 0.95;
+  /* Fluid type scale (min at 320px, max at ~1280px). Warm tech (owner's pick C,
+     2026-10-26): bigger, sentence case, tight tracking. */
+  --text-display: clamp(2.75rem, 1.9rem + 4vw, 5.25rem);
+  --text-display--line-height: 1.02;
   /* Hero headline beside media (lg+): each short sentence on one line. */
   --text-display-split: clamp(2.5rem, 0.4rem + 3.4vw, 3.75rem);
-  --text-display-split--line-height: 0.95;
-  --text-h1: clamp(1.75rem, 1rem + 3.5vw, 4rem);
-  --text-h1--line-height: 1;
-  --text-h2: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);
-  --text-h2--line-height: 1.05;
+  --text-display-split--line-height: 1.02;
+  --text-h1: clamp(2.25rem, 1.5rem + 3.2vw, 4rem);
+  --text-h1--line-height: 1.05;
+  --text-h2: clamp(2rem, 1.55rem + 2vw, 3.25rem);
+  --text-h2--line-height: 1.08;
   --text-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --text-h3--line-height: 1.2;
+  --text-h3--line-height: 1.25;
   --text-lede: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
   --text-lede--line-height: 1.55;
 
-  --tracking-display: -0.02em;
-  --tracking-eyebrow: 0.22em;
+  --tracking-display: -0.025em;
 
   --breakpoint-2xs: 22.5rem;
   --breakpoint-xs: 26rem;
@@ -107,19 +107,22 @@
   }
 }
 
-/* Refined, not shouting: medium weight, expanded width, a little air between letters. */
+/* Warm tech (owner's pick C, 2026-10-26): sentence case, bold, tight. Calm, not shouting. */
 @utility font-display {
-  font-weight: 500;
-  font-stretch: 112%;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
 }
 
+/* The small label above a heading ("Meet your coach"): plain sentence case. */
 @utility eyebrow {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
+}
+
+/* A white rounded card on the cream page: replaces rules and borders. */
+@utility card {
+  background-color: var(--color-white);
+  border-radius: 1.25rem;
 }
 
 @utility container-page {
@@ -243,21 +246,5 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-/* Section titles (the small spaced label above a page or section heading,
-   e.g. "Group kettlebell classes", "Ways to train") are underlined (owner,
-   2026-10-22), except in the site header and the home hero. Headings
-   themselves are not. */
-@layer base {
-  main .eyebrow:has(+ :is(h1, h2)),
-  main .eyebrow:has(+ * > :is(h1, h2):first-child) {
-    text-decoration-line: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.45em;
-  }
-  main section[aria-labelledby="hero-heading"] .eyebrow {
-    text-decoration-line: none;
   }
 }

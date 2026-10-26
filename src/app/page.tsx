@@ -7,7 +7,7 @@ import { timetable } from "@/content/classes";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { isPublishable } from "@/lib/publish";
 import { CoachStory } from "@/components/home/CoachStory";
-import { ClassTimes } from "@/components/home/ClassTimes";
+import { ClassTimes, classFacts } from "@/components/home/ClassTimes";
 import { FirstSession } from "@/components/home/FirstSession";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
@@ -21,8 +21,9 @@ const payg = getService("group-classes").prices[0];
 
 // Order (mobile-first redesign, 2026-10-24; first class added 2026-10-26): the
 // film and Book now, then the classes and times, what a first class is like,
-// what it costs, who coaches it, the other ways to train, and where to go. One idea per section, all on the cream page. Phones
-// read top to bottom; from lg the heading sits left of its content.
+// what it costs, who coaches it, the other ways to train, and where to go. One
+// idea per section, all on the cream page, separated by space (warm tech,
+// 2026-10-26). Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
   const sessions = isPublishable(timetable.status) ? timetable.sessions.length : 0;
@@ -31,8 +32,13 @@ export default function HomePage() {
       <Hero />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
-          <SectionHeading id="classes-heading" className="lg:col-span-5" title={sessions ? `${sessions} ${sessions === 1 ? "class" : "classes"} a week` : "Kettlebell classes"} />
-          <ClassTimes className="mt-6 lg:col-span-7 lg:mt-0" />
+          <SectionHeading
+            id="classes-heading"
+            className="lg:col-span-5"
+            title={sessions ? `${sessions} ${sessions === 1 ? "class" : "classes"} a week.` : "Kettlebell classes."}
+            intro={sessions ? classFacts() : undefined}
+          />
+          <ClassTimes className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
       <FirstSession />
@@ -41,12 +47,13 @@ export default function HomePage() {
           <SectionHeading
             id="memberships-heading"
             className="lg:col-span-5"
-            title="Memberships"
-            intro={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks against pay as you go.`}
+            eyebrow="Memberships"
+            title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
+            intro={`Every ${BILLING_WEEKS} weeks, against pay as you go.`}
           />
-          <div className="mt-6 lg:col-span-7 lg:mt-0">
+          <div className="mt-8 lg:col-span-7 lg:mt-0">
             <PlanList />
-            <PlanTerms className="mt-4" />
+            <PlanTerms className="mt-8" />
           </div>
         </div>
       </Section>

@@ -20,7 +20,7 @@ export function Location({ headingId = "location-heading", tone = "white" }: { h
           />
         </div>
         <div className="lg:col-span-5">
-          <address className="border-t border-grey pt-6 text-lg not-italic leading-relaxed">
+          <address className="card px-5 py-5 text-lg not-italic leading-relaxed sm:px-6">
             {formatAddressLines().map((line) => (
               <span key={line} className="block">
                 {line}

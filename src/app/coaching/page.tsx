@@ -53,7 +53,7 @@ export default function CoachingPage() {
       <PageHeader
         image={images.oneToOne}
         eyebrow="1:1 Coaching"
-        title="Coaching built around you"
+        title="Coaching built around you."
         intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."
       >
         <StartTraining
@@ -76,10 +76,10 @@ export default function CoachingPage() {
               intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
             />
           </div>
-          <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-7">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-7">
             {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} className="border-t border-grey pt-4">
-                <h3 className="font-display text-h3">{f.title}</h3>
+              <li key={f.title} data-reveal style={revealDelay(i)} className="card px-5 py-5 sm:px-6">
+                <h3 className="text-h3 font-semibold">{f.title}</h3>
                 <p className="mt-3 ">{f.body}</p>
               </li>
             ))}
