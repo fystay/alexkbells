@@ -50,10 +50,14 @@ export interface PaymentLink {
   url: string;
 }
 
-/** Square-hosted checkout for one amount. The idempotency key makes a retried call return the same link. */
+/**
+ * Square-hosted checkout for one amount. The idempotency key makes a retried
+ * call return the same link. redirectUrl: where Square sends the buyer after
+ * paying (only a "thanks" page: payment state always comes from the webhook).
+ */
 export function createPaymentLink(
   config: SquareConfig,
-  args: { idempotencyKey: string; name: string; amountPence: number; note: string; buyerEmail?: string },
+  args: { idempotencyKey: string; name: string; amountPence: number; note: string; buyerEmail?: string; redirectUrl?: string },
   fetchImpl: typeof fetch = fetch,
 ): Promise<SquareResult<PaymentLink>> {
   return call(
@@ -65,13 +69,16 @@ export function createPaymentLink(
       quick_pay: { name: args.name.slice(0, 255), price_money: { amount: args.amountPence, currency: "GBP" }, location_id: config.locationId },
       payment_note: args.note.slice(0, 500),
       ...(args.buyerEmail ? { pre_populated_data: { buyer_email: args.buyerEmail } } : {}),
+      ...(args.redirectUrl ? { checkout_options: { redirect_url: args.redirectUrl } } : {}),
     },
     (json) => {
       const link = obj(obj(json)?.payment_link);
       const id = str(link?.id);
       const orderId = str(link?.order_id);
       const url = str(link?.url);
-      return id && orderId && url?.startsWith("https://") ? { id, orderId, url } : null;
+      // Square's links are https; the localhost API stand-in (tests only) serves its own checkout page.
+      const ok = url?.startsWith("https://") || (config.baseUrl.startsWith("http://localhost:") && url?.startsWith("http://localhost:"));
+      return id && orderId && url && ok ? { id, orderId, url } : null;
     },
     fetchImpl,
   );

@@ -32,8 +32,12 @@ const AvailabilityCalendar = dynamic(() => loadCalendar().then((m) => m.Availabi
 });
 
 interface MembershipJoinProps {
-  /** "demo": previews only; nothing is sent. "request": the request reaches Alex, who confirms. */
-  mode: "demo" | "request";
+  /**
+   * "demo": previews only; nothing is sent. "request": the request reaches
+   * Alex, who confirms. "pay": the member pays on Square's page and the
+   * membership starts once Square confirms (owner, 2026-10-26).
+   */
+  mode: "demo" | "request" | "pay";
   /** Confirmed weekly classes the first class can be chosen from. */
   classes: PublishedClass[];
   /** Pay-as-you-go class price, for the saving on each plan. */
@@ -62,12 +66,14 @@ const getServerToday = () => null;
 /**
  * Joining a membership (owner, 2026-10-26): its own short journey instead of
  * the booking form. Plan → first class (optional) → details → check the plan,
- * the terms and the cancellation policy, agree, and send. A request, not a
- * sign-up: Alex confirms, starts the membership in the coach area and says
- * how to pay. Nothing is paid online.
+ * the terms and the cancellation policy, agree, then pay on Square's page
+ * ("pay": the membership starts as soon as Square confirms the payment, and
+ * the first class is booked then) or, where online payment isn't set up,
+ * send a request that Alex confirms ("request").
  */
 export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) {
   const demo = mode === "demo";
+  const pay = mode === "pay";
   const router = useRouter();
   const urlPlan = useChosenPlan();
   const [planChoice, setPlanChoice] = useState("");
@@ -254,7 +260,11 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
 
           {step === 1 ? (
             <section aria-labelledby="step-heading">
-              <StepHeading ref={headingRef} intro="Pick the class you'd like to start with, or book it later. Alex confirms every place.">
+              <StepHeading ref={headingRef} intro={
+                  pay
+                    ? "Pick the class you'd like to start with, or book it later. It's booked as soon as you've paid, if there's still a space."
+                    : "Pick the class you'd like to start with, or book it later. Alex confirms every place."
+                }>
                 <span id="step-heading">Your first class</span>
               </StepHeading>
               <div className="mt-6">
@@ -305,7 +315,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
 
           {step === 2 ? (
             <section aria-labelledby="step-heading">
-              <StepHeading ref={headingRef} intro="So Alex can reply to confirm your membership. Your browser can fill these in.">
+              <StepHeading ref={headingRef} intro={pay ? "For your membership and receipt. Your browser can fill these in." : "So Alex can reply to confirm your membership. Your browser can fill these in."}>
                 <span id="step-heading">Your details</span>
               </StepHeading>
               <div className="mt-6 space-y-8">
@@ -357,8 +367,11 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
 
           {step === 3 && plan ? (
             <section aria-labelledby="step-heading">
-              <StepHeading ref={headingRef} intro="Read how your membership works, then send your request. Nothing to pay now.">
-                <span id="step-heading">Check and send</span>
+              <StepHeading
+                ref={headingRef}
+                intro={pay ? `Read how your membership works, then pay for your first ${BILLING_WEEKS} weeks.` : "Read how your membership works, then send your request. Nothing to pay now."}
+              >
+                <span id="step-heading">{pay ? "Check and pay" : "Check and send"}</span>
               </StepHeading>
               <form
                 action={formAction}
@@ -436,11 +449,24 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                 </div>
 
                 <div className="card px-5 py-5 sm:px-6">
-                  <h3 className="card-title">Nothing to pay now</h3>
-                  <p className="mt-1.5">
-                    Alex confirms your membership by email, sets it up and tells you how to pay for your first {BILLING_WEEKS} weeks
-                    (£{plan.priceGbp}).
-                  </p>
+                  {pay ? (
+                    <>
+                      <h3 className="card-title">Pay securely with Square</h3>
+                      <p className="mt-1.5">
+                        Next, Square&apos;s secure page takes £{plan.priceGbp} for your first {BILLING_WEEKS} weeks. Your membership starts as soon as
+                        it&apos;s paid{chosenClass ? " and your first class is booked" : ""}. After that, you&apos;ll get a payment link by email every{" "}
+                        {BILLING_WEEKS} weeks.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="card-title">Nothing to pay now</h3>
+                      <p className="mt-1.5">
+                        Alex confirms your membership by email, sets it up and tells you how to pay for your first {BILLING_WEEKS} weeks
+                        (£{plan.priceGbp}).
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div>
@@ -484,8 +510,11 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                 <input type="hidden" name="message" value={details.message} />
                 <SubmissionMeta meta={meta} />
 
-                <PrivacyLine action={demo ? "continuing" : "sending this request"} />
-                <ActionBar onBack={() => setStep(2)} next={{ label: demo ? "Finish demo" : "Send request", type: "submit", pending }} />
+                <PrivacyLine action={demo ? "continuing" : pay ? "paying" : "sending this request"} />
+                <ActionBar
+                  onBack={() => setStep(2)}
+                  next={{ label: demo ? "Finish demo" : pay ? (pending ? "Opening Square…" : `Pay £${plan.priceGbp}`) : "Send request", type: "submit", pending }}
+                />
               </form>
             </section>
           ) : null}
@@ -504,7 +533,9 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
               </div>
             ))}
           </dl>
-          <p className="border-t-2 border-paper px-5 py-4 text-sm">Nothing to pay now. Alex confirms every membership personally.</p>
+          <p className="border-t-2 border-paper px-5 py-4 text-sm">
+            {pay ? "Pay on Square's secure page. Your membership starts as soon as it's paid." : "Nothing to pay now. Alex confirms every membership personally."}
+          </p>
         </div>
       </div>
     </div>

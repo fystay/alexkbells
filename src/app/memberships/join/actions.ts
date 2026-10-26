@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { bookingMode } from "@/lib/booking";
 import { BOOKING_EXPERIENCE, labelFor } from "@/lib/booking-options";
 import { describePlan, isBookingFormEnabled, type FormState } from "@/lib/booking-request";
@@ -9,14 +10,18 @@ import { londonToday } from "@/lib/coach/time";
 import { deliverRequest } from "@/lib/deliver-request";
 import { MEMBERSHIP_SERVICE, membershipEmail, membershipSummary, parseMembershipRequest, type MembershipField } from "@/lib/membership-request";
 import { idempotencyKey } from "@/lib/send-email";
+import { coachDb } from "@/lib/coach/db";
+import { onlineJoinEnabled, startCheckout } from "@/lib/membership-checkout";
+import { squareConfig } from "@/lib/square/config";
 
 /**
- * Validates a membership join request on the server and gets it to Alex
- * (stored for the coach area and/or emailed), like a booking request.
- * The stored request carries the plan, so "Start this membership" works on
- * it in the coach area, and the first class (if chosen) so it can be
- * confirmed as a place. Reports success only once a route accepted it.
- * Nothing is charged. Never runs on demonstration previews.
+ * Validates a membership join on the server. Where online joining is on
+ * (Square configured: lib/membership-checkout.ts), it creates the sign-up and
+ * its first charge and sends the visitor to Square's payment page; the
+ * membership starts only when Square's verified webhook records the payment
+ * (owner, 2026-10-26: no confirmation by Alex). Otherwise it's a request to
+ * Alex as before (stored for the coach area and/or emailed), reporting
+ * success only once a route accepted it. Never runs on demonstration previews.
  */
 export async function submitMembershipRequest(
   _previous: FormState<MembershipField>,
@@ -55,6 +60,20 @@ export async function submitMembershipRequest(
 
   const agreedAt = new Date().toISOString();
   const key = await idempotencyKey([data.submissionId, "membership", data.plan, data.email, data.name, data.session, data.classDate, data.message]);
+
+  const db = coachDb();
+  const square = squareConfig();
+  if (onlineJoinEnabled() && db && square) {
+    const checkout = await startCheckout(db, square, data, data.classDate && slot ? slot : null, { agreedAt, idempotencyKey: key });
+    if (checkout.ok) redirect(checkout.url);
+    if (checkout.reason === "already_member") {
+      return { status: "error", message: "You're already a member. Sign in to your account to book classes, or reply to Alex to change plan.", errors: { email: "This email already has a membership." } };
+    }
+    if (checkout.reason === "payment_in_progress") {
+      return { status: "error", message: "A payment for an earlier sign-up of yours is part-way through. Alex will be in touch to finish it.", errors: {} };
+    }
+    return { status: "error", message: "Sorry, payment couldn't be opened just now. Please try again in a minute, or message Alex on Instagram.", errors: {} };
+  }
   const details: Record<string, string> = {
     experience: labelFor(BOOKING_EXPERIENCE, data.experience),
     // The plan id lets the coach area start this membership from the request.

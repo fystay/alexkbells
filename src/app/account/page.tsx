@@ -10,6 +10,8 @@ import { formatClock, londonToday, londonToUtc, toLondon } from "@/lib/coach/tim
 import { formatPenceShort } from "@/lib/membership";
 import { memberOverview, type MemberOverview } from "@/lib/member-auth";
 import { requireMember } from "@/lib/member-session";
+import { paymentDue } from "@/lib/membership-checkout";
+import { squareConfig } from "@/lib/square/config";
 import { pageMetadata } from "@/lib/metadata";
 import { formatTime } from "@/lib/schedule";
 import { buttonClasses } from "@/components/ui/ButtonLink";
@@ -37,6 +39,7 @@ const ERRORS: Record<string, string> = {
   already_booked: "You're already booked on that class.",
   class_started: "That class has already started.",
   outside_period: "Credits can only be used in the period they belong to. That date is in your next period.",
+  period_unpaid: "Please pay for this period first. Its credits work as soon as Square confirms.",
   not_found: "That class couldn't be found. Please try again.",
   failed: "Sorry, something went wrong. Please try again, or message Alex.",
 };
@@ -81,14 +84,21 @@ function upcomingPlaces(overview: MemberOverview) {
 /**
  * The member's account (owner, 2026-10-26): plan and renewal, this period's
  * credits, their classes (cancel, with the 24-hour rule said before it
- * applies) and the classes they can book with a credit. Paying, changing
- * details, pausing or cancelling the membership stay with Alex.
+ * applies) and the classes they can book with a credit. Members who joined
+ * online also see this period's payment while it's due, with a Square link
+ * (its credits wait for it). Changing details, pausing or cancelling stay
+ * with Alex.
  */
 export default async function AccountPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const member = await requireMember();
   const params = await searchParams;
   const today = londonToday();
-  const [result, full] = await Promise.all([memberOverview(member.db, member.clientId), fullClasses(today)]);
+  const [result, full, due] = await Promise.all([
+    memberOverview(member.db, member.clientId),
+    fullClasses(today),
+    // Members who pay online: this period's payment, if it's still to pay (credits wait for it).
+    paymentDue(member.db, squareConfig(), member.clientId),
+  ]);
   const done = typeof params.done === "string" ? DONE[params.done] : undefined;
   const error = typeof params.error === "string" ? (ERRORS[params.error] ?? ERRORS.failed) : undefined;
 
@@ -138,6 +148,20 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                       : `Cancelled${m.cancelled_on ? ` from ${formatLongDate(m.cancelled_on as DateKey)}` : ""}. Credits you have can still be used until the end of this period.`}
                 </p>
               </div>
+              {due ? (
+                <div className="card px-5 py-5 sm:px-6">
+                  <p className="text-sm">Payment due</p>
+                  <p className="card-title text-xl">{formatPenceShort(due.amountPence)} for this period</p>
+                  <p className="mt-1.5">This period&apos;s credits work as soon as it&apos;s paid.</p>
+                  {due.url ? (
+                    <a href={due.url} className={buttonClasses("action", "mt-4 w-full px-6 sm:w-auto")}>
+                      Pay with Square
+                    </a>
+                  ) : (
+                    <p className="mt-3 text-sm">The payment link is in your email. If you can&apos;t find it, message Alex.</p>
+                  )}
+                </div>
+              ) : null}
               {o.period ? (
                 <div className="card px-5 py-5 sm:px-6">
                   <p className="text-sm">Credits this period</p>
@@ -198,6 +222,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <h2 className="card-title mt-10 text-xl">Book with a credit</h2>
           {!o.period ? (
             <p className="card mt-3 px-5 py-5 sm:px-6">Your next period hasn&apos;t started yet. You can book once it has.</p>
+          ) : due ? (
+            <p className="card mt-3 px-5 py-5 sm:px-6">Pay for this period to book with its credits.</p>
           ) : left === 0 ? (
             <p className="card mt-3 px-5 py-5 sm:px-6">You&apos;ve used every credit this period. New credits come when your membership renews.</p>
           ) : options.length === 0 ? (

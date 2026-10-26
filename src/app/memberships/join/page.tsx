@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { site } from "@/content/site";
 import { getService } from "@/content/services";
 import { bookingMode } from "@/lib/booking";
+import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { publishedClasses } from "@/lib/class-sessions";
 import { pageMetadata } from "@/lib/metadata";
 import { MembershipJoin } from "@/components/booking/MembershipJoin";
@@ -9,18 +10,20 @@ import { InstagramFallback } from "@/components/booking/ui";
 
 export const metadata: Metadata = pageMetadata({
   title: "Join a Membership",
-  description: "Join a RAENG Fitness kettlebell membership in Cumbernauld: choose your plan and first class. Alex confirms every membership personally.",
+  description: "Join a RAENG Fitness kettlebell membership in Cumbernauld: choose your plan and your first class.",
   path: "/memberships/join",
 });
 
 /**
  * Joining a membership (owner, 2026-10-26): its own journey, reached from
- * "Join <plan>" on the plan list (`?plan=`). The same switch as booking:
- * requests reach Alex when booking requests are on, previews show a
- * demonstration, otherwise an honest Instagram route.
+ * "Join <plan>" on the plan list (`?plan=`). Paid on Square's page where
+ * online joining is on (lib/membership-checkout.ts); otherwise the same switch
+ * as booking: requests reach Alex when booking requests are on, previews show
+ * a demonstration, otherwise an honest Instagram route.
  */
 export default function JoinMembershipPage() {
-  const mode = bookingMode();
+  const booking = bookingMode();
+  const mode = booking === "request" && onlineJoinEnabled() ? "pay" : booking;
   const payg = getService("group-classes").prices[0];
   return (
     <section aria-labelledby="join-heading" className="bg-paper">
@@ -30,10 +33,14 @@ export default function JoinMembershipPage() {
           <h1 id="join-heading" className="mt-3 font-display text-h2 text-balance">
             Join a membership.
           </h1>
-          <p className="mt-5 text-lede">Choose your plan and first class. Alex confirms every membership personally, and there&apos;s nothing to pay now.</p>
+          <p className="mt-5 text-lede">
+            {mode === "pay"
+              ? "Choose your plan and first class, then pay securely with Square. Your membership starts straight away."
+              : "Choose your plan and first class. Alex confirms every membership personally, and there's nothing to pay now."}
+          </p>
         </header>
         <div className="mt-8 lg:mt-10">
-          {mode === "request" || mode === "demo" ? (
+          {mode === "pay" || mode === "request" || mode === "demo" ? (
             <>
               <noscript>
                 <p className="mb-6 rounded-2xl border-2 border-ink p-5">

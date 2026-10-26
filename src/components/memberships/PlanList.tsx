@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { getPrimaryCtaFor } from "@/lib/booking";
+import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { extraCostPence, formatPenceShort, planFigures } from "@/lib/membership";
 import { ChoiceCards, type Choice } from "@/components/ui/ChoiceCards";
 import { ChoiceCover, choiceCard } from "@/components/ui/choice";
@@ -25,6 +26,7 @@ export function PlanList({ className }: { className?: string }) {
   const book = getPrimaryCtaFor("group-class");
   // Joining has its own journey (owner, 2026-10-26): plan, first class, details, terms. Where booking
   // goes to an outside page or isn't open, Join follows Book now instead.
+  const online = onlineJoinEnabled();
   const planHref = (id: string) => (book.kind === "booking" && !book.external ? `/memberships/join?plan=${id}` : book.href);
   const choices: Choice[] = [
     ...membershipPlans.map((plan) => ({
@@ -32,7 +34,7 @@ export function PlanList({ className }: { className?: string }) {
       label: `${plan.name} plan`,
       href: planHref(plan.id),
       action: `Join ${plan.name}`,
-      next: "Next, your first class and details. Nothing to pay now.",
+      next: online ? "Next, your first class and details, then pay with Square." : "Next, your first class and details. Nothing to pay now.",
       external: book.external,
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },

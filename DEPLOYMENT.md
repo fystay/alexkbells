@@ -141,6 +141,18 @@ Members sign in at `/account/sign-in` with a one-time emailed link (owner's choi
 
 Alex can sign a member out of every device with `select akb_member_end_sessions('<client id>')` (no button in the coach area yet).
 
+### Joining and paying online (2026-10-26, built; not live)
+
+Owner's decision (2026-10-26): members join and pay for their membership with nothing for Alex to confirm. Until every step below is done, joining stays a request that Alex confirms (`onlineJoinEnabled()` in `lib/membership-checkout.ts` is false), so nothing changes on the live site.
+
+1. Apply, in order (owner's go-ahead for each; all are additive): `20261020000000_akb_payment_functions.sql` (not yet live), `20261021000000_akb_square.sql` (check whether live), `20261024000000_akb_cancel_class.sql`, `20261027000000_akb_member_accounts.sql`, then **`20261028000000_akb_self_serve_memberships.sql`** (one table, two columns with defaults that keep current behaviour, two triggers, four functions; safe to run again). Check afterwards: Advisors shows no new warnings; `select has_table_privilege('authenticated','public.akb_membership_signups','select')` is false. Tests: `supabase/tests/20261028000000_akb_self_serve_memberships.test.sql` (29 checks; real Postgres 16).
+2. **Square live** (section below): Sandbox test first, then the live token, location, webhook subscription and `SQUARE_ENVIRONMENT=production` on Production. The webhook is what starts a membership, so it must be subscribed to `payment.created` and `payment.updated` and point at the production URL.
+3. **Email on** (Resend settings above): Alex is emailed when someone joins and pays ("nothing to confirm"), the member gets a welcome, and each renewal emails the member a Square pay link.
+4. **`CRON_SECRET`** (already needed): the daily renewal sends the pay links; the daily Square reconcile catches missed webhooks and sends any welcome emails they would have triggered.
+5. `SITE_URL` set to the real domain: Square sends payers back to `<SITE_URL>/memberships/join/done`.
+
+How it behaves: the join page's last step says "Pay £<price>" and opens Square's page; the price comes from `content/memberships.ts` on the server. The membership starts the moment the payment is recorded (Square's verified webhook, the reconcile, or Alex recording a payment in the portal against that charge), on that same charge, and the first class (if chosen) is booked with a credit then. A member who leaves Square's page without paying has nothing started; joining again replaces the unpaid sign-up. If the membership can't start (e.g. Alex already started one for them), the payment stays recorded and the sign-up is marked `needs_attention`, and Alex is emailed. Renewals: every four weeks a new period and charge, a pay link emailed once, and that period's credits can't be used until it's paid (memberships Alex starts by hand are unchanged). Refunds and cancelling a membership stay with Alex.
+
 ### Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.

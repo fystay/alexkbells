@@ -43,7 +43,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         experience and where you train), your name, email address, how you&apos;d like to be
         contacted and the phone number or Instagram username you give for that. When you send a
         membership request we also receive the plan you choose, your first class if you pick one, and the
-        date and time you agreed to the membership terms and cancellation policy. If you&apos;re a member and
+        date and time you agreed to the membership terms and cancellation policy. If you pay online, you pay on
+        Square&apos;s secure page: Square receives your card details, and we never see them; we receive the amount,
+        the date and Square&apos;s reference for the payment. If you&apos;re a member and
         sign in to your account, we keep a record of each sign-in: a coded copy of the sign-in link and of
         your session, and when they were created, last used and ended. We don&apos;t record where you are or
         what device you use. We don&apos;t ask about your health; please don&apos;t include medical details.
@@ -66,7 +68,8 @@ const sections: { heading: string; body: React.ReactNode }[] = [
       <p>
         What you send is stored in our database (Supabase, hosted in the EU, Ireland) so Alex can see
         it in his password-protected coach area, and may also be sent to him by email using our email
-        provider (Resend). Sign-in links are emailed to you by the same provider. These providers handle it on our behalf. The website is hosted by Vercel, which processes
+        provider (Resend). Sign-in links, membership confirmations and payment links are emailed to you by the same
+        provider. Online payments are taken by Square, which also processes them under its own privacy notice. These providers handle it on our behalf. The website is hosted by Vercel, which processes
         standard technical information such as IP addresses to deliver and protect the site. These
         providers may process data outside the UK under appropriate safeguards.
       </p>

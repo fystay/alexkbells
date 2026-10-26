@@ -156,7 +156,14 @@ export type LinkResult = { ok: true; url: string; amountPence: number } | { ok: 
  * click, timeout) reuses the same idempotency key, so Square returns the same
  * link instead of making another; a charge has at most one live link.
  */
-export async function createChargeLink(db: Db, square: SquareConfig, chargeId: string, fetchImpl: typeof fetch = fetch): Promise<LinkResult> {
+export async function createChargeLink(
+  db: Db,
+  square: SquareConfig,
+  chargeId: string,
+  fetchImpl: typeof fetch = fetch,
+  /** Online membership sign-ups and renewals: the member's email for Square's form, and the page to return to. */
+  options: { buyerEmail?: string; redirectUrl?: string } = {},
+): Promise<LinkResult> {
   const live = await select<LinkRow>(db, "akb_square_payment_links", [["charge_id", `eq.${chargeId}`], ["status", "in.(creating,open)"]]);
   if (!live.ok) return { ok: false, reason: "db" };
   let link = live.data[0];
@@ -182,7 +189,7 @@ export async function createChargeLink(db: Db, square: SquareConfig, chargeId: s
 
   const made = await createPaymentLink(
     square,
-    { idempotencyKey: link.idempotency_key, name: charge.description, amountPence: link.amount_pence, note: `RAENG ref ${link.id.slice(0, 8)}` },
+    { idempotencyKey: link.idempotency_key, name: charge.description, amountPence: link.amount_pence, note: `RAENG ref ${link.id.slice(0, 8)}`, ...options },
     fetchImpl,
   );
   if (!made.ok) {

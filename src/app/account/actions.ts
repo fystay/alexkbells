@@ -90,6 +90,7 @@ const RULES: Record<string, string> = {
   already_booked: "already_booked",
   class_started: "class_started",
   no_membership: "outside_period",
+  period_unpaid: "period_unpaid",
   not_found: "not_found",
   not_booked: "not_found",
   not_credit_place: "not_found",

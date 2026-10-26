@@ -4,6 +4,8 @@ import { coachDb } from "@/lib/coach/db";
 import { rpc } from "@/lib/coach/db";
 import { renewMemberships } from "@/lib/coach/memberships";
 import { londonToday } from "@/lib/coach/time";
+import { sendRenewalLinks } from "@/lib/membership-checkout";
+import { squareConfig } from "@/lib/square/config";
 
 /**
  * Renews memberships every four weeks (vercel.json "crons", daily): each
@@ -13,6 +15,8 @@ import { londonToday } from "@/lib/coach/time";
  * <CRON_SECRET>"; anything else gets 401 and does nothing. Counts only.
  * Also tidies member sign-ins (akb_member_cleanup: links after a day, ended
  * sessions after 30 days); a failure there is logged and never stops renewals.
+ * Then, for members who joined and pay online, emails a Square pay link for
+ * each new period still to pay (once each; needs Square and email settings).
  */
 export async function GET(request: Request) {
   const noStore = { "Cache-Control": "no-store" };
@@ -28,5 +32,11 @@ export async function GET(request: Request) {
   }
   const tidied = await rpc<number>(db, "akb_member_cleanup", {});
   if (!tidied.ok) console.error(`Member sign-in clean-up failed (${tidied.error.kind} ${tidied.error.code})`);
-  return NextResponse.json({ ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null }, { headers: noStore });
+  const square = squareConfig();
+  const links = square ? await sendRenewalLinks(db, square, londonToday()) : null;
+  if (links?.failed) console.error(`Membership pay links: ${links.failed} couldn't be sent`);
+  return NextResponse.json(
+    { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null },
+    { headers: noStore },
+  );
 }

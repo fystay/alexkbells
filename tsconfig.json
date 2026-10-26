@@ -30,7 +30,9 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     ".next-e2e-production/types/**/*.ts",
-    ".next-e2e-production/dev/types/**/*.ts"
+    ".next-e2e-production/dev/types/**/*.ts",
+    ".next-e2e-pay/types/**/*.ts",
+    ".next-e2e-pay/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
