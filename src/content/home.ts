@@ -5,8 +5,6 @@
 export const hero = {
   headline: "Train with purpose.",
   headlineSecondary: "Build with discipline.",
-  /** Under the headline (warm tech hero, owner's pick C, 2026-10-26): the three ways to train, no claims. */
-  summary: "Coached classes, 1:1 and online coaching.",
   primaryLabel: "Book now",
   secondaryLabel: "Explore coaching",
 } as const;

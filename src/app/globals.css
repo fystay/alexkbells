@@ -113,6 +113,15 @@
   letter-spacing: var(--tracking-display);
 }
 
+/* The production hero's type (owner, 2026-10-26: keep the live hero as it is):
+   the earlier display style, used only by the home hero. */
+@utility hero-display {
+  font-weight: 500;
+  font-stretch: 112%;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
 /* The small label above a heading ("Meet your coach"): plain sentence case, semibold so it reads as a label. */
 @utility eyebrow {
   font-size: 0.875rem;

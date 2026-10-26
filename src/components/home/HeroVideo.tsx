@@ -108,7 +108,7 @@ export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, 
 
   return (
     <div className={className}>
-      <div className={`absolute inset-0 overflow-hidden bg-white${square ? "" : " rounded-3xl"}`}>
+      <div className={`absolute inset-0 overflow-hidden bg-white${square ? "" : " sm:rounded-lg"}`}>
         {portrait ? (
           <div
             aria-hidden="true"
@@ -135,7 +135,7 @@ export function HeroVideo({ sources: landscapeSources, poster: landscapePoster, 
           type="button"
           onClick={toggle}
           aria-label={playing ? "Pause background video" : "Play background video"}
-          className={`absolute z-20 inline-flex size-11 items-center justify-center rounded-full border border-ink bg-paper text-ink transition-colors hover:bg-ink hover:text-paper ${controlClassName}`}
+          className={`absolute z-20 inline-flex size-11 items-center justify-center border border-ink bg-paper text-ink transition-colors hover:bg-ink hover:text-paper ${controlClassName}`}
         >
           <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
             {playing ? <path d="M4 2h3v12H4zM9 2h3v12H9z" /> : <path d="M4 2l10 6-10 6z" />}

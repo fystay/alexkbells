@@ -454,8 +454,7 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   await expect(hero.locator("h1")).toContainText("Train with purpose.");
-  await expect(hero.locator("h1")).toHaveText("Train with purpose.");
-  await expect(hero.locator("h1 + p")).toHaveText("Build with discipline. Coached classes, 1:1 and online coaching.");
+  await expect(hero.locator("h1")).toContainText("Build with discipline.");
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);
@@ -737,17 +736,15 @@ test("no page says 'Get in touch': the main button is always 'Book now'", async 
   }
 });
 
-test("hero film sits under the words in a 4:5 rounded frame on phones, with the vertical cut", async ({ page }) => {
+test("hero film covers the phone screen edge to edge with the vertical cut", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const source = page.locator("section[aria-labelledby=hero-heading] video source").first();
   await expect(source).toHaveAttribute("src", "/media/hero-portrait.mp4");
   const box = (await page.locator("section[aria-labelledby=hero-heading] video").boundingBox())!;
-  const heading = (await page.locator("#hero-heading").boundingBox())!;
-  expect(box.y).toBeGreaterThan(heading.y + heading.height);
-  expect(Math.round(box.x)).toBe(16);
-  expect(Math.round(box.width)).toBe(358);
-  expect(Math.abs(box.height - box.width * 1.25)).toBeLessThan(2);
+  expect(Math.round(box.x)).toBe(0);
+  expect(Math.round(box.width)).toBe(390);
+  expect(box.height).toBeGreaterThan(844 - 108 - 4);
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator("section[aria-labelledby=hero-heading] video source").first()).toHaveAttribute("src", "/media/hero.mp4");
 });
