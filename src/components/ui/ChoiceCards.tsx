@@ -26,6 +26,11 @@ interface ChoiceCardsProps {
   children: ReactNode;
   className?: string;
   buttonClassName?: string;
+  /**
+   * Classes for a frame around the cards and the button (owner, 2026-10-27,
+   * option C): the button then sits square along the frame's bottom edge.
+   */
+  frame?: string;
 }
 
 /**
@@ -40,6 +45,7 @@ export function ChoiceCards({
   children,
   className,
   buttonClassName,
+  frame,
 }: ChoiceCardsProps) {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLFieldSetElement>(null);
@@ -53,10 +59,13 @@ export function ChoiceCards({
     if (restored) setValue(restored.value);
   }, [name]);
 
-  const button = buttonClasses(
-    "action",
-    cn("w-full px-6", buttonClassName),
-  );
+  const button = frame
+    ? cn(
+        "flex min-h-14 w-full items-center justify-center bg-ink px-6 font-semibold text-white underline-offset-4 hover:underline",
+        "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-white",
+        buttonClassName,
+      )
+    : buttonClasses("action", cn("w-full px-6", buttonClassName));
   return (
     <fieldset
       ref={ref}
@@ -67,8 +76,9 @@ export function ChoiceCards({
       }}
     >
       <legend className="sr-only">{legend}</legend>
+      <div className={frame}>
       {children}
-      <div className="mt-6">
+      <div className={frame ? "border-t border-line" : "mt-6"}>
         {chosen ? (
           chosen.external ? (
             <a
@@ -90,6 +100,9 @@ export function ChoiceCards({
           // 2026-10-26), just the prompt in the button's place, so nothing moves when it appears.
           <p className="flex min-h-14 items-center justify-center text-center font-semibold">{prompt}</p>
         )}
+      </div>
+      </div>
+      <div>
         <p
           id={`${name}-choice`}
           aria-live="polite"

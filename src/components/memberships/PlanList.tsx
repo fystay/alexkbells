@@ -39,14 +39,15 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  // No rules between the rows (owner, 2026-10-27): the empty circle marks each as a choice, and the chosen row turns ink.
-  const row = cn(
-    "relative rounded-2xl px-3 py-4",
-    choiceCard,
-  );
+  // Framed (owner, 2026-10-27, option C): the plans in one box with a thin ink edge, fine grey
+  // rules between them and Join along the bottom; the chosen row turns ink.
+  const row = cn("relative border-line px-4 py-4 sm:px-5 [&+&]:border-t", choiceCard);
   return (
-    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it." className={cn("max-w-lg", className)}>
-      <ul aria-label="Membership plans" className="relative -mx-3">
+    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it."
+      className={cn("max-w-lg", className)}
+      frame="overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink"
+    >
+      <ul aria-label="Membership plans" className="relative">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
