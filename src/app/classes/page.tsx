@@ -7,6 +7,7 @@ import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { ClassesHero } from "@/components/classes/ClassesHero";
+import { ClassFocus } from "@/components/classes/ClassFocus";
 import { JoinSteps } from "@/components/home/JoinSteps";
 import { firstClassSteps } from "@/content/home";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
@@ -45,9 +46,7 @@ export default function ClassesPage() {
         moreHref="#join"
         moreLabel="How to join"
       />
-      <Section spacing="compact" className="pb-0 sm:pb-0">
-        <p className="max-w-2xl text-lede">Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld.</p>
-      </Section>
+      <ClassFocus />
 
       <Section id="join" labelledBy="join-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
