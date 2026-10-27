@@ -49,10 +49,11 @@ export const heroVideo = {
 
 /**
  * The classes page hero film (owner's clip, 2026-10-27: a 13 s phone video of
- * a class, 464 × 832 at 60 fps). Graded for a premium gym look: slowed to two
- * thirds speed (smooth from the 60 fps source), deeper contrast, cooler
- * shadows and lower saturation, a light vignette and film grain, fading in
- * and out so the loop is seamless; 19.5 s. Phones get the vertical cut; wider
+ * a class, 464 × 832 at 60 fps). The home film's grade C exactly (owner,
+ * 2026-10-27: keep the two films consistent; scripts/hero_edit.py GRADE:
+ * lifted, contrasty, slightly cool, the lower part darkened under the words),
+ * slowed to two thirds speed (smooth from the 60 fps source), fading in and
+ * out so the loop is seamless; 19.5 s. Phones get the vertical cut; wider
  * screens the same clip on the right over a blurred, darkened copy of
  * itself (1280 × 544), so the words on the left sit on calm background.
  * The source is only 464 px wide, so it is soft on large screens.
