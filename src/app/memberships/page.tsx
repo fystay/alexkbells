@@ -7,7 +7,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { CancellationPolicy } from "@/components/memberships/CancellationPolicy";
-import { PlanList } from "@/components/memberships/PlanList";
+import { PaygExtra, PlanList } from "@/components/memberships/PlanList";
 import { MembershipTerms } from "@/components/memberships/MembershipTerms";
 
 export const metadata: Metadata = pageMetadata({
@@ -21,7 +21,8 @@ const payg = getService("group-classes").prices[0];
 
 // Reads in the order a visitor decides (owner, 2026-10-27): how memberships work,
 // the prices side by side, then the call to action. The cancellation policy is
-// reference, so it sits last (other pages link to #cancellation).
+// reference, so it sits last (other pages link to #cancellation). What pay as
+// you go costs on top is one plain link under the plans, closed until asked for.
 export default function MembershipsPage() {
   return (
     <>
@@ -33,7 +34,8 @@ export default function MembershipsPage() {
           title="Compare the prices."
           intro={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class.`}
         />
-        <PlanList className="mt-8 max-w-2xl" />
+        <PlanList className="mt-8" />
+        <PaygExtra className="mt-6" />
       </Section>
       <CtaBand body={null} tone="plain" />
       <CancellationPolicy />

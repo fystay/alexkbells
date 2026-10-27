@@ -557,6 +557,11 @@ test.describe("memberships", () => {
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12");
     await expect(payg).toContainText("Per class. No membership needed.");
+    // What pay as you go costs on top: closed behind one link, the figures calculated from the prices.
+    await page.getByText("What pay as you go costs on top").click();
+    const extra = page.getByRole("table", { name: /what you.d pay on top/i });
+    await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
+    await expect(extra.getByRole("row")).toHaveCount(4);
   });
 
   test("select, then Book now: the chosen row turns ink and the button opens the calendar with the plan", async ({ page }) => {
