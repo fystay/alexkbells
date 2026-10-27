@@ -589,7 +589,7 @@
     transform: none;
   }
   .ch-slide:not(:first-child),
-  .ch-pause {
+  .ch-controls {
     display: none;
   }
   .ch-slide:first-child {
@@ -602,5 +602,40 @@
   }
   to {
     transform: scale(1.07);
+  }
+}
+
+/* Classes hero progress bar: tap a segment to jump; the current one fills as its photo shows (5.5 s, then the next). */
+.ch-seg {
+  position: relative;
+  display: block;
+  min-height: 2.75rem;
+  padding: 0;
+}
+.ch-track {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 3px;
+  translate: 0 -50%;
+  background: var(--color-grey);
+}
+.ch-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-white);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.ch-fill.ch-done,
+.ch-fill.ch-cur {
+  transform: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ch-cur {
+    animation: mx-fill 5500ms linear both;
+  }
+  .ch-controls[data-paused] .ch-cur {
+    animation-play-state: paused;
   }
 }
