@@ -17,7 +17,7 @@ export function MembershipExplainer({ terms, extraClassPrice }: { terms: readonl
   const next = (i: number) => setCurrent((i + 1) % terms.length);
 
   return (
-    <div className="mx lg:grid lg:grid-cols-[32.5rem_1fr] lg:items-center lg:gap-x-16" data-paused={paused || undefined}>
+    <div className="mx mx-split lg:grid lg:grid-cols-[32.5rem_1fr] lg:items-center lg:gap-x-16" data-paused={paused || undefined}>
       <div>
         {/* Decorative: the five terms are in the list that follows. */}
         <div className="mx-stage" aria-hidden="true">

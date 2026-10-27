@@ -8,10 +8,11 @@ import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
+import { Explainer } from "@/components/ui/Explainer";
+import { oneToOneFocusScenes, oneToOneHowScenes } from "@/components/coaching/CoachingScenes";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { revealDelay } from "@/lib/reveal";
 
 export const metadata: Metadata = pageMetadata({
   title: "1:1 Kettlebell Coaching",
@@ -71,14 +72,18 @@ export default function CoachingPage() {
               intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
             />
           </div>
-          <ul className="bullets lg:col-span-7">
-            {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} >
-                <h3 className="font-semibold">{f.title}</h3>
-                <p className="mt-0.5">{f.body}</p>
-              </li>
-            ))}
-          </ul>
+          <div className="lg:col-span-7">
+            {/* Tap through the three: the words are also here as a list for screen readers. */}
+            <Explainer steps={focus} scenes={oneToOneFocusScenes} autoPlay={false} noun="point" />
+            <ul className="bullets sr-only">
+              {focus.map((f) => (
+                <li key={f.title}>
+                  <h3 className="font-semibold">{f.title}</h3>
+                  <p className="mt-0.5">{f.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </Section>
 
@@ -94,7 +99,10 @@ export default function CoachingPage() {
             {/* The page opens and ends with Book now; the steps don't repeat it (2026-10-26). */}
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
-          <Steps steps={steps} className="lg:col-span-7" />
+          <div className="lg:col-span-7">
+            <Explainer steps={steps} scenes={oneToOneHowScenes} noun="step" />
+            <Steps steps={steps} className="sr-only" />
+          </div>
         </div>
       </Section>
 

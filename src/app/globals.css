@@ -392,7 +392,7 @@
 }
 /* From lg the five terms are listed beside the picture instead (MembershipExplainer). */
 @media (width >= 64rem) {
-  .mx-caption {
+  .mx-split .mx-caption {
     display: none;
   }
 }

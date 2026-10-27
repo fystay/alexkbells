@@ -6,6 +6,8 @@ import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
+import { Explainer } from "@/components/ui/Explainer";
+import { onlineHowScenes } from "@/components/coaching/CoachingScenes";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -69,7 +71,10 @@ export default function OnlineCoachingPage() {
           <div className="lg:col-span-5">
             <SectionHeading id="how-heading" eyebrow="How it works" title="Start with a conversation" />
           </div>
-          <Steps steps={steps} className="lg:col-span-7" />
+          <div className="lg:col-span-7">
+            <Explainer steps={steps} scenes={onlineHowScenes} noun="step" />
+            <Steps steps={steps} className="sr-only" />
+          </div>
         </div>
       </Section>
 
