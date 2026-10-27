@@ -535,9 +535,11 @@ test.describe("memberships", () => {
     { name: "Dedicated", price: "£85", credits: "12 class credits", perClass: "£7.08", payg: "£144", save: "£59" },
   ];
 
-  test("the page shows the home page's plan list: each plan's rules as in Alex's layout, then what pay as you go costs extra", async ({ page }) => {
+  test("the page shows the home page's plan list: each plan's rules as in Alex's layout", async ({ page }) => {
     await page.goto("/memberships");
-    await expect(page.locator("h1")).toHaveText("Save up to £59.");
+    await expect(page.locator("h1")).toHaveText("How memberships work.");
+    await expect(page.getByRole("heading", { name: "Compare the prices." })).toBeVisible();
+    await expect(page.locator("#memberships")).toContainText("Save up to £59 every 4 weeks, against pay as you go at £12 a class.");
     const rows = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
     await expect(rows).toHaveCount(4);
     for (const [i, p] of PLANS.entries()) {
@@ -555,9 +557,6 @@ test.describe("memberships", () => {
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12");
     await expect(payg).toContainText("Per class. No membership needed.");
-    const extra = page.getByRole("table", { name: "Pay as you go costs more" });
-    await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
-    await expect(extra.getByRole("row")).toHaveCount(4);
   });
 
   test("select, then Book now: the chosen row turns ink and the button opens the calendar with the plan", async ({ page }) => {
