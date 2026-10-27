@@ -18,10 +18,11 @@ export interface Option {
 }
 
 const tile =
-  "relative flex cursor-pointer items-center gap-4 rounded-2xl border border-white bg-white text-ink transition-colors duration-150 " +
+  // Outlined on the cream page, ink once chosen (2026-10-27: the site's one panel style).
+  "relative flex cursor-pointer items-center gap-4 rounded-2xl border border-line text-ink transition-colors duration-150 " +
   "hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper " +
   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink " +
-  "has-[:disabled]:cursor-not-allowed has-[:disabled]:border-line has-[:disabled]:bg-transparent has-[:disabled]:text-muted";
+  "has-[:disabled]:cursor-not-allowed has-[:disabled]:border-dashed has-[:disabled]:text-muted";
 
 function Indicator({ type }: { type: "radio" | "checkbox" }) {
   return (
@@ -398,13 +399,14 @@ export function PrivacyLine({ action }: { action: string }) {
 
 export function InstagramFallback({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-3xl bg-ink p-8 text-paper sm:p-10">
-      <p className="max-w-xl text-lede text-white">{children}</p>
+    // The site's outlined panel (2026-10-27), not a black block.
+    <div className="card p-6 sm:p-10">
+      <p className="max-w-xl text-lede">{children}</p>
       <a
         href={site.social.instagram.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-6 inline-flex min-h-12 items-center gap-3 rounded-full bg-paper px-6 text-base font-semibold text-ink transition-colors hover:bg-white"
+        className="mt-6 inline-flex min-h-12 items-center gap-3 rounded-full border border-ink bg-ink px-6 text-base font-semibold text-white transition-colors hover:bg-white hover:text-ink"
       >
         Message Alex on Instagram
         <span className="sr-only">(opens in a new tab)</span>

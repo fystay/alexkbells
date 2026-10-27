@@ -609,7 +609,7 @@ function Summary({
         <span>{demo ? "Your selection" : "Your request"}</span>
         {demo ? <span className="rounded-full bg-ink px-2.5 py-0.5 text-sm text-paper">Demo</span> : null}
       </p>
-      <dl className="divide-y divide-paper">
+      <dl className="divide-y divide-line">
         {rows.map((row) => (
           <div key={row.label} className="relative min-h-14 px-5 py-3">
             <dt className="text-xs text-muted">{row.label}</dt>
@@ -628,7 +628,7 @@ function Summary({
           </div>
         ))}
       </dl>
-      <p className="border-t-2 border-paper px-5 py-4 text-sm text-muted">
+      <p className="border-t border-line px-5 py-4 text-sm text-muted">
         {demo ? "Demonstration only. Nothing is booked." : "Alex confirms every place personally by email."}
       </p>
     </div>
@@ -646,7 +646,7 @@ function CompactSummary({
   onEdit: (step: number) => void;
 }) {
   return (
-    <dl aria-label={demo ? "Your selection (demonstration)" : "Your request so far"} className="card divide-y divide-paper px-4">
+    <dl aria-label={demo ? "Your selection (demonstration)" : "Your request so far"} className="card divide-y divide-line px-4">
       {items.map((item) => (
         <div key={item.label} className="flex items-center gap-2 py-1">
           <dt className="shrink-0 text-xs text-muted">{item.label}</dt>

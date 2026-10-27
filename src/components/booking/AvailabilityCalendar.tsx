@@ -81,10 +81,9 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                 data-status={status}
                 className={cn(
                   "relative flex h-12 items-center justify-center rounded-xl text-sm transition-colors duration-150 sm:h-14",
-                  // Bookable dates stand out as white rounded squares in bold; the rest stay plain on the page (warm tech, 2026-10-26).
-                  // Only one background per state: white when bookable, ink once chosen (both at once let white win).
+                  // Bookable dates are outlined rounded squares in bold; the rest stay plain on the page (2026-10-27: outlines, not white fills).
                   selectable && "cursor-pointer font-bold hover:outline hover:outline-1 hover:-outline-offset-1 hover:outline-ink",
-                  selectable && !selected && "bg-white",
+                  selectable && !selected && "border border-line",
                   selected && "bg-ink text-paper",
                   // Dates that can't be booked recede (disabled controls are exempt from text contrast).
                   !selectable && "text-grey",
@@ -113,7 +112,7 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
         </div>
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted" aria-label="Key">
           <li className="flex items-center gap-2">
-            <span aria-hidden="true" className="flex size-4 items-center justify-center rounded bg-white">
+            <span aria-hidden="true" className="flex size-4 items-center justify-center rounded border border-line">
               <span className="size-1 rounded-full bg-ink" />
             </span>{" "}
             Available
@@ -141,8 +140,8 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                 className={cn(
                   "flex min-h-12 items-center justify-between gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors duration-150",
                   slot.available
-                    ? "cursor-pointer border-white bg-white hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper"
-                    : "cursor-not-allowed border-line text-muted",
+                    ? "cursor-pointer border-line hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper"
+                    : "cursor-not-allowed border-dashed border-line text-muted",
                   "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink",
                 )}
               >

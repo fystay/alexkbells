@@ -157,9 +157,13 @@
   }
 }
 
-/* A white rounded card on the cream page. Now only for forms and the booking flow. */
+/*
+ * A panel in the booking, joining and account flows: a thin grey outline on
+ * the cream page, no white fill (2026-10-27: the same edge as the home page's
+ * swipe slides, so every boxed shape on the site looks alike).
+ */
 @utility card {
-  background-color: var(--color-white);
+  border: 1px solid var(--color-line);
   border-radius: 1.25rem;
 }
 

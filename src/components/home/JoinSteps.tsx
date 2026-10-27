@@ -25,7 +25,7 @@ function Step({ n, title, children, slide, footer }: { n: number; title: string;
       {n}
     </span>
   );
-  const body = <div className="mt-1 space-y-2 text-sm leading-relaxed sm:text-base">{children}</div>;
+  const body = <div className="mt-1 space-y-2 text-[0.9375rem] leading-relaxed sm:text-base">{children}</div>;
   if (!slide) {
     return (
       <li className="grid grid-cols-[2.5rem_1fr] items-start">

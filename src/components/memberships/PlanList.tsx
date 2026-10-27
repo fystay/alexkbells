@@ -13,8 +13,8 @@ const payg = getService("group-classes").prices[0];
 /**
  * The plans as rows between thin rules (card overhaul, owner 2026-10-26), with
  * each plan's rules set out as in Alex's plan layout: name and price, then
- * "Every 4 weeks · 4 class credits", the cost per class and the saving, and
- * the pay-as-you-go equivalent. Pay as you go last. Choose a row (it turns
+ * "4 class credits · £10 per class", then "Save £8 on £48 pay as you go" (the
+ * saving and the pay-as-you-go equivalent in one line). Pay as you go last. Choose a row (it turns
  * ink), then the button (select, then continue, as everywhere on the site):
  * "Join <plan>" for a membership, "Book now" for pay as you go. Join opens the
  * membership journey (/memberships/join?plan=); Book now opens the class
@@ -63,19 +63,17 @@ export function PlanList({ className }: { className?: string }) {
                 </h3>
                 <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
               </div>
-              <div className="mt-1 space-y-0.5 pl-8 text-sm lg:text-base">
-                {/* "Every 4 weeks" is said once, in the section's intro (owner, 2026-10-26). */}
-                <p>{plan.credits} class credits</p>
+              <div className="mt-1 space-y-0.5 pl-8 text-[0.9375rem] lg:text-base">
+                {/* "Every 4 weeks" is said once, in the section's intro (owner, 2026-10-26). Two lines (2026-10-27):
+                    the saving and the pay-as-you-go equivalent read as one. */}
                 <p>
-                  {formatPenceShort(f.perClassPence)} per class
-                  {f.savingPence > 0 ? (
-                    <>
-                      {" · "}
-                      <span className="font-semibold">Save {formatPenceShort(f.savingPence)}</span>
-                    </>
-                  ) : null}
+                  {plan.credits} class credits · {formatPenceShort(f.perClassPence)} per class
                 </p>
-                <p>Pay-as-you-go equivalent {formatPenceShort(f.payAsYouGoPence)}</p>
+                {f.savingPence > 0 ? (
+                  <p>
+                    <span className="font-semibold">Save {formatPenceShort(f.savingPence)}</span> on {formatPenceShort(f.payAsYouGoPence)} pay as you go
+                  </p>
+                ) : null}
               </div>
             </li>
           );
@@ -89,7 +87,7 @@ export function PlanList({ className }: { className?: string }) {
             </h3>
             <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
           </div>
-          <p className="mt-1 pl-8 text-sm lg:text-base">Per class. No membership needed.</p>
+          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">Per class. No membership needed.</p>
         </li>
       </ul>
     </ChoiceCards>
@@ -117,7 +115,7 @@ export function PlanTerms({ className }: { className?: string }) {
     "Cancel 24 hours or more before class and your credit comes back.",
   ];
   return (
-    <div className={cn("text-sm lg:text-base", className)}>
+    <div className={cn("text-[0.9375rem] lg:text-base", className)}>
       <h3 className="eyebrow mb-2">Membership rules</h3>
       <ul className="space-y-1">
         {points.map((p) => (

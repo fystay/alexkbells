@@ -547,8 +547,8 @@ test.describe("memberships", () => {
       await expect(row).toContainText(p.credits);
       // "Every 4 weeks" is said once, in the intro, not on each plan.
       await expect(row).not.toContainText("Every 4 weeks");
-      await expect(row).toContainText(`${p.perClass} per class · Save ${p.save}`);
-      await expect(row).toContainText(`Pay-as-you-go equivalent ${p.payg}`);
+      await expect(row).toContainText(`${p.credits} · ${p.perClass} per class`);
+      await expect(row).toContainText(`Save ${p.save} on ${p.payg} pay as you go`);
     }
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12");
@@ -673,12 +673,15 @@ test("class pages link to the how-to-join section", async ({ page }) => {
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
   await page.goto("/about");
-  for (const scope of [page.getByRole("contentinfo"), page.locator("#coach")]) {
-    const fb = scope.getByRole("link", { name: /Facebook/ });
-    await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");
-    await expect(fb).toHaveAttribute("target", "_blank");
-    await expect(fb).toHaveAttribute("rel", /noopener/);
-  }
+  // Facebook is in the footer; Alex's section links Instagram only (2026-10-27).
+  const fb = page.getByRole("contentinfo").getByRole("link", { name: /Facebook/ });
+  await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");
+  await expect(fb).toHaveAttribute("target", "_blank");
+  await expect(fb).toHaveAttribute("rel", /noopener/);
+  const ig = page.locator("#coach").getByRole("link", { name: /Instagram/ });
+  await expect(ig).toHaveAttribute("target", "_blank");
+  await expect(ig).toHaveAttribute("rel", /noopener/);
+  await expect(page.locator("#coach").getByRole("link", { name: /Facebook/ })).toHaveCount(0);
   // From his launch post (Instagram, 26 Oct 2026), nothing written for him.
   const story = page.locator("#story");
   await expect(story.locator("blockquote")).toHaveText("“Be part of something bigger than just a workout.”");
@@ -819,7 +822,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(page.locator("#book")).not.toContainText("Classes run");
   // Each plan states its rules as in Alex's layout.
   const regular = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").filter({ has: page.getByRole("heading", { name: "Regular" }) });
-  for (const text of ["8 class credits", "£8.13 per class", "Save £31", "Pay-as-you-go equivalent £96"]) await expect(regular).toContainText(text);
+  for (const text of ["8 class credits · £8.13 per class", "Save £31 on £96 pay as you go"]) await expect(regular).toContainText(text);
   await expect(page.locator("#memberships").getByRole("heading", { name: "Membership rules" })).toBeVisible();
   // Each fact once: the days only in the timetable, Instagram only in Meet your coach.
   await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(1);

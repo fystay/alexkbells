@@ -84,14 +84,11 @@ export function CoachStory({
                 About RAENG
               </ButtonLink>
             ) : null}
-            <p className="mt-3 flex flex-wrap items-center gap-x-5 text-sm">
-              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
+            {/* Instagram only (2026-10-27): the follower count and Facebook are in the footer and on /contact. */}
+            <p className="mt-3 text-sm">
+              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
                 Instagram {site.social.instagram.handle}
                 <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-              <span>{site.social.instagram.followers} followers</span>
-              <a href={site.social.facebook.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline ">
-                Facebook<span className="sr-only"> ({site.social.facebook.name}, opens in a new tab)</span>
               </a>
             </p>
           </div>

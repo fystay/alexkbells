@@ -240,7 +240,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                     return {
                       value: p.id,
                       label: `${p.name} · £${p.priceGbp} / ${BILLING_WEEKS} weeks`,
-                      detail: `${p.credits} classes · ${formatPenceShort(f.perClassPence)} each · save ${formatPenceShort(f.savingPence)}`,
+                      detail: `${p.credits} class credits · ${formatPenceShort(f.perClassPence)} per class · Save ${formatPenceShort(f.savingPence)}`,
                     };
                   })}
                   value={planId}
@@ -408,7 +408,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                   </div>
                 ) : null}
 
-                <dl className="card divide-y divide-paper px-5 sm:px-6">
+                <dl className="card divide-y divide-line px-5 sm:px-6">
                   {rows.map((row) => (
                     <div key={row.label} className="py-3">
                       <dt className="text-sm">{row.label}</dt>
@@ -525,7 +525,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
       <div className="hidden lg:col-span-4 lg:block">
         <div className="sticky top-28 card overflow-hidden">
           <p className="px-5 pt-5 pb-2 font-semibold">Your membership</p>
-          <dl className="divide-y divide-paper">
+          <dl className="divide-y divide-line">
             {rows.slice(0, 2).map((row) => (
               <div key={row.label} className="min-h-14 px-5 py-3">
                 <dt className="text-xs">{row.label}</dt>
@@ -533,7 +533,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
               </div>
             ))}
           </dl>
-          <p className="border-t-2 border-paper px-5 py-4 text-sm">
+          <p className="border-t border-line px-5 py-4 text-sm">
             {pay ? "Pay on Square's secure page. Your membership starts as soon as it's paid." : "Nothing to pay now. Alex confirms every membership personally."}
           </p>
         </div>
