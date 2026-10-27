@@ -9,7 +9,7 @@ import { Steps } from "@/components/ui/Steps";
 import { Explainer } from "@/components/ui/Explainer";
 import { onlineHowScenes } from "@/components/coaching/CoachingScenes";
 import { PageHeader } from "@/components/sections/PageHeader";
-import { ProgressLine } from "@/components/sections/CoachingGraphics";
+import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { images } from "@/content/images";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -48,7 +48,8 @@ export default function OnlineCoachingPage() {
   return (
     <>
       <PageHeader
-        panel={<ProgressLine photo={images.oneToOne} />}
+        // The owner's video-call image (2026-10-27), 4:5 at every width so the logo and the call both show.
+        panel={<PhotoFrame photo={images.onlineCoaching} sizes="(min-width: 1248px) 480px, (min-width: 1024px) 38vw, 100vw" priority className="aspect-[4/5] w-full" />}
         eyebrow="Online coaching"
         title="Coaching that goes where you train."
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."

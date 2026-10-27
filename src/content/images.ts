@@ -26,7 +26,7 @@ export const images = {
     alt: "A coach demonstrates a two-handed kettlebell swing in a training studio while a group follows behind",
     position: "50% 45%",
   },
-  /** Online coaching page header graphic (ProgressLine, owner 2026-10-27); was the 1:1 card (owner's photo, 2026-10-23). */
+  /** The 1:1 swing photo (owner's photo, 2026-10-23); not currently shown (online coaching uses `onlineCoaching` since 2026-10-27). */
   oneToOne: {
     src: `${dir}/one-to-one-swing.jpg`,
     width: 942,
@@ -60,6 +60,20 @@ export const images = {
     height: 1250,
     alt: "Alex in a blue T-shirt standing barefoot on a mat in a dark training studio, a kettlebell at his feet",
     position: "40% 22%",
+  },
+  /**
+   * Online coaching page header (owner, 2026-10-27): a client on a video call
+   * with his coach on a tablet, a RAENG Fitness banner and kettlebells behind.
+   * Cut from an illustrative image the owner supplied, with all its writing
+   * removed; the banner carries the real RAENG lockup (public/brand, black on
+   * cream, as the owner sent it 2026-10-27) in place of the image's mock logo. 4:5.
+   */
+  onlineCoaching: {
+    src: `${dir}/online-coaching-call.jpg`,
+    width: 1000,
+    height: 1250,
+    alt: "A man on a video call with his coach on a tablet, in front of a RAENG Fitness banner and a rack of kettlebells",
+    position: "50% 50%",
   },
   /** "Why kettlebells" (option C, owner 2026-10-23): one photo beside the numbered list. Cropped so no third-party signage shows. */
   whyKettlebells: {

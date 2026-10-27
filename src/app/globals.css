@@ -290,23 +290,17 @@
 
 
 /*
- * Coaching page graphics (owner, 2026-10-27: options A and F). Static by
- * default (brackets shown, line drawn); they only move without Reduce Motion.
+ * 1:1 coaching header graphic (owner, 2026-10-27: option A). Static by
+ * default (brackets shown); it only moves without Reduce Motion.
  */
 @media (prefers-reduced-motion: no-preference) {
   .focus-photo { animation: focus-zoom 10s ease-in-out infinite alternate; }
   .focus-corners { animation: focus-in 5s cubic-bezier(0.2, 0, 0, 1) infinite; }
   .focus-tag { animation: focus-tag 5s ease infinite; }
-  .progress-photo { animation: progress-zoom 12s ease-in-out infinite alternate; }
-  .progress-line { stroke-dasharray: 600; animation: progress-draw 7s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-  .progress-dot { transform-box: fill-box; transform-origin: center; animation: progress-dot 7s ease infinite; }
 }
 @keyframes focus-zoom { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1%, -1.5%); } }
 @keyframes focus-in { 0% { opacity: 0; transform: scale(1.3); } 25%, 80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @keyframes focus-tag { 0%, 22% { opacity: 0; transform: translateY(6px); } 32%, 80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
-@keyframes progress-zoom { from { transform: scale(1.03); } to { transform: scale(1.1); } }
-@keyframes progress-draw { 0% { stroke-dashoffset: 600; } 55%, 88% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-@keyframes progress-dot { 0%, 50% { opacity: 0; transform: scale(0.4); } 58%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
 /*
  * Membership explainer (components/memberships/MembershipExplainer.tsx). Every

@@ -39,39 +39,3 @@ export function FocusFrame({ photo }: { photo: Photo }) {
     </div>
   );
 }
-
-/** Online coaching (option F): a line drawing upwards, "Progression" (the page: "a plan that moves forward as you do"). */
-export function ProgressLine({ photo }: { photo: Photo }) {
-  return (
-    <div className={frame}>
-      <Image
-        src={photo.src}
-        alt={photo.alt}
-        fill
-        priority
-        sizes={sizes}
-        className="progress-photo object-cover"
-        style={{ objectPosition: photo.position }}
-      />
-      <p aria-hidden="true" className="eyebrow absolute top-5 left-5 text-white">
-        Progression
-      </p>
-      <svg aria-hidden="true" viewBox="0 0 400 300" preserveAspectRatio="none" className="absolute inset-x-0 top-[22%] h-[62%] w-full overflow-visible">
-        <polyline
-          className="progress-line"
-          points="20,280 90,245 140,255 205,190 255,175 305,115 370,55"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-      {/* The line's end point (370,55 of 400×300 in the box above), round at any frame shape. */}
-      <span aria-hidden="true" className="absolute top-[33.4%] left-[92.5%] -translate-1/2">
-        <span className="progress-dot block size-3.5 rounded-full bg-white" />
-      </span>
-    </div>
-  );
-}
