@@ -474,9 +474,9 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Alex's order (WhatsApp 15 Oct 2026): book, what I offer, why kettlebells, about me.
+  // Alex's order (WhatsApp 15 Oct 2026), with why kettlebells and Meet your coach moved up under the hero (owner, 2026-10-27).
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "coach-intro", "classes", "memberships", "more-ways", "why-kettlebells", "coach", "book"]);
+  expect(order).toEqual(["hero-heading", "coach-intro", "why-kettlebells", "coach", "classes", "memberships", "more-ways", "book"]);
   // A face early, without moving "About me" up: the "Coached by" line under the hero jumps to his story.
   const intro = page.getByRole("region", { name: "Your coach" });
   await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
