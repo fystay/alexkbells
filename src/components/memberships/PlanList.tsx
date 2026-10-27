@@ -13,8 +13,8 @@ const payg = getService("group-classes").prices[0];
 /**
  * The plans as rows between thin rules (card overhaul, owner 2026-10-26), with
  * each plan's rules set out as in Alex's plan layout: name and price, then
- * "4 class credits · £10 per class", then "Save £8 on £48 pay as you go" (the
- * saving and the pay-as-you-go equivalent in one line). Pay as you go last. Choose a row (it turns
+ * "4 class credits · £10 per class", then "Save £8" (the intro says it's against
+ * pay as you go, owner 2026-10-27). Pay as you go last. Choose a row (it turns
  * ink), then the button (select, then continue, as everywhere on the site):
  * "Join <plan>" for a membership, "Book now" for pay as you go. Join opens the
  * membership journey (/memberships/join?plan=); Book now opens the class
@@ -64,14 +64,14 @@ export function PlanList({ className }: { className?: string }) {
                 <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
               </div>
               <div className="mt-1 space-y-0.5 pl-8 text-[0.9375rem] lg:text-base">
-                {/* "Every 4 weeks" is said once, in the section's intro (owner, 2026-10-26). Two lines (2026-10-27):
-                    the saving and the pay-as-you-go equivalent read as one. */}
+                {/* "Every 4 weeks" and "against pay as you go" are said once, in the section's intro
+                    (owner, 2026-10-26 and 2026-10-27), so the saving stands alone. */}
                 <p>
                   {plan.credits} class credits · {formatPenceShort(f.perClassPence)} per class
                 </p>
                 {f.savingPence > 0 ? (
                   <p>
-                    <span className="font-semibold">Save {formatPenceShort(f.savingPence)}</span> on {formatPenceShort(f.payAsYouGoPence)} pay as you go
+                    <span className="font-semibold">Save {formatPenceShort(f.savingPence)}</span>
                   </p>
                 ) : null}
               </div>
