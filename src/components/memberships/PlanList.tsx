@@ -63,7 +63,7 @@ export function PlanList({ className }: { className?: string }) {
                 </h3>
                 <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
               </div>
-              <div className="mt-1 space-y-0.5 pl-8 text-sm">
+              <div className="mt-1 space-y-0.5 pl-8 text-sm lg:text-base">
                 {/* "Every 4 weeks" is said once, in the section's intro (owner, 2026-10-26). */}
                 <p>{plan.credits} class credits</p>
                 <p>
@@ -89,7 +89,7 @@ export function PlanList({ className }: { className?: string }) {
             </h3>
             <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
           </div>
-          <p className="mt-1 pl-8 text-sm">Per class. No membership needed.</p>
+          <p className="mt-1 pl-8 text-sm lg:text-base">Per class. No membership needed.</p>
         </li>
       </ul>
     </ChoiceCards>
@@ -117,7 +117,7 @@ export function PlanTerms({ className }: { className?: string }) {
     "Cancel 24 hours or more before class and your credit comes back.",
   ];
   return (
-    <div className={cn("text-sm", className)}>
+    <div className={cn("text-sm lg:text-base", className)}>
       <h3 className="eyebrow mb-2">Membership rules</h3>
       <ul className="space-y-1">
         {points.map((p) => (

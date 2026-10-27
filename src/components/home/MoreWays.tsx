@@ -30,9 +30,9 @@ export function MoreWays() {
               <Link href={w.href} className="group block py-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="card-title">{w.title}</span>
-                  {w.price ? <span className="shrink-0 text-sm font-semibold">{w.price}</span> : null}
+                  {w.price ? <span className="shrink-0 text-sm font-semibold lg:text-base">{w.price}</span> : null}
                 </span>
-                <span className="mt-1 flex items-baseline justify-between gap-4 text-sm">
+                <span className="mt-1 flex items-baseline justify-between gap-4 text-sm lg:text-base">
                   <span>{w.body}</span>
                   {/* A plain cue that the row is a link (no arrows on the site). */}
                   <span aria-hidden="true" className="shrink-0 font-semibold underline underline-offset-4 group-hover:no-underline">

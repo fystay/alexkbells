@@ -53,7 +53,7 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <CoachStory showAboutLink={false} tone={tone()} />
+      <CoachStory showAboutLink={false} showPhotos={false} tone={tone()} />
 
       {/* Why kettlebells and the location are on the home page and in the footer: not repeated here (2026-10-26). */}
       <CtaBand body="Come and train with us." tone={tone()} />

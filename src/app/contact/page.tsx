@@ -136,7 +136,8 @@ export default function ContactPage() {
         </div>
       </Section>
       {/* Every common question in one place (2026-10-26), instead of repeated on each page. */}
-      <Faq tone="plain" />
+      {/* Only what isn't answered elsewhere (2026-10-27): where, when, length, beginners, the first session and what to bring are on the home page and /classes. */}
+      <Faq tone="plain" ids={["online", "one-to-one", "contact"]} />
     </>
   );
 }

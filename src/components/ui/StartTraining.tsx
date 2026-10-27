@@ -30,8 +30,8 @@ export function StartTraining({ href, label, srSuffix, external = false, variant
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
         large && onDark
-          ? // The production hero's white button (owner, 2026-10-26: keep the live hero as it is). Only the hero uses onDark.
-            "group inline-flex min-h-14 items-center justify-center gap-3 rounded-md border border-white bg-white p-1 text-sm font-semibold tracking-[0.08em] text-ink uppercase transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-transparent hover:text-white active:translate-y-px"
+          ? // On the hero film: the site's round button in white (owner, 2026-10-27). Only the hero uses onDark.
+            "group inline-flex min-h-14 items-center justify-center gap-3 rounded-full border border-white bg-white px-2 text-base font-semibold text-ink transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-transparent hover:text-white active:translate-y-px"
           : cn(
               "group inline-flex items-center justify-center gap-3 rounded-full border font-semibold transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px",
               large

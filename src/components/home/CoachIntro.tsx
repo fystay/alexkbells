@@ -15,7 +15,7 @@ export function CoachIntro() {
   const photo = isPublishable(journey.status) ? journey.after : undefined;
   return (
     <section id="coach-intro" aria-label="Your coach" className="bg-paper">
-      <div className="container-page pt-5 sm:pt-2">
+      <div className="container-page pt-5 sm:pt-2 lg:pt-4">
         <a href="#coach" className="group flex min-h-12 items-center gap-3 sm:max-w-md">
           {photo ? (
             <Image
@@ -24,15 +24,15 @@ export function CoachIntro() {
               aria-hidden="true"
               width={photo.width}
               height={photo.height}
-              sizes="40px"
-              className="size-10 shrink-0 rounded-full object-cover object-top"
+              sizes="48px"
+              className="size-10 shrink-0 lg:size-12 rounded-full object-cover object-top"
             />
           ) : null}
           {/* Name only: his role is in Meet your coach (fewer repeats, owner 2026-10-26). */}
-          <span className="min-w-0 flex-1 text-sm leading-snug">
+          <span className="min-w-0 flex-1 text-sm leading-snug lg:text-base">
             Coached by <span className="font-semibold">{coach.name}</span>
           </span>
-          <span className="shrink-0 text-sm font-semibold underline underline-offset-4 group-hover:no-underline">Meet {coach.name.split(" ")[0]}</span>
+          <span className="shrink-0 text-sm font-semibold underline underline-offset-4 group-hover:no-underline lg:text-base">Meet {coach.name.split(" ")[0]}</span>
         </a>
       </div>
     </section>

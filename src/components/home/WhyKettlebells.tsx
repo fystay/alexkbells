@@ -19,7 +19,7 @@ export function WhyKettlebells({ tone = "plain" }: { tone?: SectionTone }) {
           {whyKettlebells.map((b, i) => (
             <li key={b.title} data-reveal style={revealDelay(i)}>
               <h3 className="font-semibold leading-snug">{b.title}</h3>
-              <p className="mt-0.5 text-sm">{b.body}</p>
+              <p className="mt-0.5 text-sm lg:text-base">{b.body}</p>
             </li>
           ))}
         </ul>

@@ -113,16 +113,6 @@
   letter-spacing: var(--tracking-display);
 }
 
-/* The production hero's type (owner, 2026-10-26: keep the live hero as it is):
-   the earlier display style, used only by the home hero. */
-@utility hero-display {
-  font-weight: 500;
-  font-stretch: 112%;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-}
-
-/* The small label above a heading ("Meet your coach"): plain sentence case, semibold so it reads as a label. */
 /* Labels above titles, set like the tagline under Alex's logo
    ("STRENGTH • COMMUNITY • DISCIPLINE", launch post 2026-10-26): small,
    spaced capitals, medium weight. */
@@ -248,13 +238,11 @@
   }
 }
 
-/* Hero headline: a soft white halo so it glows off the film without a box,
-   tint or extra colour, over a tight ink shadow that keeps the letter edges
-   crisp on bright frames (palette colours only; the blur does the fading). */
-@utility hero-glow {
-  text-shadow:
-    0 1px 3px var(--color-ink),
-    0 0 14px var(--color-white);
+/* Hero words on the film: a soft ink shadow keeps white text readable on
+   bright frames without a box, tint or glow (palette colour only; the blur
+   does the fading). */
+@utility hero-shadow {
+  text-shadow: 0 1px 12px var(--color-ink);
 }
 
 /* Header menu (2026-10-22): a slow, premium reveal. The panel unrolls from

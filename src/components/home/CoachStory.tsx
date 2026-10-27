@@ -30,15 +30,18 @@ export function coachDetails() {
 export function CoachStory({
   headingAs: Heading = "h2",
   showAboutLink = true,
+  showPhotos = true,
   tone = "white",
 }: {
   headingAs?: "h2" | "h3";
   showAboutLink?: boolean;
+  /** The before-and-after frame. Off on /about: it's on the home page, and Alex asked for few pictures (2026-10-27). */
+  showPhotos?: boolean;
   tone?: SectionTone;
 }) {
   const details = coachDetails();
   const showJourney = isPublishable(journey.status);
-  const photos = showJourney && journey.before && journey.after ? { before: journey.before, after: journey.after } : null;
+  const photos = showPhotos && showJourney && journey.before && journey.after ? { before: journey.before, after: journey.after } : null;
 
   const Sub = Heading === "h2" ? "h3" : "h4";
   const lead = showJourney ? journey.title : coach.name;
