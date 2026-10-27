@@ -1,5 +1,5 @@
 import { Noto_Sans_Thai_Looped } from "next/font/google";
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { philosophy } from "@/content/about";
 
 // Only the large แรง needs a Thai face, looped as on the card (Archivo has no Thai); loaded on /about only.
@@ -8,7 +8,7 @@ const thai = Noto_Sans_Thai_Looped({ subsets: ["thai"], weight: "900", display: 
 /**
  * /about's opening, laid out like RAENG's philosophy card (owner, 2026-10-27):
  * the label, แรง large with RAENG spaced beneath, "More than strength." as the
- * page's h1, the three paragraphs as written, then the three values. No rules
+ * page's h1, the three paragraphs as written (the values follow in their own section). No rules
  * under titles (removed site-wide 2026-10-26).
  */
 export function Philosophy({ children }: { children?: ReactNode }) {
@@ -28,15 +28,7 @@ export function Philosophy({ children }: { children?: ReactNode }) {
             <p key={p}>{p}</p>
           ))}
         </div>
-        {/* Each value stays whole, so a narrow phone never ends a line on a "•". */}
-        <p className="eyebrow mt-8">
-          {philosophy.values.split(" • ").map((v, i) => (
-            <Fragment key={v}>
-              {i > 0 ? " " : ""}
-              <span className="whitespace-nowrap">{i > 0 ? `• ${v}` : v}</span>
-            </Fragment>
-          ))}
-        </p>
+        {/* The card's "Strength • Community • Discipline" line is left out here: "What we stand for" lists the three just below (audit, 2026-10-27). */}
         {children ? <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">{children}</div> : null}
       </div>
     </header>

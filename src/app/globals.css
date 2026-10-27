@@ -144,21 +144,12 @@
 @utility rule-list {
   border-top: 1px solid var(--color-line);
 }
-/*
- * Bulleted lists (owner, 2026-10-27: too many lines, let lists flow): a plain ink
- * dot, no rules between items. Used for the short title-and-line lists.
- */
-@utility bullets {
-  list-style: disc;
-  padding-left: 1.25rem;
+/* Short lists as rows between thin lines, no bullets (owner after the audit, 2026-10-27: one list style site-wide). */
+@utility lined {
+  border-top: 1px solid var(--color-line);
   & > li {
-    padding-left: 0.375rem;
-  }
-  & > li::marker {
-    color: var(--color-ink);
-  }
-  & > li + li {
-    margin-top: 1rem;
+    border-bottom: 1px solid var(--color-line);
+    padding-block: 0.875rem;
   }
 }
 @utility rule-row {

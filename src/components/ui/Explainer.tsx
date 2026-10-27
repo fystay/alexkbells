@@ -57,7 +57,7 @@ export function Explainer({ steps, scenes, autoPlay = true, noun = "step" }: Exp
             onClick={() => setPaused((p) => !p)}
             aria-pressed={paused}
             aria-label={paused ? "Play animation" : "Pause animation"}
-            className="mx-pause grid size-11 shrink-0 place-items-center border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
+            className="mx-pause grid size-11 shrink-0 place-items-center rounded-full border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
           >
             <svg viewBox="0 0 16 16" className="size-4 fill-current" aria-hidden="true">
               <path d={paused ? "M4 2l10 6-10 6z" : "M3 2h4v12H3zM9 2h4v12H9z"} />

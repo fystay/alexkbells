@@ -14,7 +14,7 @@ export function CancellationPolicy() {
         </div>
         <div className="lg:col-span-7">
           <h3 className="card-title">Cancellations</h3>
-          <ul data-reveal className="bullets mt-4">
+          <ul data-reveal className="lined mt-4">
             {policy.cancellations.map((c) => (
               <li key={c.when}>
                 <p className="font-semibold">{c.when}</p>

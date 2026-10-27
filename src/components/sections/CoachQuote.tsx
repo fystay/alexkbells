@@ -37,8 +37,8 @@ export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
             <p>&ldquo;{aboutQuote.text}&rdquo;</p>
           </blockquote>
           <figcaption className="mt-5">
+            {/* His name only: his role is in Meet your coach further down (audit, 2026-10-27). */}
             <span className="block font-semibold">{coach.name}</span>
-            <span className="block text-sm">{coach.role}</span>
           </figcaption>
         </figure>
         <ul aria-label="Classes at a glance" className="mt-8 grid grid-cols-3 text-center">

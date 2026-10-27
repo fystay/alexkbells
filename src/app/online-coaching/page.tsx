@@ -54,11 +54,11 @@ export default function OnlineCoachingPage() {
         </p>
       </PageHeader>
 
-      {/* No decorative panel and no cards (2026-10-26): bullets, no rules between them. */}
+      {/* No decorative panel and no cards (2026-10-26): rows between thin lines (2026-10-27). */}
       <Section tone="white" id="included" labelledBy="included-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="What you get" title="Structure, support and progress" />
-          <ul className="bullets mt-8 lg:col-span-7 lg:mt-0">
+          <ul className="lined mt-8 lg:col-span-7 lg:mt-0">
             {included.map((item, i) => (
               <li key={item.title} data-reveal style={revealDelay(i)} >
                 <h3 className="font-semibold">{item.title}</h3>
@@ -75,7 +75,7 @@ export default function OnlineCoachingPage() {
             <SectionHeading id="how-heading" eyebrow="How it works" title="Start with a conversation" />
           </div>
           <div className="lg:col-span-7">
-            <Explainer steps={steps} scenes={onlineHowScenes} noun="step" />
+            <Explainer steps={steps} scenes={onlineHowScenes} autoPlay={false} noun="step" />
             <Steps steps={steps} className="sr-only" />
           </div>
         </div>

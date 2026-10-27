@@ -20,25 +20,19 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 
 const payg = getService("group-classes").prices[0];
 
-// Alex's order (WhatsApp 15 Oct 2026), reorganised 2026-10-26 and again
-// 2026-10-27 (owner): the film and Book now; a slim "Coached by Alex" line that
-// jumps to his story; then why kettlebells and who coaches it (and members'
-// words, once there are any), moved up so the why and the who come first; then
-// the classes as three steps (times, booking, where and what a first class is
-// like) ending in Book now; what Alex offers (memberships, then the other ways
-// to train); and a last Book now. No cards on these sections (owner,
-// 2026-10-26: less scrolling): space rather than rules. Phones read top to
-// bottom; from lg the heading sits left of its content.
+// Alex's order (WhatsApp 15 Oct 2026: where and how to book, what I offer,
+// why kettlebells, about me), restored by the owner 2026-10-27 after the audit:
+// the film and Book now; a slim "Coached by Alex" line that jumps to his story;
+// the classes as three steps ending in Book now; what Alex offers (memberships,
+// then the other ways to train); why kettlebells; who coaches it (and members'
+// words, once there are any); and a last Book now. Phones read top to bottom;
+// from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
   return (
     <>
       <Hero />
       <CoachIntro />
-      {/* Why kettlebells and Meet your coach sit straight under the hero (owner, 2026-10-27): the why and the who come before the classes, memberships and other ways to train. */}
-      <WhyKettlebells />
-      <CoachStory tone="plain" />
-      <Testimonials />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
           {/* A cleaner title (owner, 2026-10-26): the class count is in the rows of step 1. */}
@@ -62,6 +56,9 @@ export default function HomePage() {
         </div>
       </Section>
       <MoreWays />
+      <WhyKettlebells />
+      <CoachStory tone="plain" />
+      <Testimonials />
       <CtaBand id="book" body={null} instagram={false} tone="plain" />
     </>
   );

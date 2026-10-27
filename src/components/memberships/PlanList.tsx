@@ -118,7 +118,7 @@ export function PlanTerms({ className }: { className?: string }) {
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
       <h3 className="eyebrow mb-2">Membership rules</h3>
-      <ul className="bullets [&>li+li]:mt-1">
+      <ul className="lined">
         {points.map((p) => (
           <li key={p}>{p}</li>
         ))}

@@ -46,7 +46,7 @@ export function MembershipExplainer({ terms, extraClassPrice }: { terms: readonl
             onClick={() => setPaused((p) => !p)}
             aria-pressed={paused}
             aria-label={paused ? "Play animation" : "Pause animation"}
-            className="grid size-11 shrink-0 place-items-center border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
+            className="grid size-11 shrink-0 place-items-center rounded-full border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
           >
             <svg viewBox="0 0 16 16" className="size-4 fill-current" aria-hidden="true">
               <path d={paused ? "M4 2l10 6-10 6z" : "M3 2h4v12H3zM9 2h4v12H9z"} />
@@ -78,7 +78,7 @@ export function MembershipExplainer({ terms, extraClassPrice }: { terms: readonl
       </div>
       {/* From lg the five terms sit beside the picture, the current one in bold (the picture and bar above change it).
           Decorative: the same five terms are the accessible list in MembershipTerms. */}
-      <ul aria-hidden="true" className="bullets hidden text-lede lg:block">
+      <ul aria-hidden="true" className="lined hidden text-lede lg:block">
         {terms.map((term, i) => (
           <li key={term} className={i === current ? "font-semibold" : undefined}>
             {term}

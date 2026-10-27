@@ -4,7 +4,7 @@ import { site } from "@/content/site";
 import Link from "next/link";
 import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
 import { AddressCard } from "@/components/sections/AddressCard";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import { StartTraining } from "@/components/ui/StartTraining";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Faq } from "@/components/sections/Faq";
@@ -28,15 +28,16 @@ export default function ContactPage() {
         title="Contact RAENG"
         intro="Ask about group classes, memberships, 1:1 coaching or online coaching. The quickest way to reach Alex is a message on Instagram."
       >
-        {/* The page's one action, in the first screen at every width. */}
-        <ButtonLink
+        {/* Book now is the main button on every page (owner rule; audit 2026-10-27), with Instagram beside it. */}
+        <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
+        <a
           href={site.social.instagram.url}
-          external
-         
-          className="w-full whitespace-normal text-center sm:w-auto sm:whitespace-nowrap"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center self-center font-semibold underline underline-offset-4 hover:no-underline sm:ml-4"
         >
-          Message Alex on Instagram
-        </ButtonLink>
+          Message Alex on Instagram<span className="sr-only"> (opens in a new tab)</span>
+        </a>
       </PageHeader>
 
       <Section tone="white" labelledBy="methods-heading" className="pt-4 sm:pt-4 lg:pt-4">
@@ -62,7 +63,7 @@ export default function ContactPage() {
               <p className="mt-4 max-w-md ">
                 Send a direct message on Instagram. It helps to include:
               </p>
-              <ul className="bullets mt-3 max-w-md [&>li+li]:mt-1">
+              <ul className="lined mt-3 max-w-md">
                 <li>What you are interested in: group classes, a membership, 1:1 or online coaching</li>
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
@@ -95,19 +96,7 @@ export default function ContactPage() {
 
             {/* The other ways in, as one short list instead of three loose paragraphs (owner, 2026-10-27). */}
             <p className="eyebrow mt-12">Other ways</p>
-            <ul className="bullets mt-4 max-w-xl">
-              {/* Booking is a request on the website when the form is open; this page is for messaging. */}
-              {booking.kind === "booking" ? (
-                <li>
-                  <p>
-                    Ready to book a group class or a one-to-one session?{" "}
-                    <Link href={booking.href} className="font-semibold  underline underline-offset-4">
-                      Send a booking request
-                    </Link>{" "}
-                    and Alex confirms your place.
-                  </p>
-                </li>
-              ) : null}
+            <ul className="lined mt-4 max-w-xl">
               {/* Only when the online enquiry form can actually send. */}
               {online.href !== "/contact" ? (
                 <li>

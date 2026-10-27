@@ -39,7 +39,7 @@ export default function AboutPage() {
           id="values-heading"
           title="What we stand for."
         />
-        <ul className="bullets mt-8 max-w-2xl">
+        <ul className="lined mt-8 max-w-2xl">
           {pillars.map((p, i) => (
             <li key={p.title} data-reveal style={revealDelay(i)} >
               <h3 className="font-semibold">{p.title}</h3>
