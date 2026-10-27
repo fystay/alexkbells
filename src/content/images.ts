@@ -66,13 +66,14 @@ export const images = {
    * with his coach on a tablet, a RAENG Fitness banner and kettlebells behind.
    * Cut from an illustrative image the owner supplied, with all its writing
    * removed; the banner carries the real RAENG lockup (public/brand, black on
-   * cream, as the owner sent it 2026-10-27) in place of the image's mock logo. 4:5.
+   * cream, as the owner sent it 2026-10-27) in place of the image's mock logo,
+   * and the coach on the tablet is Alex, from his own photo (owner, 2026-10-27). 4:5.
    */
   onlineCoaching: {
     src: `${dir}/online-coaching-call.jpg`,
     width: 1000,
     height: 1250,
-    alt: "A man on a video call with his coach on a tablet, in front of a RAENG Fitness banner and a rack of kettlebells",
+    alt: "A man on a video call with Alex on a tablet, in front of a RAENG Fitness banner and a rack of kettlebells",
     position: "50% 50%",
   },
   /** "Why kettlebells" (option C, owner 2026-10-23): one photo beside the numbered list. Cropped so no third-party signage shows. */
