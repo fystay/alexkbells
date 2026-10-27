@@ -27,7 +27,7 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * The class page in the home page's style (2026-10-26: no cards, nothing said
- * twice): what the classes are and Alex's photo, then the home page's three
+ * twice; 2026-10-27: the steps swipe on phones and tablets, as on home): what the classes are and Alex's photo, then the home page's three
  * steps (times, booking, where, the first session and what to bring) with how
  * to pay, then Book now. The steps hold everything the old timetable, "What
  * to expect", "How to join" and location sections said.
@@ -56,6 +56,7 @@ export default function ClassesPage() {
           </div>
           {/* The home page's steps (the home page is the reference). */}
           <JoinSteps
+            swipe
             className="mt-8 lg:col-span-7 lg:mt-0"
             paymentNote={
               <>
