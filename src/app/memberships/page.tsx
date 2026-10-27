@@ -31,6 +31,7 @@ export default function MembershipsPage() {
         title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
         intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class.`}
       />
+      <MembershipTerms />
       <Section id="memberships" labelledBy="plans-heading">
         <h2 id="plans-heading" className="sr-only">
           Membership plans
@@ -39,7 +40,6 @@ export default function MembershipsPage() {
         <PlanList className="max-w-2xl" />
         <PaygExtra className="mt-12" />
       </Section>
-      <MembershipTerms />
       <CancellationPolicy />
       <CtaBand body={null} tone="plain" />
     </>
