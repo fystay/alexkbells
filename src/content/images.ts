@@ -42,6 +42,17 @@ export const images = {
     alt: "A group in a dark training studio mid-way through kettlebell swings, one person in the foreground",
     position: "50% 55%",
   },
+  /**
+   * Alex standing by a kettlebell (owner's photo, 2026-10-27), in Meet your
+   * coach on /about. Cropped to 4:5 so no third-party signage shows.
+   */
+  coach: {
+    src: `${dir}/coach-alex-kettlebell.jpg`,
+    width: 1000,
+    height: 1250,
+    alt: "Alex in a blue T-shirt standing barefoot on a mat in a dark training studio, a kettlebell at his feet",
+    position: "40% 35%",
+  },
   /** "Why kettlebells" (option C, owner 2026-10-23): one photo beside the numbered list. Cropped so no third-party signage shows. */
   whyKettlebells: {
     src: "/images/why/class-swing.jpg",

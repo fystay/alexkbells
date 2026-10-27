@@ -5,6 +5,8 @@ import { isPublishable } from "@/lib/publish";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Provisional } from "@/components/ui/Provisional";
 import { Section, type SectionTone } from "@/components/ui/Section";
+import type { Photo } from "@/content/types";
+import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { BeforeAfter } from "./BeforeAfter";
 
 /** The optional coach fields that are confirmed, in reading order. Empty slots are skipped. */
@@ -31,12 +33,15 @@ export function CoachStory({
   headingAs: Heading = "h2",
   showAboutLink = true,
   showPhotos = true,
+  portrait = null,
   tone = "white",
 }: {
   headingAs?: "h2" | "h3";
   showAboutLink?: boolean;
   /** The before-and-after frame. Off on /about: it's on the home page, and Alex asked for few pictures (2026-10-27). */
   showPhotos?: boolean;
+  /** One photo of Alex in the frame's place (/about, owner 2026-10-27). */
+  portrait?: Photo | null;
   tone?: SectionTone;
 }) {
   const details = coachDetails();
@@ -61,6 +66,10 @@ export function CoachStory({
               <BeforeAfter before={photos.before} after={photos.after} beforeLabel={journey.beforeLabel} afterLabel={journey.afterLabel} />
               <figcaption className="mt-3 text-sm">{journey.caption} Drag to compare.</figcaption>
             </figure>
+          ) : portrait ? (
+            <div className="lg:col-span-6 lg:row-span-2 lg:self-center">
+              <PhotoFrame photo={portrait} sizes="(min-width: 1248px) 560px, (min-width: 1024px) 45vw, 100vw" className="aspect-[4/5] w-full" />
+            </div>
           ) : null}
           <div className="lg:col-span-6 lg:mt-8 lg:self-start">
             {showJourney ? <Sub className="card-title text-xl">{coach.name}</Sub> : null}

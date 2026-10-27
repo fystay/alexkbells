@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { pillars } from "@/content/about";
+import { images } from "@/content/images";
 import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -48,7 +49,7 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <CoachStory showAboutLink={false} showPhotos={false} tone={tone()} />
+      <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()} />
 
       {/* Why kettlebells and the location are on the home page and in the footer: not repeated here (2026-10-26). */}
       <CtaBand body="Come and train with us." tone={tone()} />
