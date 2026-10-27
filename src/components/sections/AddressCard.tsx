@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
  */
 export function AddressCard({ label, large = false, className }: { label?: string; large?: boolean; className?: string }) {
   return (
-    <div className={cn("rule-list pt-4", className)}>
+    <div className={className}>
       {label ? <p className="eyebrow mb-2">{label}</p> : null}
       <address className={cn("not-italic leading-relaxed", large && "text-lg")}>
         {formatAddressLines().map((line) => (
