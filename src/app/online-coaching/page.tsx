@@ -14,6 +14,8 @@ import { images } from "@/content/images";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { revealDelay } from "@/lib/reveal";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
 
 export const metadata: Metadata = pageMetadata({
   title: "Online Kettlebell Coaching",
@@ -25,6 +27,9 @@ export const metadata: Metadata = pageMetadata({
 export default function OnlineCoachingPage() {
   const service = getService("online-coaching");
   const enquiry = getOnlineCoachingAction();
+  // One published price (content/services.ts), shown as the pricing heading.
+  const prices = publishable(service.prices);
+  const price = prices.length === 1 ? prices[0] : null;
 
   // Only what is confirmed about the service (content/services.ts). Further
   // features (reviews, check-ins, platform) are added there once Alex confirms them.
@@ -81,15 +86,33 @@ export default function OnlineCoachingPage() {
         </div>
       </Section>
 
+      {/* Tidied (owner, 2026-10-27): one price, so the price is the heading ("£79 per month."),
+          not "Simple monthly coaching" over a "Monthly … per month" row; then one way to enquire. */}
       <Section tone="white" id="pricing" labelledBy="pricing-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Simple monthly coaching" />
+        {price ? (
+          <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-14">
+            <SectionHeading id="pricing-heading" className="lg:col-span-7" eyebrow="Pricing" title={`${formatGbp(price.amountGbp)} ${price.unit}`} />
+            <div className="mt-6 lg:col-span-5 lg:mt-0 lg:text-right">
+              <a
+                href={enquiry.href}
+                {...(enquiry.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline"
+              >
+                {enquiry.label}
+                {enquiry.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+              </a>
+            </div>
           </div>
-          <div className="lg:col-span-6 lg:col-start-7">
-            <PriceList prices={service.prices} />
+        ) : (
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Monthly coaching" />
+            </div>
+            <div className="lg:col-span-6 lg:col-start-7">
+              <PriceList prices={service.prices} />
+            </div>
           </div>
-        </div>
+        )}
       </Section>
 
       <CtaBand
