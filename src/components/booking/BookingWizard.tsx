@@ -61,6 +61,12 @@ interface BookingWizardProps {
   classes: PublishedClass[];
   /** Shown once a class date is chosen, like Alex's own class listing. */
   classInfo: ClassInfo;
+  /**
+   * Group classes are booked and paid online (lib/class-checkout.ts): the
+   * class price (e.g. "£12") and the hold and cancellation rules. Absent →
+   * every booking is a request Alex confirms. One-to-one is always a request.
+   */
+  pay?: { price: string; hold: string; cancel: string } | null;
 }
 
 export interface ClassInfo {
@@ -82,8 +88,13 @@ type Details = { experience: string; name: string; email: string; phone: string;
 const subscribe = () => () => {};
 const getToday = () => toDateKey(new Date());
 const getServerToday = () => null;
+/** A class credit link (/book/group-class?credit=…), read on the client so the page itself stays static. */
+const getCredit = () => {
+  const token = new URLSearchParams(window.location.search).get("credit");
+  return token && /^[A-Za-z0-9_-]{43}$/.test(token) ? token : null;
+};
 
-export function BookingWizard({ mode, initialService, classes, classInfo }: BookingWizardProps) {
+export function BookingWizard({ mode, initialService, classes, classInfo, pay = null }: BookingWizardProps) {
   const demo = mode === "demo";
   const chosenPlan = useChosenPlan();
   const [full, setFull] = useState<{ full: string[]; cancelled: string[] }>({ full: [], cancelled: [] });
@@ -164,6 +175,11 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
       : null;
 
   const done = demo ? demoDone : serverState.status === "success";
+  // Booked and paid online, not requested: group classes without a membership plan.
+  const payNow = Boolean(pay) && usesSessions && !chosenPlan;
+  const linkCredit = useSyncExternalStore(subscribe, getCredit, getServerToday);
+  const [creditDropped, setCreditDropped] = useState(false);
+  const credit = payNow && !creditDropped ? linkCredit : null;
 
 
   // Live classes: which dates are full (capacity reached in the coach portal) or cancelled by Alex.
@@ -306,6 +322,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
   const summary = (
     <Summary
       demo={demo}
+      pay={payNow}
       rows={[
         { label: "Service", value: serviceLabel, step: 0 },
         { label: calendar ? "Date & time" : "When", value: whenText, step: 1 },
@@ -374,7 +391,11 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                 intro={
                   demo
                     ? undefined
-                    : usesSessions
+                    : payNow
+                      ? credit
+                        ? "Pick a date. Your class credit pays for it."
+                        : `Pick a date. You pay ${pay?.price} online to book your place.`
+                      : usesSessions
                       ? "Pick a date. Alex confirms every place personally."
                       : "Tell Alex when suits you and he'll reply with a confirmed time."
                 }
@@ -458,7 +479,13 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
             <section aria-labelledby="step-heading">
               <StepHeading
                 ref={headingRef}
-                intro={demo ? undefined : "So Alex can reply to confirm. Returning? Your browser can fill these in."}
+                intro={
+                  demo
+                    ? undefined
+                    : payNow
+                      ? "For your booking confirmation. Returning? Your browser can fill these in."
+                      : "So Alex can reply to confirm. Returning? Your browser can fill these in."
+                }
               >
                 <span id="step-heading">Your details</span>
               </StepHeading>
@@ -546,16 +573,41 @@ export function BookingWizard({ mode, initialService, classes, classInfo }: Book
                     <input type="hidden" name="classDate" value={date} />
                   </>
                 ) : null}
+                {credit ? <input type="hidden" name="credit" value={credit} /> : null}
                 {/* The membership plan chosen on the plan cards (?plan=), group classes only. */}
                 {chosenPlan && service === "group-class" ? <input type="hidden" name="plan" value={chosenPlan.id} /> : null}
                 {!demo && !usesSessions ? days.map((d) => <input key={d} type="hidden" name="days" value={d} />) : null}
                 {!demo && !usesSessions ? times.map((t) => <input key={t} type="hidden" name="times" value={t} />) : null}
                 <SubmissionMeta meta={meta} />
 
-                <PrivacyLine action={demo ? "continuing" : "sending this request"} />
+                {payNow && pay ? (
+                  <div id="credit" tabIndex={-1} className="rule-list space-y-2 pt-4 text-sm">
+                    {credit ? (
+                      <>
+                        <p className="font-semibold">Booking with your class credit: nothing to pay.</p>
+                        {errors.credit ? <p className="font-semibold">{errors.credit}</p> : null}
+                        <button
+                          type="button"
+                          onClick={() => setCreditDropped(true)}
+                          className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline"
+                        >
+                          Pay {pay.price} instead
+                        </button>
+                      </>
+                    ) : (
+                      <p>Square&apos;s secure page takes the payment. {pay.hold}</p>
+                    )}
+                    <p className="text-muted">{pay.cancel}</p>
+                  </div>
+                ) : null}
+                <PrivacyLine action={demo ? "continuing" : payNow ? "booking" : "sending this request"} />
                 <ActionBar
                   onBack={() => setStep(1)}
-                  next={{ label: demo ? "Finish demo" : "Send request", type: "submit", pending }}
+                  next={{
+                    label: demo ? "Finish demo" : payNow ? (credit ? "Book with your credit" : `Pay ${pay?.price}`) : "Send request",
+                    type: "submit",
+                    pending,
+                  }}
                 />
               </form>
             </section>
@@ -594,11 +646,13 @@ function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey;
 
 function Summary({
   demo,
+  pay,
   rows,
   currentStep,
   onEdit,
 }: {
   demo: boolean;
+  pay: boolean;
   rows: { label: string; value: string; step: number }[];
   currentStep: number;
   onEdit: (step: number) => void;
@@ -606,7 +660,7 @@ function Summary({
   return (
     <div className="card overflow-hidden">
       <p className="flex items-center justify-between px-5 pt-5 pb-2 font-semibold">
-        <span>{demo ? "Your selection" : "Your request"}</span>
+        <span>{demo ? "Your selection" : pay ? "Your booking" : "Your request"}</span>
         {demo ? <span className="rounded-full bg-ink px-2.5 py-0.5 text-sm text-paper">Demo</span> : null}
       </p>
       <dl className="divide-y divide-line">
@@ -629,7 +683,7 @@ function Summary({
         ))}
       </dl>
       <p className="border-t border-line px-5 py-4 text-sm text-muted">
-        {demo ? "Demonstration only. Nothing is booked." : "Alex confirms every place personally by email."}
+        {demo ? "Demonstration only. Nothing is booked." : pay ? "Your place is confirmed once you've paid." : "Alex confirms every place personally by email."}
       </p>
     </div>
   );

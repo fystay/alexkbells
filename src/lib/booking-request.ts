@@ -78,7 +78,7 @@ export interface BookingRequest {
   submissionId: string;
 }
 
-export type BookingField = "service" | "when" | "experience" | "name" | "email" | "phone" | "message";
+export type BookingField = "service" | "when" | "experience" | "name" | "email" | "phone" | "message" | "credit";
 export type FieldErrors<F extends string = BookingField> = Partial<Record<F, string>>;
 
 export type ParseResult<T, F extends string> =

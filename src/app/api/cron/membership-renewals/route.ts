@@ -17,6 +17,8 @@ import { squareConfig } from "@/lib/square/config";
  * sessions after 30 days); a failure there is logged and never stops renewals.
  * Then, for members who joined and pay online, emails a Square pay link for
  * each new period still to pay (once each; needs Square and email settings).
+ * And releases class places held for online payment that ran out
+ * (akb_release_class_holds; an unpaid charge is cancelled a day later).
  */
 export async function GET(request: Request) {
   const noStore = { "Cache-Control": "no-store" };
@@ -32,11 +34,13 @@ export async function GET(request: Request) {
   }
   const tidied = await rpc<number>(db, "akb_member_cleanup", {});
   if (!tidied.ok) console.error(`Member sign-in clean-up failed (${tidied.error.kind} ${tidied.error.code})`);
+  const holds = await rpc<number>(db, "akb_release_class_holds", {});
+  if (!holds.ok) console.error(`Class hold release failed (${holds.error.kind} ${holds.error.code})`);
   const square = squareConfig();
   const links = square ? await sendRenewalLinks(db, square, londonToday()) : null;
   if (links?.failed) console.error(`Membership pay links: ${links.failed} couldn't be sent`);
   return NextResponse.json(
-    { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null },
+    { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null, classHoldsReleased: holds.ok ? holds.data : null },
     { headers: noStore },
   );
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { bookingMode } from "@/lib/booking";
 import { BOOKABLE_SERVICES, BOOKING_EXPERIENCE, PREFERRED_DAYS, PREFERRED_TIMES, labelFor, listLabels } from "@/lib/booking-options";
 import {
@@ -17,11 +18,19 @@ import { fullClasses, fullKey } from "@/lib/class-capacity";
 import { londonToday } from "@/lib/coach/time";
 import { deliverRequest } from "@/lib/deliver-request";
 import { idempotencyKey } from "@/lib/send-email";
+import { startClassCheckout } from "@/lib/class-checkout";
+import { coachDb } from "@/lib/coach/db";
+import { onlineJoinEnabled } from "@/lib/membership-checkout";
+import { squareConfig } from "@/lib/square/config";
 
 /**
  * Validates a booking request on the server and gets it to Alex: stored in
  * Supabase for the coach area and/or emailed. Reports success only once one
  * of those has accepted it. Never runs for demonstration availability.
+ * Where online payment is on, a group class (without a membership plan) is
+ * booked instead: the place is held and the visitor sent to Square to pay
+ * (lib/class-checkout.ts), or booked straight away with a class credit link.
+ * One-to-one always stays a request (owner, 2026-10-27).
  */
 export async function submitBookingRequest(
   _previous: FormState<BookingField>,
@@ -71,6 +80,30 @@ export async function submitBookingRequest(
     data.message,
     data.plan,
   ]);
+
+  const db = coachDb();
+  const square = squareConfig();
+  if (onlineJoinEnabled() && db && square && data.service === "group-class" && data.classDate && slot && !data.plan) {
+    const credit = formData.get("credit");
+    const checkout = await startClassCheckout(db, square, { name: data.name, email: data.email, phone: data.phone }, slot, data.classDate, {
+      idempotencyKey: key,
+      creditToken: typeof credit === "string" && credit ? credit : null,
+    });
+    if (checkout.ok) redirect(checkout.url);
+    const whenError: Partial<Record<typeof checkout.reason, string>> = {
+      class_full: "That class is now full. Choose another date.",
+      class_cancelled: "That class has been cancelled. Choose another date.",
+      class_started: "That class has already started. Choose another date.",
+      already_booked: "You're already booked on that class. Choose another date.",
+    };
+    const message = whenError[checkout.reason];
+    if (message) return { status: "error", message: "Please check the highlighted fields.", errors: { when: message } };
+    if (checkout.reason === "credit_invalid") {
+      return { status: "error", message: "Please check the highlighted fields.", errors: { credit: "This class credit has been used or has expired. You can still pay for the class." } };
+    }
+    return { status: "error", message: "Sorry, payment couldn't be opened just now. Please try again in a minute, or message Alex on Instagram.", errors: {} };
+  }
+
   const delivered = await deliverRequest(
     {
       idempotencyKey: key,

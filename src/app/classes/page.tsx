@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
-import { groupClass } from "@/content/classes";
+import { groupClass, onlineClassBooking } from "@/content/classes";
+import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -18,7 +19,9 @@ const bookingOpen = getPrimaryCtaFor("group-class").kind === "booking";
 export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
   description: bookingOpen
-    ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
+    ? onlineJoinEnabled()
+      ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and book and pay online."
+      : "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
     : "Group kettlebell classes at Media House, Cumbernauld. Book now to join a session.",
   path: "/classes",
 });
@@ -59,7 +62,7 @@ export default function ClassesPage() {
             className="mt-8 lg:col-span-7 lg:mt-0"
             paymentNote={
               <>
-                {groupClass.payment}{" "}
+                {onlineJoinEnabled() ? onlineClassBooking.payment : groupClass.payment}{" "}
                 <Link href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
                   Save with a membership
                 </Link>

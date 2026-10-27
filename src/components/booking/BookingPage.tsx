@@ -2,7 +2,8 @@ import { formatAddressLines, mapsUrl, site } from "@/content/site";
 import { statement } from "@/lib/title";
 import { bookingMode, parseBookingUrl } from "@/lib/booking";
 import type { BookableService } from "@/lib/booking-options";
-import { groupClass } from "@/content/classes";
+import { groupClass, onlineClassBooking } from "@/content/classes";
+import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { getService } from "@/content/services";
 import { publishedClasses } from "@/lib/class-sessions";
 import { publishable } from "@/lib/publish";
@@ -24,15 +25,21 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
 
   const price = publishable(getService("group-classes").prices)[0];
   const classInfo: ClassInfo = { ...groupClass, price: price ? `${formatGbp(price.amountGbp)} ${price.unit}` : "" };
+  // Group classes are booked and paid online where Square is set up (owner, 2026-10-27); 1:1 stays a request.
+  const pay = mode === "request" && price && onlineJoinEnabled() ? { price: formatGbp(price.amountGbp), ...onlineClassBooking } : null;
 
   const intro =
     mode === "demo"
       ? initialService
         ? "Choose a date and time."
         : "Choose a service, then a date and time."
-      : mode === "request"
-        ? `${initialService ? "Choose when suits you." : "Choose a service, then when suits you."} Alex confirms every place personally.`
-        : "Group classes and one-to-one coaching at Media House, Cumbernauld.";
+      : mode === "request" && pay && initialService === "group-class"
+        ? "Choose a class, then pay online to book your place."
+        : mode === "request" && pay && !initialService
+          ? "Choose a service, then when suits you. Group classes are booked and paid online; Alex confirms one-to-one sessions personally."
+          : mode === "request"
+            ? `${initialService ? "Choose when suits you." : "Choose a service, then when suits you."} Alex confirms every place personally.`
+            : "Group classes and one-to-one coaching at Media House, Cumbernauld.";
 
   return (
     <section aria-labelledby="book-heading" className="bg-paper">
@@ -70,7 +77,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
                   Booking needs JavaScript. You can also message Alex on Instagram ({site.social.instagram.handle}).
                 </p>
               </noscript>
-              <BookingWizard mode={mode} initialService={initialService} classes={publishedClasses()} classInfo={classInfo} />
+              <BookingWizard mode={mode} initialService={initialService} classes={publishedClasses()} classInfo={classInfo} pay={pay} />
             </>
           ) : (
             <div className="max-w-2xl">

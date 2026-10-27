@@ -45,7 +45,8 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         membership request we also receive the plan you choose, your first class if you pick one, and the
         date and time you agreed to the membership terms and cancellation policy. If you pay online, you pay on
         Square&apos;s secure page: Square receives your card details, and we never see them; we receive the amount,
-        the date and Square&apos;s reference for the payment. If you&apos;re a member and
+        the date and Square&apos;s reference for the payment. If you book a class online, we also keep a coded copy
+        of the private link we email you to cancel it, and of any class credit link. If you&apos;re a member and
         sign in to your account, we keep a record of each sign-in: a coded copy of the sign-in link and of
         your session, and when they were created, last used and ended. We don&apos;t record where you are or
         what device you use. We don&apos;t ask about your health; please don&apos;t include medical details.
