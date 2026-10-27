@@ -7,6 +7,8 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
+import { ProgressLine } from "@/components/sections/CoachingGraphics";
+import { images } from "@/content/images";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { revealDelay } from "@/lib/reveal";
@@ -39,6 +41,7 @@ export default function OnlineCoachingPage() {
   return (
     <>
       <PageHeader
+        panel={<ProgressLine photo={images.oneToOne} />}
         eyebrow="Online coaching"
         title="Coaching that goes where you train."
         intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."

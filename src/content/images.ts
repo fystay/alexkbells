@@ -26,7 +26,7 @@ export const images = {
     alt: "A coach demonstrates a two-handed kettlebell swing in a training studio while a group follows behind",
     position: "50% 45%",
   },
-  /** "1:1 coaching" card in Ways to train (owner's photo, 2026-10-23). */
+  /** Online coaching page header graphic (ProgressLine, owner 2026-10-27); was the 1:1 card (owner's photo, 2026-10-23). */
   oneToOne: {
     src: `${dir}/one-to-one-swing.jpg`,
     width: 942,
@@ -52,6 +52,14 @@ export const images = {
     height: 1250,
     alt: "Alex in a blue T-shirt standing barefoot on a mat in a dark training studio, a kettlebell at his feet",
     position: "40% 35%",
+  },
+  /** The same photo in the 1:1 coaching page's header graphic (FocusFrame): Alex upper body on phones. */
+  coachHeader: {
+    src: `${dir}/coach-alex-kettlebell.jpg`,
+    width: 1000,
+    height: 1250,
+    alt: "Alex in a blue T-shirt standing barefoot on a mat in a dark training studio, a kettlebell at his feet",
+    position: "40% 22%",
   },
   /** "Why kettlebells" (option C, owner 2026-10-23): one photo beside the numbered list. Cropped so no third-party signage shows. */
   whyKettlebells: {

@@ -9,6 +9,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { PageHeader } from "@/components/sections/PageHeader";
+import { FocusFrame } from "@/components/sections/CoachingGraphics";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { revealDelay } from "@/lib/reveal";
@@ -46,7 +47,7 @@ export default function CoachingPage() {
   return (
     <>
       <PageHeader
-        image={images.oneToOne}
+        panel={<FocusFrame photo={images.coachHeader} />}
         eyebrow="1:1 Coaching"
         title="Coaching built around you."
         intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."
