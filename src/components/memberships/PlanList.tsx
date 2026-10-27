@@ -39,14 +39,14 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  // Straight rules inset to the text (the row itself is rounded so the chosen row reads as one ink block).
+  // No rules between the rows (owner, 2026-10-27): the empty circle marks each as a choice, and the chosen row turns ink.
   const row = cn(
-    "relative rounded-2xl px-3 py-4 after:pointer-events-none after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-line has-[:checked]:after:hidden",
+    "relative rounded-2xl px-3 py-4",
     choiceCard,
   );
   return (
     <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it." className={className}>
-      <ul aria-label="Membership plans" className="relative -mx-3 before:absolute before:inset-x-3 before:top-0 before:h-px before:bg-line">
+      <ul aria-label="Membership plans" className="relative -mx-3">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
@@ -117,12 +117,9 @@ export function PlanTerms({ className }: { className?: string }) {
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
       <h3 className="eyebrow mb-2">Membership rules</h3>
-      <ul className="space-y-1">
+      <ul className="bullets [&>li+li]:mt-1">
         {points.map((p) => (
-          <li key={p} className="flex gap-2">
-            <span aria-hidden="true">·</span>
-            {p}
-          </li>
+          <li key={p}>{p}</li>
         ))}
       </ul>
       <Link href="/memberships#how-it-works" className="mt-2 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">

@@ -17,63 +17,74 @@ export function MembershipExplainer({ terms, extraClassPrice }: { terms: readonl
   const next = (i: number) => setCurrent((i + 1) % terms.length);
 
   return (
-    <div className="mx" data-paused={paused || undefined}>
-      {/* Decorative: the five terms are in the list that follows. */}
-      <div className="mx-stage" aria-hidden="true">
-        {/* key restarts the scene's animations each time it is shown */}
-        <svg key={current} viewBox="0 0 400 344" className="mx-scene">
-          {current === 0 && <SceneCredit />}
-          {current === 1 && <SceneRenewal />}
-          {current === 2 && <SceneExpiry />}
-          {current === 3 && <SceneExtra price={extraClassPrice} />}
-          {current === 4 && <ScenePolicy />}
-        </svg>
-      </div>
-
-      <p className="mx-caption" aria-hidden="true">
-        <span className="font-semibold tabular-nums">
-          {current + 1} / {terms.length}
-        </span>
-        <span key={current} className="mx-swap">
-          {terms[current]}
-        </span>
-      </p>
-
-      <div className="mt-6 flex max-w-[32.5rem] items-center gap-4">
-        <button
-          type="button"
-          onClick={() => setPaused((p) => !p)}
-          aria-pressed={paused}
-          aria-label={paused ? "Play animation" : "Pause animation"}
-          className="grid size-11 shrink-0 place-items-center border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
-        >
-          <svg viewBox="0 0 16 16" className="size-4 fill-current" aria-hidden="true">
-            <path d={paused ? "M4 2l10 6-10 6z" : "M3 2h4v12H3zM9 2h4v12H9z"} />
+    <div className="mx lg:grid lg:grid-cols-[32.5rem_1fr] lg:items-center lg:gap-x-16" data-paused={paused || undefined}>
+      <div>
+        {/* Decorative: the five terms are in the list that follows. */}
+        <div className="mx-stage" aria-hidden="true">
+          {/* key restarts the scene's animations each time it is shown */}
+          <svg key={current} viewBox="0 0 400 344" className="mx-scene">
+            {current === 0 && <SceneCredit />}
+            {current === 1 && <SceneRenewal />}
+            {current === 2 && <SceneExpiry />}
+            {current === 3 && <SceneExtra price={extraClassPrice} />}
+            {current === 4 && <ScenePolicy />}
           </svg>
-        </button>
-        <div className="grid min-w-0 flex-1 grid-cols-5 gap-1.5">
-          {terms.map((term, i) => (
-            <button
-              key={term}
-              type="button"
-              onClick={() => setCurrent(i)}
-              aria-label={`Show step ${i + 1} of ${terms.length}`}
-              aria-current={i === current ? "step" : undefined}
-              className="mx-seg"
-            >
-              <span className="mx-track">
-                <i
-                  key={i === current ? `cur-${current}` : "idle"}
-                  className={i < current ? "mx-fill mx-done" : i === current ? "mx-fill mx-cur" : "mx-fill"}
-                  onAnimationEnd={() => {
-                    if (!paused && i === current) next(i);
-                  }}
-                />
-              </span>
-            </button>
-          ))}
+        </div>
+
+        <p className="mx-caption" aria-hidden="true">
+          <span className="font-semibold tabular-nums">
+            {current + 1} / {terms.length}
+          </span>
+          <span key={current} className="mx-swap">
+            {terms[current]}
+          </span>
+        </p>
+
+        <div className="mt-6 flex max-w-[32.5rem] items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setPaused((p) => !p)}
+            aria-pressed={paused}
+            aria-label={paused ? "Play animation" : "Pause animation"}
+            className="grid size-11 shrink-0 place-items-center border-[1.5px] border-ink bg-paper text-ink hover:bg-ink hover:text-paper"
+          >
+            <svg viewBox="0 0 16 16" className="size-4 fill-current" aria-hidden="true">
+              <path d={paused ? "M4 2l10 6-10 6z" : "M3 2h4v12H3zM9 2h4v12H9z"} />
+            </svg>
+          </button>
+          <div className="grid min-w-0 flex-1 grid-cols-5 gap-1.5">
+            {terms.map((term, i) => (
+              <button
+                key={term}
+                type="button"
+                onClick={() => setCurrent(i)}
+                aria-label={`Show step ${i + 1} of ${terms.length}`}
+                aria-current={i === current ? "step" : undefined}
+                className="mx-seg"
+              >
+                <span className="mx-track">
+                  <i
+                    key={i === current ? `cur-${current}` : "idle"}
+                    className={i < current ? "mx-fill mx-done" : i === current ? "mx-fill mx-cur" : "mx-fill"}
+                    onAnimationEnd={() => {
+                      if (!paused && i === current) next(i);
+                    }}
+                  />
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+      {/* From lg the five terms sit beside the picture, the current one in bold (the picture and bar above change it).
+          Decorative: the same five terms are the accessible list in MembershipTerms. */}
+      <ul aria-hidden="true" className="bullets hidden text-lede lg:block">
+        {terms.map((term, i) => (
+          <li key={term} className={i === current ? "font-semibold" : undefined}>
+            {term}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

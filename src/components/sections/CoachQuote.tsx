@@ -41,9 +41,9 @@ export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
             <span className="block text-sm">{coach.role}</span>
           </figcaption>
         </figure>
-        <ul aria-label="Classes at a glance" className="mt-8 grid grid-cols-3 border-y border-line text-center">
+        <ul aria-label="Classes at a glance" className="mt-8 grid grid-cols-3 text-center">
           {facts.map((f) => (
-            <li key={f.label} className="px-1.5 py-4 [&+&]:border-l [&+&]:border-line">
+            <li key={f.label} className="px-1.5 py-2">
               <span className="block font-display text-[1.625rem] leading-tight">{f.value}</span>
               <span className="block text-[0.8125rem] leading-snug">{f.label}</span>
             </li>

@@ -71,9 +71,9 @@ export default function CoachingPage() {
               intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
             />
           </div>
-          <ul className="rule-list lg:col-span-7">
+          <ul className="bullets lg:col-span-7">
             {focus.map((f, i) => (
-              <li key={f.title} data-reveal style={revealDelay(i)} className="rule-row">
+              <li key={f.title} data-reveal style={revealDelay(i)} >
                 <h3 className="font-semibold">{f.title}</h3>
                 <p className="mt-0.5">{f.body}</p>
               </li>

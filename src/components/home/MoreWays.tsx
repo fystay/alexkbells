@@ -24,9 +24,9 @@ export function MoreWays() {
     <Section id="more-ways" labelledBy="more-ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
         <SectionHeading id="more-ways-heading" className="lg:col-span-5" title="More ways to train." />
-        <ul className="mt-6 border-t border-line lg:col-span-7 lg:mt-0">
+        <ul className="mt-6 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
-            <li key={w.href} className="border-b border-line">
+            <li key={w.href}>
               <Link href={w.href} className="group block py-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="card-title">{w.title}</span>
