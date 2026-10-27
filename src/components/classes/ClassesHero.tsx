@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Photo } from "@/content/types";
-import { heroVideo } from "@/content/media";
+import { classesVideo } from "@/content/media";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { StartTraining } from "@/components/ui/StartTraining";
@@ -18,8 +18,8 @@ interface ClassesHeroProps {
 /**
  * The classes page opening, in the home hero's frame and type: edge to edge
  * under the header on phones, a rounded panel from 640px, white words straight
- * on the class footage (the same film as home, vertical on phones; owner,
- * 2026-10-27: so visitors see what a class is like). Silent and looping, with a
+ * on the class footage (owner's own class clip with a premium grade,
+ * content/media.ts `classesVideo`; vertical on phones; owner, 2026-10-27). Silent and looping, with a
  * pause button; visitors who prefer reduced motion get the still. The one `h1`.
  */
 export function ClassesHero({ photo, eyebrow, title, cta, moreHref, moreLabel }: ClassesHeroProps) {
@@ -27,12 +27,12 @@ export function ClassesHero({ photo, eyebrow, title, cta, moreHref, moreLabel }:
     <section aria-labelledby="classes-hero-heading" className="bg-paper sm:pt-5 sm:pb-8">
       <div className="relative sm:container-page">
         <div className="relative h-[min(34rem,calc(100svh-9rem))] min-h-[26rem] overflow-hidden bg-ink sm:h-[22rem] sm:rounded-3xl lg:h-[min(28rem,calc(100svh-14rem))]">
-          {heroVideo ? (
+          {classesVideo ? (
             <HeroVideo
-              sources={heroVideo.sources}
-              poster={heroVideo.poster}
-              portrait={heroVideo.portrait}
-              position={heroVideo.position}
+              sources={classesVideo.sources}
+              poster={classesVideo.poster}
+              portrait={classesVideo.portrait}
+              position={classesVideo.position}
               roundControl
               controlClassName="top-4 right-4 sm:top-5 sm:right-5"
               square

@@ -724,6 +724,15 @@ test("hero film files exist and the poster is served", async ({ request }) => {
   }
 });
 
+test("the classes hero plays the class film (vertical on phones), and its files are served", async ({ page, request }) => {
+  for (const file of ["/media/classes.mp4", "/media/classes.webm", "/media/classes-poster.jpg", "/media/classes-portrait.mp4", "/media/classes-portrait.webm", "/media/classes-portrait-poster.jpg"]) {
+    expect((await request.get(file)).status(), file).toBe(200);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/classes");
+  await expect(page.locator("section[aria-labelledby=classes-hero-heading] video source").first()).toHaveAttribute("src", "/media/classes-portrait.mp4");
+});
+
 test("with Reduce Motion the hero shows the still poster and the film stays still", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ reducedMotion: "reduce", baseURL });
   const page = await context.newPage();

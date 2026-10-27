@@ -46,3 +46,29 @@ export const heroVideo = {
     poster: "/media/hero-portrait-poster.jpg",
   },
 } as HeroVideoConfig | null;
+
+/**
+ * The classes page hero film (owner's clip, 2026-10-27: a 13 s phone video of
+ * a class, 464 × 832 at 60 fps). Graded for a premium gym look: slowed to two
+ * thirds speed (smooth from the 60 fps source), deeper contrast, cooler
+ * shadows and lower saturation, a light vignette and film grain, fading in
+ * and out so the loop is seamless; 19.5 s. Phones get the vertical cut; wider
+ * screens the same clip on the right over a blurred, darkened copy of
+ * itself (1280 × 544), so the words on the left sit on calm background.
+ * The source is only 464 px wide, so it is soft on large screens.
+ */
+export const classesVideo = {
+  sources: [
+    { src: "/media/classes.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+    { src: "/media/classes.webm", type: 'video/webm; codecs="vp9"' },
+  ],
+  poster: "/media/classes-poster.jpg",
+  position: "50% 50%",
+  portrait: {
+    sources: [
+      { src: "/media/classes-portrait.mp4", type: 'video/mp4; codecs="avc1.640028"' },
+      { src: "/media/classes-portrait.webm", type: 'video/webm; codecs="vp9"' },
+    ],
+    poster: "/media/classes-portrait-poster.jpg",
+  },
+} as HeroVideoConfig | null;
