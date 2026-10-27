@@ -34,14 +34,27 @@ export const images = {
     alt: "A man in a teal T-shirt swings a kettlebell to chest height, with a second person swinging behind him",
     position: "50% 40%",
   },
-  /** Group classes page header (desktop only). */
-  classes: {
-    src: `${dir}/class-swing-wide.jpg`,
-    width: 1200,
-    height: 1770,
-    alt: "A group in a dark training studio mid-way through kettlebell swings, one person in the foreground",
-    position: "50% 55%",
-  },
+  /**
+   * Group classes page hero (owner, 2026-10-27): a slow crossfade through these,
+   * in order. Add a class photo here to add a slide; the first is the one shown
+   * to visitors who prefer reduced motion. Alt text describes what is visible.
+   */
+  classesHero: [
+    {
+      src: `${dir}/class-swing-wide.jpg`,
+      width: 1200,
+      height: 1770,
+      alt: "A group in a dark training studio mid-way through kettlebell swings, one person in the foreground",
+      position: "50% 48%",
+    },
+    {
+      src: `${dir}/hero-coach-kettlebell-swing.jpg`,
+      width: 1100,
+      height: 1949,
+      alt: "A coach demonstrates a two-handed kettlebell swing in a training studio while a group follows behind",
+      position: "50% 28%",
+    },
+  ],
   /**
    * Alex standing by a kettlebell (owner's photo, 2026-10-27), in Meet your
    * coach on /about. Cropped to 4:5 so no third-party signage shows.
@@ -61,6 +74,6 @@ export const images = {
     alt: "A man in a teal T-shirt at the bottom of a kettlebell swing, with the class swinging behind him",
     position: "50% 15%",
   },
-} satisfies Record<string, Photo>;
+} satisfies Record<string, Photo | Photo[]>;
 
 export type ImageRole = keyof typeof images;

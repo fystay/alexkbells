@@ -5,10 +5,8 @@ import { groupClass, onlineClassBooking } from "@/content/classes";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { ButtonLink } from "@/components/ui/ButtonLink";
-import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { PageHeader } from "@/components/sections/PageHeader";
+import { ClassesHero } from "@/components/classes/ClassesHero";
 import { JoinSteps } from "@/components/home/JoinSteps";
 import { firstClassSteps } from "@/content/home";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
@@ -39,17 +37,17 @@ export default function ClassesPage() {
 
   return (
     <>
-      <PageHeader
-        image={images.classes}
-        eyebrow="Classes"
+      <ClassesHero
+        photos={images.classesHero}
         title="Group kettlebell training."
-        intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
-      >
-        <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
-        <ButtonLink href="#join" variant="text" className="self-center sm:ml-4">
-          How to join
-        </ButtonLink>
-      </PageHeader>
+        eyebrow="Classes in Cumbernauld"
+        cta={{ href: booking.href, label: booking.label, external: booking.external }}
+        moreHref="#join"
+        moreLabel="How to join"
+      />
+      <Section spacing="compact" className="pb-0 sm:pb-0">
+        <p className="max-w-2xl text-lede">Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld.</p>
+      </Section>
 
       <Section id="join" labelledBy="join-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">

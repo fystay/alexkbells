@@ -557,3 +557,50 @@
     stroke-width: 6;
   }
 }
+
+/*
+ * Classes page hero (components/classes/ClassesHero.tsx): the pictures stack
+ * and crossfade; the one showing pushes in slowly. Still, with the first
+ * picture only, for Reduce Motion.
+ */
+.ch-slide {
+  opacity: 0;
+  /* The outgoing picture stays put (and below) until the new one has faded in over it, so the frame never dips to dark. */
+  transition: opacity 1400ms ease 1400ms;
+}
+.ch-slide img {
+  transform: scale(1.07);
+}
+.ch-slide[data-active] {
+  z-index: 1;
+  opacity: 1;
+  transition-delay: 0s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ch-slide[data-active] img {
+    animation: ch-push 9s ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch-slide {
+    transition: none;
+  }
+  .ch-slide img {
+    transform: none;
+  }
+  .ch-slide:not(:first-child),
+  .ch-pause {
+    display: none;
+  }
+  .ch-slide:first-child {
+    opacity: 1;
+  }
+}
+@keyframes ch-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
