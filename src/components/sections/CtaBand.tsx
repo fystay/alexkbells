@@ -16,7 +16,7 @@ interface CtaBandProps {
   headingId?: string;
   /** Section id, for in-page links and the home page's order test. */
   id?: string;
-  /** Where Book now goes: the page's own service (default group class), or "any" for the /book chooser. */
+  /** Where Book now goes: the /book chooser at step 1 (default, owner 2026-10-27), or a service's own step. */
   service?: BookableService | "any";
   tone?: SectionTone;
   /** The quieter Instagram link; off on home, where Meet your coach already links it. */
@@ -28,7 +28,7 @@ interface CtaBandProps {
  * own), one booking button and Instagram as a quieter link. No arrow (owner rule). Nothing here books anything: the button opens
  * the booking request flow.
  */
-export function CtaBand({ title = "Ready to start?", body, headingId = "cta-heading", id, service = "group-class", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
+export function CtaBand({ title = "Ready to start?", body, headingId = "cta-heading", id, service = "any", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCtaFor(service);
   const times = isPublishable(timetable.status) ? groupedSessions(timetable.sessions) : [];

@@ -818,6 +818,8 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(page.getByRole("table")).toHaveCount(0);
   await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
   await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toBeVisible();
+  // Ready to start? opens the booking flow at step 1, choosing the service (owner, 2026-10-27).
+  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
   // The times are at the top; the closing band doesn't repeat them.
   await expect(page.locator("#book")).not.toContainText("Classes run");
   // Each plan states its rules as in Alex's layout.
