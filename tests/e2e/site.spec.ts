@@ -474,9 +474,9 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Alex's order (WhatsApp 15 Oct 2026): book, what I offer, why kettlebells, about me.
+  // Alex's order (WhatsApp 15 Oct 2026), with why kettlebells and Meet your coach moved up under the hero (owner, 2026-10-27).
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "coach-intro", "classes", "memberships", "more-ways", "why-kettlebells", "coach", "book"]);
+  expect(order).toEqual(["hero-heading", "coach-intro", "why-kettlebells", "coach", "classes", "memberships", "more-ways", "book"]);
   // A face early, without moving "About me" up: the "Coached by" line under the hero jumps to his story.
   const intro = page.getByRole("region", { name: "Your coach" });
   await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
@@ -535,9 +535,11 @@ test.describe("memberships", () => {
     { name: "Dedicated", price: "£85", credits: "12 class credits", perClass: "£7.08", payg: "£144", save: "£59" },
   ];
 
-  test("the page shows the home page's plan list: each plan's rules as in Alex's layout, then what pay as you go costs extra", async ({ page }) => {
+  test("the page shows the home page's plan list: each plan's rules as in Alex's layout", async ({ page }) => {
     await page.goto("/memberships");
-    await expect(page.locator("h1")).toHaveText("Save up to £59.");
+    await expect(page.locator("h1")).toHaveText("How memberships work.");
+    await expect(page.getByRole("heading", { name: "Compare the prices." })).toBeVisible();
+    await expect(page.locator("#memberships")).toContainText("Save up to £59 every 4 weeks, against pay as you go at £12 a class.");
     const rows = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li");
     await expect(rows).toHaveCount(4);
     for (const [i, p] of PLANS.entries()) {
@@ -555,7 +557,9 @@ test.describe("memberships", () => {
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12");
     await expect(payg).toContainText("Per class. No membership needed.");
-    const extra = page.getByRole("table", { name: "Pay as you go costs more" });
+    // What pay as you go costs on top: closed behind one link, the figures calculated from the prices.
+    await page.getByText("What pay as you go costs on top").click();
+    const extra = page.getByRole("table", { name: /what you.d pay on top/i });
     await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
     await expect(extra.getByRole("row")).toHaveCount(4);
   });

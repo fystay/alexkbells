@@ -39,9 +39,9 @@ export default function AboutPage() {
           id="values-heading"
           title="What we stand for."
         />
-        <ul className="rule-list mt-8 max-w-2xl">
+        <ul className="bullets mt-8 max-w-2xl">
           {pillars.map((p, i) => (
-            <li key={p.title} data-reveal style={revealDelay(i)} className="rule-row">
+            <li key={p.title} data-reveal style={revealDelay(i)} >
               <h3 className="font-semibold">{p.title}</h3>
               <p className="mt-0.5">{p.body}</p>
             </li>

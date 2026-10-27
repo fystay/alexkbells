@@ -39,7 +39,7 @@ export default function ContactPage() {
         </ButtonLink>
       </PageHeader>
 
-      <Section tone="white" labelledBy="methods-heading">
+      <Section tone="white" labelledBy="methods-heading" className="pt-4 sm:pt-4 lg:pt-4">
         <h2 id="methods-heading" className="sr-only">
           Ways to reach us
         </h2>
@@ -62,29 +62,16 @@ export default function ContactPage() {
               <p className="mt-4 max-w-md ">
                 Send a direct message on Instagram. It helps to include:
               </p>
-              <ul className="mt-3 max-w-md list-disc space-y-1 pl-5  marker:">
+              <ul className="bullets mt-3 max-w-md [&>li+li]:mt-1">
                 <li>What you are interested in: group classes, a membership, 1:1 or online coaching</li>
                 <li>Whether you have trained with kettlebells before</li>
                 <li>Any questions you have</li>
               </ul>
             </div>
-            <p className="mt-6 ">
-              Also on Facebook:{" "}
-              <a
-                href={site.social.facebook.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center font-semibold  underline underline-offset-4 hover:no-underline"
-              >
-                {site.social.facebook.name}
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            </p>
-
             {email || phone ? (
-              <dl className="rule-list mt-6">
+              <dl className="mt-8 space-y-3">
                 {email ? (
-                  <div className="flex flex-wrap justify-between gap-2 border-b border-line py-4">
+                  <div className="flex flex-wrap justify-between gap-2">
                     <dt className="eyebrow ">Email</dt>
                     <dd>
                       <a href={`mailto:${email}`} className="font-semibold underline underline-offset-4">
@@ -94,7 +81,7 @@ export default function ContactPage() {
                   </div>
                 ) : null}
                 {phone ? (
-                  <div className="flex flex-wrap justify-between gap-2 border-b border-line py-4">
+                  <div className="flex flex-wrap justify-between gap-2">
                     <dt className="eyebrow ">Phone</dt>
                     <dd>
                       <a href={`tel:${phone.replace(/\s+/g, "")}`} className="font-semibold underline underline-offset-4">
@@ -106,27 +93,48 @@ export default function ContactPage() {
               </dl>
             ) : null}
 
-            {/* Booking is a request on the website when the form is open; this page is for messaging. */}
-            {booking.kind === "booking" ? (
-              <p className="mt-8 ">
-                Ready to book a group class or a one-to-one session?{" "}
-                <Link href={booking.href} className="font-semibold  underline underline-offset-4">
-                  Send a booking request
-                </Link>{" "}
-                and Alex confirms your place.
-              </p>
-            ) : null}
-
-            {/* Only when the online enquiry form can actually send. */}
-            {online.href !== "/contact" ? (
-              <p className="mt-8 ">
-                Interested in online coaching? Answer a few quick questions and Alex replies personally:{" "}
-                <Link href={online.href} className="font-semibold  underline underline-offset-4">
-                  enquire about online coaching
-                </Link>
-                .
-              </p>
-            ) : null}
+            {/* The other ways in, as one short list instead of three loose paragraphs (owner, 2026-10-27). */}
+            <p className="eyebrow mt-12">Other ways</p>
+            <ul className="bullets mt-4 max-w-xl">
+              {/* Booking is a request on the website when the form is open; this page is for messaging. */}
+              {booking.kind === "booking" ? (
+                <li>
+                  <p>
+                    Ready to book a group class or a one-to-one session?{" "}
+                    <Link href={booking.href} className="font-semibold  underline underline-offset-4">
+                      Send a booking request
+                    </Link>{" "}
+                    and Alex confirms your place.
+                  </p>
+                </li>
+              ) : null}
+              {/* Only when the online enquiry form can actually send. */}
+              {online.href !== "/contact" ? (
+                <li>
+                  <p>
+                    Interested in online coaching? Answer a few quick questions and Alex replies personally:{" "}
+                    <Link href={online.href} className="font-semibold  underline underline-offset-4">
+                      enquire about online coaching
+                    </Link>
+                    .
+                  </p>
+                </li>
+              ) : null}
+              <li>
+                <p>
+                  Also on Facebook:{" "}
+                  <a
+                    href={site.social.facebook.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center font-semibold  underline underline-offset-4 hover:no-underline"
+                  >
+                    {site.social.facebook.name}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </p>
+              </li>
+            </ul>
           </div>
 
           <div className="lg:col-span-4 lg:col-start-9">

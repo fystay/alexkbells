@@ -3,7 +3,7 @@ import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { pageMetadata } from "@/lib/metadata";
-import { Section } from "@/components/ui/Section";
+import { Section, SectionHeading } from "@/components/ui/Section";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { CancellationPolicy } from "@/components/memberships/CancellationPolicy";
@@ -19,29 +19,26 @@ export const metadata: Metadata = pageMetadata({
 
 const payg = getService("group-classes").prices[0];
 
-// Follows the home page's memberships section (owner, 2026-10-23): the same
-// heading, wording and plan rows, then only what belongs here: the extra cost
-// of pay as you go, Alex's full terms and the cancellation policy. No cards
-// and no buttons above the plans (2026-10-26): choosing a plan is the action.
+// Reads in the order a visitor decides (owner, 2026-10-27): how memberships work,
+// the prices side by side, then the call to action. The cancellation policy is
+// reference, so it sits last (other pages link to #cancellation). What pay as
+// you go costs on top is one plain link under the plans, closed until asked for.
 export default function MembershipsPage() {
   return (
     <>
-      <PageHeader
-        eyebrow="Kettlebell memberships"
-        title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
-        intro={`Every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class.`}
-      />
-      <Section id="memberships" labelledBy="plans-heading">
-        <h2 id="plans-heading" className="sr-only">
-          Membership plans
-        </h2>
-        {/* The home page's plan list (the home page is the reference), then the detail that only belongs here. */}
-        <PlanList className="max-w-2xl" />
-        <PaygExtra className="mt-12" />
-      </Section>
+      <PageHeader eyebrow="Kettlebell memberships" title="How memberships work." intro={`Class credits, renewed every ${BILLING_WEEKS} weeks.`} />
       <MembershipTerms />
-      <CancellationPolicy />
+      <Section id="memberships" labelledBy="plans-heading" className="pt-0 sm:pt-0 lg:pt-0">
+        <SectionHeading
+          id="plans-heading"
+          title="Compare the prices."
+          intro={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))} every ${BILLING_WEEKS} weeks, against pay as you go at £${payg.amountGbp} a class.`}
+        />
+        <PlanList className="mt-8" />
+        <PaygExtra className="mt-6" />
+      </Section>
       <CtaBand body={null} tone="plain" />
+      <CancellationPolicy />
     </>
   );
 }

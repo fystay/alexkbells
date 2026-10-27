@@ -5,10 +5,9 @@ import { groupClass, onlineClassBooking } from "@/content/classes";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { ButtonLink } from "@/components/ui/ButtonLink";
-import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { PageHeader } from "@/components/sections/PageHeader";
+import { ClassesHero } from "@/components/classes/ClassesHero";
+import { ClassFocus } from "@/components/classes/ClassFocus";
 import { JoinSteps } from "@/components/home/JoinSteps";
 import { firstClassSteps } from "@/content/home";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
@@ -28,7 +27,7 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * The class page in the home page's style (2026-10-26: no cards, nothing said
- * twice): what the classes are and Alex's photo, then the home page's three
+ * twice; 2026-10-27: the steps swipe on phones and tablets, as on home): what the classes are and Alex's photo, then the home page's three
  * steps (times, booking, where, the first session and what to bring) with how
  * to pay, then Book now. The steps hold everything the old timetable, "What
  * to expect", "How to join" and location sections said.
@@ -39,17 +38,15 @@ export default function ClassesPage() {
 
   return (
     <>
-      <PageHeader
-        image={images.classes}
-        eyebrow="Classes"
+      <ClassesHero
+        photo={images.classes}
         title="Group kettlebell training."
-        intro="Coached sessions that build strength, conditioning and movement quality, at Media House in Cumbernauld."
-      >
-        <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-[22rem]" />
-        <ButtonLink href="#join" variant="text" className="self-center sm:ml-4">
-          How to join
-        </ButtonLink>
-      </PageHeader>
+        eyebrow="Classes in Cumbernauld"
+        cta={{ href: booking.href, label: booking.label, external: booking.external }}
+        moreHref="#join"
+        moreLabel="How to join"
+      />
+      <ClassFocus />
 
       <Section id="join" labelledBy="join-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
@@ -59,6 +56,7 @@ export default function ClassesPage() {
           </div>
           {/* The home page's steps (the home page is the reference). */}
           <JoinSteps
+            swipe
             className="mt-8 lg:col-span-7 lg:mt-0"
             paymentNote={
               <>

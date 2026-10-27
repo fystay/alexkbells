@@ -34,13 +34,13 @@ export const images = {
     alt: "A man in a teal T-shirt swings a kettlebell to chest height, with a second person swinging behind him",
     position: "50% 40%",
   },
-  /** Group classes page header (desktop only). */
+  /** Group classes page hero: the still shown only if the film (content/media.ts) is switched off. */
   classes: {
     src: `${dir}/class-swing-wide.jpg`,
     width: 1200,
     height: 1770,
     alt: "A group in a dark training studio mid-way through kettlebell swings, one person in the foreground",
-    position: "50% 55%",
+    position: "50% 48%",
   },
   /**
    * Alex standing by a kettlebell (owner's photo, 2026-10-27), in Meet your

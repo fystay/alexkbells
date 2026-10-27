@@ -25,7 +25,7 @@ export function classPriceLine(): string | null {
 
 /**
  * The week's classes (option 1 of the card overhaul, owner 2026-10-26): one
- * row per class between thin rules, day left and time right, no cards.
+ * row per class, day left and time right, no rules between them, no cards.
  * Choosing the date happens in the booking calendar, so the rows aren't
  * choices. Every figure comes from content. Home and /classes share it.
  */
@@ -35,9 +35,9 @@ export function ClassTimes({ className, showPrice = true }: { className?: string
   if (sessions.length === 0) return null;
   return (
     <div className={className}>
-      <ul aria-label="Class times" className="border-t border-line">
+      <ul aria-label="Class times">
         {sessions.map((s) => (
-          <li key={s.id} className="flex min-h-12 items-center justify-between gap-4 border-b border-line py-2.5">
+          <li key={s.id} className="flex min-h-11 items-center justify-between gap-4 py-1.5">
             <span className="font-semibold">{s.day}</span>
             <span className="tabular-nums">{formatTime(s.start)}</span>
           </li>

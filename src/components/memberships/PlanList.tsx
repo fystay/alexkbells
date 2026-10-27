@@ -39,14 +39,14 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  // Straight rules inset to the text (the row itself is rounded so the chosen row reads as one ink block).
+  // No rules between the rows (owner, 2026-10-27): the empty circle marks each as a choice, and the chosen row turns ink.
   const row = cn(
-    "relative rounded-2xl px-3 py-4 after:pointer-events-none after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-line has-[:checked]:after:hidden",
+    "relative rounded-2xl px-3 py-4",
     choiceCard,
   );
   return (
-    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it." className={className}>
-      <ul aria-label="Membership plans" className="relative -mx-3 before:absolute before:inset-x-3 before:top-0 before:h-px before:bg-line">
+    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it." className={cn("max-w-lg", className)}>
+      <ul aria-label="Membership plans" className="relative -mx-3">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
@@ -117,12 +117,9 @@ export function PlanTerms({ className }: { className?: string }) {
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
       <h3 className="eyebrow mb-2">Membership rules</h3>
-      <ul className="space-y-1">
+      <ul className="bullets [&>li+li]:mt-1">
         {points.map((p) => (
-          <li key={p} className="flex gap-2">
-            <span aria-hidden="true">·</span>
-            {p}
-          </li>
+          <li key={p}>{p}</li>
         ))}
       </ul>
       <Link href="/memberships#how-it-works" className="mt-2 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
@@ -132,41 +129,55 @@ export function PlanTerms({ className }: { className?: string }) {
   );
 }
 
-/** What pay as you go costs on top of each plan (owner, 2026-10-23). Secondary: on /memberships only. */
+/**
+ * What pay as you go costs on top of each plan (owner, 2026-10-23). Secondary:
+ * on /memberships only, behind a plain "what it costs on top" link so the page
+ * stays light (owner, 2026-10-27), and without rules between the rows.
+ */
 export function PaygExtra({ className }: { className?: string }) {
   return (
-    <div className={className}>
-      <h3 id="payg-extra" className="card-title">
-        Pay as you go costs more
-      </h3>
-      <p className="mt-2 text-sm">What you&apos;d pay on top, going pay as you go instead of each plan, using every credit.</p>
-      <div className="rule-list mt-5 max-w-lg">
-      <table aria-labelledby="payg-extra" className="w-full text-sm tabular-nums">
-        <thead>
-          <tr>
-            <th scope="col" className="py-2 text-left font-normal">
-              <span className="sr-only">Plan</span>
-            </th>
-            <th scope="col" className="py-2 text-right font-normal">Week</th>
-            <th scope="col" className="py-2 text-right font-normal">{BILLING_WEEKS} weeks</th>
-            <th scope="col" className="py-2 text-right font-semibold">Year</th>
-          </tr>
-        </thead>
-        <tbody>
-          {membershipPlans.map((plan) => {
-            const x = extraCostPence(plan, payg.amountGbp);
-            return (
-              <tr key={plan.id} className="border-t border-line">
-                <th scope="row" className="py-2 text-left font-normal">{plan.name}</th>
-                <td className="py-2 text-right">{formatPenceShort(x.week)}</td>
-                <td className="py-2 text-right">{formatPenceShort(x.period)}</td>
-                <td className="py-2 text-right font-semibold">{formatPenceShort(x.year)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <details className={cn("group max-w-lg", className)}>
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center font-semibold underline underline-offset-4 hover:no-underline [&::-webkit-details-marker]:hidden">
+        What pay as you go costs on top
+      </summary>
+      <div className="pt-2">
+        <p id="payg-extra" className="text-sm">
+          What you&apos;d pay on top, going pay as you go instead of each plan, using every credit.
+        </p>
+        <table aria-labelledby="payg-extra" className="mt-4 w-full text-sm tabular-nums">
+          <thead>
+            <tr>
+              <th scope="col" className="py-2 text-left font-normal">
+                <span className="sr-only">Plan</span>
+              </th>
+              <th scope="col" className="py-2 text-right font-normal">
+                Week
+              </th>
+              <th scope="col" className="py-2 text-right font-normal">
+                {BILLING_WEEKS} weeks
+              </th>
+              <th scope="col" className="py-2 text-right font-semibold">
+                Year
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {membershipPlans.map((plan) => {
+              const x = extraCostPence(plan, payg.amountGbp);
+              return (
+                <tr key={plan.id}>
+                  <th scope="row" className="py-2 text-left font-normal">
+                    {plan.name}
+                  </th>
+                  <td className="py-2 text-right">{formatPenceShort(x.week)}</td>
+                  <td className="py-2 text-right">{formatPenceShort(x.period)}</td>
+                  <td className="py-2 text-right font-semibold">{formatPenceShort(x.year)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    </div>
+    </details>
   );
 }

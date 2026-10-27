@@ -14,14 +14,14 @@ export function CancellationPolicy() {
         </div>
         <div className="lg:col-span-7">
           <h3 className="card-title">Cancellations</h3>
-          <dl data-reveal className="rule-list mt-4">
+          <ul data-reveal className="bullets mt-4">
             {policy.cancellations.map((c) => (
-              <div key={c.when} className="rule-row grid grid-cols-1 gap-1 sm:grid-cols-[14rem_1fr] sm:gap-6">
-                <dt className="font-semibold">{c.when}</dt>
-                <dd>{c.outcome}</dd>
-              </div>
+              <li key={c.when}>
+                <p className="font-semibold">{c.when}</p>
+                <p className="mt-0.5">{c.outcome}</p>
+              </li>
             ))}
-          </dl>
+          </ul>
           <div className="mt-8 space-y-6 text-sm">
             <div>
               <h3 className="font-semibold">Membership credits</h3>
