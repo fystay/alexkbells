@@ -38,7 +38,7 @@ export default function ClassesPage() {
   return (
     <>
       <ClassesHero
-        photos={images.classesHero}
+        photo={images.classes}
         title="Group kettlebell training."
         eyebrow="Classes in Cumbernauld"
         cta={{ href: booking.href, label: booking.label, external: booking.external }}
