@@ -22,6 +22,8 @@ Read `CORE.md` (facts and their status), then the relevant `DESIGN.md`, `CONTENT
 ## Owner rules (non-negotiable)
 - **Never use the words "Get in touch"** on the site (buttons, links, headings, copy). The main button is always **"Book now"**, whether or not booking is switched on; where nothing can be booked it opens /book, which says so honestly. This holds even when the owner says "go ahead with your recommendation". Enforced by a unit test and an e2e test.
 
+- **Home page order is fixed (owner, 2026-10-27, final):** hero → Coached by → Why kettlebells → Meet your coach → Classes (three steps) → Memberships → More ways to train → Ready to start (Book now). This overrides Alex's earlier stated order (book, what I offer, why kettlebells, about me). Audits and reviews must not flag this order or suggest moving Why kettlebells or Meet your coach down; keep it unless the owner asks to change it.
+
 - **The home page is the point of reference** (owner, 2026-10-23). Inner pages follow its information, wording, prices and design: reuse the home components (the plan list `PlanList`, the timetable `ClassTimes`, Why kettlebells) rather than writing second versions.
 
 - **Design phone first** (owner and Alex, 2026-10-24: most visitors are on phones). Design, review and preview every change at phone size (390 px wide) first, then desktop. Previews sent to the owner lead with phone photos.
