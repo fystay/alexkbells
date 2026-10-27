@@ -26,3 +26,21 @@ export const pillars = [
     body: "Showing up and doing the work, session after session. Not intensity for a week, but consistency over time.",
   },
 ] as const;
+
+/**
+ * "Our philosophy", word for word from RAENG's own philosophy card (supplied
+ * by the owner, 2026-10-27). Opens /about.
+ */
+export const philosophy = {
+  status: "confirmed" as ContentStatus,
+  eyebrow: "Our philosophy",
+  thai: "แรง",
+  word: "RAENG",
+  title: "More than strength.",
+  paragraphs: [
+    "In Thai, แรง (Raeng) represents strength, power, energy and drive. It’s more than just physical strength, it’s a mindset.",
+    "RAENG is built on the belief that real strength comes from discipline, consistency and the willingness to keep showing up. Kettlebell training is the tool, but the purpose is bigger.",
+    "To build stronger people, a stronger community and a stronger version of ourselves, inside and outside the gym.",
+  ],
+  values: "Strength • Community • Discipline",
+};

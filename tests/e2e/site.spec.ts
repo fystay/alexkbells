@@ -673,6 +673,10 @@ test("class pages link to the how-to-join section", async ({ page }) => {
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
   await page.goto("/about");
+  // Opens with RAENG's philosophy card, word for word (owner, 2026-10-27).
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("More than strength.");
+  await expect(page.locator("header").filter({ hasText: "Our philosophy" })).toContainText("In Thai, แรง (Raeng) represents strength, power, energy and drive.");
+  await expect(page.locator('[lang="th"]')).toHaveText("แรง");
   // Facebook is in the footer; Alex's section links Instagram only (2026-10-27).
   const fb = page.getByRole("contentinfo").getByRole("link", { name: /Facebook/ });
   await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");

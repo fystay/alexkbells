@@ -121,3 +121,6 @@ Contact
 
 - **Member quotes:** `content/community.ts` (`testimonials`). The "In their words" section appears on the home page once an entry is `confirmed` (written permission, attribution as agreed). Empty now.
 - **Your first class:** `content/firstClass.ts`. Short beginner reassurance points in Alex's own words; the section appears under the at-a-glance strip once `confirmed`. Null now.
+
+## About: our philosophy (2026-10-27)
+Word for word from RAENG's philosophy card, supplied by the owner: `philosophy` in `src/content/about.ts` opens /about ("More than strength.", what แรง means, the belief, the purpose, Strength • Community • Discipline). Replaces the header "Strength is built through consistency." and the values intro line.
