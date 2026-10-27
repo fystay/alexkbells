@@ -434,7 +434,10 @@ test.describe("production configuration", () => {
   test("joining a membership with a first class: stored with the plan, emailed, and ready to start in the coach area", async ({ page, request }) => {
     await page.goto(`${PROD}/memberships/join?plan=dedicated`);
     await expect(page.getByRole("heading", { level: 1, name: "Join a membership." })).toBeVisible();
-    // The plan tapped on the plan list arrives chosen, and can be changed.
+    // The plan tapped on the plan list arrives chosen, so the journey opens on the first class (owner, 2026-10-27)…
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeVisible();
+    // …and the plan can still be changed from the step bar.
+    await page.getByRole("navigation", { name: "Membership steps" }).getByRole("button", { name: /Plan/ }).click();
     await expect(page.getByRole("radio", { name: /^Dedicated · £85 \/ 4 weeks/ })).toBeChecked();
     await choose(page, "Regular · £65 / 4 weeks");
     await continueButton(page).click();
@@ -492,7 +495,6 @@ test.describe("production configuration", () => {
 
   test("joining without a first class: book later", async ({ page, request }) => {
     await page.goto(`${PROD}/memberships/join?plan=starter`);
-    await continueButton(page).click();
     await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
     await page.getByRole("textbox", { name: "Name" }).fill("Later Joiner");
     await page.getByRole("textbox", { name: "Email" }).fill("later@example.com");
@@ -669,8 +671,7 @@ test.describe("going back in the booking wizard", () => {
 test.describe("membership join (preview demonstration)", () => {
   test("walks every step, sends nothing and says so", async ({ page, request }) => {
     await page.goto("/memberships/join?plan=regular");
-    await expect(page.getByRole("radio", { name: /^Regular · £65 \/ 4 weeks/ })).toBeChecked();
-    await continueButton(page).click();
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeVisible();
     await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
     await page.getByRole("textbox", { name: "Name" }).fill("Join Demo");
     await page.getByRole("textbox", { name: "Email" }).fill("join-demo@example.com");
@@ -685,19 +686,18 @@ test.describe("membership join (preview demonstration)", () => {
 
   test("the browser's Back moves between the steps", async ({ page }) => {
     await page.goto("/memberships/join?plan=starter");
-    await continueButton(page).click();
-    await expect(page).toHaveURL(/#first-class$/);
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeVisible();
+    await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
+    await expect(page).toHaveURL(/#details$/);
     await page.goBack();
-    await expect(page.getByRole("heading", { name: "Choose your plan" })).toBeVisible();
-    await expect(page.getByRole("radio", { name: /^Starter/ })).toBeChecked();
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeVisible();
   });
 
-  test("the plan step and the check step have no automatically detectable accessibility issues", async ({ page }) => {
+  test("the first-class step and the check step have no automatically detectable accessibility issues", async ({ page }) => {
     await page.goto("/memberships/join?plan=regular");
     // Let the step's fade-in finish: mid-fade text is briefly translucent.
     await page.waitForTimeout(1300);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-    await continueButton(page).click();
     await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
     await page.getByRole("textbox", { name: "Name" }).fill("Axe Joiner");
     await page.getByRole("textbox", { name: "Email" }).fill("axe@example.com");

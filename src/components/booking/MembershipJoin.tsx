@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useActionState, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { submitMembershipRequest } from "@/app/memberships/join/actions";
 import { BOOKING_EXPERIENCE } from "@/lib/booking-options";
 import { initialFormState, type FieldErrors, type FormState } from "@/lib/booking-request";
@@ -108,6 +108,16 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
     if (window.history.length > 1) window.history.back();
     else router.push("/memberships");
   };
+  // A plan already chosen on the plan list (?plan=) skips "Choose your plan" (owner,
+  // 2026-10-27): the journey opens on the first class. The plan stays changeable from
+  // the step bar and the summary. Before paint, so the plan step never flashes.
+  const skipped = useRef(false);
+  useLayoutEffect(() => {
+    if (!urlPlan || skipped.current) return;
+    skipped.current = true;
+    stack.current = [1];
+    setStepState(1);
+  }, [urlPlan]);
 
   // First class
   const today = useSyncExternalStore(subscribe, getToday, getServerToday);

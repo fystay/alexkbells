@@ -591,9 +591,9 @@ test.describe("memberships", () => {
     // Choosing doesn't leave the page; the button does.
     await expect(page).toHaveURL(/\/memberships$/);
     await section.getByRole("link", { name: "Join Regular" }).click();
-    // Joining has its own journey (2026-10-26), starting on the chosen plan.
+    // Joining has its own journey (2026-10-26); with the plan chosen it opens on the first class (owner, 2026-10-27).
     await expect(page).toHaveURL(/\/memberships\/join\?plan=regular$/);
-    await expect(page.getByRole("radio", { name: /^Regular · £65 \/ 4 weeks/ })).toBeChecked();
+    await expect(page.getByRole("heading", { name: "Your first class" })).toBeVisible();
     // No payment step: only the reassurance that nothing is paid now.
     await expect(page.locator("main")).not.toContainText(/checkout|card number|(?<!nothing to )pay now/i);
   });

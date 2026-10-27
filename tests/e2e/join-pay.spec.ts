@@ -30,10 +30,9 @@ async function emailsTo(request: APIRequestContext, to: string): Promise<Recorde
 
 const continueButton = (page: Page) => page.getByRole("button", { name: "Continue" });
 
-/** Plan → skip the first class → details → the check step. */
+/** The plan arrives chosen (the plan step is skipped) → skip the first class → details → the check step. */
 async function toCheckStep(page: Page, plan: string, name: string, email: string) {
   await page.goto(`${PAY}/memberships/join?plan=${plan}`);
-  await continueButton(page).click();
   await page.getByRole("button", { name: "Skip: I'll book my first class later" }).click();
   await page.getByRole("textbox", { name: "Name" }).fill(name);
   await page.getByRole("textbox", { name: "Email" }).fill(email);

@@ -39,8 +39,8 @@ export function PlanList({ className }: { className?: string }) {
     })),
     { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
   ];
-  // Framed (owner, 2026-10-27, option C): the plans in one box with a thin ink edge, fine grey
-  // rules between them and Join along the bottom; the chosen row turns ink.
+  // Framed (owner, 2026-10-27, option C): the plans in one box with a thin ink edge and fine grey
+  // rules between them; the chosen row turns ink. Join / Book now sits under the box, separate (owner, 2026-10-27).
   const row = cn("relative border-line px-4 py-4 sm:px-5 [&+&]:border-t", choiceCard);
   return (
     <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it."
