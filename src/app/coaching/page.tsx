@@ -9,7 +9,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Steps } from "@/components/ui/Steps";
 import { Explainer } from "@/components/ui/Explainer";
-import { oneToOneFocusScenes, oneToOneHowScenes } from "@/components/coaching/CoachingScenes";
+import { coachingClips } from "@/content/media";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { FocusFrame } from "@/components/sections/CoachingGraphics";
 import { PriceList } from "@/components/sections/PriceList";
@@ -75,7 +75,7 @@ export default function CoachingPage() {
           </div>
           <div className="lg:col-span-7">
             {/* Tap through the three: the words are also here as a list for screen readers. */}
-            <Explainer steps={focus} scenes={oneToOneFocusScenes} autoPlay={false} noun="point" />
+            <Explainer steps={focus} clips={coachingClips.focus} autoPlay={false} noun="point" />
             <ul className="bullets sr-only">
               {focus.map((f) => (
                 <li key={f.title}>
@@ -101,7 +101,7 @@ export default function CoachingPage() {
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
           <div className="lg:col-span-7">
-            <Explainer steps={steps} scenes={oneToOneHowScenes} noun="step" />
+            <Explainer steps={steps} clips={coachingClips.how} noun="step" />
             <Steps steps={steps} className="sr-only" />
           </div>
         </div>

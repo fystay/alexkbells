@@ -73,3 +73,35 @@ export const classesVideo = {
     poster: "/media/classes-portrait-poster.jpg",
   },
 } as HeroVideoConfig | null;
+
+/** One short silent loop for one step of an explainer (components/ui/Explainer.tsx). */
+export interface StepClip {
+  sources: { src: string; type: string }[];
+  /** First frame: shown while it loads, if it cannot play, and with Reduce Motion. */
+  poster: string;
+}
+
+const clip = (name: string): StepClip => ({
+  sources: [
+    { src: `/media/coaching/${name}.mp4`, type: 'video/mp4; codecs="avc1.640028"' },
+    { src: `/media/coaching/${name}.webm`, type: 'video/webm; codecs="vp9"' },
+  ],
+  poster: `/media/coaching/${name}-poster.jpg`,
+});
+
+/**
+ * Live-action shots for the /coaching explainers (owner's request, 2026-10-27),
+ * replacing the line drawings there. All six come from the owner's 23.6 s class
+ * clip (supplied 2026-10-27, tripod, 464 × 832 at 60 fps). The other gym's
+ * APEX | FREQUENCY roller banner and wall sign were painted out frame by frame
+ * (`scripts/signage_clean.py`: a per-pixel background plate with the signs
+ * removed, people passing in front kept). Each shot is a 464 × 400 crop at the
+ * stage's shape, slowed to two-thirds speed and given the home film's grade C (as the classes film),
+ * 4.6 s (one explainer step), with a cross-fade so it loops seamlessly
+ * (`scripts/coaching_clips.sh`). It is class footage: it shows Alex coaching and
+ * training with a group, not a 1:1 session. Replace with 1:1 footage when there is some.
+ */
+export const coachingClips = {
+  focus: [clip("strength"), clip("technique"), clip("movement")],
+  how: [clip("request"), clip("confirm"), clip("together")],
+} satisfies Record<string, readonly StepClip[]>;

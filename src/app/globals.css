@@ -599,3 +599,37 @@
     stroke-width: 6;
   }
 }
+
+/*
+ * Live-action steps in the explainer (Explainer `clips`, 2026-10-27). The poster is
+ * the frame's background, so a still shows before and without the video.
+ */
+.mx-clip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-ink);
+  background-size: cover;
+  background-position: center;
+}
+.mx-clip-play,
+.mx-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mx-video {
+  object-fit: cover;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mx-clip {
+    animation: mx-fade 450ms ease-out both;
+  }
+}
+/* With Reduce Motion only the poster shows until the visitor presses play. */
+@media (prefers-reduced-motion: reduce) {
+  .mx:not([data-played]) .mx-clip-play {
+    visibility: hidden;
+  }
+}
