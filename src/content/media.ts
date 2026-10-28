@@ -52,8 +52,11 @@ export const heroVideo = {
  * a class, 464 × 832 at 60 fps). The home film's grade C exactly (owner,
  * 2026-10-27: keep the two films consistent; scripts/hero_edit.py GRADE:
  * lifted, contrasty, slightly cool, the lower part darkened under the words),
- * slowed to two thirds speed (smooth from the 60 fps source), fading in and
- * out so the loop is seamless; 19.5 s. Phones get the vertical cut; wider
+ * re-timed for even motion (2026-10-28, scripts/classes_film.py: half speed,
+ * every 60 fps frame shown at 30 fps, the one frame in four the first cut
+ * dropped restored by motion interpolation), the owner's hard cuts replaced by
+ * 0.8 s dissolves and the last shot dissolving into the first so the loop has
+ * no start or end (no fade through black); 19.5 s. Phones get the vertical cut; wider
  * screens the same clip on the right over a blurred, darkened copy of
  * itself (1280 × 544), so the words on the left sit on calm background.
  * The source is only 464 px wide, so it is soft on large screens.
