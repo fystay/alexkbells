@@ -250,6 +250,8 @@ Same tokens and type, tuned for use on a phone between sessions:
 
 ## Scroll reveal (foundation, 2026-10-18)
 
+- **Cinematic again (owner, 2026-10-28; supersedes the 0.7 s fade-only note of 2026-10-26):** blocks rise 16 px (22 px from 640 px) and come into focus from a 6 px (10 px) blur over 1.1 s; photos settle from a 1.06 zoom over 1.8 s; each page's opening heading, then what follows it, does the same on load. Every top-level block of a page section (or of its grid) is covered without markup (`AUTO_REVEAL` in `lib/reveal.ts`, mirrored in `globals.css`; needs `:has()`, otherwise it simply shows); the second block of a split section follows its heading by 160 ms. Blocks reveal as soon as any part is in view (6% above the bottom edge), so a tall block is never left hidden. Off under reduced motion, as before.
+
 - Add `data-reveal` to any element and it fades up 24 px over 0.7 s the first time 12% of it enters the viewport (8% above the bottom edge). Stagger lists with `style={revealDelay(i)}` (80 ms apart, capped at 6) from `src/lib/reveal.ts`.
 - Switched on by a tiny inline script in `<head>` (`REVEAL_SCRIPT`) before first paint: no flash, no dependence on React. Off, so content simply shows, under reduced motion, without IntersectionObserver or without JavaScript.
 - Applied to: every `SectionHeading`, the "Why kettlebells" points, the offer cards, About stills, the journey photos, How-to-book steps, FAQ items and the closing band. Not used on the hero (first view and LCP) or on buttons and form controls.

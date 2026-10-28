@@ -102,6 +102,16 @@ for (const route of [...publicRoutes, ...memberRoutes, ...coachRoutes]) {
       for (const width of [390, 768]) {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(route);
+        // Measure once the reveal has settled: a block still rising sits at a
+        // fractional offset, which can read as 43.99 px.
+        await page.evaluate(() =>
+          Promise.all(
+            document
+              .getAnimations()
+              .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+              .map((a) => a.finished.catch(() => null)),
+          ),
+        );
         const small = await page.$$eval("a, button, summary", (els) =>
           els
             .filter((el) => {
