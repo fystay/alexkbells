@@ -15,7 +15,9 @@ export const metadata: Metadata = pageMetadata({
 // 2026-10-26: membership requests and member accounts added (wording from
 // docs/MEMBER_ACCOUNTS_DRAFT.md, approved by the owner; Alex to confirm,
 // with a retention period and contact email if he wants one).
-const LAST_UPDATED = "26 October 2026";
+// 2026-10-28: accounts for everyone who has booked and paid (not only members),
+// and the sign-in cookie is site-wide so booking forms can fill in details.
+const LAST_UPDATED = "28 October 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
@@ -46,8 +48,10 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         date and time you agreed to the membership terms and cancellation policy. If you pay online, you pay on
         Square&apos;s secure page: Square receives your card details, and we never see them; we receive the amount,
         the date and Square&apos;s reference for the payment. If you book a class online, we also keep a coded copy
-        of the private link we email you to cancel it, and of any class credit link. If you&apos;re a member and
-        sign in to your account, we keep a record of each sign-in: a coded copy of the sign-in link and of
+        of the private link we email you to cancel it, and of any class credit link. Once you&apos;ve paid for a
+        class or a membership, you have an account: you can sign in with your email to see your classes and
+        credits, and we keep your name, email and phone so the booking form can fill them in next time. When
+        you sign in, we keep a record of each sign-in: a coded copy of the sign-in link and of
         your session, and when they were created, last used and ended. We don&apos;t record where you are or
         what device you use. We don&apos;t ask about your health; please don&apos;t include medical details.
       </p>
@@ -89,9 +93,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Cookies",
     body: (
       <p>
-        This website does not use analytics, advertising or tracking cookies. If you&apos;re a member and sign
-        in, we set one cookie that keeps you signed in for up to 30 days; it&apos;s only used on your account
-        pages, and signing out removes it. The coach login sets two cookies that keep the coach signed in;
+        This website does not use analytics, advertising or tracking cookies. If you sign in to your account,
+        we set one cookie that keeps you signed in for up to 30 days; it&apos;s only used for your account pages
+        and to fill in your details on the booking forms, and signing out removes it. The coach login sets two cookies that keep the coach signed in;
         they are only used on the coach&apos;s pages.
       </p>
     ),
@@ -101,7 +105,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         You can ask to see, correct or delete the details we hold about you by contacting us on
-        Instagram. Members can sign out of every device from their account page, or ask Alex to. If you&apos;re unhappy with how we&apos;ve handled your information, you can complain to
+        Instagram. You can sign out of every device from your account page, or ask Alex to. If you&apos;re unhappy with how we&apos;ve handled your information, you can complain to
         the Information Commissioner&apos;s Office at{" "}
         <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
           ico.org.uk<span className="sr-only"> (opens in a new tab)</span>

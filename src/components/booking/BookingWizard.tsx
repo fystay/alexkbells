@@ -22,6 +22,7 @@ import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
 import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
+import { useSignedInDetails } from "@/lib/signed-in-details";
 import {
   ActionBar,
   ChoiceGroup,
@@ -159,6 +160,10 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
   // Details
   const [details, setDetails] = useState<Details>({ experience: BOOKING_EXPERIENCE[0].value, name: "", email: "", phone: "", message: "" });
   const [clientErrors, setClientErrors] = useState<FieldErrors>({});
+  // Signed in (a past booking made the account): fill in what's still empty.
+  const signedIn = useSignedInDetails((d) =>
+    setDetails((prev) => ({ ...prev, name: prev.name || d.name, email: prev.email || d.email, phone: prev.phone || d.phone })),
+  );
   const [demoDone, setDemoDone] = useState(false);
   const meta = useSubmissionMeta();
   const [serverState, formAction, pending] = useActionState(submitBookingRequest, initialFormState as FormState<BookingField>);
@@ -551,6 +556,12 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   onChange={(v) => update("experience")(v)}
                   error={errors.experience}
                 />
+                {signedIn ? (
+                  <p className="text-sm">Filled in from your account.</p>
+                ) : payNow && !demo ? (
+                  // The booking makes the account (2026-10-28): say so, once, before they pay.
+                  <p className="text-sm">We&apos;ll use your email to sign you in to your account next time. No password.</p>
+                ) : null}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <TextField name="name" label="Name" autoComplete="name" maxLength={100} value={details.name} onChange={update("name")} error={errors.name} />
                   <TextField

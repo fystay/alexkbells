@@ -6,7 +6,7 @@ import type { PublishedClass } from "./class-sessions";
 import { inList, rpc, select, update, type Db, type DbError } from "./coach/db";
 import { formatLongDate, londonToUtc, toLondon, formatClock, type DateKey } from "./coach/time";
 import type { Env } from "./env";
-import { isToken, memberLinkOrigin, randomToken, sha256Hex } from "./member-auth";
+import { isToken, memberLinkOrigin, randomToken, sha256Hex, SIGN_IN_PATH } from "./member-auth";
 import { publishable } from "./publish";
 import { formatTime } from "./schedule";
 import { sendEmail } from "./send-email";
@@ -191,6 +191,9 @@ export async function notifyClassBookings(db: Db, classes: PublishedClass[], env
             "Need to cancel? Use this private link:",
             `${memberLinkOrigin(env)}${BOOK_MANAGE_PATH}?token=${token}`,
             onlineClassBooking.cancel,
+            "",
+            // The booking is the account (2026-10-28): sign in with this email, no password.
+            `Your bookings and any class credits are also in your account: ${memberLinkOrigin(env)}${SIGN_IN_PATH} (sign in with this email address).`,
           ].join("\n"),
         },
         fetchImpl,

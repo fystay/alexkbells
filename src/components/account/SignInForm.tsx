@@ -8,7 +8,7 @@ import { SubmissionMeta, TextField, useSubmissionMeta } from "@/components/booki
 
 /**
  * Email in, "check your email" out. The same answer for every address, so
- * the form never says who is a member.
+ * the form never says who has an account.
  */
 export function SignInForm() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export function SignInForm() {
       <div ref={statusRef} tabIndex={-1} role="status" className="card p-6 focus:outline-none sm:p-8">
         <h2 className="card-title text-xl">Check your email</h2>
         <p className="mt-2">
-          If <span className="font-semibold">{state.message}</span> is a member&apos;s email, a sign-in link is on its way. It works once, for 15
+          If <span className="font-semibold">{state.message}</span> has an account, a sign-in link is on its way. It works once, for 15
           minutes.
         </p>
         <p className="mt-3 text-sm">Nothing arrived after a few minutes? Check your junk folder, then try again.</p>
@@ -47,7 +47,7 @@ export function SignInForm() {
         inputMode="email"
         autoComplete="email"
         maxLength={254}
-        hint="The one Alex has for your membership."
+        hint="The one you booked or joined with."
         value={email}
         onChange={setEmail}
         error={state.errors.email}

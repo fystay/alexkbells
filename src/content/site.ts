@@ -80,8 +80,8 @@ export const mainNav = [
 /** Extra page listed in the phone menu and footer, after mainNav. */
 export const pageNav = [{ label: "Contact", href: "/contact" }] as const;
 
-/** Members' sign-in (2026-10-26): in the menu and the footer, before Alex's. */
-export const memberSignInNav = { label: "Member sign-in", href: "/account/sign-in" } as const;
+/** Sign-in for members and anyone who has booked (2026-10-26; "Sign in" since 2026-10-28): in the menu and the footer, before Alex's. */
+export const memberSignInNav = { label: "Sign in", href: "/account/sign-in" } as const;
 
 /** Alex's sign-in: last in the phone menu and the footer. */
 export const coachLoginNav = { label: "Coach login", href: "/coach/login" } as const;

@@ -8,8 +8,8 @@ import { SignInForm } from "@/components/account/SignInForm";
 import { Section } from "@/components/ui/Section";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Member sign-in",
-  description: "Sign in to see your RAENG membership, credits and classes.",
+  title: "Sign in",
+  description: "Sign in to see your RAENG classes, credits and membership.",
   path: "/account/sign-in",
   noindex: true,
 });
@@ -19,7 +19,10 @@ const NOTES: Record<string, string> = {
   out: "You're signed out.",
 };
 
-/** Members sign in with a one-time link emailed to them: no password. */
+/**
+ * Sign in with a one-time link emailed to you: no password. For members and
+ * anyone who has booked and paid for a class (2026-10-28: the booking is the account).
+ */
 export default async function MemberSignInPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   if (await currentMember()) redirect(ACCOUNT_PATH);
   const params = await searchParams;
@@ -27,11 +30,11 @@ export default async function MemberSignInPage({ searchParams }: { searchParams:
   return (
     <Section labelledBy="sign-in-heading">
       <div className="max-w-lg">
-        <p className="eyebrow">Members</p>
+        <p className="eyebrow">Your account</p>
         <h1 id="sign-in-heading" className="mt-3 font-display text-h1 text-balance">
           Sign in.
         </h1>
-        <p className="mt-5 text-lede">See your credits and renewal date, and book or cancel classes. We&apos;ll email you a link: no password needed.</p>
+        <p className="mt-5 text-lede">See your classes and credits, and book or cancel. We&apos;ll email you a link: no password needed.</p>
         {note ? (
           <p role="status" className="card mt-8 px-5 py-4 font-semibold">
             {note}
@@ -41,7 +44,11 @@ export default async function MemberSignInPage({ searchParams }: { searchParams:
           <SignInForm />
         </div>
         <p className="mt-10 text-sm">
-          Not a member yet? See the{" "}
+          New here? Your account is made when you first book and pay for a class.{" "}
+          <a href="/book/group-class" className="font-semibold underline underline-offset-4 hover:no-underline">
+            Book a class
+          </a>{" "}
+          or see the{" "}
           <a href="/memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
             memberships
           </a>

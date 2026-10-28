@@ -54,7 +54,8 @@ begin
   perform pg_temp.ok(public.akb_member_create_login_link('  A@Example.COM ', pg_temp.h('t2')), 'the email match ignores case and spaces');
   perform pg_temp.ok(not public.akb_member_create_login_link('c@example.com', pg_temp.h('t3')), 'a non-member gets no link');
   perform pg_temp.ok(not public.akb_member_create_login_link('nobody@example.com', pg_temp.h('t4')), 'an unknown address gets no link');
-  perform pg_temp.ok(not public.akb_member_create_login_link('old@example.com', pg_temp.h('t5')), 'a former member gets no link');
+  -- Since 20261030000000 (accounts for everyone who has paid) a former member can sign in to see their history and rejoin.
+  perform pg_temp.ok(public.akb_member_create_login_link('old@example.com', pg_temp.h('t5')), 'a former member still gets a link');
   perform pg_temp.ok(public.akb_member_create_login_link('a@example.com', pg_temp.h('t6')), 'third link this hour');
   perform pg_temp.ok(public.akb_member_create_login_link('a@example.com', pg_temp.h('t7')), 'fourth link this hour');
   perform pg_temp.ok(public.akb_member_create_login_link('a@example.com', pg_temp.h('t8')), 'fifth link this hour');

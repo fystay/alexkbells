@@ -38,12 +38,12 @@ describe("the emailed link", () => {
 });
 
 describe("the session cookie", () => {
-  it("is httpOnly, Lax, secure in production and scoped to /account for 30 days", () => {
+  it("is httpOnly, Lax, secure in production and site-wide for 30 days (the booking form fills in details)", () => {
     expect(memberCookieOptions({ NODE_ENV: "production", SUPABASE_URL: "https://x.supabase.co" })).toEqual({
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      path: "/account",
+      path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
   });

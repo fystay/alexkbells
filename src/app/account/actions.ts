@@ -4,16 +4,20 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { bookingDeliveryConfig, isSpam, text, type FormState } from "@/lib/booking-request";
 import { isClassDate } from "@/lib/availability/timetable";
+import { notifyClassBookings } from "@/lib/class-checkout";
 import { publishedClasses } from "@/lib/class-sessions";
 import { coachDb, isUuid } from "@/lib/coach/db";
 import { londonToday, londonToUtc } from "@/lib/coach/time";
 import { emailError, singleLine } from "@/lib/form-validation";
 import {
   ACCOUNT_PATH,
+  bookWithClassCredit,
   bookWithCredit,
+  cancelPaidPlace,
   cancelPlace,
   createLoginLink,
   isToken,
+  LEGACY_COOKIE_PATH,
   MEMBER_SESSION_COOKIE,
   memberCookieOptions,
   randomToken,
@@ -30,9 +34,10 @@ import { sendEmailWithRetry } from "@/lib/send-email";
 export type SignInField = "email";
 
 /**
- * Sends a one-time sign-in link to a member's email. The visitor sees the
- * same message whether or not the address is a member's (so the form can't
- * be used to find out who is), and nothing says whether an email went.
+ * Sends a one-time sign-in link to a customer's email (a member, or anyone
+ * who has paid for a class: migration 20261030000000). The visitor sees the
+ * same message whether or not the address has an account (so the form can't
+ * be used to find out who does), and nothing says whether an email went.
  */
 export async function requestSignInLink(_previous: FormState<SignInField>, formData: FormData): Promise<FormState<SignInField>> {
   const db = coachDb();
@@ -94,7 +99,11 @@ const RULES: Record<string, string> = {
   not_found: "not_found",
   not_booked: "not_found",
   not_credit_place: "not_found",
+  credit_invalid: "credit_invalid",
 };
+
+const errorFor = (result: { ok: false; error: { kind: string; rule?: string | null } }) =>
+  result.error.kind === "rule" ? (RULES[result.error.rule ?? ""] ?? "failed") : "failed";
 
 /**
  * Books a class with a credit. The class's start time and length come from
@@ -113,24 +122,62 @@ export async function bookClass(formData: FormData): Promise<void> {
     startsAt: londonToUtc(date, slot.start),
     durationMinutes: slot.durationMinutes ?? 60,
   });
-  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${result.error.kind === "rule" ? (RULES[result.error.rule ?? ""] ?? "failed") : "failed"}`);
+  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
   redirect(`${ACCOUNT_PATH}?done=booked`);
 }
 
-/** Cancels one of the member's own places. Late cancellations are confirmed on the page first. */
+/**
+ * Cancels one of the customer's own places. Late cancellations are confirmed
+ * on the page first. A membership-credit place gets its credit back (24 hours
+ * or more before); a paid place gets a class credit (same rule).
+ */
 export async function cancelClass(formData: FormData): Promise<void> {
   const member = await requireMember();
   const id = text(formData, "place");
   if (!isUuid(id)) redirect(`${ACCOUNT_PATH}?error=not_found`);
+  if (text(formData, "paid") === "yes") {
+    const result = await cancelPaidPlace(member.db, member.clientId, id);
+    if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
+    redirect(`${ACCOUNT_PATH}?done=${result.data ? "cancelled_credit" : "cancelled_paid_late"}`);
+  }
   const result = await cancelPlace(member.db, member.clientId, id);
-  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${result.error.kind === "rule" ? (RULES[result.error.rule ?? ""] ?? "failed") : "failed"}`);
+  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
   redirect(`${ACCOUNT_PATH}?done=${result.data ? "cancelled_late" : "cancelled"}`);
+}
+
+/**
+ * Books a class with one of the customer's class credits. As with credits,
+ * the class's start time comes from the published timetable; the form only
+ * says which class, which date and which credit.
+ */
+export async function bookClassWithCredit(formData: FormData): Promise<void> {
+  const member = await requireMember();
+  const slot = publishedClasses().find((c) => c.id === text(formData, "slot"));
+  const date = text(formData, "date");
+  const credit = text(formData, "credit");
+  if (!slot || !isClassDate(date, slot, londonToday()) || !isUuid(credit)) redirect(`${ACCOUNT_PATH}?error=not_found`);
+  const result = await bookWithClassCredit(member.db, {
+    clientId: member.clientId,
+    creditId: credit,
+    slot: slot.id,
+    date,
+    startsAt: londonToUtc(date, slot.start),
+    durationMinutes: slot.durationMinutes ?? 60,
+    // One booking per credit: pressing twice books once.
+    idempotencyKey: `account-credit/${credit}`,
+  });
+  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
+  // Confirmed at once: email the customer and Alex now rather than at the next reconcile (best effort).
+  await notifyClassBookings(member.db, publishedClasses()).catch(() => 0);
+  redirect(`${ACCOUNT_PATH}?done=booked_class_credit`);
 }
 
 /** Signs this browser out, or every device (everywhere=yes). */
 export async function signOutMember(formData: FormData): Promise<void> {
   const member = await requireMember();
   await signOut(member.db, member.sessionHash, text(formData, "everywhere") === "yes");
-  (await cookies()).delete({ name: MEMBER_SESSION_COOKIE, path: ACCOUNT_PATH });
+  const jar = await cookies();
+  jar.delete({ name: MEMBER_SESSION_COOKIE, path: "/" });
+  jar.delete({ name: MEMBER_SESSION_COOKIE, path: LEGACY_COOKIE_PATH });
   redirect(`${SIGN_IN_PATH}?signed=out`);
 }

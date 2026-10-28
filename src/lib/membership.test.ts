@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "./membership";
+import { bestPlanFor, extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "./membership";
 
 const payg = getService("group-classes").prices[0].amountGbp;
 
@@ -54,5 +54,19 @@ describe("extra cost of pay as you go", () => {
     const plan = membershipPlans.find((p) => p.id === id)!;
     const x = extraCostPence(plan, payg);
     expect([formatPenceShort(x.week), formatPenceShort(x.period), formatPenceShort(x.year)]).toEqual([week, period, year]);
+  });
+});
+
+describe("bestPlanFor (pay-as-you-go account)", () => {
+  const payg = getService("group-classes").prices[0].amountGbp;
+  it("says nothing until a plan would have been cheaper", () => {
+    expect(bestPlanFor(membershipPlans, 0, payg)).toBeNull();
+    expect(bestPlanFor(membershipPlans, 3, payg)).toBeNull();
+  });
+  it("picks the plan that saves most, counting extra classes at the class price", () => {
+    // 4 classes: £48 singly, Starter £40.
+    expect(bestPlanFor(membershipPlans, 4, payg)).toMatchObject({ plan: { id: "starter" }, savingPence: 800 });
+    // 8 classes: £96 singly; Regular £65 saves £31, Starter £40 + 4 × £12 = £88 saves £8.
+    expect(bestPlanFor(membershipPlans, 8, payg)).toMatchObject({ plan: { id: "regular" }, savingPence: 3100 });
   });
 });

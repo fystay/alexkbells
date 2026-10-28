@@ -72,9 +72,9 @@ test.describe("member accounts", () => {
     await expect(page.getByText("left of 8")).toBeVisible();
     await expect(page.getByText("No classes booked yet.")).toBeVisible();
 
-    // The session cookie: httpOnly, only for /account.
-    const cookie = (await page.context().cookies(PROD + "/account")).find((c) => c.name === "akb_member_session");
-    expect(cookie).toMatchObject({ httpOnly: true, path: "/account", sameSite: "Lax" });
+    // The session cookie: httpOnly, site-wide since 2026-10-28 (the booking form fills in details).
+    const cookie = (await page.context().cookies(PROD + "/")).find((c) => c.name === "akb_member_session");
+    expect(cookie).toMatchObject({ httpOnly: true, path: "/", sameSite: "Lax" });
 
     // Book the furthest class this period (more than 24 hours away), with a credit.
     const options = page.locator("li").filter({ has: page.getByRole("button", { name: /^Book / }) });
@@ -111,11 +111,67 @@ test.describe("member accounts", () => {
     await expect(page.getByRole("status")).toContainText("expired or has already been used");
   });
 
-  test("an address that isn't a member's gets the same answer and no email", async ({ page, request }) => {
+  test("an address with no account gets the same answer and no email", async ({ page, request }) => {
     const email = `not-a-member-${Date.now()}@example.com`;
     await askForLink(page, email);
-    await expect(page.getByRole("status")).toContainText(`If ${email} is a member's email`);
+    await expect(page.getByRole("status")).toContainText(`If ${email} has an account`);
     expect(await emailsTo(request, email)).toHaveLength(0);
+  });
+
+  test("pay as you go (2026-10-28): the paid booking is the account; cancel for a class credit, book with it, and the form fills in", async ({ page, request }) => {
+    const email = `payg-${Date.now()}@example.com`;
+    // A class booked and paid online 5 days from now (as Square's webhook would record it).
+    const [booking] = await sql(
+      request,
+      `select akb_create_class_booking('Pay Go', $1, '07700 900123', 'mon-evening', akb_london_today() + 5,
+         ((akb_london_today() + 5)::timestamp + time '18:30') at time zone 'Europe/London', 60, 1200, 'Group class', null, $2) as r`,
+      [email, `e2e-${Date.now()}`],
+    );
+    // Not paid yet: no account, so no email.
+    await askForLink(page, email);
+    expect(await emailsTo(request, email)).toHaveLength(0);
+    const chargeId = booking.r.charge_id as string;
+    await sql(
+      request,
+      `select akb_record_payment((select client_id from akb_charges where id = $1), 'group', 1200, akb_london_today(), 'card', '', '', $2,
+         jsonb_build_array(jsonb_build_object('charge_id', $1::uuid, 'amount_pence', 1200)))`,
+      [chargeId, `e2e-pay-${Date.now()}`],
+    );
+
+    // Paid: the same email gets a link and signs in to "Your account".
+    await askForLink(page, email);
+    const sent = await emailsTo(request, email);
+    expect(sent).toHaveLength(1);
+    await page.goto(PROD + linkPath(sent[0]));
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Your account." })).toBeVisible();
+    await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
+    await expect(page.getByText("Pay as you go")).toBeVisible();
+    const place = page.locator("li").filter({ hasText: "Paid" }).filter({ has: page.getByRole("button", { name: /^Cancel/ }) });
+    await expect(place).toContainText("You get a class credit for another class within 4 weeks.");
+
+    // Cancel in time: a class credit, then book another class with it, nothing to pay.
+    await place.getByRole("button", { name: /^Cancel/ }).click();
+    await expect(page.getByRole("status")).toHaveText("Cancelled. You have a class credit for another class within 4 weeks.");
+    await expect(page.getByText("Class credits")).toBeVisible();
+    const options = page.locator("li").filter({ has: page.getByRole("button", { name: /^Book / }) });
+    await options.first().getByRole("button", { name: /^Book / }).click();
+    await expect(page.getByRole("status")).toHaveText("Booked with your class credit. Nothing to pay.");
+    await expect(page.getByRole("listitem").filter({ has: page.getByText("Class credit", { exact: true }) })).toHaveCount(1);
+    await expect(page.getByText("Class credits")).toHaveCount(0);
+
+    // The account page passes an accessibility scan.
+    await page.waitForTimeout(1300);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+    // Signed in, the booking form fills in their details.
+    await page.goto(`${PROD}/book/group-class`);
+    await page.evaluate(() => sessionStorage.clear());
+    const response = await page.request.get(`${PROD}/api/account/details`);
+    expect(await response.json()).toEqual({ name: "Pay Go", email, phone: "07700 900123" });
+    // Signed out, the details API says nothing.
+    const anon = await request.get(`${PROD}/api/account/details`);
+    expect(await anon.json()).toEqual({});
   });
 
   test("a made-up or broken link signs nobody in", async ({ page }) => {
@@ -128,7 +184,7 @@ test.describe("member accounts", () => {
 
   test("the menu and footer link to member sign-in, and robots keep /account out", async ({ page, request }) => {
     await page.goto(PROD);
-    await expect(page.locator("footer").getByRole("link", { name: "Member sign-in" })).toHaveAttribute("href", "/account/sign-in");
+    await expect(page.locator("footer").getByRole("link", { name: "Sign in", exact: true })).toHaveAttribute("href", "/account/sign-in");
     const robots = await (await request.get(`${PROD}/robots.txt`)).text();
     expect(robots).toContain("Disallow: /account");
     const sitemap = await (await request.get(`${PROD}/sitemap.xml`)).text();

@@ -12,6 +12,7 @@ import { formatLongDate, formatShortDate, fromDateKey, toDateKey, weekdayIndex, 
 import { classAvailability } from "@/lib/availability/timetable";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { useChosenPlan } from "@/lib/chosen-plan";
+import { useSignedInDetails } from "@/lib/signed-in-details";
 import { formatPenceShort, planFigures } from "@/lib/membership";
 import type { MembershipField } from "@/lib/membership-request";
 import { formatTime } from "@/lib/schedule";
@@ -133,6 +134,11 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
   // Details and agreement
   const [details, setDetails] = useState<Details>({ experience: BOOKING_EXPERIENCE[0].value, name: "", email: "", phone: "", message: "" });
   const [clientErrors, setClientErrors] = useState<FieldErrors<MembershipField>>({});
+  // Signed in (a past booking made the account): fill in what's still empty.
+  const signedIn = useSignedInDetails((d) =>
+    setDetails((prev) => ({ ...prev, name: prev.name || d.name, email: prev.email || d.email, phone: prev.phone || d.phone })),
+  );
+
   const [agreed, setAgreed] = useState(false);
   const [demoDone, setDemoDone] = useState(false);
   const meta = useSubmissionMeta();
@@ -338,6 +344,9 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                   onChange={(v) => update("experience")(v)}
                   error={errors.experience}
                 />
+                {signedIn ? (
+                  <p className="text-sm">Filled in from your account.</p>
+                ) : null}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <TextField name="name" label="Name" autoComplete="name" maxLength={100} value={details.name} onChange={update("name")} error={errors.name} />
                   <TextField name="email" label="Email" type="email" inputMode="email" autoComplete="email" maxLength={254} value={details.email} onChange={update("email")} error={errors.email} />

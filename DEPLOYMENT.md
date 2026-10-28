@@ -150,7 +150,7 @@ Owner's decision (2026-10-26): members join and pay for their membership with no
 3. **Email on** (Resend settings above): Alex is emailed when someone joins and pays ("nothing to confirm"), the member gets a welcome, and each renewal emails the member a Square pay link.
 4. **`CRON_SECRET`** (already needed): the daily renewal sends the pay links; the daily Square reconcile catches missed webhooks and sends any welcome emails they would have triggered.
 5. `SITE_URL` set to the real domain: Square sends payers back to `<SITE_URL>/memberships/join/done`.
-6. Then `20261029000000_akb_instant_class_booking.sql` for booking single classes online (next section).
+6. Then `20261029000000_akb_instant_class_booking.sql` for booking single classes online, and `20261030000000_akb_customer_accounts.sql` for accounts for everyone who has paid (next sections).
 
 How it behaves: the join page's last step says "Pay £<price>" and opens Square's page; the price comes from `content/memberships.ts` on the server. The membership starts the moment the payment is recorded (Square's verified webhook, the reconcile, or Alex recording a payment in the portal against that charge), on that same charge, and the first class (if chosen) is booked with a credit then. A member who leaves Square's page without paying has nothing started; joining again replaces the unpaid sign-up. If the membership can't start (e.g. Alex already started one for them), the payment stays recorded and the sign-up is marked `needs_attention`, and Alex is emailed. Renewals: every four weeks a new period and charge, a pay link emailed once, and that period's credits can't be used until it's paid (memberships Alex starts by hand are unchanged). Refunds and cancelling a membership stay with Alex.
 
@@ -162,6 +162,15 @@ Owner's decisions (2026-10-27): group classes are booked and paid instantly (1:1
 2. Square's webhook confirms the place, so it must be live as above. Payers come back to `<SITE_URL>/book/done`; the emailed private link is `<SITE_URL>/book/manage?token=…`, the credit link `<SITE_URL>/book/group-class?credit=…`.
 
 How it behaves: the last step says "Pay £12" (price from `content/services.ts` on the server) and opens Square's page; the place counts towards the class's capacity for 15 minutes. Paid in time → confirmed, Alex is emailed ("nothing to confirm") and the booker gets the private link. A payment that arrives after the hold ran out confirms the place if there's still room; otherwise the payment is recorded, the booking is marked `needs_attention` and Alex is emailed to sort it out (refunds stay with Alex). A charge still unpaid a day after its hold is cancelled by the daily renewal job (`akb_release_class_holds`). Booking with a membership plan chosen on the plan list stays a request.
+
+### Accounts for everyone who has paid (2026-10-28, built; not live)
+
+Owner's decision (2026-10-28, "the standard gym flow"): the first paid booking makes the account; no passwords and no separate sign-up. Anyone who has paid (a class booked online, a membership, or a payment Alex recorded) signs in at `/account/sign-in` with the same emailed link members use, and sees their classes, class credits and, for members, the plan and credits. Former members can still sign in.
+
+1. Apply **`20261030000000_akb_customer_accounts.sql`** after `20261029…` (replaces five functions, adds three; no table or row changes; safe to run again). Check: `select has_function_privilege('anon','public.akb_can_sign_in(uuid)','execute')` is false. Tests: `supabase/tests/20261030000000_akb_customer_accounts.test.sql` (real Postgres 16; the member accounts test now expects a former member to get a link).
+2. Needs email (Resend) on Production, like member sign-in.
+
+How it behaves: the booking confirmation email says the bookings are in their account; the account page lists their classes (paid ones cancel for a class credit 24 hours or more before, as the emailed link does), their class credits (book with one, nothing to pay), Book now, and what a membership would have saved them (from content prices and their own bookings). Signed in, the booking and join forms fill in name, email and phone (`/api/account/details`, own details only). The sign-in cookie is now site-wide (was `/account`); people signed in before keep their old cookie until it expires or they sign out.
 
 ### Square card payments (2026-10-21, not live; needs the owner)
 

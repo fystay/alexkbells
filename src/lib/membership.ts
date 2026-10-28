@@ -45,3 +45,24 @@ export function extraCostPence(plan: MembershipPlan, payAsYouGoGbp: number): { w
   const period = planFigures(plan, payAsYouGoGbp).savingPence;
   return { week: Math.round(period / BILLING_WEEKS), period, year: (period * 52) / BILLING_WEEKS };
 }
+
+/**
+ * For someone who paid for `classes` classes singly in 4 weeks: the plan that
+ * would have cost them least, and how much less (pence), counting any classes
+ * beyond the plan's credits at the pay-as-you-go price. Null when no plan
+ * would have been cheaper. Shown on a pay-as-you-go customer's account.
+ */
+export function bestPlanFor(
+  plans: readonly MembershipPlan[],
+  classes: number,
+  payAsYouGoGbp: number,
+): { plan: MembershipPlan; savingPence: number } | null {
+  const paid = classes * payAsYouGoGbp * 100;
+  let best: { plan: MembershipPlan; savingPence: number } | null = null;
+  for (const plan of plans) {
+    const cost = plan.priceGbp * 100 + Math.max(0, classes - plan.credits) * payAsYouGoGbp * 100;
+    const savingPence = paid - cost;
+    if (savingPence > 0 && (!best || savingPence > best.savingPence)) best = { plan, savingPence };
+  }
+  return best;
+}

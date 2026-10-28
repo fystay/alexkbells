@@ -34,12 +34,19 @@ export async function sha256Hex(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** httpOnly so page scripts can't read it; only sent to /account pages. */
+/**
+ * httpOnly so page scripts can't read it. Sent to the whole site (2026-10-28,
+ * was /account only) so the booking forms can fill in a signed-in customer's
+ * details (/api/account/details); nothing else reads it.
+ */
 export function memberCookieOptions(env: Env = process.env) {
   // Plain http only for the local e2e stand-in, like the coach cookies.
   const local = env.SUPABASE_URL?.startsWith("http://localhost:") ?? false;
-  return { httpOnly: true, secure: env.NODE_ENV === "production" && !local, sameSite: "lax" as const, path: ACCOUNT_PATH, maxAge: MEMBER_SESSION_MAX_AGE };
+  return { httpOnly: true, secure: env.NODE_ENV === "production" && !local, sameSite: "lax" as const, path: "/", maxAge: MEMBER_SESSION_MAX_AGE };
 }
+
+/** Where the cookie was set before 2026-10-28; cleared on sign-out too. */
+export const LEGACY_COOKIE_PATH = ACCOUNT_PATH;
 
 /**
  * Where the emailed link points. Never taken from the request's Host header
@@ -60,7 +67,7 @@ export function signInEmail(link: string): { subject: string; text: string } {
   return {
     subject: "Your RAENG sign-in link",
     text: [
-      "Here's your link to sign in to your RAENG membership:",
+      "Here's your link to sign in to your RAENG account:",
       "",
       link,
       "",
@@ -99,12 +106,19 @@ export interface MemberPlace {
   status: "booked" | "attended" | "cancelled" | "no_show";
   late_cancel: boolean;
   with_credit: boolean;
+  /** How it was paid: membership credit, paid online, a class credit, or arranged with Alex. */
+  how: "credit" | "paid" | "class_credit" | "other";
   class_cancelled: boolean;
   can_cancel: boolean;
   credit_back_if_cancelled: boolean;
 }
 
+/**
+ * Everything the account page shows (migration 20261030000000): members and
+ * pay-as-you-go customers alike; membership and period are null without one.
+ */
 export interface MemberOverview {
+  client: { name: string; email: string; phone: string };
   membership: {
     plan: string;
     plan_name: string;
@@ -117,6 +131,10 @@ export interface MemberOverview {
   } | null;
   period: { start: string; end: string; credits: number; used: number; left: number } | null;
   places: MemberPlace[];
+  /** Unused class credits from cancelled paid bookings. */
+  class_credits: { id: string; expires_on: string }[];
+  /** Classes paid for singly online, from 14 days ago to 13 days ahead (4 weeks). */
+  paid_classes_28d: number;
 }
 
 export function memberOverview(db: Db, clientId: string): Promise<DbResult<MemberOverview>> {
@@ -139,4 +157,34 @@ export function bookWithCredit(
 /** True when the cancellation was late (the credit is used). */
 export function cancelPlace(db: Db, clientId: string, attendanceId: string): Promise<DbResult<boolean>> {
   return rpc<boolean>(db, "akb_member_cancel_place", { p_client: clientId, p_attendance: attendanceId });
+}
+
+/**
+ * Cancels one of the customer's own paid bookings (by its place). 24 hours or
+ * more before: a class credit for 28 days (it shows in the account; only the
+ * hash of its link is stored). Returns whether a credit was given.
+ */
+export async function cancelPaidPlace(db: Db, clientId: string, attendanceId: string): Promise<DbResult<boolean>> {
+  const r = await rpc<{ credit: boolean }>(db, "akb_member_cancel_booking", {
+    p_client: clientId,
+    p_attendance: attendanceId,
+    p_credit_token_hash: await sha256Hex(randomToken()),
+  });
+  return r.ok ? { ok: true, data: r.data.credit } : r;
+}
+
+/** Books a class with one of the customer's own class credits: confirmed at once, nothing to pay. */
+export function bookWithClassCredit(
+  db: Db,
+  args: { clientId: string; creditId: string; slot: string; date: string; startsAt: string; durationMinutes: number; idempotencyKey: string },
+): Promise<DbResult<{ booking_id: string; status: string }>> {
+  return rpc(db, "akb_member_book_with_class_credit", {
+    p_client: args.clientId,
+    p_credit: args.creditId,
+    p_slot: args.slot,
+    p_date: args.date,
+    p_starts_at: args.startsAt,
+    p_duration: args.durationMinutes,
+    p_idempotency_key: args.idempotencyKey,
+  });
 }

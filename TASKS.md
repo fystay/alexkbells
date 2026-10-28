@@ -165,7 +165,7 @@ See Coach portal below.
 - [x] Join and pay online with no confirmation by Alex (2026-10-26): Square checkout, membership starts on the verified payment, first class booked then, renewal pay links, credits wait for payment; tested (SQL, unit, e2e with a Square stand-in)
 - [x] Book and pay for a group class online (2026-10-27): 15-minute hold, confirmed on Square's verified payment, private link to cancel, 24 h → class credit for 4 weeks; 1:1 stays a request; tested (SQL, unit, e2e with the Square stand-in)
 - [ ] Alex to confirm the class credit wording ("Cancel 24 hours or more before and you get a credit for another class within 4 weeks…")
-- [ ] Go live with online joining and class booking: apply migrations 20261020 → 20261029, Square Sandbox test then live, Resend, SITE_URL (DEPLOYMENT.md)
+- [ ] Go live with online joining and class booking: apply migrations 20261020 → 20261030, Square Sandbox test then live, Resend, SITE_URL (DEPLOYMENT.md)
 - [ ] Alex to confirm: wording of the renewal email ("To stop your membership, reply to this email") and whether unpaid renewals should pause a membership automatically
 - [x] Restyle /classes, /memberships, /coaching, /online-coaching, /about and /contact to the home system: no cards, nothing repeated, shorter (2026-10-26); hero wording A "Get stronger. / Kettlebell classes in Cumbernauld"
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
