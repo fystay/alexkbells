@@ -217,11 +217,13 @@ See Coach portal below.
 - [x] Member accounts built (2026-10-26, owner approved the recommended choices): `/account/sign-in`, `/account/confirm`, `/account`; migration `20261027000000_akb_member_accounts.sql`; privacy notice updated; tests (SQL on Postgres 16, unit, e2e)
 - [x] Account page polish (2026-10-28): next class card with Add to calendar / Google Calendar / Directions, credits meter, Cancel asks first, booking rows grouped by week, "Just booked" highlight, status message cleared from the address
 - [x] Members area redesign from the owner's designs (2026-10-28): app frame with drawer, account menu and Home / Book / Plan tab bar; confirm sheets and toasts; real data and rules; works without JavaScript (`design-reference/members.html`)
-- [ ] P2 Members design's account menu items not built yet: Profile and details, Notifications, Calendar sync, Sign-in and security (left out of the menu until they exist)
+- [x] Account menu items from the owner's design built (2026-10-28), each a real page with real state: Profile and details (name, phone; email read-only, changed through Alex), Notifications (class reminder email on the morning of each class, off until chosen; daily `/api/cron/class-reminders`, sends once email is live), Calendar sync (private subscribe link, shown once, only its hash stored; replace or turn off), Sign-in and security (devices signed in, sign one out, or all). Migration `20261031000000_akb_member_settings.sql` (not yet applied). Privacy notice updated (Alex to confirm)
+- [ ] P2 Changing the email on an account (needs a confirmation email to the new address; until then through Alex)
+- [ ] P2 Reminder timing options (now one email on the morning of the class)
 - [ ] P2 The rest of the owner's redesign brief (2026-10-28): home Why kettlebells and Classes sections, /classes, /coaching (and its header Book now going to group-class booking), /online-coaching, /about. Only the members area is done; only its design (`design-reference/members.html`) is in the repo
 - [ ] **P1** Sign-in code in the email alongside the link (iPhone mail apps open links in their own browser, so the member is signed in there, not in Safari)
 - [ ] P2 Sessions that extend while in use (now a fixed 30 days from sign-in)
-- [ ] P2 Class reminder email the day before (needs Resend live and a daily job)
+- [ ] P2 Class reminder email the day before (the morning-of reminder is built, see above; this is the optional earlier one)
 - [ ] P2 Payment history and receipts in the account; edit name, phone and email
 - [ ] **Needs Alex's rules first** Pause or cancel a membership from the account (notice, pause limits, refunds); waitlist for full classes (needs class capacities)
 - [x] Applied `20261024000000_akb_cancel_class.sql` and `20261027000000_akb_member_accounts.sql` to the live database (2026-10-28) (DEPLOYMENT.md → Member accounts)

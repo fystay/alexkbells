@@ -1029,3 +1029,23 @@
     transform: translateY(8px);
   }
 }
+.members-input {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.625rem 1rem;
+  border: 1.5px solid var(--color-grey);
+  border-radius: 16px;
+  background: var(--color-white);
+  color: var(--color-ink);
+  font-size: 1rem;
+}
+.members-input:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-color: var(--color-ink);
+}
+.members-input[readonly] {
+  background: transparent;
+  border-style: dashed;
+}

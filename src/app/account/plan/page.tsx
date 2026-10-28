@@ -32,7 +32,7 @@ export default async function AccountPlanPage({ searchParams }: { searchParams: 
   const m = o.membership;
 
   return (
-    <MembersShell view="plan" overview={o} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view="plan" overview={o} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
       <div className="flex flex-col gap-2">
         <p className="members-eyebrow">Plan and account</p>
         <h1 className="text-[clamp(1.875rem,8.4vw,2.625rem)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">

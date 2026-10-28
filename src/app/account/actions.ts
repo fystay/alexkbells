@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { bookingDeliveryConfig, isSpam, text, type FormState } from "@/lib/booking-request";
 import { isClassDate } from "@/lib/availability/timetable";
@@ -29,6 +29,7 @@ import {
   signInLink,
   signOut,
 } from "@/lib/member-auth";
+import { deviceLabel, labelSession } from "@/lib/member-settings";
 import { requireMember } from "@/lib/member-session";
 import { sendEmailWithRetry } from "@/lib/send-email";
 
@@ -84,6 +85,8 @@ export async function confirmSignIn(formData: FormData): Promise<void> {
   const session = randomToken();
   const result = await redeemLoginLink(db, await sha256Hex(token), await sha256Hex(session));
   if (!result.ok || !result.data) redirect(`${SIGN_IN_PATH}?link=invalid`);
+  // So the member can tell their devices apart (Sign-in and security); best effort, the label is only the device and browser family.
+  await labelSession(db, await sha256Hex(session), deviceLabel((await headers()).get("user-agent"))).catch(() => null);
   (await cookies()).set(MEMBER_SESSION_COOKIE, session, memberCookieOptions());
   redirect(ACCOUNT_PATH);
 }

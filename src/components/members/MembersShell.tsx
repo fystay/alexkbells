@@ -4,6 +4,7 @@ import { bookClass, bookClassWithCredit, cancelClass, signOutMember } from "@/ap
 import { mapsUrl, site } from "@/content/site";
 import { formatPenceShort } from "@/lib/membership";
 import type { MemberOverview } from "@/lib/member-auth";
+import { CALENDAR_SYNC_PATH, NOTIFICATIONS_PATH, PROFILE_PATH, SECURITY_PATH, type MemberSettings } from "@/lib/member-settings";
 import { MEMBERS_VIEW_PATH, type MembersView } from "@/lib/members-app";
 import { countdown, firstName, shortWhen, upcomingPlaces } from "@/lib/member-view";
 import { ClearStatus } from "@/components/account/ClearStatus";
@@ -35,6 +36,15 @@ const icons = {
   help: <path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17zM9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.8v.1" />,
   out: <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />,
   devices: <path d="M4 6h12v9H4zM2 18h16M19 9h3v9h-3z" />,
+  person: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+    </>
+  ),
+  bell: <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0" />,
+  calendar: <path d="M4 8a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3zM4 10h16M9 3v4M15 3v4" />,
+  lock: <path d="M7 10h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zM8 10V7a4 4 0 0 1 8 0v3" />,
 };
 
 function Icon({ name, className = ICON }: { name: keyof typeof icons; className?: string }) {
@@ -53,6 +63,7 @@ const PUBLIC_LINKS: [string, string][] = [
   ["/about", "About RAENG"],
 ];
 
+const MENU_ICON = "size-[19px] shrink-0 fill-none stroke-current stroke-[1.7]";
 const external = { target: "_blank", rel: "noopener noreferrer" } as const;
 const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>;
 
@@ -65,14 +76,18 @@ const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>;
 export function MembersShell({
   view,
   overview,
+  settings = null,
   now,
   done,
   error,
   sheet,
   children,
 }: {
-  view: MembersView;
+  /** The tab to mark current; null on the settings pages, which belong to the account menu. */
+  view: MembersView | null;
   overview: MemberOverview;
+  /** Reminders and calendar link, for the account menu's "On" and "Connected" (left out if null). */
+  settings?: MemberSettings | null;
   now: Date;
   done: string | null;
   error: string | null;
@@ -87,7 +102,7 @@ export function MembersShell({
   const left = o.period?.left ?? 0;
   const next = upcomingPlaces(o, now)[0] ?? null;
   const status = m ? `${m.plan_name} · ${left} credit${left === 1 ? "" : "s"} left` : o.class_credits.length > 0 ? `Pay as you go · ${o.class_credits.length} class credit${o.class_credits.length === 1 ? "" : "s"}` : "Pay as you go";
-  const path = MEMBERS_VIEW_PATH[view];
+  const path = MEMBERS_VIEW_PATH[view ?? "home"];
 
   return (
     <div data-members-app className="members-app min-h-dvh bg-paper text-ink">
@@ -166,15 +181,44 @@ export function MembersShell({
             </div>
             <ul>
               <li>
+                <Link href={PROFILE_PATH} className="members-menu-item">
+                  <Icon name="person" className={MENU_ICON} />
+                  Profile and details
+                </Link>
+              </li>
+              <li>
                 <Link href={MEMBERS_VIEW_PATH.plan} className="members-menu-item">
-                  <Icon name="card" className="size-[19px] shrink-0 fill-none stroke-current stroke-[1.7]" />
+                  <Icon name="card" className={MENU_ICON} />
                   Plan and billing
                   {m ? <em className="ml-auto text-xs text-ink not-italic">{formatPenceShort(m.price_pence)} / 4 wks</em> : null}
                 </Link>
               </li>
               <li>
+                <Link href={NOTIFICATIONS_PATH} className="members-menu-item">
+                  <Icon name="bell" className={MENU_ICON} />
+                  Notifications
+                  {settings ? <em className="ml-auto text-xs text-ink not-italic">{settings.class_reminders ? "On" : "Off"}</em> : null}
+                </Link>
+              </li>
+              <li>
+                <Link href={CALENDAR_SYNC_PATH} className="members-menu-item">
+                  <Icon name="calendar" className={MENU_ICON} />
+                  Calendar sync
+                  {settings ? <em className="ml-auto text-xs text-ink not-italic">{settings.calendar_feed ? "Connected" : "Not connected"}</em> : null}
+                </Link>
+              </li>
+              <li>
+                <Link href={SECURITY_PATH} className="members-menu-item">
+                  <Icon name="lock" className={MENU_ICON} />
+                  Sign-in and security
+                </Link>
+              </li>
+            </ul>
+            <hr className="my-1.5 border-line" />
+            <ul>
+              <li>
                 <a href={site.social.instagram.url} {...external} className="members-menu-item">
-                  <Icon name="help" className="size-[19px] shrink-0 fill-none stroke-current stroke-[1.7]" />
+                  <Icon name="help" className={MENU_ICON} />
                   <span>Help and contact{NEW_TAB}</span>
                   <em className="ml-auto text-xs text-ink not-italic">Instagram</em>
                 </a>
@@ -183,14 +227,14 @@ export function MembersShell({
             <hr className="my-1.5 border-line" />
             <form action={signOutMember}>
               <button type="submit" className="members-menu-item text-ink">
-                <Icon name="out" className="size-[19px] shrink-0 fill-none stroke-current stroke-[1.7]" />
+                <Icon name="out" className={MENU_ICON} />
                 Sign out
               </button>
             </form>
             <form action={signOutMember}>
               <input type="hidden" name="everywhere" value="yes" />
               <button type="submit" className="members-menu-item text-ink">
-                <Icon name="devices" className="size-[19px] shrink-0 fill-none stroke-current stroke-[1.7]" />
+                <Icon name="devices" className={MENU_ICON} />
                 Sign out of every device
               </button>
             </form>

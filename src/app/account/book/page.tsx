@@ -59,7 +59,7 @@ export default async function AccountBookPage({ searchParams }: { searchParams: 
       : ["Book a class.", payg ? `£${payg.amountGbp} a class, paid when you book.` : "Pick a class, then pay when you book."];
 
   return (
-    <MembersShell view="book" overview={o} now={d.now} done={d.done} error={d.error} sheet={initial}>
+    <MembersShell view="book" overview={o} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={initial}>
       <div className="flex flex-col gap-2">
         <p className="members-eyebrow">Book a class</p>
         <h1 className="text-[clamp(1.875rem,8.4vw,2.625rem)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">{title}</h1>

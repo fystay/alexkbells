@@ -46,13 +46,8 @@ function endOf(event: ClassEvent): Date {
   return new Date(new Date(event.startsAt).getTime() + event.durationMinutes * 60_000);
 }
 
-export function icsFor(event: ClassEvent, now: Date = new Date()): string {
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//RAENG Fitness//Classes//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+function eventLines(event: ClassEvent, now: Date): string[] {
+  return [
     "BEGIN:VEVENT",
     `UID:${event.id}@raeng-fitness`,
     `DTSTAMP:${stamp(now)}`,
@@ -62,6 +57,31 @@ export function icsFor(event: ClassEvent, now: Date = new Date()): string {
     `LOCATION:${escapeText(event.location)}`,
     `DESCRIPTION:${escapeText(event.description)}`,
     "END:VEVENT",
+  ];
+}
+
+export function icsFor(event: ClassEvent, now: Date = new Date()): string {
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RAENG Fitness//Classes//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", ...eventLines(event, now), "END:VCALENDAR"];
+  return lines.map(fold).join("\r\n") + "\r\n";
+}
+
+/**
+ * A subscribable calendar (2026-10-28): every event in one feed that Apple,
+ * Google and Outlook calendars re-read on their own, so a class that is
+ * booked or cancelled appears or goes without anyone adding it again. The
+ * UIDs match icsFor's, so a class added by hand and by feed is one event.
+ */
+export function icsFeed(events: readonly ClassEvent[], name: string, now: Date = new Date()): string {
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//RAENG Fitness//Classes//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:${escapeText(name)}`,
+    "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
+    "X-PUBLISHED-TTL:PT1H",
+    ...events.flatMap((e) => eventLines(e, now)),
     "END:VCALENDAR",
   ];
   return lines.map(fold).join("\r\n") + "\r\n";

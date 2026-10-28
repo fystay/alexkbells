@@ -3,7 +3,15 @@
  * pages have their own app header, menu and tab bar instead of the public
  * site's header and footer. Sign-in and confirm keep the site's.
  */
-export const MEMBERS_APP_PATHS = ["/account", "/account/book", "/account/plan"] as const;
+export const MEMBERS_APP_PATHS = [
+  "/account",
+  "/account/book",
+  "/account/plan",
+  "/account/profile",
+  "/account/security",
+  "/account/calendar-sync",
+  "/account/notifications",
+] as const;
 
 export type MembersView = "home" | "book" | "plan";
 

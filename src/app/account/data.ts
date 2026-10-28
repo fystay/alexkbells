@@ -1,6 +1,7 @@
 import { fullClasses } from "@/lib/class-capacity";
 import { londonToday } from "@/lib/coach/time";
 import { memberOverview } from "@/lib/member-auth";
+import { memberSettings } from "@/lib/member-settings";
 import { requireMember } from "@/lib/member-session";
 import { paymentDue } from "@/lib/membership-checkout";
 import { squareConfig } from "@/lib/square/config";
@@ -13,6 +14,11 @@ export const DONE: Record<string, string> = {
   cancelled_credit: "Cancelled. You have a class credit for another class within 4 weeks.",
   cancelled_paid_late: "Cancelled. It was less than 24 hours before the class, so there's nothing back.",
   booked_class_credit: "Booked with your class credit. Nothing to pay.",
+  profile_saved: "Saved. Your details are updated.",
+  reminders_on: "Class reminders are on. You'll get an email on the morning of each class you're booked on.",
+  reminders_off: "Class reminders are off.",
+  calendar_off: "Calendar link turned off. Calendars that used it stop updating.",
+  device_out: "That device is signed out.",
 };
 
 /** Why an action couldn't happen (?error=). Shown as an alert at the top. */
@@ -26,6 +32,9 @@ export const ERRORS: Record<string, string> = {
   period_unpaid: "Please pay for this period first. Its credits work as soon as Square confirms.",
   not_found: "That class couldn't be found. Please try again.",
   credit_invalid: "That class credit can't be used for that class. It may have been used, or the class is after it runs out.",
+  invalid_name: "Please enter your name (up to 100 characters).",
+  invalid_phone: "That phone number looks too long. Please check it (up to 30 characters).",
+  device_gone: "That device was already signed out.",
   failed: "Sorry, something went wrong. Please try again, or message Alex.",
 };
 
@@ -41,8 +50,10 @@ export async function loadMembers(searchParams: Promise<Params>) {
   const params = await searchParams;
   const now = new Date();
   const today = londonToday(now);
-  const [overview, full, due] = await Promise.all([
+  const [overview, settings, full, due] = await Promise.all([
     memberOverview(member.db, member.clientId),
+    // The account menu's "On" / "Connected"; the menu leaves them out if this can't be read.
+    memberSettings(member.db, member.clientId),
     fullClasses(today),
     // Members who pay online: this period's payment, if it's still to pay (credits wait for it).
     paymentDue(member.db, squareConfig(), member.clientId),
@@ -50,5 +61,5 @@ export async function loadMembers(searchParams: Promise<Params>) {
   const one = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : null);
   const done = one("done") ? (DONE[one("done")!] ?? null) : null;
   const error = one("error") ? (ERRORS[one("error")!] ?? ERRORS.failed) : null;
-  return { member, now, today, overview, full, due, done, error, justBooked: done ? one("at") : null, confirm: one("confirm") };
+  return { member, now, today, overview, settings: settings.ok ? settings.data : null, full, due, done, error, justBooked: done ? one("at") : null, confirm: one("confirm") };
 }

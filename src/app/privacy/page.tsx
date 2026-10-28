@@ -17,6 +17,8 @@ export const metadata: Metadata = pageMetadata({
 // with a retention period and contact email if he wants one).
 // 2026-10-28: accounts for everyone who has booked and paid (not only members),
 // and the sign-in cookie is site-wide so booking forms can fill in details.
+// 2026-10-28: account menu pages: device and browser kind per session, class
+// reminder choice, coded copy of the calendar link (Alex to confirm).
 const LAST_UPDATED = "28 October 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
@@ -52,8 +54,11 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         class or a membership, you have an account: you can sign in with your email to see your classes and
         credits, and we keep your name, email and phone so the booking form can fill them in next time. When
         you sign in, we keep a record of each sign-in: a coded copy of the sign-in link and of
-        your session, and when they were created, last used and ended. We don&apos;t record where you are or
-        what device you use. We don&apos;t ask about your health; please don&apos;t include medical details.
+        your session, and when they were created, last used and ended, with the kind of device and browser
+        (for example &quot;iPhone, Safari&quot;) so you can tell your devices apart and sign one out. Your
+        account records don&apos;t hold where you are or your IP address. If you turn on class reminders we keep that choice and note which
+        classes we&apos;ve reminded you of; if you make a calendar link we keep only a coded copy of it. We don&apos;t
+        ask about your health; please don&apos;t include medical details.
       </p>
     ),
   },
@@ -85,7 +90,8 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         Only as long as we need it to arrange and run your coaching, then we delete it. Sign-in links are
-        deleted after a day, and records of your sessions 30 days after you sign out or they expire.
+        deleted after a day, and records of your sessions 30 days after you sign out or they expire. Records of
+        reminders sent are deleted after 60 days.
       </p>
     ),
   },

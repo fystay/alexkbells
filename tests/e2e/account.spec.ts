@@ -184,6 +184,112 @@ test.describe("member accounts", () => {
     await expect(page.getByRole("status")).toContainText("expired or has already been used");
   });
 
+  test("the account menu's pages (2026-10-28): profile, notifications and reminders, calendar sync, devices", async ({ page, request }) => {
+    test.slow();
+    const email = `menu-${Date.now()}@example.com`;
+    await seedMember(request, email);
+    await askForLink(page, email);
+    await page.goto(PROD + linkPath((await emailsTo(request, email))[0]));
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/account$/);
+
+    // The menu: every item is a real page, with its real state.
+    await page.getByRole("button", { name: "Account menu" }).click();
+    const menu = page.locator("#account-menu");
+    await expect(menu.getByRole("link", { name: /^Profile and details/ })).toHaveAttribute("href", "/account/profile");
+    await expect(menu.getByRole("link", { name: /^Notifications\s*Off$/ })).toHaveAttribute("href", "/account/notifications");
+    await expect(menu.getByRole("link", { name: /^Calendar sync\s*Not connected$/ })).toHaveAttribute("href", "/account/calendar-sync");
+    await expect(menu.getByRole("link", { name: /^Sign-in and security/ })).toHaveAttribute("href", "/account/security");
+
+    // Profile: change the name; the greeting follows. The email can't be changed here.
+    await menu.getByRole("link", { name: /^Profile and details/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Your details." })).toBeVisible();
+    await expect(page.getByLabel("Email")).toHaveAttribute("readonly", "");
+    await page.getByLabel("Name").fill("  Sam   Tester ");
+    await page.getByLabel(/^Phone/).fill("07700 900456");
+    await page.getByRole("button", { name: "Save details" }).click();
+    await expect(page.getByRole("status")).toHaveText("Saved. Your details are updated.");
+    await expect(page.getByLabel("Name")).toHaveValue("Sam Tester");
+    await page.getByLabel("Name").fill("   ");
+    await page.getByRole("button", { name: "Save details" }).click();
+    await expect(page.getByText("Please enter your name (up to 100 characters).")).toBeVisible();
+    expect((await sql(request, "select full_name, phone from akb_clients where lower(email) = $1", [email]))[0]).toEqual({ full_name: "Sam Tester", phone: "07700 900456" });
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+    // A class today, a few hours from now (for the reminder and the calendar).
+    const [client] = await sql(request, "select id from akb_clients where lower(email) = $1", [email]);
+    await sql(request, "select akb_member_book_class($1, 'e2e-reminder', akb_london_today(), now() + interval '3 hours', 60)", [client.id]);
+
+    // Notifications: off until chosen; on, then the daily job sends one email, once.
+    await page.goto(`${PROD}/account/notifications`);
+    await expect(page.getByRole("heading", { level: 2, name: "Off" })).toBeVisible();
+    await page.getByRole("button", { name: "Turn reminders on" }).click();
+    await expect(page.getByRole("status")).toContainText("Class reminders are on.");
+    await expect(page.getByRole("heading", { level: 2, name: "On" })).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    const cron = { headers: { authorization: "Bearer e2e-cron-secret-0123456789" } };
+    expect((await request.get(`${PROD}/api/cron/class-reminders`)).status()).toBe(401);
+    const first = await (await request.get(`${PROD}/api/cron/class-reminders`, cron)).json();
+    expect(first.ok).toBe(true);
+    const reminders = (await emailsTo(request, email)).filter((e) => e.payload.subject.startsWith("Reminder:"));
+    expect(reminders).toHaveLength(1);
+    expect(reminders[0].payload.text).toContain("Hi Sam,");
+    expect(reminders[0].payload.text).toContain("/account/notifications");
+    await request.get(`${PROD}/api/cron/class-reminders`, cron);
+    expect((await emailsTo(request, email)).filter((e) => e.payload.subject.startsWith("Reminder:"))).toHaveLength(1);
+    await page.getByRole("button", { name: "Turn reminders off" }).click();
+    await expect(page.getByRole("status")).toHaveText("Class reminders are off.");
+
+    // Calendar sync: make the link (shown once), the feed has the class, a wrong link is a 404, turning off ends it.
+    await page.goto(`${PROD}/account/calendar-sync`);
+    await expect(page.getByText("Not connected.")).toBeVisible();
+    await page.getByRole("button", { name: "Make my calendar link" }).click();
+    const url = await page.getByLabel("Calendar link").inputValue();
+    expect(url).toMatch(/\/account\/calendar\/feed\/[A-Za-z0-9_-]{43}\.ics$/);
+    await expect(page.getByRole("link", { name: "Add to my calendar" })).toHaveAttribute("href", /^webcal:\/\//);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    const feedPath = new URL(url).pathname;
+    const feed = await request.get(PROD + feedPath);
+    expect(feed.headers()["content-type"]).toContain("text/calendar");
+    expect(feed.headers()["cache-control"]).toContain("no-store");
+    const body = await feed.text();
+    expect(body).toContain("X-WR-CALNAME:");
+    expect(body.match(/BEGIN:VEVENT/g)).toHaveLength(1);
+    expect((await request.get(`${PROD}/account/calendar/feed/${"A".repeat(43)}.ics`)).status()).toBe(404);
+    expect((await request.get(`${PROD}/account/calendar/feed/nope.ics`)).status()).toBe(404);
+    await page.goto(`${PROD}/account/calendar-sync`);
+    await expect(page.getByText("A calendar link is set up.")).toBeVisible();
+    await page.getByRole("button", { name: "Turn off calendar sync" }).click();
+    await expect(page.getByRole("status")).toContainText("Calendar link turned off.");
+    expect((await request.get(PROD + feedPath)).status()).toBe(404);
+
+    // Phone width: no sideways scroll on any of them, and the open menu stays on screen.
+    await page.setViewportSize({ width: 320, height: 640 });
+    for (const path of ["/account/profile", "/account/notifications", "/account/calendar-sync", "/account/security"]) {
+      await page.goto(PROD + path);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true);
+      await page.getByRole("button", { name: "Account menu" }).click();
+      const box = await page.locator("#account-menu").boundingBox();
+      expect(box && box.x >= 0 && box.x + box.width <= 320, `${path} menu`).toBe(true);
+      await page.keyboard.press("Escape");
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // Sign-in and security: this device, another one signed out from here, then every device.
+    await sql(request, "insert into akb_member_sessions (client_id, session_hash, expires_at, device) values ($1, $2, now() + interval '30 days', 'iPhone, Safari')", [client.id, "a".repeat(64)]);
+    await page.goto(`${PROD}/account/security`);
+    await expect(page.getByText(/\(this device\)/)).toBeVisible();
+    await expect(page.getByText("iPhone, Safari", { exact: true }).first()).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.getByRole("button", { name: /^Sign out iPhone, Safari/ }).click();
+    await expect(page.getByRole("status")).toHaveText("That device is signed out.");
+    await expect(page.getByText("iPhone, Safari", { exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "Sign out of every device" }).click();
+    await expect(page).toHaveURL(/\/account\/sign-in\?signed=out$/);
+    await page.goto(`${PROD}/account/profile`);
+    await expect(page).toHaveURL(/\/account\/sign-in$/);
+  });
+
   test("an address with no account gets the same answer and no email", async ({ page, request }) => {
     const email = `not-a-member-${Date.now()}@example.com`;
     await askForLink(page, email);

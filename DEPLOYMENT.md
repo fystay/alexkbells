@@ -174,6 +174,16 @@ Owner's decision (2026-10-28, "the standard gym flow"): the first paid booking m
 
 How it behaves: the booking confirmation email says the bookings are in their account; the account page lists their classes (paid ones cancel for a class credit 24 hours or more before, as the emailed link does), their class credits (book with one, nothing to pay), Book now, and what a membership would have saved them (from content prices and their own bookings). Signed in, the booking and join forms fill in name, email and phone (`/api/account/details`, own details only). The sign-in cookie is now site-wide (was `/account`); people signed in before keep their old cookie until it expires or they sign out.
 
+### Account menu settings (2026-10-28, built; not live)
+
+Profile and details, Notifications, Calendar sync and Sign-in and security, each a page opened from the avatar's menu.
+
+1. **Apply `supabase/migrations/20261031000000_akb_member_settings.sql`** after `20261030…` (with the owner's go-ahead): three tables (RLS on, no policies, `anon`/`authenticated` revoked), one column with a default (`akb_member_sessions.device`), eleven new functions and a replaced `akb_member_cleanup` (adds deleting reminder records after 60 days); no existing row changes; safe to run again. Check: `select has_table_privilege('authenticated','public.akb_member_calendar_feeds','select')` is false. Tests: `src/lib/coach/member-settings.test.ts` (real migrations on PGlite).
+2. **Class reminders need email on Production** (Resend, as for sign-in links) and `CRON_SECRET`. `/api/cron/class-reminders` runs daily at 07:41 UTC (vercel.json): each member who switched reminders on gets one email on the morning of a class they're booked on. A place is reminded once (`akb_class_reminders`); cancelled, held and cancelled-class places get nothing. Without the email settings it sends nothing and records nothing, so reminders start when email goes live; the Notifications page says so while it isn't.
+3. The calendar link is `<SITE_URL>/account/calendar/feed/<token>.ics` (from `SITE_URL`, else the production URL). The token is shown once; the database keeps only its SHA-256 hash. A new link replaces the old one; Turn off removes it. Calendar apps refresh it about hourly (Google Calendar can take longer).
+4. Devices: the sign-in records the kind of device and browser from the user agent (e.g. "iPhone, Safari"), never the IP address or the user agent itself.
+5. The email address isn't editable by members (it is their sign-in and how bookings find them); Alex changes it in the coach area.
+
 ### Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.
