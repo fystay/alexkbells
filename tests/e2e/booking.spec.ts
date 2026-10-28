@@ -309,6 +309,21 @@ test.describe("production configuration", () => {
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   });
 
+  test("a class chosen on the home page's tiles arrives with its next date and time chosen", async ({ page }) => {
+    await page.goto(`${PROD}/book/group-class?class=wed-evening`);
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+    await expect(page.getByText(/· Wednesday class/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue" })).toBeEnabled();
+    // It can still be changed: choosing another date in that month clears the time.
+    const days = classAvailability(timetable.sessions, toDateKey(new Date())).days;
+    const wed = days.find((d) => new Date(`${d.date}T12:00:00`).getDay() === 3)!;
+    const other = days.find((d) => d.date !== wed.date && d.date.slice(0, 7) === wed.date.slice(0, 7));
+    if (other) {
+      await pickDate(page, `${formatLongDate(other.date)}, available`);
+      await expect(page.getByRole("button", { name: "Continue" })).toBeDisabled();
+    }
+  });
+
   test("a group class request uses a real class date, is stored for the coach area and emailed", async ({ page, request }) => {
     await page.goto(`${PROD}/book/group-class`);
     await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();

@@ -6,8 +6,9 @@ import { getService } from "@/content/services";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { CoachIntro } from "@/components/home/CoachIntro";
 import { CoachStory } from "@/components/home/CoachStory";
-import { JoinSteps } from "@/components/home/JoinSteps";
-import { firstClassSteps } from "@/content/home";
+import { ClassPicker } from "@/components/home/ClassPicker";
+import { timetable } from "@/content/classes";
+import { isPublishable } from "@/lib/publish";
 import { Hero } from "@/components/home/Hero";
 import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
@@ -28,6 +29,12 @@ const payg = getService("group-classes").prices[0];
 // overrides Alex's earlier stated order: audits must not move these back.
 // Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
+const COUNT = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
+/** "Three classes a week." from the confirmed timetable. */
+function classesTitle(): string {
+  const n = isPublishable(timetable.status) ? timetable.sessions.length : 0;
+  return n > 0 && n < COUNT.length ? `${COUNT[n]} ${n === 1 ? "class" : "classes"} a week.` : "Classes.";
+}
 export default function HomePage() {
   return (
     <>
@@ -38,9 +45,9 @@ export default function HomePage() {
       <Testimonials />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
-          {/* A cleaner title (owner, 2026-10-26): the class count is in the rows of step 1. */}
-          <SectionHeading id="classes-heading" className="lg:col-span-5" eyebrow="Classes" title={firstClassSteps.title} />
-          <JoinSteps swipe className="mt-8 lg:col-span-7 lg:mt-0" />
+          {/* Day tiles, chosen then booked (owner's pick A, 2026-10-28); the count comes from the timetable. */}
+          <SectionHeading id="classes-heading" className="lg:col-span-5" eyebrow="Classes" title={classesTitle()} />
+          <ClassPicker className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
       <Section id="memberships" labelledBy="memberships-heading">

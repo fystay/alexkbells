@@ -480,16 +480,11 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   // A face early, without moving "About me" up: the "Coached by" line under the hero jumps to his story.
   const intro = page.getByRole("region", { name: "Your coach" });
   await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
-  // Where the classes are sits with the times, not at the end.
-  await expect(page.locator("#classes").locator("address")).toContainText("Cumbernauld");
-  await expect(page.locator("#classes").getByRole("link", { name: /Get directions/ })).toBeVisible();
-  // Start in three steps, every answer still there, then Book now.
+  // The classes as day tiles (owner's pick A, 2026-10-28): price, level and venue in one line.
   const classes = page.locator("#classes");
-  for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(classes.getByRole("heading", { level: 3, name: step })).toBeVisible();
+  await expect(classes).toContainText("£12 a class");
+  await expect(classes).toContainText("Media House");
   await expect(classes).toContainText("New? Say so when you book.");
-  await expect(classes).toContainText("goals and any injuries");
-  await expect(classes).toContainText("Flat shoes or bare feet work best");
-  await expect(classes.getByRole("link", { name: "Book now" })).toBeVisible();
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   await expect(more.getByRole("link", { name: /Online coaching/ })).toHaveAttribute("href", "/online-coaching");
@@ -744,20 +739,26 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the classes start in three steps, the first with the week's times as rows", async ({ page }) => {
+test("home: the classes are day tiles; choose one, then Book now opens the calendar on that class", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const facts = page.getByRole("region", { name: "Start in three steps." });
-  await expect(facts.getByRole("heading", { level: 2 })).toHaveText("Start in three steps.");
-  const rows = facts.getByRole("list", { name: "Class times" }).locator("> li");
-  await expect(rows).toHaveCount(3);
-  await expect(rows.nth(0)).toContainText("Monday");
-  await expect(rows.nth(0)).toContainText("6:30 pm");
-  await expect(rows.nth(2)).toContainText("Saturday");
-  await expect(rows.nth(2)).toContainText("9:00 am");
-  // The date is chosen in the calendar, so the rows aren't choices.
-  await expect(facts.getByRole("radio")).toHaveCount(0);
-  await expect(facts).toContainText("60 minutes. All levels, scaled to you.");
-  await expect(facts).toContainText("£12 a class, or save with a membership.");
+  const section = page.getByRole("region", { name: "Three classes a week." });
+  const tiles = section.getByRole("list", { name: "Class times" }).locator("> li");
+  await expect(tiles).toHaveCount(3);
+  await expect(tiles.nth(0)).toContainText("Mon");
+  await expect(tiles.nth(0)).toContainText("6:30");
+  await expect(tiles.nth(2)).toContainText("Sat");
+  await expect(tiles.nth(2)).toContainText("9:00");
+  // Nothing chosen yet: the prompt, not the button.
+  await expect(section.getByRole("link", { name: "Book now" })).toHaveCount(0);
+  await expect(section).toContainText("Tap a day to choose it.");
+  await tiles.nth(1).click();
+  await expect(section.getByRole("radio", { name: "Wednesday 6:30 pm" })).toBeChecked();
+  // The button always reads Book now (owner rule); the chosen class is said under it.
+  const book = section.getByRole("link", { name: "Book now" });
+  await expect(book).toHaveAttribute("href", "/book/group-class?class=wed-evening");
+  await expect(section).toContainText("Wednesday 6:30 pm class selected.");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
 
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
@@ -835,7 +836,6 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(payg.getByRole("radio", { name: /^Pay as you go/ })).toHaveCount(1);
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
-  await expect(page.locator("main").getByText("9:00 am", { exact: true })).toHaveCount(1);
   await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toBeVisible();
   // Ready to start? opens the booking flow at step 1, choosing the service (owner, 2026-10-27).
   await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
@@ -846,7 +846,8 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   for (const text of ["8 class credits · £8.13 per class", "Save £31"]) await expect(regular).toContainText(text);
   await expect(page.locator("#memberships").getByRole("heading", { name: "Membership rules" })).toBeVisible();
   // Each fact once: the days only in the timetable, Instagram only in Meet your coach.
-  await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(1);
+  await expect(page.locator("main").getByText("Sat", { exact: true })).toHaveCount(1);
+  await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(0);
   await expect(page.locator("#book").getByRole("link", { name: /Instagram/ })).toHaveCount(0);
   // No sticky Book now bar: the header's Book now is always on screen.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);

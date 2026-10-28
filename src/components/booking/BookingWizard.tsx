@@ -21,7 +21,7 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { cn } from "@/lib/cn";
-import { useChosenPlan } from "@/lib/chosen-plan";
+import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
 import {
   ActionBar,
   ChoiceGroup,
@@ -141,8 +141,18 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
   // Demo availability
   const today = useSyncExternalStore(subscribe, getToday, getServerToday);
   const [loaded, setLoaded] = useState<{ key: string; window: AvailabilityWindow } | null>(null);
-  const [date, setDate] = useState<DateKey | null>(null);
-  const [slotId, setSlotId] = useState<string | null>(null);
+  const [pickedDate, setPickedDate] = useState<DateKey | null>(null);
+  const [pickedSlot, setPickedSlot] = useState<string | null>(null);
+  // Once the visitor picks (or changes service), the class from the address no longer applies.
+  const [picked, setPicked] = useState(false);
+  const setDate = (d: DateKey | null) => {
+    setPicked(true);
+    setPickedDate(d);
+  };
+  const setSlotId = (id: string | null) => {
+    setPicked(true);
+    setPickedSlot(id);
+  };
   // Request preferences
   const [days, setDays] = useState<string[]>([]);
   const [times, setTimes] = useState<string[]>([]);
@@ -168,6 +178,22 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
     : usesSessions && today
       ? classAvailability(classes, today, fullSet, cancelledSet)
       : null;
+  // A class chosen on the home page's day tiles (?class=<timetable id>, owner 2026-10-28):
+  // its next bookable date and time arrive already chosen, until the visitor picks another.
+  const classParam = useQueryParam("class");
+  const fromLink = (() => {
+    if (picked || !classParam || !usesSessions || !avail) return null;
+    const cls = classes.find((c) => c.id === classParam);
+    if (!cls) return null;
+    for (const d of avail.days) {
+      if (WEEKDAY_NAMES[weekdayIndex(d.date)] !== cls.day) continue;
+      const slot = d.slots.find((s) => s.time === cls.start && s.available);
+      if (slot) return { date: d.date, slotId: slot.id };
+    }
+    return null;
+  })();
+  const date = picked ? pickedDate : (fromLink?.date ?? pickedDate);
+  const slotId = picked ? pickedSlot : (fromLink?.slotId ?? pickedSlot);
   const chosenSlot = avail?.days.find((d) => d.date === date)?.slots.find((s) => s.id === slotId && s.available) ?? null;
   const chosenClass =
     usesSessions && date && chosenSlot
@@ -175,6 +201,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
       : null;
 
   const done = demo ? demoDone : serverState.status === "success";
+
   // Booked and paid online, not requested: group classes without a membership plan.
   const payNow = Boolean(pay) && usesSessions && !chosenPlan;
   const linkCredit = useSyncExternalStore(subscribe, getCredit, getServerToday);
