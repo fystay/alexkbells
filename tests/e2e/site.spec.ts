@@ -377,9 +377,10 @@ for (const [server, base] of [
 
   test(`${server}: booking CTAs reach the right service, with Instagram as the labelled alternative`, async ({ page }) => {
     await page.goto(base + "/classes");
-    const join = page.locator("#times");
-    // The home page's class times, ending in Book now on the chosen class (2026-10-28).
-    await expect(join.getByRole("link", { name: "Book now" })).toHaveAttribute("href", /^\/book\/group-class(\?class=[a-z-]+)?$/);
+    const join = page.locator("#join");
+    // The three steps, then Book now (owner's design, 2026-10-28).
+    for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { name: step })).toBeVisible();
+    await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await expect(page.locator("#main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
     await expect(join.getByRole("link", { name: /Message Alex on Instagram/ })).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
 
@@ -667,18 +668,25 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("/classes has the home page's class times, then the first class (owner, 2026-10-28)", async ({ page }) => {
+test("/classes: what the classes build, then how to join in three steps (owner's design, 2026-10-28)", async ({ page }) => {
   await page.goto("/classes");
-  const times = page.locator("#times");
-  await expect(times.getByRole("heading", { level: 2 })).toHaveText("Three classes a week.");
-  await expect(times.getByRole("list", { name: "Class times" }).getByRole("button")).toHaveCount(3);
-  await expect(times.getByRole("button", { pressed: true })).toHaveCount(1);
-  await expect(times.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
-  await expect(times.getByRole("link", { name: "Book now" })).toBeVisible();
-  await expect(times).toContainText("Your first class");
-  await expect(times).toContainText("Kettlebells provided.");
-  await page.getByRole("link", { name: "Class times" }).click();
-  await expect(page).toHaveURL(/#times$/);
+  const focus = page.locator("section[aria-labelledby=focus-heading]");
+  for (const word of ["Strength", "Conditioning", "Movement quality"]) await expect(focus).toContainText(word);
+  const join = page.locator("#join");
+  await expect(join.getByRole("heading", { level: 2 })).toHaveText("Start in three steps.");
+  for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { level: 3, name: step })).toBeVisible();
+  const week = join.getByRole("list", { name: "Class days and times" });
+  for (const time of ["Monday 6:30 pm", "Wednesday 6:30 pm", "Saturday 9:00 am"]) await expect(week).toContainText(time);
+  await expect(join).toContainText("£12");
+  await expect(join.getByRole("link", { name: "membership" })).toHaveAttribute("href", "/memberships");
+  await expect(join.getByRole("list", { name: "How to pay" }).getByRole("listitem")).not.toHaveCount(0);
+  await expect(join.locator("address")).toContainText("1A Dunns Wood Road");
+  await expect(join.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+  await expect(join.getByRole("list", { name: "What to bring" }).getByRole("listitem")).toHaveCount(4);
+  await expect(join).toContainText("Kettlebells are provided.");
+  await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await page.getByRole("link", { name: "How to join" }).click();
+  await expect(page).toHaveURL(/#join$/);
 });
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {

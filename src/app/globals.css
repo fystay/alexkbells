@@ -206,6 +206,33 @@
   }
 }
 
+/*
+ * Line drawings (owner's classes design, 2026-10-28): thin ink strokes with
+ * pathLength="1", drawn in as their data-reveal block scrolls into view.
+ * Without the reveal (reduced motion, no script) they are simply drawn.
+ */
+.ln {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.ln-faint {
+  stroke: var(--color-line);
+  stroke-width: 1.4;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-reveal-ready] [data-reveal] .ln {
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.6, 0, 0.2, 1) calc(var(--reveal-delay, 0ms) + 150ms);
+  }
+  html[data-reveal-ready] [data-reveal]:not([data-revealed]) .ln {
+    stroke-dashoffset: 1;
+  }
+}
+
 /* Opening curtain (lib/reveal.ts INTRO_SCRIPT): first visit only. The logo is
    the supplied black artwork on the cream page colour (never recoloured). */
 .intro {

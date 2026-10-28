@@ -25,6 +25,8 @@ export const groupClass = {
   description:
     "A 60-minute kettlebell training session designed to build strength, conditioning and movement quality. Suitable for all experience levels, with exercises scaled to your ability.",
   payment: "Pay by bank transfer or cash.",
+  /** The same, as the short labels on /classes. */
+  paymentMethods: ["Bank transfer", "Cash"],
 } as const;
 
 /**
@@ -37,6 +39,7 @@ export const groupClass = {
  */
 export const onlineClassBooking = {
   payment: "Pay online when you book.",
+  paymentMethods: ["Pay online when you book"],
   hold: "Your place is held for 15 minutes while you pay.",
   cancel:
     "Cancel 24 hours or more before and you get a credit for another class within 4 weeks. Later than that, or not turning up, the class is used.",

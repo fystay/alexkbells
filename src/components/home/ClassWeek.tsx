@@ -72,7 +72,6 @@ export function ClassWeek({
   address,
   mapsHref,
   beginners,
-  membershipsHref,
 }: {
   classes: WeekClass[];
   facts: string[];
@@ -84,8 +83,6 @@ export function ClassWeek({
   address: { venue: string; lines: string[]; postcode: string };
   mapsHref: string;
   beginners: string | null;
-  /** "#memberships" on home (the plans follow), "/memberships" elsewhere. */
-  membershipsHref: string;
 }) {
   const tick = useSyncExternalStore(subscribe, getTick, getServerTick);
   const [choice, setChoice] = useState<number | null>(null);
@@ -214,7 +211,7 @@ export function ClassWeek({
         </p>
         <p className="mt-2">
           {beginners ? `${beginners} ` : null}
-          <Link href={membershipsHref} className="font-semibold underline underline-offset-4 hover:no-underline">
+          <Link href="#memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
             Save with a membership
           </Link>
         </p>

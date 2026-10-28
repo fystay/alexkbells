@@ -27,8 +27,13 @@ export const whyKettlebells = [
  * only while its FAQ answer is confirmed. Keep them in step with faq.ts.
  */
 export const firstClassSteps = {
+  title: "Start in three steps.",
   // The first session says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
   beginners: "New? Say so when you book.",
   firstSession: "Alex asks about your goals and any injuries, teaches the key movements and gets your technique solid before you go heavier.",
   bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Flat shoes or bare feet work best.",
+  // The same answers, short, for /classes (owner's classes design, 2026-10-28).
+  scaled: "Every movement is scaled to you.",
+  bringItems: ["Comfy clothes", "Water", "Small towel", "Flat shoes or bare feet"],
+  provided: "Kettlebells are provided.",
 } as const;
