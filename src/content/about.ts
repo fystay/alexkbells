@@ -49,7 +49,10 @@ export const philosophy = {
     { word: "drive", line: "The reason you still turn up on the hard days." },
   ],
   title: "More than strength.",
+  /** Word for word from RAENG's philosophy card (owner, 2026-10-28). */
   paragraphs: [
-    "To us it is a mindset as much as a physical quality. Real strength comes from discipline, consistency and continuing to show up. Kettlebells are the tool. The aim is stronger people, a stronger community and a stronger version of yourself, in and out of the gym.",
+    "In Thai, แรง (Raeng) represents strength, power, energy and drive. It’s more than just physical strength, it’s a mindset.",
+    "RAENG is built on the belief that real strength comes from discipline, consistency and the willingness to keep showing up. Kettlebell training is the tool, but the purpose is bigger.",
+    "To build stronger people, a stronger community and a stronger version of ourselves, inside and outside the gym.",
   ],
 };
