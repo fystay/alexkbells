@@ -21,17 +21,13 @@ export const whyKettlebells = [
 ] as const;
 
 /**
- * "Start in three steps." on the home page's classes section (option 1 of the card
- * overhaul, owner 2026-10-26). The step lines restate the confirmed FAQ
- * answers (content/faq.ts) more tightly; each shows only while its FAQ
- * answer is confirmed. Keep them in step with faq.ts.
+ * Class lines (owner 2026-10-26): the beginners note under the home page's
+ * class times, and the first session and what to bring on /classes. They
+ * restate the confirmed FAQ answers (content/faq.ts) more tightly; each shows
+ * only while its FAQ answer is confirmed. Keep them in step with faq.ts.
  */
 export const firstClassSteps = {
-  title: "Start in three steps.",
-  pick: "Pick a class",
-  book: "Book your place",
-  turnUp: "Turn up and train",
-  // Step 3 says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
+  // The first session says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
   beginners: "New? Say so when you book.",
   firstSession: "Alex asks about your goals and any injuries, teaches the key movements and gets your technique solid before you go heavier.",
   bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Flat shoes or bare feet work best.",

@@ -377,10 +377,9 @@ for (const [server, base] of [
 
   test(`${server}: booking CTAs reach the right service, with Instagram as the labelled alternative`, async ({ page }) => {
     await page.goto(base + "/classes");
-    const join = page.locator("#join");
-    // The home page's three steps, ending in Book now (2026-10-26).
-    for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { name: step })).toBeVisible();
-    await expect(join.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+    const join = page.locator("#times");
+    // The home page's class times, ending in Book now on the chosen class (2026-10-28).
+    await expect(join.getByRole("link", { name: "Book now" })).toHaveAttribute("href", /^\/book\/group-class(\?class=[a-z-]+)?$/);
     await expect(page.locator("#main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
     await expect(join.getByRole("link", { name: /Message Alex on Instagram/ })).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
 
@@ -668,12 +667,18 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("class pages link to the how-to-join section", async ({ page }) => {
+test("/classes has the home page's class times, then the first class (owner, 2026-10-28)", async ({ page }) => {
   await page.goto("/classes");
-  await expect(page.locator("#join")).toHaveCount(1);
-  await expect(page.locator("#join ol > li")).toHaveCount(3);
-  await page.getByRole("link", { name: "How to join" }).click();
-  await expect(page).toHaveURL(/#join$/);
+  const times = page.locator("#times");
+  await expect(times.getByRole("heading", { level: 2 })).toHaveText("Three classes a week.");
+  await expect(times.getByRole("list", { name: "Class times" }).getByRole("button")).toHaveCount(3);
+  await expect(times.getByRole("button", { pressed: true })).toHaveCount(1);
+  await expect(times.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+  await expect(times.getByRole("link", { name: "Book now" })).toBeVisible();
+  await expect(times).toContainText("Your first class");
+  await expect(times).toContainText("Kettlebells provided.");
+  await page.getByRole("link", { name: "Class times" }).click();
+  await expect(page).toHaveURL(/#times$/);
 });
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {

@@ -9,13 +9,20 @@ import { formatTime, sortSessions } from "@/lib/schedule";
 import { ClassWeek, type WeekClass } from "./ClassWeek";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const COUNT = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
+
+/** "Three classes a week." from the confirmed timetable (home and /classes). */
+export function classesTitle(): string {
+  const n = isPublishable(timetable.status) ? timetable.sessions.length : 0;
+  return n > 0 && n < COUNT.length ? `${COUNT[n]} ${n === 1 ? "class" : "classes"} a week.` : "Classes.";
+}
 
 /**
  * The home page's classes (owner's design, 2026-10-28; see ClassWeek): every
  * figure from content. Book now opens the calendar on the chosen class
  * (`/book/group-class?class=<timetable id>`) where booking is on.
  */
-export function ClassPicker({ className }: { className?: string }) {
+export function ClassPicker({ className, membershipsHref = "#memberships" }: { className?: string; membershipsHref?: string }) {
   const sessions = isPublishable(timetable.status) ? sortSessions(timetable.sessions) : [];
   if (sessions.length === 0) return null;
   const cta = getPrimaryCtaFor("group-class");
@@ -39,6 +46,7 @@ export function ClassPicker({ className }: { className?: string }) {
         classHrefBase={bookable ? `${cta.href}?class=` : null}
         address={{ venue: l.venue, lines: [l.street, `${l.town}, ${l.city}`], postcode: l.postcode }}
         mapsHref={mapsUrl()}
+        membershipsHref={membershipsHref}
         beginners={beginners && isPublishable(beginners.status) ? firstClassSteps.beginners : null}
       />
     </div>
