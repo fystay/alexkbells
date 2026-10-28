@@ -210,13 +210,16 @@ test("the contact page leads to Alex's Instagram", async ({ page }) => {
   }
 });
 
-test("contact links straight to Alex's Instagram profile, once beside the header button", async ({ page }) => {
+test("contact: every way in, in one card, Book now first (owner's pick D, 2026-10-28)", async ({ page }) => {
   await page.goto("/contact");
-  const handle = page.locator("#enquire").getByRole("link", { name: /@alex\.kbells on Instagram/i });
-  await expect(handle).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
-  await expect(handle).toHaveAttribute("target", "_blank");
-  // No second "Follow" button repeating it (2026-10-26).
-  await expect(page.locator("#enquire").getByRole("link", { name: /follow/i })).toHaveCount(0);
+  const ways = page.locator("#ways > li");
+  await expect(ways.first()).toContainText("Book a class or 1:1");
+  await expect(ways.first().getByRole("link", { name: "Book now" })).toBeVisible();
+  await expect(page.locator("#ways")).toContainText("@alex.kbells");
+  await expect(page.locator("#ways").getByRole("link", { name: /Directions to Media House/ })).toHaveAttribute("href", /google\.com\/maps/);
+  await expect(page.locator("#ways")).toContainText("1A Dunns Wood Road");
+  // No "Follow" button repeating Instagram (2026-10-26).
+  await expect(page.locator("main").getByRole("link", { name: /follow/i })).toHaveCount(0);
 });
 
 test("header: menu at the left, logo centred, Book Now at the right, none overlapping", async ({ page }) => {
