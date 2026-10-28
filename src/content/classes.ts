@@ -25,6 +25,8 @@ export const groupClass = {
   description:
     "A 60-minute kettlebell training session designed to build strength, conditioning and movement quality. Suitable for all experience levels, with exercises scaled to your ability.",
   payment: "Pay by bank transfer or cash.",
+  /** Shown with the length on the chosen class in the booking form (owner, 2026-10-28; the description says the same). */
+  level: "All levels",
   /** The same, as the short labels on /classes. */
   paymentMethods: ["Bank transfer", "Cash"],
 } as const;

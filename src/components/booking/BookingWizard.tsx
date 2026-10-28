@@ -74,8 +74,8 @@ export interface ClassInfo {
   name: string;
   description: string;
   payment: string;
-  /** e.g. "£10 per person"; empty when no price can be published. */
-  price: string;
+  /** e.g. "All levels"; shown in place of the price (owner, 2026-10-28). */
+  level: string;
 }
 
 /** Each step's #hash in the address bar, so browser Back moves between steps. */
@@ -675,7 +675,7 @@ function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey;
         {info.name} · {session.day} class
       </p>
       <p className="mt-1 text-sm font-semibold">
-        {[minutes ? `${minutes === 60 ? "1 hr" : `${minutes} min`}` : "", info.price, "with Alex"].filter(Boolean).join(" · ")}
+        {[minutes ? `${minutes === 60 ? "1 hr" : `${minutes} min`}` : "", info.level, "with Alex"].filter(Boolean).join(" · ")}
       </p>
       <p className="mt-3 max-w-xl text-muted">{info.description}</p>
     </div>
