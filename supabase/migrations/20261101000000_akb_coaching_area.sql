@@ -392,6 +392,29 @@ returns void language sql set search_path = public as $$
   update public.akb_coaching_messages set read_at = now() where subscription_id = p_subscription and from_client and read_at is null;
 $$;
 
+-- The coach's inbox for coaching: check-ins still to answer, and the latest
+-- unread message from each client with one. Active plans only.
+create or replace function public.akb_coaching_inbox()
+returns jsonb language sql stable set search_path = public as $$
+  select coalesce(jsonb_agg(x.item order by x.at desc), '[]'::jsonb)
+  from (
+    select c.created_at as at, jsonb_build_object(
+      'kind', 'check_in', 'subscription_id', c.subscription_id, 'name', cl.full_name, 'at', c.created_at,
+      'detail', concat('Week ', coalesce(c.programme_week::text, '-'), '. Energy ', c.energy, ', sleep ', c.sleep, ', training ', c.training,
+                       case when c.struggles <> '' then '. ' || c.struggles else '' end)) as item
+    from public.akb_coaching_check_ins c
+    join public.akb_subscriptions s on s.id = c.subscription_id and s.status = 'active'
+    join public.akb_clients cl on cl.id = s.client_id
+    where c.coach_reply is null
+    union all
+    select m.created_at as at, jsonb_build_object(
+      'kind', 'message', 'subscription_id', m.subscription_id, 'name', cl.full_name, 'at', m.created_at, 'detail', left(m.body, 200)) as item
+    from (select distinct on (subscription_id) * from public.akb_coaching_messages where from_client and read_at is null order by subscription_id, id desc) m
+    join public.akb_subscriptions s on s.id = m.subscription_id and s.status = 'active'
+    join public.akb_clients cl on cl.id = s.client_id
+  ) x;
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Access: server only, like every other akb_ table and function
 -- ---------------------------------------------------------------------------
@@ -406,7 +429,7 @@ begin
       'akb_coaching_subscription', 'akb_coaching_week', 'akb_can_sign_in', 'akb_coaching_status', 'akb_coaching_overview_sub',
       'akb_coaching_overview', 'akb_coaching_log_session', 'akb_coaching_submit_check_in', 'akb_coaching_send_message',
       'akb_coaching_mark_read', 'akb_coaching_save_programme', 'akb_coaching_reply_check_in', 'akb_coaching_coach_message',
-      'akb_coaching_unread_for_coach', 'akb_coaching_coach_read')
+      'akb_coaching_unread_for_coach', 'akb_coaching_coach_read', 'akb_coaching_inbox')
   loop
     execute format('revoke all on function %s from public, anon, authenticated', f.sig);
     execute format('grant execute on function %s to service_role', f.sig);

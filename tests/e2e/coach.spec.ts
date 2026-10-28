@@ -55,6 +55,8 @@ test("the coach signs in, stays signed in after the access token expires, and si
   await page.goto("/coach");
   await expect(page.getByText(`Signed in as ${coach.email}`)).toBeVisible();
 
+  // Sign out is in the account menu (the avatar), as in the owner's coach design.
+  await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/coach\/login$/);
   await page.goto("/coach");

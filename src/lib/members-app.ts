@@ -27,5 +27,9 @@ export const MEMBERS_VIEW_PATH: Record<MembersView, string> = {
 };
 
 export function isMembersApp(pathname: string | null): boolean {
-  return pathname !== null && (MEMBERS_APP_PATHS as readonly string[]).includes(pathname.replace(/\/$/, "") || "/");
+  if (pathname === null) return false;
+  const path = pathname.replace(/\/$/, "") || "/";
+  // The coach portal (owner's coach design, 2026-10-28) has the same kind of frame; its login page keeps the site's.
+  if (path === "/coach" || (path.startsWith("/coach/") && path !== "/coach/login")) return true;
+  return (MEMBERS_APP_PATHS as readonly string[]).includes(path);
 }
