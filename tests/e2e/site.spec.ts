@@ -483,7 +483,8 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   // The classes as day tiles (owner's pick A, 2026-10-28): price, level and venue in one line.
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
-  await expect(classes).toContainText("Media House");
+  await expect(classes.locator("address")).toContainText("1A Dunns Wood Road");
+  await expect(classes.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(classes).toContainText("New? Say so when you book.");
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");

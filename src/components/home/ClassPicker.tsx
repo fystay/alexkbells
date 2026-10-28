@@ -3,7 +3,7 @@ import { timetable } from "@/content/classes";
 import { faq } from "@/content/faq";
 import { firstClassSteps, hero } from "@/content/home";
 import { getService } from "@/content/services";
-import { site } from "@/content/site";
+import { formatAddressLines, mapsUrl } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { isPublishable, publishable } from "@/lib/publish";
 import { formatTime, sortSessions } from "@/lib/schedule";
@@ -36,7 +36,9 @@ export function ClassPicker({ className }: { className?: string }) {
     next: "Next, check the date and add your details.",
     external: cta.external,
   }));
-  const facts = [price ? `£${price.amountGbp} a class` : null, "All levels", site.location.venue].filter(Boolean);
+  // The venue was too little on its own (owner, 2026-10-28): length in the facts, the full address with directions under them.
+  const minutes = sessions[0]?.durationMinutes;
+  const facts = [price ? `£${price.amountGbp} a class` : null, minutes ? `${minutes} minutes` : null, "All levels"].filter(Boolean);
   return (
     <div className={className}>
       <ChoiceCards name="class" legend="Choose a class" choices={choices} prompt="Tap a day to choose it.">
@@ -53,11 +55,17 @@ export function ClassPicker({ className }: { className?: string }) {
             );
           })}
         </ul>
-        <p className="mt-5 flex justify-between gap-3 border-y border-line py-3 text-sm sm:text-[0.9375rem]">
+        <p className="mt-5 flex justify-between gap-3 border-t border-line pt-3 text-sm sm:text-[0.9375rem]">
           {facts.map((f) => (
             <span key={f}>{f}</span>
           ))}
         </p>
+        <div className="mt-3 flex items-start justify-between gap-4 border-b border-line pb-3 text-sm sm:text-[0.9375rem]">
+          <address className="not-italic">{formatAddressLines().join(", ")}</address>
+          <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className="-my-3 inline-flex min-h-11 shrink-0 items-center font-semibold underline underline-offset-4 hover:no-underline">
+            Directions<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </div>
       </ChoiceCards>
       <p className="mt-1 text-[0.9375rem] lg:text-base">
         {beginners && isPublishable(beginners.status) ? `${firstClassSteps.beginners} ` : null}
