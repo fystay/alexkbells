@@ -125,7 +125,7 @@ See Coach portal below.
 
 ### To do
 - [x] Migration applied to Supabase 2026-10-18 (all but three functions; DEPLOYMENT.md → Coach portal)
-- [ ] **P0** Apply `20261020000000_akb_payment_functions.sql` (the three still-missing functions; awaiting approval) (DEPLOYMENT.md → Coach portal)
+- [x] Applied `20261020000000_akb_payment_functions.sql` (2026-10-28) (DEPLOYMENT.md → Coach portal)
 - [x] Public sign-ups off in Supabase (verified 2026-10-20)
 - [ ] **P0** Turn on leaked-password protection (Auth → Providers → Email; affects the shared project's other app too); change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
 - [x] Email alerts to Alex: outcome recorded per request, one immediate retry, daily cron retry inside the provider's idempotency window, shown in the portal (2026-10-20, code only)
@@ -165,7 +165,8 @@ See Coach portal below.
 - [x] Join and pay online with no confirmation by Alex (2026-10-26): Square checkout, membership starts on the verified payment, first class booked then, renewal pay links, credits wait for payment; tested (SQL, unit, e2e with a Square stand-in)
 - [x] Book and pay for a group class online (2026-10-27): 15-minute hold, confirmed on Square's verified payment, private link to cancel, 24 h → class credit for 4 weeks; 1:1 stays a request; tested (SQL, unit, e2e with the Square stand-in)
 - [ ] Alex to confirm the class credit wording ("Cancel 24 hours or more before and you get a credit for another class within 4 weeks…")
-- [ ] Go live with online joining and class booking: apply migrations 20261020 → 20261030, Square Sandbox test then live, Resend, SITE_URL (DEPLOYMENT.md)
+- [x] Migrations 20261020 → 20261030 applied to the live database (2026-10-28)
+- [ ] Go live with online joining and class booking: Square Sandbox test then live, Resend, SITE_URL (DEPLOYMENT.md)
 - [ ] Alex to confirm: wording of the renewal email ("To stop your membership, reply to this email") and whether unpaid renewals should pause a membership automatically
 - [x] Restyle /classes, /memberships, /coaching, /online-coaching, /about and /contact to the home system: no cards, nothing repeated, shorter (2026-10-26); hero wording A "Get stronger. / Kettlebell classes in Cumbernauld"
 - [ ] P2 Hero film: muted colour grade (recommended 2026-10-24, not yet done)
@@ -176,7 +177,7 @@ See Coach portal below.
 - [x] Owner decided (2026-10-24): **manual membership billing for now**. Each four-week period's charge is owed in the portal; Alex records the payment or sends a Square payment link. Nothing charges a card automatically
 - [ ] P3 Later, if wanted: Square Subscriptions for automatic card billing (needs the plan in Square and the API checked against current docs)
 - [x] Coach cancels a whole class (2026-10-24, `20261024000000_akb_cancel_class.sql`): every place cancelled in one step, members' credits back whatever the time, unpaid class charges cancelled, no one can be booked onto it again, and the booking calendar stops offering it
-- [ ] P0 Apply `20261024000000_akb_cancel_class.sql` to the live database (no deletes; the MCP confirmation timed out on 2026-10-24). Until then "Cancel class" says the tables aren't set up, and the public calendar marks nothing full or cancelled
+- [x] Applied `20261024000000_akb_cancel_class.sql` to the live database (2026-10-28)
 - [x] Member requests confirmed on a credit: the confirm form ticks "Pay with their membership credit" when their period covers the class (no £12 charge) (2026-10-24)
 - [x] Client record: Membership tab (plan, credits left, renewal) (2026-10-24)
 - [x] Dashboard: "No credits left" for members who have used every credit this period; renewals caught up on every visit to the dashboard or Memberships, so they still happen without `CRON_SECRET` (2026-10-24)
@@ -214,7 +215,7 @@ See Coach portal below.
 - [ ] **P2** Alex's layout references (ChatGPT images, 21 Oct) and his 25 Oct voice note weren't in the chat export: compare once received
 - [x] Membership join flow (`/memberships/join`, 2026-10-26): plan → optional first class → details → terms agreed → request to Alex; nothing paid online
 - [x] Member accounts built (2026-10-26, owner approved the recommended choices): `/account/sign-in`, `/account/confirm`, `/account`; migration `20261027000000_akb_member_accounts.sql`; privacy notice updated; tests (SQL on Postgres 16, unit, e2e)
-- [ ] **P0, needs the owner** Go-ahead to apply `20261024000000_akb_cancel_class.sql` then `20261027000000_akb_member_accounts.sql` to the live database (DEPLOYMENT.md → Member accounts)
+- [x] Applied `20261024000000_akb_cancel_class.sql` and `20261027000000_akb_member_accounts.sql` to the live database (2026-10-28) (DEPLOYMENT.md → Member accounts)
 - [ ] **P0, needs Alex** Resend in production (also turns on booking alerts); without it members can't get sign-in links
 - [ ] **P1, needs Alex** Confirm the privacy wording; a retention period and a contact email if he wants one listed
 - [ ] **P2** A "Sign out everywhere" button for a member in the coach area (today: `select akb_member_end_sessions('<client id>')`)
