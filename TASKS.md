@@ -215,6 +215,12 @@ See Coach portal below.
 - [ ] **P2** Alex's layout references (ChatGPT images, 21 Oct) and his 25 Oct voice note weren't in the chat export: compare once received
 - [x] Membership join flow (`/memberships/join`, 2026-10-26): plan → optional first class → details → terms agreed → request to Alex; nothing paid online
 - [x] Member accounts built (2026-10-26, owner approved the recommended choices): `/account/sign-in`, `/account/confirm`, `/account`; migration `20261027000000_akb_member_accounts.sql`; privacy notice updated; tests (SQL on Postgres 16, unit, e2e)
+- [x] Account page polish (2026-10-28): next class card with Add to calendar / Google Calendar / Directions, credits meter, Cancel asks first, booking rows grouped by week, "Just booked" highlight, status message cleared from the address
+- [ ] **P1** Sign-in code in the email alongside the link (iPhone mail apps open links in their own browser, so the member is signed in there, not in Safari)
+- [ ] P2 Sessions that extend while in use (now a fixed 30 days from sign-in)
+- [ ] P2 Class reminder email the day before (needs Resend live and a daily job)
+- [ ] P2 Payment history and receipts in the account; edit name, phone and email
+- [ ] **Needs Alex's rules first** Pause or cancel a membership from the account (notice, pause limits, refunds); waitlist for full classes (needs class capacities)
 - [x] Applied `20261024000000_akb_cancel_class.sql` and `20261027000000_akb_member_accounts.sql` to the live database (2026-10-28) (DEPLOYMENT.md → Member accounts)
 - [ ] **P0, needs Alex** Resend in production (also turns on booking alerts); without it members can't get sign-in links
 - [ ] **P1, needs Alex** Confirm the privacy wording; a retention period and a contact email if he wants one listed

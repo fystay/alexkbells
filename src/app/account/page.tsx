@@ -3,7 +3,8 @@ import Link from "next/link";
 import { bookClass, bookClassWithCredit, cancelClass, signOutMember } from "@/app/account/actions";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { site } from "@/content/site";
+import { groupClass } from "@/content/classes";
+import { mapsUrl, site } from "@/content/site";
 import { addDays, formatLongDate, weekdayIndex, type DateKey } from "@/lib/availability/dates";
 import { CLASS_WINDOW_DAYS } from "@/lib/availability/timetable";
 import { fullClasses, fullKey } from "@/lib/class-capacity";
@@ -17,6 +18,9 @@ import { squareConfig } from "@/lib/square/config";
 import { pageMetadata } from "@/lib/metadata";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { formatTime } from "@/lib/schedule";
+import { googleCalendarUrl } from "@/lib/calendar";
+import { classEventFor } from "@/app/account/class-event";
+import { ClearStatus } from "@/components/account/ClearStatus";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { Section } from "@/components/ui/Section";
 
@@ -82,6 +86,16 @@ function bookable(overview: MemberOverview, today: DateKey, until: string | null
   return out;
 }
 
+/** "This week", "Next week", then "Week of 9 November" (weeks start on Monday). */
+function weekLabel(date: DateKey, today: DateKey): string {
+  const monday = (d: DateKey) => addDays(d, -weekdayIndex(d));
+  const thisWeek = monday(today);
+  const week = monday(date);
+  if (week === thisWeek) return "This week";
+  if (week === addDays(thisWeek, 7)) return "Next week";
+  return `Week of ${shortDate(week)}`;
+}
+
 /** Booked places still to come. */
 function upcomingPlaces(overview: MemberOverview) {
   const now = Date.now();
@@ -123,6 +137,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     paymentDue(member.db, squareConfig(), member.clientId),
   ]);
   const done = typeof params.done === "string" ? DONE[params.done] : undefined;
+  // The class just booked (?at=date.slot), marked in the list.
+  const justBooked = done && typeof params.at === "string" ? params.at : null;
   const error = typeof params.error === "string" ? (ERRORS[params.error] ?? ERRORS.failed) : undefined;
 
   if (!result.ok) {
@@ -148,6 +164,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   const payg = getService("group-classes").prices[0];
   const best = !m && payg ? bestPlanFor(membershipPlans, o.paid_classes_28d, payg.amountGbp) : null;
   const booking = getPrimaryCtaFor("group-class");
+  const next = upcoming[0] ?? null;
 
   return (
     <Section labelledBy="account-heading">
@@ -158,6 +175,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             {m ? "Your membership." : "Your account."}
           </h1>
           {o.client.email ? <p className="mt-3 text-sm">Signed in as {o.client.email}</p> : null}
+          {done || error ? <ClearStatus /> : null}
           {done || error ? (
             <p role={error ? "alert" : "status"} className={`mt-6 rounded-2xl px-5 py-4 font-semibold ${error ? "border-2 border-ink bg-white" : "bg-ink text-white"}`}>
               {error ?? done}
@@ -165,6 +183,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           ) : null}
 
           <div className="mt-8 grid grid-cols-1 gap-3">
+            {next ? <NextClass place={next} /> : null}
             {m ? (
               <div className="card px-5 py-5 sm:px-6">
                 <p className="text-sm">Plan</p>
@@ -201,6 +220,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                   <span className="font-display text-h2 tabular-nums">{left}</span>{" "}
                   <span className="font-semibold">left of {o.period.credits}</span>
                 </p>
+                {/* The same at a glance: one dot per credit, filled while unused. */}
+                <div aria-hidden="true" className="mt-2 flex flex-wrap gap-1.5">
+                  {Array.from({ length: o.period.credits }, (_, i) => (
+                    <span key={i} className={`size-3 rounded-full border border-ink ${i < left ? "bg-ink" : ""}`} />
+                  ))}
+                </div>
                 <p className="mt-1.5 text-sm">
                   {shortDate(o.period.start)} to {shortDate(o.period.end)}. Unused credits don&apos;t roll over.
                 </p>
@@ -248,35 +273,34 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                 const note = cancelNote(p);
                 const paidPlace = p.how === "paid" || p.how === "class_credit";
                 return (
-                  <li key={p.id} className="card px-5 py-5 sm:px-6">
+                  <li
+                    key={p.id}
+                    className={`card px-5 py-5 sm:px-6 ${justBooked === `${p.class_date}.${p.slot}` ? "ring-2 ring-ink ring-offset-2 ring-offset-paper" : ""}`}
+                  >
+                    {justBooked === `${p.class_date}.${p.slot}` ? <p className="eyebrow mb-2">Just booked</p> : null}
                     <p className="card-title">{when(p.starts_at)}</p>
                     <p className="mt-0.5 text-sm">
                       {p.how === "credit" ? "Membership credit" : p.how === "paid" ? "Paid" : p.how === "class_credit" ? "Class credit" : "Arranged with Alex"}
                     </p>
+                    <a href={`/account/calendar?place=${p.id}`} className={`mt-1 inline-flex min-h-11 items-center text-sm ${linkClass}`}>
+                      Add to calendar<span className="sr-only"> {when(p.starts_at)}</span>
+                    </a>
                     {p.can_cancel ? (
-                      p.credit_back_if_cancelled ? (
-                        <form action={cancelClass} className="mt-3">
+                      // Cancelling asks first, and says what comes back (or that nothing does, under 24 hours).
+                      <details className="mt-1">
+                        <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold underline underline-offset-4 hover:no-underline">
+                          Cancel<span className="sr-only"> {when(p.starts_at)}</span>
+                        </summary>
+                        <form action={cancelClass} className="mt-2">
                           <input type="hidden" name="place" value={p.id} />
                           {paidPlace ? <input type="hidden" name="paid" value="yes" /> : null}
-                          <button type="submit" className={`inline-flex min-h-11 items-center ${linkClass}`}>
-                            Cancel<span className="sr-only"> {when(p.starts_at)}</span>
+                          <p>{p.credit_back_if_cancelled ? note.inTime : note.late}</p>
+                          <button type="submit" className={buttonClasses("secondary", "mt-3")}>
+                            {p.credit_back_if_cancelled ? "Cancel class" : "Cancel anyway"}
+                            <span className="sr-only"> {when(p.starts_at)}</span>
                           </button>
-                          <span className="ml-2 text-sm">{note.inTime}</span>
                         </form>
-                      ) : (
-                        // Less than 24 hours to go: say what happens before it does.
-                        <details className="mt-3">
-                          <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold underline underline-offset-4">Cancel</summary>
-                          <form action={cancelClass} className="mt-2">
-                            <input type="hidden" name="place" value={p.id} />
-                            {paidPlace ? <input type="hidden" name="paid" value="yes" /> : null}
-                            <p>{note.late}</p>
-                            <button type="submit" className={buttonClasses("secondary", "mt-3")}>
-                              Cancel anyway<span className="sr-only"> {when(p.starts_at)}</span>
-                            </button>
-                          </form>
-                        </details>
-                      )
+                      </details>
                     ) : (
                       <p className="mt-1.5 text-sm">To change this place, message Alex.</p>
                     )}
@@ -298,7 +322,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               ) : options.length === 0 ? (
                 <p className="card mt-3 px-5 py-5 sm:px-6">No more classes to book this period.</p>
               ) : (
-                <ClassOptions options={options} action={bookClass} />
+                <ClassOptions options={options} today={today} action={bookClass} />
               )}
             </>
           ) : null}
@@ -309,7 +333,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               {creditOptions.length === 0 ? (
                 <p className="card mt-3 px-5 py-5 sm:px-6">No classes to book before your credit runs out.</p>
               ) : (
-                <ClassOptions options={creditOptions} action={bookClassWithCredit} credit={classCredit.id} />
+                <ClassOptions options={creditOptions} today={today} action={bookClassWithCredit} credit={classCredit.id} />
               )}
             </>
           ) : null}
@@ -367,35 +391,75 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   );
 }
 
-/** Classes to book with one press: with a membership credit, or (credit set) a class credit. */
+/** The next class first: when, where, and into the calendar or the map. */
+function NextClass({ place }: { place: MemberPlace }) {
+  const l = site.location;
+  return (
+    <div className="card px-5 py-5 sm:px-6">
+      <p className="text-sm">Your next class</p>
+      <p className="card-title text-xl">{when(place.starts_at)}</p>
+      <p className="mt-1.5">
+        {groupClass.name} at {l.venue}, {l.town}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-x-5">
+        <a href={`/account/calendar?place=${place.id}`} className={`inline-flex min-h-11 items-center ${linkClass}`}>
+          Add to calendar
+        </a>
+        <a href={googleCalendarUrl(classEventFor(place))} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-11 items-center ${linkClass}`}>
+          Google Calendar<span className="sr-only"> (opens in a new tab)</span>
+        </a>
+        <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-11 items-center ${linkClass}`}>
+          Directions<span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/** Classes to book with one press (a membership credit, or with `credit` a class credit), as rows grouped by week. */
 function ClassOptions({
   options,
+  today,
   action,
   credit,
 }: {
   options: ReturnType<typeof bookable>;
+  today: DateKey;
   action: (formData: FormData) => Promise<void>;
   credit?: string;
 }) {
+  const weeks: { label: string; items: typeof options }[] = [];
+  for (const c of options) {
+    const label = weekLabel(c.date, today);
+    if (weeks.at(-1)?.label !== label) weeks.push({ label, items: [] });
+    weeks.at(-1)!.items.push(c);
+  }
   return (
-    <ul className="mt-3 grid grid-cols-1 gap-3">
-      {options.map((c) => (
-        <li key={`${c.slot}|${c.date}`} className="card flex min-h-16 items-center justify-between gap-4 px-5 py-3 sm:px-6">
-          <span className="font-semibold">{c.label}</span>
-          {c.full ? (
-            <span className="text-sm">Full</span>
-          ) : (
-            <form action={action}>
-              <input type="hidden" name="slot" value={c.slot} />
-              <input type="hidden" name="date" value={c.date} />
-              {credit ? <input type="hidden" name="credit" value={credit} /> : null}
-              <button type="submit" className={buttonClasses("primary", "min-h-11 px-5")}>
-                Book<span className="sr-only"> {c.label}</span>
-              </button>
-            </form>
-          )}
-        </li>
+    <div className="mt-3 space-y-6">
+      {weeks.map((w) => (
+        <div key={w.label}>
+          <h3 className="eyebrow">{w.label}</h3>
+          <ul className="mt-2 border-t border-line">
+            {w.items.map((c) => (
+              <li key={`${c.slot}|${c.date}`} className="flex min-h-16 items-center justify-between gap-4 border-b border-line py-2.5">
+                <span className="font-semibold">{c.label}</span>
+                {c.full ? (
+                  <span className="text-sm">Full</span>
+                ) : (
+                  <form action={action}>
+                    <input type="hidden" name="slot" value={c.slot} />
+                    <input type="hidden" name="date" value={c.date} />
+                    {credit ? <input type="hidden" name="credit" value={credit} /> : null}
+                    <button type="submit" className={buttonClasses("secondary", "min-h-11 px-5")}>
+                      Book<span className="sr-only"> {c.label}</span>
+                    </button>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

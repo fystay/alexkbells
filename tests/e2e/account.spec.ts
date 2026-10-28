@@ -81,13 +81,26 @@ test.describe("member accounts", () => {
     const label = (await options.last().locator("span").first().innerText()).trim();
     await options.last().getByRole("button", { name: /^Book / }).click();
     await expect(page.getByRole("status")).toHaveText("Booked. One credit used.");
+    // The message stays, but the address goes back to /account (a refresh won't say it again).
+    await expect(page).toHaveURL(/\/account$/);
     await expect(page.locator("span.tabular-nums").first()).toHaveText("7");
-    const booked = page.locator("li").filter({ hasText: label }).filter({ has: page.getByRole("button", { name: /^Cancel/ }) });
+    const booked = page.locator("li").filter({ hasText: label }).filter({ has: page.locator("summary", { hasText: "Cancel" }) });
     await expect(booked).toBeVisible();
+    await expect(booked).toContainText("Just booked");
     await expect(booked).toContainText("Your credit comes back.");
+    // It's the next class, with directions and the calendar.
+    await expect(page.getByText("Your next class")).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
 
-    // Cancel it in time: the credit comes back.
-    await booked.getByRole("button", { name: /^Cancel/ }).click();
+    // Add to calendar: an .ics of this class, for this member only.
+    const ics = await page.request.get(PROD + (await booked.getByRole("link", { name: /^Add to calendar/ }).getAttribute("href"))!);
+    expect(ics.headers()["content-type"]).toContain("text/calendar");
+    expect(await ics.text()).toMatch(/BEGIN:VEVENT[\s\S]*DTSTART:\d{8}T\d{6}Z[\s\S]*LOCATION:Media House/);
+    expect((await request.get(`${PROD}/account/calendar?place=00000000-0000-0000-0000-000000000000`, { maxRedirects: 0 })).status()).toBe(307);
+
+    // Cancel it in time: it asks first, then the credit comes back.
+    await booked.locator("summary", { hasText: "Cancel" }).click();
+    await booked.getByRole("button", { name: /^Cancel class/ }).click();
     await expect(page.getByRole("status")).toHaveText("Cancelled. Your credit is back.");
     await expect(page.locator("span.tabular-nums").first()).toHaveText("8");
 
@@ -147,11 +160,12 @@ test.describe("member accounts", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Your account." })).toBeVisible();
     await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
     await expect(page.getByText("Pay as you go")).toBeVisible();
-    const place = page.locator("li").filter({ hasText: "Paid" }).filter({ has: page.getByRole("button", { name: /^Cancel/ }) });
+    const place = page.locator("li").filter({ hasText: "Paid" }).filter({ has: page.locator("summary", { hasText: "Cancel" }) });
     await expect(place).toContainText("You get a class credit for another class within 4 weeks.");
 
     // Cancel in time: a class credit, then book another class with it, nothing to pay.
-    await place.getByRole("button", { name: /^Cancel/ }).click();
+    await place.locator("summary", { hasText: "Cancel" }).click();
+    await place.getByRole("button", { name: /^Cancel class/ }).click();
     await expect(page.getByRole("status")).toHaveText("Cancelled. You have a class credit for another class within 4 weeks.");
     await expect(page.getByText("Class credits")).toBeVisible();
     const options = page.locator("li").filter({ has: page.getByRole("button", { name: /^Book / }) });

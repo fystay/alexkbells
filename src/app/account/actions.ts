@@ -123,7 +123,8 @@ export async function bookClass(formData: FormData): Promise<void> {
     durationMinutes: slot.durationMinutes ?? 60,
   });
   if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
-  redirect(`${ACCOUNT_PATH}?done=booked`);
+  // at= marks the class just booked on the page.
+  redirect(`${ACCOUNT_PATH}?done=booked&at=${date}.${slot.id}`);
 }
 
 /**
@@ -169,7 +170,7 @@ export async function bookClassWithCredit(formData: FormData): Promise<void> {
   if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
   // Confirmed at once: email the customer and Alex now rather than at the next reconcile (best effort).
   await notifyClassBookings(member.db, publishedClasses()).catch(() => 0);
-  redirect(`${ACCOUNT_PATH}?done=booked_class_credit`);
+  redirect(`${ACCOUNT_PATH}?done=booked_class_credit&at=${date}.${slot.id}`);
 }
 
 /** Signs this browser out, or every device (everywhere=yes). */
