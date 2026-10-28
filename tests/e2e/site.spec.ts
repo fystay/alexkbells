@@ -487,7 +487,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
   await expect(classes.locator("address")).toContainText("1A Dunns Wood Road");
-  await expect(classes.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+  await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(classes).toContainText("New? Say so when you book.");
   const more = page.locator("#more-ways");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
@@ -743,25 +743,24 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the classes are day tiles; choose one, then Book now opens the calendar on that class", async ({ page }) => {
+test("home: the class times (owner's design): the next class chosen, tap another, Book now opens the calendar on it", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const section = page.getByRole("region", { name: "Three classes a week." });
-  const tiles = section.getByRole("list", { name: "Class times" }).locator("> li");
-  await expect(tiles).toHaveCount(3);
-  await expect(tiles.nth(0)).toContainText("Mon");
-  await expect(tiles.nth(0)).toContainText("6:30");
-  await expect(tiles.nth(2)).toContainText("Sat");
-  await expect(tiles.nth(2)).toContainText("9:00");
-  // Nothing chosen yet: the prompt, not the button.
-  await expect(section.getByRole("link", { name: "Book now" })).toHaveCount(0);
-  await expect(section).toContainText("Tap a day to choose it.");
-  await tiles.nth(1).click();
-  await expect(section.getByRole("radio", { name: "Wednesday 6:30 pm" })).toBeChecked();
+  const cards = section.getByRole("list", { name: "Class times" }).getByRole("button");
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText("Mon");
+  await expect(cards.nth(2)).toContainText("9:00");
+  // One class is chosen to begin with (the next one), marked "Next up" or "On now".
+  await expect(section.getByRole("button", { pressed: true })).toHaveCount(1);
+  await expect(section.getByText(/^(Next up|On now)$/)).toHaveCount(1);
+  await section.getByRole("button", { name: "Saturday 9:00 am" }).click();
+  await expect(section.getByRole("button", { name: "Saturday 9:00 am" })).toHaveAttribute("aria-pressed", "true");
   // The button always reads Book now (owner rule); the chosen class is said under it.
   const book = section.getByRole("link", { name: "Book now" });
-  await expect(book).toHaveAttribute("href", "/book/group-class?class=wed-evening");
-  await expect(section).toContainText("Wednesday 6:30 pm class selected.");
+  await expect(book).toHaveAttribute("href", "/book/group-class?class=sat-morning");
+  await expect(section).toContainText(/Saturday \d+ \w+, 9:00 am selected \(in /);
+  await expect(section.getByRole("link", { name: /Get directions to Media House/ })).toHaveAttribute("href", /google\.com\/maps/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
 
