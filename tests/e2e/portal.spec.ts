@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
+import { classOccurrences } from "../../src/lib/coach/classes";
 import { addDays, londonToday, weekday } from "../../src/lib/coach/time";
 
 /**
@@ -72,6 +73,9 @@ test.describe("access", () => {
     "/coach/memberships/00000000-0000-4000-8000-000000000000",
     "/coach/finances",
     "/coach/finances/payments/new",
+    "/coach/schedule",
+    "/coach/members",
+    "/coach/inbox",
   ];
   for (const route of routes) {
     test(`${route} needs the coach login`, async ({ page }) => {
@@ -363,6 +367,143 @@ test("online coaching: plan, check-in schedule and a period charge", async ({ pa
   await expect(page.getByText("Forecast from active plans, not money received")).toBeVisible();
 });
 
+test("online coaching: write the programme, answer the client's check-in and messages", async ({ page, request }) => {
+  const person = unique("Pia Programme");
+  const clientId = await seedClient(request, person);
+  await signIn(page);
+  await page.goto(`/coach/online/new?client=${clientId}`);
+  await page.getByLabel("Start date").fill(today);
+  await page.getByLabel("Next renewal").fill(today);
+  await page.getByRole("button", { name: "Save plan" }).click();
+  await expect(page).toHaveURL(/\/coach\/online\/[0-9a-f-]{36}$/);
+  const [{ id: subscription }] = await sql<{ id: string }>(request, "select id from akb_subscriptions where client_id = $1", [clientId]);
+
+  // The programme: a mistake is pointed out by line, then it saves and repeats the week for the rest.
+  await page.getByLabel("Programme name").fill("Snatch prep");
+  await page.getByLabel("Goal").fill("First 24 kg snatch");
+  await page.getByLabel("Exercises").fill("Day A\nSwing | many | 10 | 24 kg");
+  await page.getByRole("button", { name: "Create programme" }).click();
+  await expect(page.getByText('Line 2: "Swing" needs a number of sets from 1 to 20.')).toBeVisible();
+  await page.getByLabel("Exercises").fill("Week 1\nDay A\nTwo-hand swing | 5 | 10 | 24 kg\nStrict press | 4 | 5 each | 16 kg | Pause 2 s at the top. | https://youtu.be/press.demo\nDay B\nSnatch | 6 | 5 each | 16 kg");
+  await page.getByRole("button", { name: "Create programme" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Programme saved" })).toBeVisible();
+  const [{ n }] = await sql<{ n: number }>(request, "select count(*)::int as n from akb_coaching_items i join akb_coaching_programmes p on p.id = i.programme_id where p.subscription_id = $1", [subscription]);
+  expect(n).toBe(18);
+  await page.reload();
+  await expect(page.getByLabel("Exercises")).toHaveValue(/^Week 1\nDay A\nTwo-hand swing \| 5 \| 10 \| 24 kg\nStrict press \| 4 \| 5 each \| 16 kg \| Pause 2 s at the top\. \| https:\/\/youtu\.be\/press\.demo\nDay B/);
+  // Videos are links only: a link that isn't https is refused.
+  await page.getByLabel("Exercises").fill("Day A\nSwing | 3 | 10 | 24 kg | | http://example.com/v");
+  await page.getByRole("button", { name: "Save programme" }).click();
+  await expect(page.getByText(/the demo link must start with https/)).toBeVisible();
+
+  // The client checks in and messages from their app (here, straight into the database); the coach sees both.
+  await sql(request, "insert into akb_coaching_check_ins (subscription_id, week_of, programme_week, energy, sleep, training, wins) values ($1, date_trunc('week', current_date)::date, 1, 4, 3, 5, 'All sessions in')", [subscription]);
+  await sql(request, "insert into akb_coaching_messages (subscription_id, from_client, body) values ($1, true, 'Is Day B fine on Saturday?')", [subscription]);
+  await page.goto("/coach/online");
+  await expect(page.getByRole("link", { name: new RegExp(`${person.name}[\\s\\S]*1 new message`) })).toBeVisible();
+  await page.goto(`/coach/online/${subscription}`);
+  await expect(page.getByText("Energy 4 · Sleep 3 · Training 5")).toBeVisible();
+  await expect(page.getByText("Is Day B fine on Saturday?")).toBeVisible();
+  await page.getByLabel("Reply", { exact: true }).fill("Good week. Keep the pause.");
+  await page.getByRole("button", { name: "Send reply" }).click();
+  // The form gives way to the reply once it is saved.
+  await expect(page.getByText("Your reply: Good week. Keep the pause.")).toBeVisible();
+  await page.getByLabel("Message", { exact: true }).fill("Yes, any order works.");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Sent." })).toBeVisible();
+  const [{ reply, read }] = await sql<{ reply: string; read: boolean }>(request, "select (select coach_reply from akb_coaching_check_ins where subscription_id = $1) as reply, (select bool_and(read_at is not null) from akb_coaching_messages where subscription_id = $1 and from_client) as read", [subscription]);
+  expect(reply).toBe("Good week. Keep the pause.");
+  expect(read).toBe(true);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("the coach tabs (2026-10-28): check in today's class, the schedule, members and the inbox", async ({ page, request }) => {
+  test.slow();
+  const person = unique("Tab Tester");
+  const clientId = await seedClient(request, person);
+  await sql(request, "select akb_start_membership($1, 'regular', 'Regular', 6500, 8, akb_london_today())", [clientId]);
+  // Put them on the next class that hasn't ended, whatever day it is.
+  const occ = classOccurrences(today, addDays(today, 14)).find((o) => new Date(o.startsAt).getTime() + 3_600_000 > Date.now())!;
+  await sql(request, "select akb_add_attendee($1::uuid, $2::text, $3::date, $4::timestamptz, 60, 0, 'Class', null)", [clientId, occ.slot.id, occ.date, occ.startsAt]);
+  // Something in each inbox group.
+  const requester = unique("Rita Request");
+  await seedRequest(request, requester, { service: "One-to-one", summary: "Tuesdays after six" });
+  const payer = unique("Pat Payer");
+  const payerId = await seedClient(request, payer);
+  await sql(request, "insert into akb_charges (client_id, service, description, amount_pence, due_on) values ($1, 'group', 'Kettlebell training', 1200, $2)", [payerId, today]);
+  await signIn(page);
+
+  // Today: the greeting, three counts, the next session and who's booked.
+  await page.goto("/coach");
+  await expect(page.getByRole("heading", { level: 1, name: /^(Morning|Afternoon|Evening)\.$/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /payments to confirm/ })).toHaveAttribute("href", "/coach/inbox?f=pay");
+  await expect(page.getByRole("link", { name: /members low on credits/ })).toHaveAttribute("href", "/coach/members?f=low");
+  const session = page.getByRole("region", { name: "Next session" });
+  await expect(session).toContainText("Next session");
+  await expect(session.getByRole("link", { name: "Manage" })).toHaveAttribute("href", /\/coach\/classes\/\d{4}-\d{2}-\d{2}\/[a-z-]+$/);
+  const mail = await session.getByRole("link", { name: "Message class" }).getAttribute("href");
+  expect(mail).toMatch(/^mailto:\?bcc=/);
+  // The roster: tap here, tap again to undo; a no-show is the other mark.
+  const here = page.getByRole("button", { name: `Mark ${person.name} as here` });
+  await expect(here).toHaveAttribute("aria-pressed", "false");
+  await here.click();
+  await expect(page.getByRole("button", { name: `Mark ${person.name} as here` })).toHaveAttribute("aria-pressed", "true");
+  expect((await sql<{ status: string }>(request, "select status from akb_class_attendance where client_id = $1", [clientId]))[0].status).toBe("attended");
+  await page.getByRole("button", { name: `Mark ${person.name} as here` }).click();
+  await expect(page.getByRole("button", { name: `Mark ${person.name} as here` })).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("button", { name: `Mark ${person.name} as no-show` }).click();
+  await expect(page.getByRole("button", { name: `Mark ${person.name} as no-show` })).toHaveAttribute("aria-pressed", "true");
+  expect((await sql<{ status: string }>(request, "select status from akb_class_attendance where client_id = $1", [clientId]))[0].status).toBe("no_show");
+  // Everything the old dashboard held is still on the page.
+  await expect(page.getByRole("heading", { name: "Needs attention" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revenue" })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  // The tab bar: the inbox badge counts what is waiting.
+  const tabs = page.getByRole("navigation", { name: "Coach", exact: true });
+  await expect(tabs.getByRole("link", { name: /^Inbox/ })).toContainText("waiting");
+
+  // Schedule: week tabs, and the class opens its page.
+  await tabs.getByRole("link", { name: "Schedule" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /bookings? this week\.$/ })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Week" }).getByRole("link", { name: "This week" })).toHaveAttribute("aria-current", "page");
+  await page.getByRole("navigation", { name: "Week" }).getByRole("link", { name: "Next week" }).click();
+  await expect(page).toHaveURL(/week=1/);
+  await expect(page.getByRole("link", { name: "Add a 1:1 session" })).toHaveAttribute("href", "/coach/sessions/new");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  // Members: search, filters, and a row opens the client record.
+  await tabs.getByRole("link", { name: "Members" }).click();
+  await expect(page.getByRole("heading", { name: "Online coaching" })).toBeVisible();
+  await page.getByRole("searchbox", { name: "Search members" }).fill(person.name);
+  await page.getByRole("button", { name: "Search" }).click();
+  await expect(page.getByRole("link", { name: new RegExp(`${person.name}[\\s\\S]*Regular`) })).toHaveAttribute("href", `/coach/clients/${clientId}`);
+  await page.goto(`/coach/members?f=payg&q=${encodeURIComponent(payer.name)}`);
+  await expect(page.getByRole("link", { name: new RegExp(`${payer.name}[\\s\\S]*Pay as you go`) })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Filter members" }).getByRole("link", { name: /^Pay as you go/ })).toHaveAttribute("aria-current", "page");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  // Inbox: a request, a payment to confirm, each with where to deal with it.
+  await tabs.getByRole("link", { name: /^Inbox/ }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /to deal with\.$/ })).toBeVisible();
+  await expect(page.getByText(requester.name, { exact: true })).toBeVisible();
+  await page.getByRole("navigation", { name: "Filter inbox" }).getByRole("link", { name: /^Payments/ }).click();
+  const payment = page.getByRole("listitem").filter({ hasText: payer.name });
+  await expect(payment).toContainText("Payment to confirm");
+  await expect(payment.getByRole("link", { name: /^Mark paid/ })).toHaveAttribute("href", new RegExp(`/coach/finances/payments/new\\?client=${payerId}&charge=`));
+  await expect(page.getByText(requester.name, { exact: true })).toHaveCount(0);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  // The menu keeps every section reachable, and signs out.
+  await page.getByRole("button", { name: "Coach menu" }).click();
+  const sections = page.getByRole("navigation", { name: "Coach sections" });
+  for (const name of ["Requests", "Clients", "Classes", "Memberships", "1:1 sessions", "Online coaching", "Finances"]) await expect(sections.getByRole("link", { name })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Account menu" }).click();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/coach\/login$/);
+});
+
 test("finances: totals by period and service, and a safe CSV export", async ({ page, request }) => {
   const person = { ...unique("Fin"), name: `=HYPERLINK("http://evil.example") ${Date.now()}` };
   const clientId = await seedClient(request, person);
@@ -526,7 +667,7 @@ test.describe("on a phone", () => {
     const clientId = await seedClient(request, person);
     const requestId = await seedRequest(request, unique("Phone Request"), { details: { classDate: next(5, 1), classSlot: "sat-morning" } });
     await signIn(page);
-    for (const path of ["/coach", "/coach/requests", `/coach/requests/${requestId}`, "/coach/clients", `/coach/clients/${clientId}`, `/coach/classes/${next(5)}/sat-morning`, "/coach/sessions", "/coach/online", "/coach/memberships", "/coach/memberships/new", "/coach/finances", "/coach/finances/payments/new"]) {
+    for (const path of ["/coach", "/coach/requests", `/coach/requests/${requestId}`, "/coach/clients", `/coach/clients/${clientId}`, `/coach/classes/${next(5)}/sat-morning`, "/coach/sessions", "/coach/online", "/coach/memberships", "/coach/memberships/new", "/coach/finances", "/coach/finances/payments/new", "/coach/schedule", "/coach/members", "/coach/inbox"]) {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -536,8 +677,20 @@ test.describe("on a phone", () => {
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`), path).toEqual([]);
     }
-    // The section nav scrolls sideways and marks where you are.
+    // The tab bar marks where you are: a class belongs to Schedule, a client to Members, a request to Inbox.
+    const tabs = page.getByRole("navigation", { name: "Coach", exact: true });
+    await page.goto("/coach");
+    await expect(tabs.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "page");
+    await page.goto(`/coach/classes/${next(5)}/sat-morning`);
+    await expect(tabs.getByRole("link", { name: "Schedule" })).toHaveAttribute("aria-current", "page");
+    await page.goto(`/coach/clients/${clientId}`);
+    await expect(tabs.getByRole("link", { name: "Members" })).toHaveAttribute("aria-current", "page");
+    await page.goto(`/coach/requests/${requestId}`);
+    await expect(tabs.getByRole("link", { name: /^Inbox/ })).toHaveAttribute("aria-current", "page");
+    // Finances has no tab; it is in the menu.
     await page.goto("/coach/finances");
-    await expect(page.getByRole("navigation", { name: "Coach portal" }).getByRole("link", { name: "Finances" })).toHaveAttribute("aria-current", "page");
+    await expect(tabs.locator('[aria-current="page"]')).toHaveCount(0);
+    await page.getByRole("button", { name: "Coach menu" }).click();
+    await expect(page.getByRole("navigation", { name: "Coach sections" }).getByRole("link", { name: "Finances" })).toBeVisible();
   });
 });

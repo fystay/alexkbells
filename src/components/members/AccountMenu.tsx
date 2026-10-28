@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
  * button and a panel of links and buttons. Escape, a click outside or
  * following a link closes it; focus goes back to the avatar on Escape.
  */
-export function AccountMenu({ initial, label, children }: { initial: string; label: string; children: ReactNode }) {
+export function AccountMenu({ initial, label, coaching = false, children }: { initial: string; label: string; /** Online coaching client: a ring round the avatar (as the design's brass ring, in the site's grey). */ coaching?: boolean; children: ReactNode }) {
   const pathname = usePathname();
   // Open on the page it was opened on: following a link closes it.
   const [openOn, setOpenOn] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function AccountMenu({ initial, label, children }: { initial: string; lab
       >
         <span
           aria-hidden="true"
-          className={`grid size-9 place-items-center rounded-full bg-ink text-[0.9375rem] font-bold text-paper ${open ? "ring-[1.5px] ring-ink ring-offset-[3px] ring-offset-paper" : ""}`}
+          className={`grid size-9 place-items-center rounded-full bg-ink text-[0.9375rem] font-bold text-paper ${open ? "ring-[1.5px] ring-ink ring-offset-[3px] ring-offset-paper" : coaching ? "ring-[1.5px] ring-grey ring-offset-[3px] ring-offset-paper" : ""}`}
         >
           {initial}
         </span>

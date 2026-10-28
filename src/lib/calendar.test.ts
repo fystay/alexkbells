@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { icsFor, type ClassEvent } from "./calendar";
+import { icsFeed, icsFor, type ClassEvent } from "./calendar";
 
 const event: ClassEvent = {
   id: "0f6c6f0e-1b0a-4f4e-9d0e-2b1c3d4e5f60",
@@ -34,5 +34,26 @@ describe("icsFor", () => {
     for (const line of ics.split("\r\n")) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
     // Unfolding gives the description back.
     expect(ics.replace(/\r\n /g, "")).toContain("DESCRIPTION:Booked in your RAENG account\\; to cancel\\, sign in at https://raengfitness.vercel.app/account");
+  });
+});
+
+describe("icsFeed", () => {
+  const other: ClassEvent = { ...event, id: "11111111-1b0a-4f4e-9d0e-2b1c3d4e5f60", startsAt: "2026-11-04T18:30:00.000Z" };
+  const feed = icsFeed([event, other], "RAENG classes", new Date("2026-10-28T12:00:00Z"));
+
+  it("is one calendar with every class, named and told to refresh", () => {
+    expect(feed.match(/BEGIN:VCALENDAR/g)).toHaveLength(1);
+    expect(feed.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+    expect(feed).toContain("\r\nX-WR-CALNAME:RAENG classes\r\n");
+    expect(feed).toContain("\r\nREFRESH-INTERVAL;VALUE=DURATION:PT1H\r\n");
+  });
+
+  it("uses the same event ids as a single download, so a class added both ways is one event", () => {
+    expect(feed).toContain(`UID:${event.id}@raeng-fitness`);
+    expect(icsFor(event)).toContain(`UID:${event.id}@raeng-fitness`);
+  });
+
+  it("is a valid empty calendar with no classes", () => {
+    expect(icsFeed([], "RAENG classes")).not.toContain("BEGIN:VEVENT");
   });
 });
