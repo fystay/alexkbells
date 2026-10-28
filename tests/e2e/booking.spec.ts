@@ -341,7 +341,7 @@ test.describe("production configuration", () => {
 
     // The class is described like Alex's own listing.
     await expect(page.getByText("Kettlebell Training ·")).toBeVisible();
-    await expect(page.getByText(/1 hr · £12 per person · with Alex/)).toBeVisible();
+    await expect(page.getByText(/1 hr · All levels · with Alex/)).toBeVisible();
     await expect(page.getByText("Pay by bank transfer or cash.")).toHaveCount(0);
     await continueButton(page).click();
 
