@@ -1049,3 +1049,78 @@
   background: transparent;
   border-style: dashed;
 }
+
+/* Raeng Coaching (owner's members design, 2026-10-28): the coaching area is dark.
+   The same four colours with ink and paper swapped, so every utility inside
+   (bg-paper, text-ink, border-line...) follows. The design's brass accent is
+   not used: the site has four colours. */
+.coaching-dark {
+  --color-ink: #f5f2eb;
+  --color-paper: #171717;
+  --color-white: #171717;
+  --color-surface: #171717;
+  --color-muted: #f5f2eb;
+  --color-line: #777873;
+}
+.coaching-scale input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+}
+.coaching-scale label {
+  position: relative;
+  display: grid;
+  min-height: 3rem;
+  place-items: center;
+  border: 1.5px solid var(--color-line);
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.coaching-scale label:has(input:checked) {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+.coaching-scale label:has(input:focus-visible) {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+.coaching-done {
+  position: relative;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1.5px solid var(--color-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.coaching-done input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.coaching-done svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  visibility: hidden;
+}
+.coaching-done:has(input:checked) {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+.coaching-done:has(input:checked) svg {
+  visibility: visible;
+}
+.coaching-done:has(input:focus-visible) {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}

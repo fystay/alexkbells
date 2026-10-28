@@ -363,6 +363,56 @@ test("online coaching: plan, check-in schedule and a period charge", async ({ pa
   await expect(page.getByText("Forecast from active plans, not money received")).toBeVisible();
 });
 
+test("online coaching: write the programme, answer the client's check-in and messages", async ({ page, request }) => {
+  const person = unique("Pia Programme");
+  const clientId = await seedClient(request, person);
+  await signIn(page);
+  await page.goto(`/coach/online/new?client=${clientId}`);
+  await page.getByLabel("Start date").fill(today);
+  await page.getByLabel("Next renewal").fill(today);
+  await page.getByRole("button", { name: "Save plan" }).click();
+  await expect(page).toHaveURL(/\/coach\/online\/[0-9a-f-]{36}$/);
+  const [{ id: subscription }] = await sql<{ id: string }>(request, "select id from akb_subscriptions where client_id = $1", [clientId]);
+
+  // The programme: a mistake is pointed out by line, then it saves and repeats the week for the rest.
+  await page.getByLabel("Programme name").fill("Snatch prep");
+  await page.getByLabel("Goal").fill("First 24 kg snatch");
+  await page.getByLabel("Exercises").fill("Day A\nSwing | many | 10 | 24 kg");
+  await page.getByRole("button", { name: "Create programme" }).click();
+  await expect(page.getByText('Line 2: "Swing" needs a number of sets from 1 to 20.')).toBeVisible();
+  await page.getByLabel("Exercises").fill("Week 1\nDay A\nTwo-hand swing | 5 | 10 | 24 kg\nStrict press | 4 | 5 each | 16 kg | Pause 2 s at the top. | https://youtu.be/press.demo\nDay B\nSnatch | 6 | 5 each | 16 kg");
+  await page.getByRole("button", { name: "Create programme" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Programme saved" })).toBeVisible();
+  const [{ n }] = await sql<{ n: number }>(request, "select count(*)::int as n from akb_coaching_items i join akb_coaching_programmes p on p.id = i.programme_id where p.subscription_id = $1", [subscription]);
+  expect(n).toBe(18);
+  await page.reload();
+  await expect(page.getByLabel("Exercises")).toHaveValue(/^Week 1\nDay A\nTwo-hand swing \| 5 \| 10 \| 24 kg\nStrict press \| 4 \| 5 each \| 16 kg \| Pause 2 s at the top\. \| https:\/\/youtu\.be\/press\.demo\nDay B/);
+  // Videos are links only: a link that isn't https is refused.
+  await page.getByLabel("Exercises").fill("Day A\nSwing | 3 | 10 | 24 kg | | http://example.com/v");
+  await page.getByRole("button", { name: "Save programme" }).click();
+  await expect(page.getByText(/the demo link must start with https/)).toBeVisible();
+
+  // The client checks in and messages from their app (here, straight into the database); the coach sees both.
+  await sql(request, "insert into akb_coaching_check_ins (subscription_id, week_of, programme_week, energy, sleep, training, wins) values ($1, date_trunc('week', current_date)::date, 1, 4, 3, 5, 'All sessions in')", [subscription]);
+  await sql(request, "insert into akb_coaching_messages (subscription_id, from_client, body) values ($1, true, 'Is Day B fine on Saturday?')", [subscription]);
+  await page.goto("/coach/online");
+  await expect(page.getByRole("link", { name: new RegExp(`${person.name}[\\s\\S]*1 new message`) })).toBeVisible();
+  await page.goto(`/coach/online/${subscription}`);
+  await expect(page.getByText("Energy 4 · Sleep 3 · Training 5")).toBeVisible();
+  await expect(page.getByText("Is Day B fine on Saturday?")).toBeVisible();
+  await page.getByLabel("Reply", { exact: true }).fill("Good week. Keep the pause.");
+  await page.getByRole("button", { name: "Send reply" }).click();
+  // The form gives way to the reply once it is saved.
+  await expect(page.getByText("Your reply: Good week. Keep the pause.")).toBeVisible();
+  await page.getByLabel("Message", { exact: true }).fill("Yes, any order works.");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Sent." })).toBeVisible();
+  const [{ reply, read }] = await sql<{ reply: string; read: boolean }>(request, "select (select coach_reply from akb_coaching_check_ins where subscription_id = $1) as reply, (select bool_and(read_at is not null) from akb_coaching_messages where subscription_id = $1 and from_client) as read", [subscription]);
+  expect(reply).toBe("Good week. Keep the pause.");
+  expect(read).toBe(true);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
 test("finances: totals by period and service, and a safe CSV export", async ({ page, request }) => {
   const person = { ...unique("Fin"), name: `=HYPERLINK("http://evil.example") ${Date.now()}` };
   const clientId = await seedClient(request, person);

@@ -290,6 +290,160 @@ test.describe("member accounts", () => {
     await expect(page).toHaveURL(/\/account\/sign-in$/);
   });
 
+  test("Raeng Coaching (2026-10-28): a coaching client logs a session, checks in and messages; others see the unlock page", async ({ page, request }) => {
+    test.slow();
+    const email = `coaching-${Date.now()}@example.com`;
+    // A coaching client who has never booked a class: an active subscription and a programme from Alex.
+    const [client] = await sql(request, "insert into akb_clients (full_name, email, status) values ('Cora Client', $1, 'active') returning id", [email]);
+    const [sub] = await sql(request, "insert into akb_subscriptions (client_id, plan, price_pence, start_on, status) values ($1, 'Online coaching', 7900, current_date, 'active') returning id", [client.id]);
+    const items = [
+      { week: 1, day: "Day A", position: 1, name: "Two-hand swing", sets: 2, reps: "10", load: "24 kg", note: "", video_url: "https://youtu.be/swing.demo" },
+      { week: 1, day: "Day A", position: 2, name: "Strict press", sets: 2, reps: "5 each", load: "16 kg", note: "Pause at the top.", video_url: null },
+      { week: 1, day: "Day B", position: 1, name: "Snatch", sets: 3, reps: "5 each", load: "16 kg", note: "", video_url: null },
+    ];
+    await sql(request, "select akb_coaching_save_programme($1::uuid, 'Snatch prep'::text, 'First 24 kg snatch'::text, 6, 2, akb_london_today(), $2::jsonb)", [sub.id, JSON.stringify(items)]);
+
+    await askForLink(page, email);
+    await page.goto(PROD + linkPath((await emailsTo(request, email))[0]));
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/account$/);
+
+    // Home: the coaching card under the next class; the menu's Coaching; the members frame is otherwise unchanged.
+    const card = page.getByRole("link", { name: /Raeng Coaching\s*Week 1 of 6/ }).first();
+    await expect(card).toHaveAttribute("href", "/account/coaching");
+    await page.getByRole("button", { name: "Account menu" }).click();
+    await expect(page.locator("#account-menu").getByRole("link", { name: /^Coaching\s*Week 1$/ })).toHaveAttribute("href", "/account/coaching");
+    await page.keyboard.press("Escape");
+    // Plan: the coaching subscription from the database.
+    await page.goto(`${PROD}/account/plan`);
+    await expect(page.getByText("£79 a month")).toBeVisible();
+    await expect(page.getByText("Snatch prep · week 1 of 6")).toBeVisible();
+
+    // Today: the workout, in the dark coaching frame with its own tabs.
+    await page.goto(`${PROD}/account/coaching`);
+    await expect(page.getByRole("heading", { level: 1, name: "Week 1, Day A." })).toBeVisible();
+    await expect(page.getByRole("link", { name: /RAENG\s*COACHING/ })).toBeVisible();
+    const tabs = page.getByRole("navigation", { name: "Coaching" });
+    await expect(tabs.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("link", { name: /^Watch demo of Two-hand swing/ })).toHaveAttribute("href", "https://youtu.be/swing.demo");
+    await expect(page.getByText("Pause at the top.")).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.getByLabel("Two-hand swing set 1 weight").fill("26");
+    await page.getByLabel("Two-hand swing set 1 done").check();
+    await page.getByLabel("Strict press set 1 done").check();
+    await expect(page.getByRole("status").filter({ hasText: "sets" })).toHaveText("2 of 4 sets");
+    await page.getByLabel(/^Note for Alex/).fill("Press felt strong");
+    await page.getByRole("button", { name: "Finish session" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Session logged" })).toHaveText("Session logged. Alex can see it.");
+    await expect(page.getByText("Two-hand swing 1 × 10 · 26 kg")).toBeVisible();
+    await expect(page.getByText("“Press felt strong”")).toBeVisible();
+    // Day B is next, and last week's numbers don't exist yet.
+    await page.getByRole("link", { name: /^Day B/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Week 1, Day B." })).toBeVisible();
+    // Logging Day A again starts from what was logged.
+    await page.goto(`${PROD}/account/coaching?day=Day%20A&relog=1`);
+    await expect(page.getByLabel("Two-hand swing set 1 weight")).toHaveValue("26");
+    await expect(page.getByLabel("Two-hand swing set 1 done")).toBeChecked();
+
+    // Programme: this week's days, Day A logged.
+    await tabs.getByRole("link", { name: "Programme" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Snatch prep." })).toBeVisible();
+    await expect(page.getByText("First 24 kg snatch")).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Day A\s*Logged/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Day B\s*To do/ })).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+    // Check-in: scores are needed; then it's sent once a week.
+    await tabs.getByRole("link", { name: "Check-in" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "How was your week?" })).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.getByLabel("Energy 4 of 5").check();
+    await page.getByLabel("Sleep 3 of 5").check();
+    await page.getByLabel("Training 5 of 5").check();
+    await page.getByLabel("Wins this week").fill("All sessions in");
+    await page.getByLabel(/^Form video link/).fill("javascript:alert(1)");
+    await page.getByRole("button", { name: "Send to Alex" }).click();
+    // A link that isn't http(s) is refused by the server, and the form starts again.
+    await expect(page.getByText("That video link doesn't look right.")).toBeVisible();
+    await page.getByLabel("Energy 4 of 5").check();
+    await page.getByLabel("Sleep 3 of 5").check();
+    await page.getByLabel("Training 5 of 5").check();
+    await page.getByLabel("Wins this week").fill("All sessions in");
+    await page.getByLabel(/^Form video link/).fill("https://youtu.be/form.check");
+    await page.getByRole("button", { name: "Send to Alex" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Check-in sent" })).toHaveText("Check-in sent to Alex.");
+    await expect(page.getByRole("heading", { level: 1, name: "Sent. Nice work." })).toBeVisible();
+    // Alex replies from the coach area; the member sees it with the check-in next week's list.
+    await sql(request, "select akb_coaching_reply_check_in((select id from akb_coaching_check_ins where subscription_id = $1), 'Good week. Keep the pause.')", [sub.id]);
+
+    // Messages: write to Alex; his reply shows a dot on the tab until it is opened.
+    await tabs.getByRole("link", { name: "Messages" }).click();
+    await page.getByLabel("Message Alex").fill("Is Day B fine on Saturday?");
+    await page.getByRole("button", { name: "Send" }).click();
+    await expect(page.getByRole("log").getByText("Is Day B fine on Saturday?")).toBeVisible();
+    await sql(request, "select akb_coaching_coach_message($1, 'Yes, any order works.')", [sub.id]);
+    await page.goto(`${PROD}/account/coaching`);
+    await expect(tabs.getByRole("link", { name: /Messages\s*,\s*1 new/ })).toBeVisible();
+    await tabs.getByRole("link", { name: /Messages/ }).click();
+    await expect(page.getByRole("log").getByText("Yes, any order works.")).toBeVisible();
+    await page.goto(`${PROD}/account/coaching`);
+    await expect(tabs.getByRole("link", { name: /Messages\s*,\s*1 new/ })).toHaveCount(0);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+    // Phone width: no sideways scroll on any coaching page.
+    await page.setViewportSize({ width: 320, height: 640 });
+    for (const path of ["/account/coaching", "/account/coaching/programme", "/account/coaching/check-in", "/account/coaching/messages", "/account/plan", "/account"]) {
+      await page.goto(PROD + path);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true);
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // A coaching client has no use for the unlock page.
+    await page.goto(`${PROD}/account/coaching/unlock`);
+    await expect(page).toHaveURL(/\/account\/coaching$/);
+    // Signed out, none of it is reachable.
+    await page.context().clearCookies();
+    await page.goto(`${PROD}/account/coaching/messages`);
+    await expect(page).toHaveURL(/\/account\/sign-in$/);
+  });
+
+  test("a member without coaching sees Unlock coaching, not the programme", async ({ page, request }) => {
+    test.slow();
+    const email = `nocoach-${Date.now()}@example.com`;
+    await seedMember(request, email);
+    await askForLink(page, email);
+    await page.goto(PROD + linkPath((await emailsTo(request, email))[0]));
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/account$/);
+
+    // Home: the card sits at the bottom, below Booked, so it never pushes class booking down.
+    const card = page.getByRole("link", { name: /Raeng Coaching\s*Train with Alex/ });
+    await expect(card).toHaveAttribute("href", "/account/coaching/unlock");
+    expect((await card.boundingBox())!.y).toBeGreaterThan((await page.locator("#booked").boundingBox())!.y);
+    await page.getByRole("button", { name: "Account menu" }).click();
+    await expect(page.locator("#account-menu").getByRole("link", { name: /^Coaching\s*Unlock$/ })).toBeVisible();
+    await page.keyboard.press("Escape");
+
+    // Plan: what coaching adds, with the published price.
+    await page.goto(`${PROD}/account/plan`);
+    await expect(page.getByRole("heading", { name: "Add coaching" })).toBeVisible();
+    await expect(page.getByText("+£79 a month")).toBeVisible();
+
+    // The area itself is the unlock page.
+    await page.goto(`${PROD}/account/coaching`);
+    await expect(page).toHaveURL(/\/account\/coaching\/unlock$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Train with Alex, wherever you are." })).toBeVisible();
+    await expect(page.getByText("£79 a month").first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Unlock coaching" })).toHaveAttribute("href", /online-coaching\/enquire/);
+    for (const path of ["/account/coaching/programme", "/account/coaching/check-in", "/account/coaching/messages"]) {
+      await page.goto(PROD + path);
+      await expect(page).toHaveURL(/\/account\/coaching\/unlock$/);
+    }
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.setViewportSize({ width: 320, height: 640 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
   test("an address with no account gets the same answer and no email", async ({ page, request }) => {
     const email = `not-a-member-${Date.now()}@example.com`;
     await askForLink(page, email);

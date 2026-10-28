@@ -29,7 +29,7 @@ export default async function AccountProfilePage({ searchParams }: { searchParam
   const c = d.settings ?? { name: o.client.name, email: o.client.email, phone: o.client.phone };
 
   return (
-    <MembersShell view={null} overview={o} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view={null} overview={o} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={null}>
       <SettingsHeading eyebrow="Account" title="Your details.">
         Used for your bookings and to fill in forms for you.
       </SettingsHeading>

@@ -7,7 +7,7 @@ import { collect } from "@/lib/coach/db";
 import { loadMessage } from "@/lib/coach/errors";
 import { SUBSCRIPTION_STATUS } from "@/lib/coach/labels";
 import { formatPence } from "@/lib/coach/money";
-import { listCheckIns, listSubscriptions, SUBSCRIPTION_STATUSES } from "@/lib/coach/online";
+import { coachingUnread, listCheckIns, listSubscriptions, SUBSCRIPTION_STATUSES } from "@/lib/coach/online";
 import { expectedMonthly } from "@/lib/coach/revenue";
 import { formatDate } from "@/lib/coach/time";
 import type { SubscriptionStatus } from "@/lib/coach/types";
@@ -41,6 +41,9 @@ async function Online({ searchParams }: { searchParams: PageProps<"/coach/online
   const shown = all.filter((s) => s.status === status).sort((a, b) => (a.next_check_in_on ?? "9999").localeCompare(b.next_check_in_on ?? "9999"));
   const checkIns = shown.length ? await listCheckIns(db, { subscriptionIds: shown.map((s) => s.id) }) : { ok: true as const, data: [] };
   if (!checkIns.ok) return <LoadError message={loadMessage(checkIns.error)} />;
+  // Messages from clients in their coaching area, not yet read (a failure here only hides the badge).
+  const unreadResult = await coachingUnread(db);
+  const unread = unreadResult.ok ? unreadResult.data : {};
   const name = (id: string) => clients.find((c) => c.id === id)?.full_name ?? "Client";
   const active = all.filter((s) => s.status === "active");
   const dueCheckIns = active.filter((s) => s.next_check_in_on && s.next_check_in_on <= today).length;
@@ -88,6 +91,7 @@ async function Online({ searchParams }: { searchParams: PageProps<"/coach/online
                     <span className="block text-muted">{latest ? `Last: ${formatDate(latest.checked_in_on)}` : "No check-ins yet"}</span>
                   </span>
                   <span className="flex flex-wrap gap-2 text-sm md:justify-end">
+                    {unread[s.id] ? <Badge tone="strong">{unread[s.id]} new message{unread[s.id] === 1 ? "" : "s"}</Badge> : null}
                     {due ? <Badge tone="strong">Check-in due</Badge> : null}
                     {s.renews_on ? <span className="text-muted">Renews {formatDate(s.renews_on)}</span> : null}
                   </span>

@@ -28,7 +28,7 @@ export default async function AccountSecurityPage({ searchParams }: { searchPara
   const list = devices.ok ? devices.data : [];
 
   return (
-    <MembersShell view={null} overview={d.overview.data} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view={null} overview={d.overview.data} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={null}>
       <SettingsHeading eyebrow="Account" title="Sign-in and security.">
         There&apos;s no password. Each time you sign in we email a link that works once, for 15 minutes, and a device then stays signed in for 30 days.
       </SettingsHeading>

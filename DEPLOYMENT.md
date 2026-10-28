@@ -184,6 +184,16 @@ Profile and details, Notifications, Calendar sync and Sign-in and security, each
 4. Devices: the sign-in records the kind of device and browser from the user agent (e.g. "iPhone, Safari"), never the IP address or the user agent itself.
 5. The email address isn't editable by members (it is their sign-in and how bookings find them); Alex changes it in the coach area.
 
+### Raeng Coaching (2026-10-28, built; not live)
+
+The member side of online coaching, opened from the members area, plus the coach tools that feed it.
+
+1. **Apply `supabase/migrations/20261101000000_akb_coaching_area.sql`** after `20261031…` (with the owner's go-ahead): six tables (RLS on, no policies, `anon`/`authenticated` revoked), fifteen functions, and `akb_can_sign_in` replaced so a client with an active online coaching subscription can sign in even if they have never booked a class. Adds no column to an existing table and changes no row; safe to run again. Check: `select has_table_privilege('authenticated','public.akb_coaching_messages','select')` is false. Tests: `src/lib/coach/coaching.test.ts` (real migrations on PGlite).
+2. **Who has it:** a client with an **active** subscription in the coach area (Online coaching). Paused, cancelled or completed plans have no access (they see the unlock page). Nothing is bought in the members area: Alex starts the subscription after an enquiry.
+3. **Alex writes the programme** on the plan's page (`/coach/online/<id>` → Programme): name, goal, weeks (1 to 12), days a week, start date, and the exercises as text (`Week 1`, `Day A`, then `name | sets | reps | load | note | demo link`; a week left out repeats the one before). Demo links are `https://` links to a video hosted elsewhere (YouTube unlisted, Vimeo, Drive); **videos are never uploaded**. Saving again keeps what the client has logged.
+4. **Messages and check-ins:** clients write in their Messages and Check-in tabs; Alex sees them and replies on the same plan page, and the Online coaching list shows a badge for unread messages. **Nothing emails Alex yet** (needs Resend; TASKS.md), so he has to open the list.
+5. Prices come from `content/services.ts` (the Online coaching monthly price); a client's own plan name and price are read from their subscription.
+
 ### Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.

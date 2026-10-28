@@ -11,6 +11,11 @@ export const MEMBERS_APP_PATHS = [
   "/account/security",
   "/account/calendar-sync",
   "/account/notifications",
+  "/account/coaching",
+  "/account/coaching/programme",
+  "/account/coaching/check-in",
+  "/account/coaching/messages",
+  "/account/coaching/unlock",
 ] as const;
 
 export type MembersView = "home" | "book" | "plan";

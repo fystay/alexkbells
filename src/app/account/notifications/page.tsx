@@ -27,7 +27,7 @@ export default async function AccountNotificationsPage({ searchParams }: { searc
   const emailReady = bookingDeliveryConfig() !== null;
 
   return (
-    <MembersShell view={null} overview={d.overview.data} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view={null} overview={d.overview.data} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={null}>
       <SettingsHeading eyebrow="Account" title="Notifications." />
       <section aria-labelledby="reminders-heading" className="flex flex-col gap-3 rounded-3xl border-[1.5px] border-ink p-5.5">
         <p className="members-eyebrow">Class reminders</p>

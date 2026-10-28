@@ -9,6 +9,7 @@ import { MEMBERS_VIEW_PATH } from "@/lib/members-app";
 import { countdown, firstName, greeting, longWhen, pastPlaces, upcomingPlaces } from "@/lib/member-view";
 import type { MemberPlace } from "@/lib/member-auth";
 import { AccountUnavailable, ClassCredits, PayAsYouGo, PaymentDue } from "@/components/members/Cards";
+import { CoachingCard } from "@/components/members/CoachingCards";
 import { CreditRing } from "@/components/members/CreditRing";
 import { MembersShell } from "@/components/members/MembersShell";
 import { SheetTrigger } from "@/components/members/SheetTrigger";
@@ -43,7 +44,7 @@ export default async function AccountHomePage({ searchParams }: { searchParams: 
   const sheet = d.confirm ? (upcoming.map((p) => [sheetKey.cancel(p), cancelSheet(p, "home")] as const).find(([k]) => k === d.confirm)?.[1] ?? null) : null;
 
   return (
-    <MembersShell view="home" overview={o} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={sheet}>
+    <MembersShell view="home" overview={o} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={sheet}>
       <div className="flex flex-col gap-2">
         <p className="members-eyebrow">{m ? "Members" : "Your account"}</p>
         <h1 className="text-[clamp(1.875rem,8.4vw,2.625rem)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">
@@ -72,6 +73,8 @@ export default async function AccountHomePage({ searchParams }: { searchParams: 
           </Link>
         </section>
       )}
+
+      {d.coaching?.active ? <CoachingCard coaching={d.coaching} /> : null}
 
       {m && o.period ? (
         <section aria-labelledby="credits-heading" className="grid grid-cols-[96px_1fr] items-center gap-5 py-1">
@@ -126,6 +129,8 @@ export default async function AccountHomePage({ searchParams }: { searchParams: 
           </ul>
         </section>
       ) : null}
+
+      {d.coaching && !d.coaching.active ? <CoachingCard coaching={d.coaching} /> : null}
     </MembersShell>
   );
 }

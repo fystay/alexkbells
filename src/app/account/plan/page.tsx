@@ -7,6 +7,7 @@ import { formatPenceShort } from "@/lib/membership";
 import { pageMetadata } from "@/lib/metadata";
 import { periodProgress } from "@/lib/member-view";
 import { AccountUnavailable, ClassCredits, PayAsYouGo, PaymentDue } from "@/components/members/Cards";
+import { PlanCoaching } from "@/components/members/CoachingCards";
 import { MembersShell } from "@/components/members/MembersShell";
 import { loadMembers } from "../data";
 
@@ -32,7 +33,7 @@ export default async function AccountPlanPage({ searchParams }: { searchParams: 
   const m = o.membership;
 
   return (
-    <MembersShell view="plan" overview={o} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view="plan" overview={o} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={null}>
       <div className="flex flex-col gap-2">
         <p className="members-eyebrow">Plan and account</p>
         <h1 className="text-[clamp(1.875rem,8.4vw,2.625rem)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">
@@ -102,6 +103,8 @@ export default async function AccountPlanPage({ searchParams }: { searchParams: 
           <ClassCredits o={o} />
         </>
       )}
+
+      {d.coaching ? <PlanCoaching coaching={d.coaching} overview={o} /> : null}
 
       <section aria-labelledby="manage-heading" className="flex flex-col gap-3">
         <h2 id="manage-heading" className="members-eyebrow">

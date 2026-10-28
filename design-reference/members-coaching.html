@@ -1,0 +1,849 @@
+<title>Raeng Members Area</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap">
+<style>
+/* Layout: app-like members area; slim header with avatar, three views (Home / Book / Plan) switched by a bottom tab bar; one ink card per view carries the weight, everything else on hairlines */
+:root{
+  color-scheme:light;
+  --bg:#faf6ee; --ink:#151515; --rule:#cfcbc2; --muted:#5d5a54; --soft:#e8e4db; --paper:#ffffff;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Archivo","Helvetica Neue",Arial,sans-serif;
+}
+/* Single light look to match the Raeng site in every theme */
+:root{color-scheme:light}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit}
+p,h1,h2,h3{margin:0}
+.muted{color:var(--muted)}
+.gut{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* Header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--rule)}
+.bar{max-width:620px;margin:0 auto;height:60px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center}
+.icon-btn{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+.icon-btn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round}
+.mark{text-align:center;font-weight:800;letter-spacing:.34em;font-size:17px;padding-left:.34em}
+.mark small{display:block;font-size:9px;font-weight:600;letter-spacing:.4em;color:var(--muted);margin-top:-2px}
+.avatar{all:unset;cursor:pointer;justify-self:end;width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:15px}
+
+/* Views */
+main{max-width:620px;margin:0 auto;padding-top:28px;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.view{display:flex;flex-direction:column;gap:28px;animation:fade .35s both}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,8.4vw,42px);letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+h2{font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.head{display:flex;flex-direction:column;gap:8px}
+.demo{display:inline-flex;align-self:flex-start;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px dashed var(--rule);color:var(--muted)}
+
+/* Next class card */
+.next{background:var(--ink);color:var(--bg);border-radius:24px;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px}
+.next .lbl{font-size:12px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+.next .when{font-family:var(--display);font-weight:800;font-size:clamp(26px,7.4vw,34px);letter-spacing:-.03em;line-height:1.08}
+.next .where{opacity:.75;font-size:15px}
+.next .row{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid color-mix(in srgb,var(--bg) 22%,transparent);padding-top:14px;flex-wrap:wrap}
+.count{font-variant-numeric:tabular-nums;font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid color-mix(in srgb,var(--bg) 40%,transparent)}
+.chip:hover{background:var(--bg);color:var(--ink)}
+.empty-next{border:1.5px dashed var(--rule);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+
+/* Credits */
+.credits{display:grid;grid-template-columns:96px 1fr;gap:20px;align-items:center;padding-block:4px}
+.ring{width:96px;height:96px}
+.ring .track{fill:none;stroke:var(--soft);stroke-width:8}
+.ring .fill{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1)}
+.ring text{fill:var(--ink);font-family:"Archivo",Arial,sans-serif;font-weight:800;font-size:28px;font-variant-numeric:tabular-nums}
+.ring .of{font-size:11px;font-weight:600;fill:var(--muted);letter-spacing:1px}
+.credits div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.credits b{font-size:18px;letter-spacing:-.01em}
+.credits .small{font-size:14px}
+
+/* Lists */
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:16px;border-bottom:1px solid var(--rule);min-width:0}
+.list .t{display:flex;flex-direction:column;min-width:0}
+.list .t b{font-weight:600}
+.list .t span{font-size:14px;color:var(--muted)}
+.link{all:unset;cursor:pointer;font-weight:600;font-size:15px;border-bottom:1.5px solid var(--ink)}
+.empty{color:var(--muted);padding-block:16px;border-bottom:1px solid var(--rule)}
+.section{display:flex;flex-direction:column;gap:12px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline}
+
+/* Book view */
+.weeks{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;padding:4px}
+.weeks::-webkit-scrollbar{display:none}
+.wk{all:unset;cursor:pointer;flex:none;padding:10px 16px;border-radius:999px;border:1.5px solid var(--rule);font-size:14px;font-weight:600;white-space:nowrap;transition:background .25s,color .25s,border-color .25s}
+.wk[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.slot{all:unset;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 6px 14px;border:1.5px solid var(--ink);border-radius:20px;text-align:center;min-width:0;transition:transform .15s,background .25s,color .25s}
+.slot:active{transform:scale(.97)}
+.slot .d{font-size:12px;font-weight:600;letter-spacing:.2em}
+.slot .n{font-family:var(--display);font-weight:800;font-size:clamp(26px,7.6vw,34px);letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.slot .tm{font-size:14px}
+.slot .st{margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.slot.booked{background:var(--ink);color:var(--bg)}
+.slot.past{border-color:var(--rule);color:var(--muted);cursor:default;border-style:dashed}
+.slot.past:active{transform:none}
+.slot.out{border-color:var(--rule);color:var(--muted)}
+.hint{font-size:14px;color:var(--muted)}
+
+/* Plan view */
+.plan-card{border:1.5px solid var(--ink);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:6px}
+.plan-card .nm{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.03em}
+.period{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.track-bar{height:6px;border-radius:99px;background:var(--soft);overflow:hidden}
+.track-bar i{display:block;height:100%;background:var(--ink);border-radius:99px}
+.period .ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.kv{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.kv li{display:flex;justify-content:space-between;gap:16px;padding-block:14px;border-bottom:1px solid var(--rule)}
+.kv span{color:var(--muted)}
+.kv b{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+
+/* Train view (online coaching clients only) */
+.wkbar{display:grid;gap:4px;margin-top:4px}
+.wkbar i{height:6px;border-radius:99px;background:var(--soft)}
+.wkbar i.f{background:var(--ink)}
+.wkbar i.c{background:repeating-linear-gradient(90deg,var(--ink) 0 4px,var(--soft) 4px 7px)}
+.strip{display:flex;justify-content:space-between;align-items:center;gap:6px 16px;flex-wrap:wrap;padding-block:12px;border-block:1px solid var(--rule);font-size:14px;margin-block:-8px}
+.strip b{font-variant-numeric:tabular-nums}
+.strip .link{font-size:14px}
+.wk .ok{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-left:8px;vertical-align:middle}
+.ex-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.ex{padding-block:20px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:12px}
+.ex-top{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
+.ex-no{font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;transition:background .25s,color .25s}
+.ex.all .ex-no{background:var(--ink);color:var(--bg)}
+.ex-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ex-t b{font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.ex-t .rx{font-weight:600;font-variant-numeric:tabular-nums}
+.ex-t .cue{font-size:14px;color:var(--muted)}
+.ex-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-left:40px;font-size:13px}
+.ex-meta .last{color:var(--muted);font-variant-numeric:tabular-nums}
+.demo-link{color:var(--ink);font-weight:600;font-size:14px;text-decoration:none;border-bottom:1.5px solid var(--ink)}
+.no-demo{font-size:13px;color:var(--muted)}
+.sets{display:flex;flex-direction:column;gap:8px;padding-left:40px}
+.set{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(0,1fr) 40px;gap:8px;align-items:center}
+.set .sn{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.num{position:relative;display:block;min-width:0}
+.num input{all:unset;box-sizing:border-box;width:100%;height:44px;padding:0 44px 0 12px;border:1.5px solid var(--rule);border-radius:12px;background:var(--paper);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;transition:border-color .2s}
+.num input:focus{border-color:var(--ink)}
+.num em{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:12px;color:var(--muted);pointer-events:none;white-space:nowrap}
+.done{all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;transition:background .2s,transform .15s}
+.done:active{transform:scale(.9)}
+.done svg{width:18px;height:18px;fill:none;stroke:var(--bg);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.done[aria-pressed="true"]{background:var(--ink)}
+.done[aria-pressed="true"] svg{opacity:1}
+.set.is-done .num input{border-color:var(--soft);color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lbl{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.field textarea,.field input{all:unset;box-sizing:border-box;width:100%;padding:12px 14px;border:1.5px solid var(--rule);border-radius:14px;background:var(--paper);font-size:16px;line-height:1.45;transition:border-color .2s}
+.field textarea{min-height:84px;white-space:pre-wrap}
+.field textarea:focus,.field input:focus{border-color:var(--ink)}
+.finish{display:flex;flex-direction:column;gap:14px}
+.finish .btn{flex:none}
+.logged{border:1.5px dashed var(--rule);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.logged ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums}
+.logged .note{font-size:14px;color:var(--muted)}
+.reply{border-left:2px solid var(--ink);padding:2px 0 2px 14px;display:flex;flex-direction:column;gap:4px}
+.reply span{font-size:13px;color:var(--muted)}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{all:unset;cursor:pointer;text-align:center;height:44px;border-radius:12px;border:1.5px solid var(--rule);font-weight:700;font-variant-numeric:tabular-nums;transition:background .2s,color .2s,border-color .2s}
+.scale button[aria-checked="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.scale-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.sheet.tall{max-height:92vh;overflow-y:auto;overscroll-behavior:contain}
+.sheet .in.form{gap:18px}
+
+/* ---- Coaching area: premium space with an inverted palette and a brass accent ---- */
+:root{--brass:#b8925a}
+body{transition:background-color .45s,color .45s}
+body.coach{--bg:#131312;--ink:#f4efe4;--rule:#34322e;--muted:#a19b90;--soft:#26241f;--paper:#1c1b19;--brass:#d2ad72}
+.mark small.co{color:var(--brass)}
+.brass{color:var(--brass)}
+.ccard{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;background:#131312;color:#f4efe4;border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:8px;border:1px solid color-mix(in srgb,var(--brass) 60%,transparent);transition:transform .15s}
+.ccard:active{transform:scale(.99)}
+.ccard .lbl{font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
+.ccard .ttl{font-weight:800;font-size:clamp(24px,6.8vw,30px);letter-spacing:-.03em;line-height:1.1;max-width:15ch;text-wrap:balance}
+.ccard .sub{font-size:15px;color:#c9c3b8;max-width:30ch}
+.ccard .go{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #34322e;padding-top:14px;margin-top:6px;font-weight:600;font-size:15px}
+.ccard .go em{font-style:normal;color:#a19b90;font-weight:500;font-size:14px}
+.ccard .kb{position:absolute;right:-14px;top:-8px;width:120px;height:120px;fill:none;stroke:var(--brass);stroke-width:1.1;opacity:.3;pointer-events:none}
+.ccard.sm{margin-top:12px;padding:16px 18px;border-radius:20px;gap:2px}
+.ccard.sm .ttl{font-size:18px;max-width:none}
+.ccard.sm .sub{font-size:13px}
+.ccard.sm .kb{width:78px;height:78px;right:-8px;top:-6px}
+.lockic{display:inline-flex;align-items:center;gap:8px}
+.lockic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.btn.brass{background:var(--brass);border-color:var(--brass);color:#131312}
+.avatar.pro{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--brass)}
+.ptag{display:inline-flex;align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--brass);color:var(--brass);margin-top:3px}
+/* Unlock page */
+.preview{position:relative;border:1px solid var(--rule);border-radius:24px;padding:18px;overflow:hidden;background:var(--paper)}
+.preview .blur{filter:blur(3.5px);opacity:.75;pointer-events:none;user-select:none;display:flex;flex-direction:column;gap:14px}
+.preview .pv b{display:block;font-weight:800;font-size:17px}
+.preview .pv span{font-size:13px;color:var(--muted)}
+.preview .pv i{display:block;height:34px;border-radius:10px;border:1.5px solid var(--rule);margin-top:8px}
+.preview .lockc{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(closest-side,color-mix(in srgb,var(--bg) 55%,transparent),transparent)}
+.preview .lockc span{display:inline-flex;gap:8px;align-items:center;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px}
+.preview .lockc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.perks{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.perks li{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;padding-block:16px;border-bottom:1px solid var(--rule)}
+.perks svg{width:24px;height:24px;fill:none;stroke:var(--brass);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.perks b{display:block;font-weight:700}
+.perks span{color:var(--muted);font-size:14px}
+.how{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.how li{display:grid;grid-template-columns:34px 1fr;gap:14px}
+.how .n{font-size:13px;font-weight:700;color:var(--brass);font-variant-numeric:tabular-nums;padding-top:2px}
+.how b{display:block;font-weight:700}
+.how span{color:var(--muted);font-size:14px}
+.price{border:1px solid var(--brass);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:6px}
+.price .amt{font-weight:800;font-size:46px;letter-spacing:-.04em;line-height:1}
+.price .amt small{font-size:16px;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:6px}
+.cta-bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--rule);padding:12px max(20px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+.cta-bar[hidden],.tabs[hidden]{display:none}
+.cta-bar .in{max-width:620px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.cta-bar .in div{display:flex;flex-direction:column;line-height:1.25}
+.cta-bar b{font-size:17px}
+.cta-bar span{font-size:13px;color:var(--muted)}
+.cta-bar .btn{flex:none;padding:14px 22px;text-decoration:none}
+/* Programme */
+.wlist{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.wlist>li{padding-block:16px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:14px}
+.wrow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.wrow div{display:flex;flex-direction:column;min-width:0}
+.wrow b{font-weight:700}
+.wrow span{font-size:14px;color:var(--muted)}
+.wlist li.future .wrow b{color:var(--muted)}
+.tag{flex:none;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid currentColor;color:var(--muted);white-space:nowrap}
+.tag.now{color:var(--brass)}
+.tag.ok{color:var(--ink)}
+.pday{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;padding:14px 16px;border:1px solid var(--rule);border-radius:16px;width:100%}
+.pday b{font-weight:700}
+.pday span{font-size:14px;color:var(--muted);grid-column:1}
+.pday .tag{grid-column:2;grid-row:1 / span 2}
+.pdays{display:flex;flex-direction:column;gap:8px}
+/* Check-in history and messages */
+.cihist{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.cihist li{padding-block:16px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:10px}
+.cihist .sc{display:flex;gap:16px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.cihist .sc b{color:var(--ink)}
+.thread{display:flex;flex-direction:column;gap:8px}
+.msg{max-width:84%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.45;overflow-wrap:anywhere}
+.msg.them{align-self:flex-start;background:var(--soft);border-bottom-left-radius:6px}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--bg);border-bottom-right-radius:6px}
+.msg small{display:block;font-size:11px;opacity:.6;margin-top:4px}
+.sep{align-self:center;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:10px 0 4px}
+.composer{display:grid;grid-template-columns:1fr 48px;gap:8px;align-items:end}
+.composer textarea{all:unset;box-sizing:border-box;width:100%;min-height:48px;max-height:140px;padding:12px 16px;border:1.5px solid var(--rule);border-radius:24px;background:var(--paper);font-size:16px;line-height:1.4;white-space:pre-wrap}
+.composer textarea:focus{border-color:var(--ink)}
+.send{all:unset;cursor:pointer;width:48px;height:48px;border-radius:50%;background:var(--ink);display:grid;place-items:center}
+.send svg{width:20px;height:20px;fill:none;stroke:var(--bg);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabs .tab{position:relative}
+.tab .dot{position:absolute;top:8px;left:calc(50% + 7px);width:8px;height:8px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 2px var(--bg)}
+/* Plan: add coaching */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp{border:1.5px solid var(--rule);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cmp.up{background:#131312;color:#f4efe4;border-color:var(--brass)}
+.cmp .k{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.cmp.up .k{color:var(--brass)}
+.cmp .nm{font-weight:800;font-size:18px;letter-spacing:-.02em;line-height:1.15}
+.cmp .pr{font-size:13px;color:var(--muted)}
+.cmp.up .pr{color:#a19b90}
+.cmp ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.3}
+.cmp li{display:grid;grid-template-columns:14px 1fr;gap:7px}
+.cmp li::before{content:"✓";font-weight:700}
+.cmp.up li::before{color:var(--brass)}
+.cmp li.no{color:var(--muted)}
+.cmp li.no::before{content:"–"}
+
+/* Tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(var(--n,3),1fr);position:relative}
+.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 12px;font-size:12px;font-weight:600;color:var(--muted);transition:color .25s}
+.tab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[hidden]{display:none}
+.tab-ind{position:absolute;top:-1px;left:0;width:calc(100% / var(--n,3));height:2px;display:flex;justify-content:center;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.tab-ind::after{content:"";width:28px;height:2px;background:var(--ink);border-radius:2px}
+
+/* Drawer (members menu) */
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,10,.38);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;left:0;z-index:21;width:min(340px,86vw);background:var(--bg);transform:translateX(-102%);transition:transform .4s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 22px calc(22px + env(safe-area-inset-bottom,0px)) max(22px,env(safe-area-inset-left,0px));overflow-y:auto}
+.drawer.on{transform:none}
+.who{display:flex;gap:14px;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.who .avatar{width:46px;height:46px;font-size:18px;cursor:default}
+.who div{display:flex;flex-direction:column;min-width:0}
+.who b{font-size:17px}
+.who span{font-size:14px;color:var(--muted)}
+.mnav{display:flex;flex-direction:column;padding-block:12px}
+.mnav button{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.mnav button span{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0}
+.mnav button[aria-current="page"]::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink);margin-right:10px}
+.mnav button[aria-current="page"]{justify-content:flex-start}
+.mnav button[aria-current="page"] span{margin-left:auto}
+details{border-top:1px solid var(--rule);padding-block:6px}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;padding:12px 0;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:18px;letter-spacing:0;line-height:1}
+details[open] summary::after{content:"−"}
+.site{display:flex;flex-direction:column;gap:2px;padding-bottom:8px}
+.site a{color:var(--ink);text-decoration:none;padding:7px 0;font-size:16px}
+/* Drawer layout switcher (demo only) */
+.dlayout{margin-top:auto;padding-top:18px;border-top:1px dashed var(--rule);display:flex;flex-direction:column;gap:8px}
+.dlayout p{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.dlayout .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--soft);border-radius:999px;padding:4px}
+.dlayout button{all:unset;cursor:pointer;text-align:center;padding:8px 4px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.dlayout button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#dbody{display:flex;flex-direction:column;flex:1}
+/* B: grouped */
+.grp{display:flex;flex-direction:column;padding-block:14px;border-bottom:1px solid var(--rule)}
+.grp h4{margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.grp button,.grp a{all:unset;cursor:pointer;display:flex;justify-content:space-between;padding:8px 0;font-size:17px;font-weight:600;color:var(--ink)}
+.grp button span,.grp a span{font-size:13px;color:var(--muted);font-weight:500}
+/* C: action-first */
+.mini{margin-top:12px;background:var(--ink);color:var(--bg);border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+button.mini{border:0;font:inherit;text-align:left;cursor:pointer;width:100%}
+.mini small{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:.7}
+.mini b{font-size:18px;letter-spacing:-.01em}
+.mini span{font-size:13px;opacity:.75}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tile{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:var(--soft);font-size:14px;font-weight:600;color:var(--ink)}
+.tile svg{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.foot-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:14px}
+.dh{margin:22px 0 -4px;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.who+.dh{margin-top:18px}
+.tile.pri{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.foot-links a{color:var(--muted);text-decoration:none}
+
+/* Account menu (top right) */
+.acct{position:fixed;z-index:22;width:min(300px,calc(100vw - 24px));background:var(--paper);border:1px solid var(--rule);border-radius:20px;box-shadow:0 18px 40px -12px rgba(20,18,14,.25);padding:8px;opacity:0;transform:translateY(-6px) scale(.97);transform-origin:top right;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.2,.8,.2,1)}
+.acct.on{opacity:1;transform:none;pointer-events:auto}
+.acct-head{display:flex;gap:12px;align-items:center;padding:10px 10px 14px;border-bottom:1px solid var(--rule);margin-bottom:6px}
+.acct-head .avatar{width:40px;height:40px;cursor:default}
+.acct-head div{display:flex;flex-direction:column;min-width:0}
+.acct-head b{font-size:16px}
+.acct-head span{font-size:13px;color:var(--muted)}
+.acct [role="menuitem"]{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:12px;font-size:15px;font-weight:500;color:var(--ink)}
+.acct [role="menuitem"]:hover,.acct [role="menuitem"]:focus-visible{background:var(--soft);outline:none}
+.acct [role="menuitem"] svg{width:19px;height:19px;flex:none;fill:none;stroke:var(--ink);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.acct [role="menuitem"] em{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted)}
+.acct hr{border:0;border-top:1px solid var(--rule);margin:6px 0}
+.acct .out{color:var(--muted)}
+.acct .out svg{stroke:var(--muted)}
+.who .avatar,.acct-head .avatar{color:var(--bg);font-size:17px}
+.avatar[aria-expanded="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--ink)}
+
+/* Bottom sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--paper);border-radius:26px 26px 0 0;transform:translateY(105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);padding:12px max(22px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(22px,env(safe-area-inset-left,0px))}
+.sheet.on{transform:none}
+.sheet .in{max-width:576px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--rule);align-self:center;margin-bottom:6px}
+.sheet h3{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.03em;line-height:1.1}
+.sheet .btns{display:flex;gap:10px;margin-top:6px}
+.btn{all:unset;cursor:pointer;flex:1;text-align:center;padding:15px 20px;border-radius:999px;font-weight:600;border:1.5px solid var(--ink)}
+.btn.solid{background:var(--ink);color:var(--bg)}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<header>
+  <div class="bar gut">
+    <button class="icon-btn" id="menuBtn" aria-label="Open members menu" aria-expanded="false" aria-controls="drawer">
+      <svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h11"/></svg>
+    </button>
+    <div class="mark" aria-label="Raeng Fitness">RAENG<small id="markSub">MEMBERS</small></div>
+    <button class="avatar" id="avatarBtn" aria-label="Account menu" aria-haspopup="menu" aria-expanded="false" aria-controls="acct">N</button>
+  </div>
+</header>
+
+<main class="gut" id="main"></main>
+
+<!-- Tab bar: members tabs (Home / Book / Plan) or, inside Coaching, Today / Programme / Check-in / Messages. Built by script. -->
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <div class="in" role="tablist" id="tabsIn"></div>
+</nav>
+
+<!-- Unlock page bottom bar (members without coaching) -->
+<div class="cta-bar" id="ctaBar" hidden>
+  <div class="in"><div><b>£79 a month</b><span>Online coaching with Alex</span></div><a class="btn brass" href="https://raengfitness.vercel.app/online-coaching/enquire" target="_blank" rel="noopener">Unlock coaching</a></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" aria-label="Members menu" aria-hidden="true">
+  <div id="dbody"></div>
+</aside>
+
+<div class="acct" id="acct" role="menu" aria-label="Account" aria-hidden="true">
+  <div class="acct-head"><span class="avatar" id="acctAv" aria-hidden="true">N</span><div><b>Nitisat</b><span id="acctSub">Dedicated member</span></div></div>
+  <button role="menuitem" data-acct="coach"><svg viewBox="0 0 24 24"><path d="M9 8.5a3 3 0 1 1 6 0"/><path d="M8.2 8.5h7.6l1.7 9.2a2 2 0 0 1-2 2.3H8.5a2 2 0 0 1-2-2.3z"/></svg>Coaching<em id="acctCoach">Unlock</em></button>
+  <button role="menuitem" data-acct="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Profile and details</button>
+  <button role="menuitem" data-acct="plan"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg>Plan and billing<em>£85 / 4 wks</em></button>
+  <button role="menuitem" data-acct="notify"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notifications<em>On</em></button>
+  <button role="menuitem" data-acct="cal"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Calendar sync<em>Not connected</em></button>
+  <button role="menuitem" data-acct="security"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Sign-in and security</button>
+  <hr>
+  <button role="menuitem" data-acct="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.8v.1"/></svg>Help and contact</button>
+  <button role="menuitem" class="out" data-acct="out"><svg viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></svg>Sign out</button>
+</div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+  <div class="in">
+    <span class="grab" aria-hidden="true"></span>
+    <p class="eyebrow" id="sheetEyebrow">Book with a credit</p>
+    <h3 id="sheetTitle">Saturday 31 October, 9:00 am</h3>
+    <p class="muted" id="sheetBody">Uses 1 of your 10 credits. Kettlebell training at Media House, Cumbernauld.</p>
+    <div class="btns"><button class="btn" id="sheetNo">Not now</button><button class="btn solid" id="sheetYes">Book it</button></div>
+  </div>
+</div>
+
+<!-- Train sheet: check-in, finish session, message Alex (content set by script) -->
+<div class="sheet tall" id="tsheet" role="dialog" aria-modal="true" aria-labelledby="tsTitle" aria-hidden="true">
+  <div class="in form" id="tsBody"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  // ---- Example data, shaped like the current members area. Replace with your Supabase data. ----
+  const NOW=new Date('2026-10-28T18:50:00Z');            // 28 Oct 2026, 6:50 pm UK
+  const PERIOD={start:new Date('2026-10-27T00:00:00Z'),end:new Date('2026-11-23T23:59:00Z'),renew:'Tuesday 24 November'};
+  const PLAN={name:'Dedicated',price:'£85',every:'4 weeks',credits:12};
+  const ME={name:'Nitisat'};
+  const SLOTS=[[0,18,30],[2,18,30],[5,9,0]];              // Mon 6:30 pm, Wed 6:30 pm, Sat 9:00 am
+  const WEEKS=['2026-10-26','2026-11-02','2026-11-09','2026-11-16','2026-11-23'];
+  let booked=new Set(['2026-10-28T18:30','2026-11-04T18:30']); // one attended, one upcoming
+
+  // ---- Raeng Coaching: a separate, premium area inside the members app.
+  // ME.coaching = true  → member has online coaching: Home shows a Coaching card that opens the Coaching area
+  //                       (its own dark look and tabs: Today / Programme / Check-in / Messages).
+  // ME.coaching = false → the same card says "Unlock coaching" and opens the unlock page (→ /online-coaching/enquire).
+  // Replace with Supabase: programmes + programme_items, exercises (name, cue, video_url),
+  // workout_logs + set_logs, check_ins (+ coach_reply), and a messages table for client ↔ Alex.
+  // Demo videos are plain links to an outside host (unlisted YouTube, Vimeo, Bunny, Drive). Never upload video.
+  ME.coaching=true;
+  const ENQUIRE='https://raengfitness.vercel.app/online-coaching/enquire';
+  const COACHING={coach:'Alex',price:'£79',block:'Snatch prep',goal:'First 24 kg snatch test',week:3,of:6,perWeek:3,start:'2026-10-12',checkDue:'Sunday 1 November',checkSent:null,
+    lastCheck:{when:'Sun 25 Oct',reply:'Good week. Stay on the 16 kg for snatches and chalk up for the last two sets. The grip will come.',replied:'Mon 26 Oct'}};
+  const PAST_WEEKS={1:'3 of 3 sessions',2:'3 of 3 sessions'};
+  const CHECKS=[
+    {when:'Sun 25 Oct',week:2,energy:4,sleep:3,training:4,wins:'Hit 16 kg snatches for 5 a side without the bell flopping.',struggles:'Left grip fades in the last two sets.',reply:'Good week. Stay on the 16 kg for snatches and chalk up for the last two sets. The grip will come.',replied:'Mon 26 Oct'},
+    {when:'Sun 18 Oct',week:1,energy:3,sleep:3,training:3,wins:'Got all three sessions in.',struggles:'Swings felt rushed.',reply:'Slow the swings down and own the float at the top. Quality first, we add load next week.',replied:'Mon 19 Oct'}
+  ];
+  const MSGS=[
+    {me:false,t:'Welcome to Snatch prep. Six weeks, three days a week. Log every set and send me a check-in on Sundays.',when:'Mon 12 Oct'},
+    {me:true,t:'Brilliant, thanks Alex. Is it fine to do Day C on a Saturday?',when:'Mon 12 Oct'},
+    {me:false,t:'Yes, any order works as long as there is a rest day between A and C.',when:'Mon 12 Oct'},
+    {me:false,t:'Saw your Day A log. Press looks strong. Keep the pause on the last set.',when:'Tue 27 Oct'}
+  ];
+  let unread=1;
+  const ci={energy:0,sleep:0,training:0,wins:'',struggles:'',video:''};
+  const EXLIB={
+    swing:{name:'Two-hand swing',cue:'Hinge, snap the hips, let the bell float.',video:'https://www.youtube.com/results?search_query=kettlebell+two+hand+swing+form'},
+    goblet:{name:'Goblet squat',cue:'Elbows inside knees, chest tall.',video:'https://www.youtube.com/results?search_query=kettlebell+goblet+squat+form'},
+    clean:{name:'Single-arm clean',cue:'Zip the jacket, soft catch in the rack.',video:'https://www.youtube.com/results?search_query=kettlebell+clean+form'},
+    press:{name:'Strict press',cue:'Glutes on, ribs down, press from the rack.',video:'https://www.youtube.com/results?search_query=kettlebell+strict+press+form'},
+    row:{name:'Bent-over row',cue:'Flat back, elbow to the hip.',video:''},
+    tgu:{name:'Turkish get-up',cue:'Eyes on the bell, one step at a time.',video:'https://www.youtube.com/results?search_query=turkish+get+up+kettlebell+form'},
+    snatch:{name:'Snatch',cue:'Punch through at the top. No bell flop.',video:'https://www.youtube.com/results?search_query=kettlebell+snatch+form'},
+    rdl:{name:'Single-leg deadlift',cue:'Square hips, long spine.',video:''},
+    carry:{name:'Suitcase carry',cue:'Stay tall, no leaning.',video:''}
+  };
+  // This week's programme, as set in the coach dashboard: [exercise, sets, reps, load, coach note]
+  const WEEK_DAYS={
+    'Day A':[['swing',5,'10','24 kg',''],['goblet',4,'8','20 kg',''],['press',4,'5 each','16 kg','Last set: pause 2 s at the top.'],['carry',3,'40 m each','24 kg','']],
+    'Day B':[['clean',5,'5 each','16 kg',''],['rdl',3,'8 each','20 kg','Slow on the way down.'],['row',4,'8 each','20 kg',''],['tgu',3,'1 each','16 kg','']],
+    'Day C':[['snatch',6,'5 each','16 kg','Chalk before sets 5 and 6.'],['swing',10,'10','20 kg','On the minute.'],['goblet',3,'10','16 kg','']]
+  };
+  // What was logged for each exercise last week (from set_logs)
+  const LAST={'Day A':{swing:'20 kg × 10',goblet:'16 kg × 8',press:'16 kg × 4 each',carry:'20 kg × 40 m'},
+              'Day B':{clean:'16 kg × 4 each',rdl:'16 kg × 8 each',row:'16 kg × 8 each',tgu:'12 kg × 1 each'},
+              'Day C':{snatch:'16 kg × 4 each',swing:'20 kg × 10',goblet:'16 kg × 10'}};
+  const DAYLOG={'Day A':{when:'Mon 26 Oct',note:'Press felt strong. Grip okay today.',items:['Two-hand swing 5 × 10 · 24 kg','Goblet squat 4 × 8 · 20 kg','Strict press 4 × 5 each · 16 kg','Suitcase carry 3 × 40 m each · 24 kg']}};
+  const HISTORY=[{day:'Week 3 · Day A',when:'Mon 26 Oct',sets:'16 sets'},{day:'Week 2 · Day C',when:'Sat 24 Oct',sets:'19 sets'},{day:'Week 2 · Day B',when:'Thu 22 Oct',sets:'15 sets'}];
+  const TODAY_LBL='Wed 28 Oct';
+  const tr={day:Object.keys(WEEK_DAYS).find(d=>!DAYLOG[d])||'Day A',sets:{},note:''};
+
+  // Views: members (home/book/plan), coaching (c-*), unlock. norm() keeps people out of areas they don't have.
+  const inCoach=v=>v.startsWith('c-')||v==='unlock';
+  const norm=v=>{if(v==='coaching')v='c-today';if(v.startsWith('c-')&&!ME.coaching)return 'unlock';if(v==='unlock'&&ME.coaching)return 'c-today';return v};
+  let view=norm((location.hash||'#home').slice(1));
+  let week=0;
+
+  const $=s=>document.querySelector(s);
+  const main=$('#main');
+  const fmt=(d,o)=>new Intl.DateTimeFormat('en-GB',Object.assign({timeZone:'UTC'},o)).format(d);
+  const key=d=>d.toISOString().slice(0,16);
+  const timeLbl=d=>{const h=d.getUTCHours(),m=d.getUTCMinutes();return (h%12||12)+':'+String(m).padStart(2,'0')+' '+(h<12?'am':'pm')};
+  const longLbl=d=>fmt(d,{weekday:'long',day:'numeric',month:'long'})+', '+timeLbl(d);
+  const slotsFor=w=>SLOTS.map(([dd,h,m])=>{const d=new Date(WEEKS[w]+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+dd);d.setUTCHours(h,m);return d});
+  const all=()=>WEEKS.flatMap((_,i)=>slotsFor(i));
+  const used=()=>[...booked].filter(k=>{const d=new Date(k+':00Z');return d>=PERIOD.start&&d<=PERIOD.end}).length;
+  const left=()=>PLAN.credits-used();
+  const upcoming=()=>all().filter(d=>booked.has(key(d))&&d>NOW).sort((a,b)=>a-b);
+  const until=d=>{const m=Math.round((d-NOW)/60000),dd=Math.floor(m/1440),h=Math.floor(m%1440/60);return dd>1?'in '+dd+' days':dd===1?'tomorrow':h>0?'in '+h+' h':'in '+m+' min'};
+
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return ''}};
+  // "5 each" → [5,'each'], "40 m each" → [40,'m each'], "10" → [10,'reps']; "24 kg" → [24,'kg']
+  const qty=s=>{const m=String(s).match(/^([\d.]+)\s*(.*)$/);return m?[m[1],m[2]||'reps']:['',s]};
+  const sk=(day,i,s)=>day+'|'+i+'|'+s;
+  function setState(day,i,s){
+    const k=sk(day,i,s);if(!tr.sets[k]){const it=WEEK_DAYS[day][i];tr.sets[k]={load:qty(it[3])[0],reps:qty(it[2])[0],done:false}}
+    return tr.sets[k];
+  }
+  const totalSets=day=>WEEK_DAYS[day].reduce((n,it)=>n+it[1],0);
+  const doneSets=day=>Object.entries(tr.sets).filter(([k,v])=>k.startsWith(day+'|')&&v.done).length;
+  const sessionsDone=()=>Object.keys(DAYLOG).length;
+
+  function ring(n,of){
+    const c=2*Math.PI*40,off=c*(1-n/of);
+    return '<svg class="ring" viewBox="0 0 96 96" role="img" aria-label="'+n+' of '+of+' credits left"><circle class="track" cx="48" cy="48" r="40"/><circle class="fill" cx="48" cy="48" r="40" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/><text x="48" y="54" text-anchor="middle">'+n+'</text><text class="of" x="48" y="70" text-anchor="middle">OF '+of+'</text></svg>';
+  }
+
+  const KB='<svg class="kb" viewBox="0 0 64 64" aria-hidden="true"><path d="M21 33c-2-14 2-21 11-21s13 7 11 21"/><path d="M25.5 31c-1-8 1.5-12 6.5-12s7.5 4 6.5 12"/><circle cx="32" cy="42" r="14"/></svg>';
+  const LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>';
+  function coachCard(small){
+    if(ME.coaching){
+      const log=DAYLOG[tr.day];
+      return '<button class="ccard'+(small?' sm':'')+'" data-go="coaching">'+KB+'<span class="lbl">Raeng Coaching</span><span class="ttl">Week '+COACHING.week+', '+tr.day+'</span>'+
+        '<span class="sub">'+(log?'Logged '+log.when:COACHING.block+' · '+WEEK_DAYS[tr.day].length+' exercises')+(unread&&!small?' · 1 new message':'')+'</span>'+
+        (small?'':'<span class="go"><span>Open today\'s session</span><span aria-hidden="true">→</span></span>')+'</button>';
+    }
+    return '<button class="ccard'+(small?' sm':'')+'" data-go="unlock">'+KB+'<span class="lbl">Raeng Coaching</span><span class="ttl">'+(small?'Unlock coaching':'Train with Alex, wherever you are.')+'</span>'+
+      '<span class="sub">'+(small?COACHING.price+' a month':'Your own programme, demo videos and weekly check-ins.')+'</span>'+
+      (small?'':'<span class="go"><span class="lockic">'+LOCK+'Unlock coaching</span><em>'+COACHING.price+' a month</em></span>')+'</button>';
+  }
+
+  const views={
+    home(){
+      const up=upcoming(),nx=up[0];
+      return '<div class="head"><span class="demo">Example data</span><p class="eyebrow">Members</p><h1>Evening, '+ME.name+'.</h1></div>'+
+      (nx?'<section class="next" aria-label="Your next class"><p class="lbl">Your next class</p><p class="when">'+fmt(nx,{weekday:'long',day:'numeric',month:'long'})+'<br>'+timeLbl(nx)+'</p><p class="where">Kettlebell training · Media House, Cumbernauld</p><div class="row"><span class="count">'+until(nx)+'</span><div class="chips"><button class="chip" data-act="cal">Add to calendar</button><a class="chip" href="https://www.google.com/maps/search/?api=1&query=Media%20House%2C%201A%20Dunns%20Wood%20Road%2C%20Cumbernauld%2C%20G67%203EN" target="_blank" rel="noopener">Directions</a></div></div></section>'
+        :'<section class="empty-next"><p class="lbl eyebrow">No class booked</p><p>You have '+left()+' credits to use before '+fmt(PERIOD.end,{day:'numeric',month:'long'})+'.</p><button class="btn solid" data-go="book" style="flex:none">Book a class</button></section>')+
+      (ME.coaching?coachCard():'')+
+      '<section class="credits" aria-label="Credits">'+ring(left(),PLAN.credits)+'<div><b>'+left()+' credits left</b><span class="muted small">'+PLAN.name+' · renews '+PERIOD.renew.split(' ').slice(1).join(' ')+'</span><span class="muted small">Unused credits don\'t roll over.</span></div></section>'+
+      '<section class="section"><div class="section-head"><h2>Booked</h2><button class="link" data-go="book">Book more</button></div>'+
+      (up.length?'<ul class="list">'+up.map(d=>'<li><div class="t"><b>'+longLbl(d)+'</b><span>Membership credit</span></div><button class="link" data-cancel="'+key(d)+'">Cancel</button></li>').join('')+'</ul>':'<p class="empty">Nothing booked yet.</p>')+'</section>'+
+      (ME.coaching?'':coachCard());
+    },
+    book(){
+      const tabs=WEEKS.map((w,i)=>{const d=new Date(w+'T00:00:00Z');const lbl=i===0?'This week':i===1?'Next week':(()=>{const e=new Date(d);e.setUTCDate(e.getUTCDate()+5);return fmt(d,{day:'numeric'})+'–'+fmt(e,{day:'numeric',month:'short'})})();return '<button class="wk" role="tab" aria-selected="'+(i===week)+'" data-week="'+i+'">'+lbl+'</button>'}).join('');
+      const cards=slotsFor(week).map(d=>{
+        const k=key(d),b=booked.has(k),past=d<=NOW,out=d>PERIOD.end;
+        const cls='slot'+(b?' booked':'')+(past?' past':'')+(out&&!b?' out':'');
+        const st=past?(b?'Attended':'Past'):b?'Booked':out?'Next period':left()>0?'Book':'No credits';
+        return '<button class="'+cls+'" data-slot="'+k+'"'+(past?' aria-disabled="true"':'')+'><span class="d">'+fmt(d,{weekday:'short'}).toUpperCase()+'</span><span class="n">'+fmt(d,{day:'numeric'})+'</span><span class="tm">'+timeLbl(d)+'</span><span class="st">'+st+'</span></button>';
+      }).join('');
+      return '<div class="head"><p class="eyebrow">Book a class</p><h1>'+left()+' credits to use.</h1><p class="muted">Before '+fmt(PERIOD.end,{weekday:'long',day:'numeric',month:'long'})+'. One credit per class.</p></div>'+
+      '<div class="weeks" role="tablist" aria-label="Week">'+tabs+'</div><div class="slots">'+cards+'</div><p class="hint">Tap a class to book it. Tap a booked class to cancel.</p>';
+    },
+    plan(){
+      const total=PERIOD.end-PERIOD.start,pct=Math.min(100,Math.max(0,(NOW-PERIOD.start)/total*100));
+      return '<div class="head"><p class="eyebrow">Plan and account</p><h1>Your membership.</h1></div>'+
+      '<section class="plan-card"><span class="eyebrow">Current plan</span><span class="nm">'+PLAN.name+'</span><span class="muted">'+PLAN.price+' every '+PLAN.every+' · '+PLAN.credits+' credits</span>'+
+      '<div class="period"><div class="track-bar"><i style="width:'+pct.toFixed(1)+'%"></i></div><div class="ends"><span>'+fmt(PERIOD.start,{day:'numeric',month:'short'})+'</span><span>Renews '+fmt(new Date(PERIOD.end.getTime()+60000),{day:'numeric',month:'short'})+'</span></div></div></section>'+
+      '<ul class="kv"><li><span>Credits used</span><b>'+used()+' of '+PLAN.credits+'</b></li><li><span>Next renewal</span><b>'+PERIOD.renew+'</b></li><li><span>New credits</span><b>'+PLAN.credits+' on renewal</b></li><li><span>Signed in as</span><b>'+ME.name+'</b></li></ul>'+
+      planCoach()+
+      '<section class="section"><h2>Manage</h2><ul class="list"><li><div class="t"><b>Change plan</b><span>See all memberships</span></div><a class="link" href="https://raengfitness.vercel.app/memberships" style="color:var(--ink);text-decoration:none">View</a></li><li><div class="t"><b>Questions about your plan</b><span>Message Alex</span></div><a class="link" href="https://www.instagram.com/alex.kbells/" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:none">Instagram</a></li></ul></section>';
+    },
+    'c-today'(){
+      const C=COACHING,day=tr.day,items=WEEK_DAYS[day],log=DAYLOG[day];
+      const bar='<div class="wkbar" style="grid-template-columns:repeat('+C.of+',1fr)" role="img" aria-label="Week '+C.week+' of '+C.of+'">'+Array.from({length:C.of},(_,i)=>'<i class="'+(i<C.week-1?'f':i===C.week-1?'c':'')+'"></i>').join('')+'</div>';
+      const days=Object.keys(WEEK_DAYS).map(d=>'<button class="wk" role="tab" aria-selected="'+(d===day)+'" data-day="'+d+'"'+(DAYLOG[d]?' aria-label="'+d+', logged"':'')+'>'+d+(DAYLOG[d]?'<span class="ok" aria-hidden="true"></span>':'')+'</button>').join('');
+      const strip='<div class="strip"><span><b>'+sessionsDone()+' of '+C.perWeek+'</b> sessions this week</span>'+
+        (C.checkSent?'<span class="muted">Check-in sent</span>':'<button class="link" data-go="c-checkin">Check-in due Sun</button>')+'</div>';
+      let body;
+      if(log){
+        body='<section class="logged" aria-label="Logged session"><p class="eyebrow">Logged '+log.when+'</p><ul>'+log.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(log.note?'<p class="note">“'+esc(log.note)+'”</p>':'')+'<button class="link" data-relog style="align-self:flex-start">Log it again</button></section>';
+      }else{
+        body='<ol class="ex-list">'+items.map(([id,sets,reps,load,note],i)=>{
+          const e=EXLIB[id]||{name:id,cue:'',video:''},[,ru]=qty(reps),[,lu]=qty(load);
+          const rows=Array.from({length:sets},(_,s)=>{const st=setState(day,i,s+1),k=sk(day,i,s+1);
+            return '<div class="set'+(st.done?' is-done':'')+'" data-row="'+k+'"><span class="sn">'+(s+1)+'</span>'+
+              '<label class="num"><input inputmode="decimal" data-k="'+k+'" data-f="load" value="'+esc(st.load)+'" aria-label="'+esc(e.name)+' set '+(s+1)+' weight"><em>'+esc(lu)+'</em></label>'+
+              '<label class="num"><input inputmode="decimal" data-k="'+k+'" data-f="reps" value="'+esc(st.reps)+'" aria-label="'+esc(e.name)+' set '+(s+1)+' reps"><em>'+esc(ru)+'</em></label>'+
+              '<button class="done" data-done="'+k+'" aria-pressed="'+st.done+'" aria-label="Set '+(s+1)+' done"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></button></div>'}).join('');
+          const all=Array.from({length:sets},(_,s)=>setState(day,i,s+1).done).every(Boolean);
+          return '<li class="ex'+(all?' all':'')+'" data-ex="'+i+'"><div class="ex-top"><span class="ex-no">'+(i+1)+'</span><div class="ex-t"><b>'+esc(e.name)+'</b><span class="rx">'+sets+' × '+esc(reps)+' · '+esc(load)+'</span><span class="cue">'+esc(e.cue)+(note?' '+esc(note):'')+'</span></div></div>'+
+            '<div class="ex-meta">'+(e.video?'<a class="demo-link" href="'+esc(e.video)+'" target="_blank" rel="noopener">Watch demo ↗</a>':'<span class="no-demo">No demo video yet</span>')+(LAST[day]&&LAST[day][id]?'<span class="last">Last week: '+esc(LAST[day][id])+'</span>':'')+'</div>'+
+            '<div class="sets">'+rows+'</div></li>';
+        }).join('')+'</ol>'+
+        '<section class="finish"><div class="section-head"><h2>Finish</h2><span class="count" id="trProg">'+doneSets(day)+' of '+totalSets(day)+' sets</span></div>'+
+        '<div class="field"><label for="trNote">Note for '+C.coach+' (optional)</label><textarea id="trNote" placeholder="How did it feel? Anything sore or easy?">'+esc(tr.note)+'</textarea></div>'+
+        '<button class="btn solid" data-finish>Finish session</button></section>';
+      }
+      return '<div class="head"><span class="demo">Example data</span><p class="eyebrow brass">Today · '+esc(C.block)+'</p><h1>Week '+C.week+', '+day+'.</h1><p class="muted">'+items.length+' exercises · '+totalSets(day)+' sets · programmed by '+C.coach+'</p>'+bar+'</div>'+
+        strip+'<div class="weeks" role="tablist" aria-label="Training day">'+days+'</div>'+body;
+    },
+    'c-programme'(){
+      const C=COACHING,mon=w=>{const d=new Date(C.start+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+7*(w-1));return fmt(d,{weekday:'short',day:'numeric',month:'short'})};
+      const weeks=Array.from({length:C.of},(_,i)=>{const w=i+1;
+        if(w<C.week)return '<li><div class="wrow"><div><b>Week '+w+'</b><span>'+(PAST_WEEKS[w]||'Done')+'</span></div><span class="tag ok">Done</span></div></li>';
+        if(w===C.week)return '<li><div class="wrow"><div><b>Week '+w+'</b><span>From '+mon(w)+' · '+sessionsDone()+' of '+C.perWeek+' sessions</span></div><span class="tag now">This week</span></div>'+
+          '<div class="pdays">'+Object.keys(WEEK_DAYS).map(d=>'<button class="pday" data-pday="'+d+'"><b>'+d+'</b><span>'+WEEK_DAYS[d].map(x=>(EXLIB[x[0]]||{name:x[0]}).name).join(', ')+'</span><span class="tag'+(DAYLOG[d]?' ok':'')+'">'+(DAYLOG[d]?'Logged':'To do')+'</span></button>').join('')+'</div></li>';
+        return '<li class="future"><div class="wrow"><div><b>Week '+w+'</b><span>Opens '+mon(w)+'</span></div>'+(w===C.of?'<span class="tag">Test week</span>':'')+'</div></li>';
+      }).join('');
+      return '<div class="head"><p class="eyebrow brass">Your programme</p><h1>'+esc(C.block)+'.</h1><p class="muted">Written by '+C.coach+' for you. '+C.of+' weeks, '+C.perWeek+' days a week.</p>'+wkbar()+'</div>'+
+        '<ul class="kv"><li><span>Goal</span><b>'+esc(C.goal)+'</b></li><li><span>Started</span><b>'+mon(1)+'</b></li></ul>'+
+        '<section class="section"><h2>Weeks</h2><ul class="wlist">'+weeks+'</ul></section>'+
+        '<section class="section"><h2>Recent sessions</h2><ul class="list">'+HISTORY.map(h=>'<li><div class="t"><b>'+esc(h.day)+'</b><span>'+esc(h.when)+' · '+esc(h.sets)+'</span></div></li>').join('')+'</ul></section>';
+    },
+    'c-checkin'(){
+      const C=COACHING;
+      const scale=(k,label,lo,hi)=>'<div class="field"><span class="lbl" id="ci_'+k+'">'+label+'</span><div class="scale" role="radiogroup" aria-labelledby="ci_'+k+'">'+[1,2,3,4,5].map(n=>'<button type="button" role="radio" aria-checked="'+(ci[k]===n)+'" data-score="'+k+'|'+n+'">'+n+'</button>').join('')+'</div><div class="scale-ends"><span>'+lo+'</span><span>'+hi+'</span></div></div>';
+      const form=C.checkSent
+        ?'<section class="logged"><p class="eyebrow">Sent '+C.checkSent+'</p><p>Energy '+ci.energy+' · Sleep '+ci.sleep+' · Training '+ci.training+'</p>'+(ci.wins?'<p class="note">“'+esc(ci.wins)+'”</p>':'')+'<p class="note">'+C.coach+' usually replies within a day. You\'ll see it here and in Messages.</p></section>'
+        :scale('energy','Energy','Flat','Full of beans')+scale('sleep','Sleep','Poor','Great')+scale('training','Training','Hard going','Felt great')+
+          '<div class="field"><label for="ciWins">Wins this week</label><textarea id="ciWins" placeholder="New weight, more reps, made every session…">'+esc(ci.wins)+'</textarea></div>'+
+          '<div class="field"><label for="ciStr">What was hard</label><textarea id="ciStr" placeholder="Anything sore, missed or hard to fit in">'+esc(ci.struggles)+'</textarea></div>'+
+          '<div class="field"><label for="ciVid">Form video link (optional)</label><input id="ciVid" type="url" inputmode="url" value="'+esc(ci.video)+'" placeholder="https://youtu.be/… or a Google Drive link"><span class="hint">Paste a link to an unlisted YouTube, Vimeo or Drive video. No uploads.</span></div>'+
+          '<button class="btn solid" data-cisend style="flex:none">Send to '+C.coach+'</button>';
+      return '<div class="head"><p class="eyebrow brass">Weekly check-in · Week '+C.week+'</p><h1>'+(C.checkSent?'Sent. Nice work.':'How was your week?')+'</h1>'+(C.checkSent?'':'<p class="muted">Due '+C.checkDue+'. '+C.coach+' reads every one and adjusts your next week.</p>')+'</div>'+
+        form+
+        '<section class="section"><h2>Past check-ins</h2><ul class="cihist">'+CHECKS.map(c=>'<li><div class="wrow"><div><b>Week '+c.week+'</b><span>'+c.when+'</span></div></div><div class="sc"><span>Energy <b>'+c.energy+'</b></span><span>Sleep <b>'+c.sleep+'</b></span><span>Training <b>'+c.training+'</b></span></div>'+
+          (c.reply?'<div class="reply"><p>'+esc(c.reply)+'</p><span>'+C.coach+' · '+c.replied+'</span></div>':'')+'</li>').join('')+'</ul></section>';
+    },
+    'c-messages'(){
+      unread=0;let last='';
+      const th=MSGS.map(m=>{const sep=m.when!==last?'<span class="sep">'+esc(m.when)+'</span>':'';last=m.when;return sep+'<div class="msg '+(m.me?'me':'them')+'">'+esc(m.t)+'</div>'}).join('');
+      return '<div class="head"><p class="eyebrow brass">Messages</p><h1>'+COACHING.coach+'.</h1><p class="muted">Your coach. Usually replies within a day.</p></div>'+
+        '<div class="thread" aria-live="polite">'+th+'</div>'+
+        '<div class="composer"><textarea id="msgTxt" rows="1" aria-label="Message '+COACHING.coach+'" placeholder="Message '+COACHING.coach+'…"></textarea><button class="send" data-msgsend aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>';
+    },
+    unlock(){
+      const C=COACHING;
+      const pv=[['snatch','6 × 5 each · 16 kg'],['swing','10 × 10 · 20 kg'],['goblet','3 × 10 · 16 kg']].map(([id,rx])=>'<div class="pv"><b>'+EXLIB[id].name+'</b><span>'+rx+' · Watch demo ↗</span><i></i></div>').join('');
+      const ic={prog:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M8 14h3M8 17h6"/>',vid:'<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="m16 10.5 5-3v9l-5-3"/>',log:'<path d="M4 19h16M6 16V11M10 16V7M14 16v-6M18 16V5"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>'};
+      const perks=[['prog','A programme written for you','Six-week blocks built around your goal, your kit and your week.'],['vid','A demo for every lift','Short videos from Alex so you know exactly how each movement should look.'],['log','Log every set','Weights and reps in a tap. See last week\'s numbers so you know what to beat.'],['chat','Weekly check-ins and messages','Tell Alex how the week went. He replies and adjusts your next week.']];
+      return '<div class="head"><span class="demo">Example data</span><p class="eyebrow brass">Raeng Coaching</p><h1>Train with Alex, wherever you are.</h1><p class="muted">Online kettlebell coaching, right here in your members app. It sits alongside your class membership.</p></div>'+
+        '<div class="preview" aria-label="Preview of a coaching workout"><div class="blur" aria-hidden="true"><p class="eyebrow">Week 3 · Day C</p>'+pv+'</div><div class="lockc"><span>'+LOCK+'Your programme lives here</span></div></div>'+
+        '<ul class="perks">'+perks.map(([k,b,t])=>'<li><svg viewBox="0 0 24 24" aria-hidden="true">'+ic[k]+'</svg><div><b>'+b+'</b><span>'+t+'</span></div></li>').join('')+'</ul>'+
+        '<section class="section"><h2>How it works</h2><ol class="how"><li><span class="n">01</span><div><b>Tell Alex about you</b><span>Your goal, your experience and how to reach you, in a few quick questions.</span></div></li><li><span class="n">02</span><div><b>Alex reviews it personally</b><span>Every enquiry is read and answered by Alex himself.</span></div></li><li><span class="n">03</span><div><b>Coaching unlocks here</b><span>If it\'s a good fit, your programme appears in this app, ready for day one.</span></div></li></ol></section>'+
+        '<section class="price"><p class="eyebrow brass">One monthly price</p><p class="amt">'+C.price+'<small>a month</small></p><p class="muted">Online kettlebell coaching with Alex.</p></section>'+
+        '<p class="hint">Questions first? <a href="'+IG+'" target="_blank" rel="noopener" style="color:var(--ink)">Message Alex on Instagram</a>.</p>';
+    }
+  };
+  function wkbar(){const C=COACHING;return '<div class="wkbar" style="grid-template-columns:repeat('+C.of+',1fr)" role="img" aria-label="Week '+C.week+' of '+C.of+'">'+Array.from({length:C.of},(_,i)=>'<i class="'+(i<C.week-1?'f':i===C.week-1?'c':'')+'"></i>').join('')+'</div>'}
+  function planCoach(){
+    if(ME.coaching)return '<section class="section"><div class="section-head"><h2>Coaching</h2><button class="link" data-go="coaching">Open</button></div><ul class="kv"><li><span>Online coaching</span><b>'+COACHING.price+' a month</b></li><li><span>Programme</span><b>'+esc(COACHING.block)+' · week '+COACHING.week+' of '+COACHING.of+'</b></li><li><span>Coach</span><b>'+COACHING.coach+'</b></li></ul></section>';
+    return '<section class="section"><h2>Add coaching</h2><div class="compare">'+
+      '<div class="cmp"><span class="k">You have</span><span class="nm">'+PLAN.name+'</span><span class="pr">'+PLAN.price+' every '+PLAN.every+'</span><ul><li>'+PLAN.credits+' classes</li><li>Booking app</li><li class="no">Programme</li><li class="no">Demo videos</li><li class="no">Check-ins</li></ul></div>'+
+      '<div class="cmp up"><span class="k">Raeng Coaching</span><span class="nm">Add coaching</span><span class="pr">+'+COACHING.price+' a month</span><ul><li>Your classes</li><li>Booking app</li><li>Programme</li><li>Demo videos</li><li>Check-ins</li><li>Message Alex</li></ul></div>'+
+      '</div><button class="btn brass" data-go="unlock" style="flex:none;margin-top:4px">See coaching</button></section>';
+  }
+
+  const TABSVG={home:'<path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/>',book:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4M10 15l1.5 1.5L15 13"/>',plan:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8h-8z"/>',
+    today:'<path d="M9 8.5a3 3 0 1 1 6 0"/><path d="M8.2 8.5h7.6l1.7 9.2a2 2 0 0 1-2 2.3H8.5a2 2 0 0 1-2-2.3z"/>',prog:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+    check:'<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5M9 12l2 2 4-4M9 17h6"/>',msg:'<path d="M4 5h16v11H9l-5 4z"/>'};
+  const MTABS=[['home','Home','home'],['book','Book','book'],['plan','Plan','plan']];
+  const CTABS=[['c-today','Today','today'],['c-programme','Programme','prog'],['c-checkin','Check-in','check'],['c-messages','Messages','msg']];
+  const MENU_SVG='<svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h11"/></svg>',BACK_SVG='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+  let tabSet='';
+  function renderChrome(){
+    const cm=inCoach(view),set=view==='unlock'?null:(cm?CTABS:MTABS);
+    document.body.classList.toggle('coach',cm);
+    const ms=$('#markSub');ms.textContent=cm?'COACHING':'MEMBERS';ms.classList.toggle('co',cm);
+    menuBtn.innerHTML=cm?BACK_SVG:MENU_SVG;menuBtn.setAttribute('aria-label',cm?'Back to members area':'Open members menu');
+    $('#tabs').hidden=!set;$('#ctaBar').hidden=view!=='unlock';
+    if(set){
+      const id=set===CTABS?'c':'m';
+      if(tabSet!==id){tabSet=id;$('#tabsIn').style.setProperty('--n',set.length);
+        $('#tabsIn').innerHTML='<span class="tab-ind" id="tabInd" aria-hidden="true"></span>'+set.map(([v,l,ic])=>'<button class="tab" role="tab" data-view="'+v+'"><svg viewBox="0 0 24 24">'+TABSVG[ic]+'</svg>'+l+'</button>').join('')}
+      document.querySelectorAll('.tab').forEach((t,i)=>{const on=t.dataset.view===view;t.setAttribute('aria-selected',on);if(on)$('#tabInd').style.transform='translateX('+(i*100)+'%)';
+        const d=t.querySelector('.dot');if(t.dataset.view==='c-messages'&&unread&&!d)t.insertAdjacentHTML('beforeend','<b class="dot" aria-label="New message"></b>');else if(d&&(!unread||t.dataset.view!=='c-messages'))d.remove()});
+    }
+    // Coaching status: brass ring on the avatar, tag in the account menu
+    [av,$('#acctAv')].forEach(a=>a.classList.toggle('pro',ME.coaching));
+    $('#acctSub').innerHTML=PLAN.name+' member'+(ME.coaching?' · <span class="brass">Coaching</span>':'');
+    $('#acctCoach').textContent=ME.coaching?'Week '+COACHING.week:'Unlock';
+  }
+  function render(){
+    main.innerHTML='<div class="view">'+views[view]()+'</div>';
+    renderChrome();
+    document.querySelectorAll('.mnav button').forEach(b=>b.dataset.go===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+    renderDrawer();
+  }
+  function go(v){v=norm(v);const was=view;view=v;try{history.replaceState(null,'','#'+v)}catch(e){location.hash=v}render();closeDrawer();
+    if(v==='c-messages')window.scrollTo(0,document.body.scrollHeight);else window.scrollTo({top:0,behavior:inCoach(was)!==inCoach(v)?'auto':'smooth'})}
+
+  // Drawer
+  const drawer=$('#drawer'),scrim=$('#scrim'),menuBtn=$('#menuBtn');
+  function openDrawer(){drawer.classList.add('on');scrim.classList.add('on');drawer.setAttribute('aria-hidden','false');menuBtn.setAttribute('aria-expanded','true')}
+  function closeDrawer(){drawer.classList.remove('on');if(!sheet.classList.contains('on'))scrim.classList.remove('on');drawer.setAttribute('aria-hidden','true');menuBtn.setAttribute('aria-expanded','false')}
+  menuBtn.addEventListener('click',()=>{if(inCoach(view))go('home');else openDrawer()});
+  // ---- Left drawer: three layouts to compare ----
+  let layout='c';
+  const MAP='https://www.google.com/maps/search/?api=1&query=Media%20House%2C%201A%20Dunns%20Wood%20Road%2C%20Cumbernauld%2C%20G67%203EN';
+  const IG='https://www.instagram.com/alex.kbells/', SITE='https://raengfitness.vercel.app/';
+  const siteLinks=[['classes','Classes'],['memberships','Memberships'],['coaching','1:1 Coaching'],['online-coaching','Online Coaching'],['about','About RAENG']];
+  const ico={cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4M10 15l1.5 1.5L15 13"/>',list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',ring:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8h-8z"/>',pin:'<path d="M12 21s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',bell:'<path d="M9 8.5a3 3 0 1 1 6 0"/><path d="M8.2 8.5h7.6l1.7 9.2a2 2 0 0 1-2 2.3H8.5a2 2 0 0 1-2-2.3z"/>',check:'<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5M9 12l2 2 4-4M9 17h6"/>'};
+  function renderDrawer(){
+    const nx=upcoming()[0], l=left();
+    const head='<div class="who"><span class="avatar" aria-hidden="true">N</span><div><b>'+ME.name+'</b><span>'+PLAN.name+' · '+l+' credits left</span></div></div>';
+    let h='';
+    if(layout==='a'){
+      h=head+'<div class="mnav"><button data-go="home"'+(view==='home'?' aria-current="page"':'')+'>Home <span>Next class</span></button><button data-go="book"'+(view==='book'?' aria-current="page"':'')+'>Book a class <span>'+l+' credits</span></button><button data-go="plan"'+(view==='plan'?' aria-current="page"':'')+'>My plan <span>Renews 24 Nov</span></button>'+'<button data-go="coaching">Coaching <span class="brass">'+(ME.coaching?'Week '+COACHING.week:'Unlock')+'</span></button>'+'</div>'+
+        '<details><summary>Help</summary><div class="site"><a href="'+IG+'" target="_blank" rel="noopener">Message Alex on Instagram</a><a href="'+MAP+'" target="_blank" rel="noopener">Directions to Media House</a></div></details>'+
+        '<details><summary>Website</summary><div class="site">'+siteLinks.map(([p,t])=>'<a href="'+SITE+p+'">'+t+'</a>').join('')+'</div></details>';
+    }else if(layout==='b'){
+      h=head+'<div class="grp"><h4>Train</h4><button data-go="book">Book a class <span>'+l+' credits</span></button><button data-go="home">My bookings <span>'+upcoming().length+' upcoming</span></button>'+'<button data-go="coaching">Raeng Coaching <span class="brass">'+(ME.coaching?tr.day:'Unlock')+'</span></button>'+'</div>'+
+        '<div class="grp"><h4>Membership</h4><button data-go="plan">Plan and credits <span>'+PLAN.name+'</span></button><a href="'+SITE+'memberships">Change plan <span>→</span></a></div>'+
+        '<div class="grp"><h4>The club</h4><a href="'+SITE+'classes">Timetable</a><a href="'+SITE+'coaching">1:1 Coaching</a><a href="'+SITE+'online-coaching">Online Coaching</a><a href="'+SITE+'about">About RAENG</a></div>'+
+        '<div class="grp" style="border-bottom:0"><h4>Get in touch</h4><a href="'+IG+'" target="_blank" rel="noopener">Message Alex <span>Instagram</span></a><a href="'+MAP+'" target="_blank" rel="noopener">Directions <span>Media House</span></a></div>';
+    }else{
+      const foot=siteLinks.filter(([p])=>!(ME.coaching&&p==='online-coaching')).map(([p,t])=>'<a href="'+SITE+p+'">'+t+'</a>').join('')+'<a href="'+MAP+'" target="_blank" rel="noopener">Directions</a>';
+      h=head+'<p class="dh">Up next</p>'+
+        (nx?'<button class="mini" data-go="home"><small>Next class</small><b>'+fmt(nx,{weekday:'short',day:'numeric',month:'short'})+', '+timeLbl(nx)+'</b><span>'+until(nx)+' · Media House</span></button>':'<div class="mini"><small>Next class</small><b>Nothing booked</b><span>'+l+' credits to use</span></div>')+
+        coachCard(true)+
+        '<p class="dh">Shortcuts</p>'+
+        '<div class="tiles"><button class="tile pri" data-go="book"><svg viewBox="0 0 24 24">'+ico.cal+'</svg>Book a class</button><button class="tile" data-go="home"><svg viewBox="0 0 24 24">'+ico.list+'</svg>My bookings</button><button class="tile" data-go="plan"><svg viewBox="0 0 24 24">'+ico.ring+'</svg>Plan and credits</button><a class="tile" href="'+IG+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24">'+ico.chat+'</svg>Message Alex</a></div>'+
+        '<p class="dh">Raeng</p><div class="foot-links">'+foot+'</div>';
+    }
+    // Demo only: preview the app as a member with or without coaching
+    h+='<div class="dlayout"><p>Demo: view as</p><div class="seg" style="grid-template-columns:1fr 1fr"><button data-demo="member" aria-pressed="'+!ME.coaching+'">Member</button><button data-demo="client" aria-pressed="'+ME.coaching+'">Coaching client</button></div></div>';
+    $('#dbody').innerHTML=h;
+  }
+
+  // ---- Account menu (top right) ----
+  const acct=$('#acct'),av=$('#avatarBtn');
+  function placeAcct(){const r=av.getBoundingClientRect();acct.style.top=(r.bottom+10)+'px';acct.style.right=Math.max(12,innerWidth-r.right)+'px'}
+  function openAcct(){closeDrawer();placeAcct();acct.classList.add('on');acct.setAttribute('aria-hidden','false');av.setAttribute('aria-expanded','true');acct.querySelector('[role=menuitem]').focus()}
+  function closeAcct(){acct.classList.remove('on');acct.setAttribute('aria-hidden','true');av.setAttribute('aria-expanded','false')}
+  av.addEventListener('click',e=>{e.stopPropagation();acct.classList.contains('on')?closeAcct():openAcct()});
+  document.addEventListener('click',e=>{if(acct.classList.contains('on')&&!acct.contains(e.target)&&e.target!==av)closeAcct()});
+  addEventListener('resize',()=>{if(acct.classList.contains('on'))placeAcct()});
+  acct.addEventListener('keydown',e=>{const items=[...acct.querySelectorAll('[role=menuitem]')],i=items.indexOf(document.activeElement);if(e.key==='ArrowDown'){e.preventDefault();items[(i+1)%items.length].focus()}if(e.key==='ArrowUp'){e.preventDefault();items[(i-1+items.length)%items.length].focus()}});
+  acct.addEventListener('click',e=>{const b=e.target.closest('[data-acct]');if(!b)return;const a=b.dataset.acct;closeAcct();
+    if(a==='plan')go('plan');
+    else if(a==='coach')go('coaching');
+    else if(a==='out')toast('Signed out (example)');
+    else toast({profile:'Profile and details (example)',notify:'Notification settings (example)',cal:'Connect Apple or Google Calendar (example)',security:'Sign-in and security (example)',help:'Help and contact (example)'}[a]);
+    av.focus();});
+
+  // Sheet
+  const sheet=$('#sheet');let pending=null;
+  function openSheet(mode,k){
+    pending={mode,k};const d=new Date(k+':00Z');
+    $('#sheetEyebrow').textContent=mode==='book'?'Book with a credit':'Cancel booking';
+    $('#sheetTitle').textContent=longLbl(d);
+    $('#sheetBody').textContent=mode==='book'?'Uses 1 of your '+left()+' credits. Kettlebell training at Media House, Cumbernauld.':'Your place is released for someone else.';
+    $('#sheetYes').textContent=mode==='book'?'Book it':'Cancel booking';
+    $('#sheetNo').textContent=mode==='book'?'Not now':'Keep it';
+    sheet.classList.add('on');scrim.classList.add('on');sheet.setAttribute('aria-hidden','false');$('#sheetYes').focus();
+  }
+  function closeSheet(){sheet.classList.remove('on');scrim.classList.remove('on');sheet.setAttribute('aria-hidden','true');pending=null}
+  $('#sheetNo').addEventListener('click',closeSheet);
+  $('#sheetYes').addEventListener('click',()=>{
+    if(!pending)return;const d=new Date(pending.k+':00Z');
+    if(pending.mode==='book'){booked.add(pending.k);toast('Booked: '+fmt(d,{weekday:'short',day:'numeric',month:'short'})+', '+timeLbl(d))}
+    else{booked.delete(pending.k);toast('Booking cancelled')}
+    closeSheet();render();
+  });
+  // ---- Train sheet (check-in, finish session, message coach) ----
+  const ts=$('#tsheet'),tsBody=$('#tsBody');let tsOnOk=null;
+  function openT(html,onOk){
+    closeDrawer();tsBody.innerHTML='<span class="grab" aria-hidden="true"></span>'+html;tsOnOk=onOk;
+    ts.classList.add('on');scrim.classList.add('on');ts.setAttribute('aria-hidden','false');ts.scrollTop=0;
+    const f=tsBody.querySelector('[data-autofocus]')||tsBody.querySelector('[data-ts="ok"]');if(f)setTimeout(()=>f.focus({preventScroll:true}),60);
+  }
+  function closeT(){ts.classList.remove('on');scrim.classList.remove('on');ts.setAttribute('aria-hidden','true');tsOnOk=null}
+  tsBody.addEventListener('click',e=>{
+    const b=e.target.closest('[data-ts]');if(!b)return;
+    if(b.dataset.ts==='no')closeT();else if(tsOnOk&&tsOnOk()!==false)closeT();
+  });
+  const tsBtns=(no,ok)=>'<div class="btns"><button class="btn" data-ts="no">'+no+'</button><button class="btn solid" data-ts="ok">'+ok+'</button></div>';
+
+  function openFinish(){
+    const day=tr.day,d=doneSets(day),t=totalSets(day);
+    openT('<p class="eyebrow">Finish session</p><h3 id="tsTitle">Week '+COACHING.week+' · '+day+'</h3><p class="muted">'+d+' of '+t+' sets ticked.'+(d<t?' Unticked sets are saved as missed.':'')+' This goes straight to '+COACHING.coach+'.</p>'+tsBtns('Keep going','Log session'),
+    ()=>{
+      // → insert workout_logs (week, day, note) + set_logs (load, reps, done) for each set
+      const items=WEEK_DAYS[day].map(([id,sets,reps,load],i)=>{
+        const done=Array.from({length:sets},(_,s)=>setState(day,i,s+1)).filter(x=>x.done);
+        if(!done.length)return null;
+        const [,ru]=qty(reps),[,lu]=qty(load),top=done.reduce((m,x)=>Math.max(m,parseFloat(x.load)||0),0);
+        return (EXLIB[id]||{name:id}).name+' '+done.length+' × '+done[0].reps+(ru==='reps'?'':' '+ru)+(top?' · '+top+' '+lu:'');
+      }).filter(Boolean);
+      DAYLOG[day]={when:TODAY_LBL,note:tr.note.trim(),items:items.length?items:['No sets ticked']};
+      HISTORY.unshift({day:'Week '+COACHING.week+' · '+day,when:TODAY_LBL,sets:d+' sets'});
+      Object.keys(tr.sets).forEach(k=>{if(k.startsWith(day+'|'))delete tr.sets[k]});tr.note='';
+      toast('Session logged. '+COACHING.coach+' can see it.');render();window.scrollTo({top:0,behavior:'smooth'});
+    });
+  }
+
+  // Train view interactions
+  main.addEventListener('input',e=>{
+    const i=e.target;
+    if(i.dataset.k){const [day,ix,s]=i.dataset.k.split('|');setState(day,+ix,+s)[i.dataset.f]=i.value}
+    else if(i.id==='trNote')tr.note=i.value;
+    else if(i.id==='ciWins')ci.wins=i.value;else if(i.id==='ciStr')ci.struggles=i.value;else if(i.id==='ciVid')ci.video=i.value;
+    if(i.id==='msgTxt'){i.style.height='auto';i.style.height=Math.min(140,i.scrollHeight+3)+'px'}
+  });
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[data-day],[data-done],[data-finish],[data-relog],[data-pday],[data-score],[data-cisend],[data-msgsend],[data-demo]');if(!t||ts.contains(t))return;
+    if(t.dataset.day!==undefined&&t.dataset.day){tr.day=t.dataset.day;render()}
+    else if(t.dataset.done){
+      const k=t.dataset.done,[day,ix,s]=k.split('|'),st=setState(day,+ix,+s);st.done=!st.done;
+      t.setAttribute('aria-pressed',st.done);t.closest('.set').classList.toggle('is-done',st.done);
+      const li=t.closest('.ex'),n=WEEK_DAYS[day][+ix][1];
+      li.classList.toggle('all',Array.from({length:n},(_,j)=>setState(day,+ix,j+1).done).every(Boolean));
+      const p=$('#trProg');if(p)p.textContent=doneSets(day)+' of '+totalSets(day)+' sets';
+      if(st.done&&navigator.vibrate)try{navigator.vibrate(10)}catch(_){}
+    }
+    else if(t.hasAttribute('data-finish'))openFinish();
+    else if(t.dataset.pday){tr.day=t.dataset.pday;go('c-today')}
+    else if(t.dataset.score){const [k,n]=t.dataset.score.split('|');ci[k]=+n;t.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',b===t))}
+    else if(t.hasAttribute('data-cisend')){
+      if(!ci.energy||!ci.sleep||!ci.training){toast('Pick 1–5 for energy, sleep and training');return}
+      if(ci.video.trim()&&!/^https?:\/\/\S+\.\S+/.test(ci.video.trim())){toast('That video link doesn\'t look right');$('#ciVid').focus();return}
+      // → insert into check_ins (client_id, energy, sleep, training, wins, struggles, video_url)
+      COACHING.checkSent=TODAY_LBL;toast('Check-in sent to '+COACHING.coach);render();window.scrollTo({top:0,behavior:'smooth'});
+    }
+    else if(t.hasAttribute('data-msgsend')){
+      const box=$('#msgTxt'),txt=box.value.trim();if(!txt){box.focus();return}
+      // → insert into messages (client_id, from_client, body); shows in the coach Inbox
+      MSGS.push({me:true,t:txt,when:TODAY_LBL});render();window.scrollTo(0,document.body.scrollHeight);$('#msgTxt').focus();
+    }
+    else if(t.dataset.demo){ME.coaching=t.dataset.demo==='client';toast(ME.coaching?'Viewing as a coaching client':'Viewing as a member without coaching');view=norm(view);render()}
+    else if(t.hasAttribute('data-relog')){delete DAYLOG[tr.day];render()}
+  });
+
+  scrim.addEventListener('click',()=>{closeSheet();closeT();closeDrawer()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(acct.classList.contains('on')){closeAcct();av.focus()}closeSheet();closeT();closeDrawer()}});
+
+  // Toast
+  let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+
+  // Delegated clicks
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[data-view],[data-go],[data-week],[data-slot],[data-cancel],[data-act]');if(!t)return;
+    if(t.dataset.view)go(t.dataset.view);
+    else if(t.dataset.go)go(t.dataset.go);
+    else if(t.dataset.week){week=+t.dataset.week;render()}
+    else if(t.dataset.cancel)openSheet('cancel',t.dataset.cancel);
+    else if(t.dataset.act==='cal')toast('Calendar file ready (example)');
+    else if(t.dataset.slot){
+      const k=t.dataset.slot,d=new Date(k+':00Z');
+      if(d<=NOW)return;
+      if(booked.has(k))openSheet('cancel',k);
+      else if(d>PERIOD.end)toast('Opens when your plan renews');
+      else if(left()<1)toast('No credits left this period');
+      else openSheet('book',k);
+    }
+  });
+  addEventListener('hashchange',()=>{const v=norm(location.hash.slice(1));if(views[v]&&v!==view){view=v;render()}});
+  render();
+})();
+</script>

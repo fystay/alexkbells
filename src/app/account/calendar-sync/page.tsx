@@ -26,7 +26,7 @@ export default async function AccountCalendarSyncPage({ searchParams }: { search
   const connected = d.settings?.calendar_feed ?? false;
 
   return (
-    <MembersShell view={null} overview={d.overview.data} settings={d.settings} now={d.now} done={d.done} error={d.error} sheet={null}>
+    <MembersShell view={null} overview={d.overview.data} settings={d.settings} coaching={d.coaching} now={d.now} done={d.done} error={d.error} sheet={null}>
       <SettingsHeading eyebrow="Account" title="Calendar sync.">
         Your booked classes in your own calendar, kept up to date. Calendar apps check for changes every so often, so a new booking can take a while to show.
       </SettingsHeading>
