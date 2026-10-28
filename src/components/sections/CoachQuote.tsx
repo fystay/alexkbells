@@ -11,7 +11,7 @@ import { StartTraining } from "@/components/ui/StartTraining";
 /**
  * Alex's line in his own words, the class facts and Book now (owner's pick C,
  * 2026-10-26; boxes removed the same day: the quote stands on the page, the
- * facts sit in one row between thin rules). No photo: his before-and-after is
+ * facts sit in one row between thin rules; owner's /about design 2026-10-28). No photo: his before-and-after is
  * further down /about. Each fact shows only when its content is confirmed.
  */
 export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
@@ -29,23 +29,21 @@ export function CoachQuote({ tone = "white" }: { tone?: SectionTone }) {
   return (
     <Section tone={tone} id="story" labelledBy="story-heading">
       <div className="max-w-2xl">
-        <h2 id="story-heading" className="sr-only">
+        {/* Owner's /about design (2026-10-28): a visible label, the quote, "Alex Robertson, coach", the facts in thirds between rules. */}
+        <h2 id="story-heading" className="eyebrow">
           In {coach.name.split(" ")[0]}&apos;s words
         </h2>
-        <figure data-reveal>
-          <blockquote className="font-display text-[1.875rem] leading-[1.15] text-balance sm:text-[2.5rem]">
+        <figure data-reveal className="mt-5">
+          <blockquote className="font-display text-[clamp(1.5rem,6.4vw,2rem)] leading-[1.25] font-medium tracking-tight text-balance">
             <p>&ldquo;{aboutQuote.text}&rdquo;</p>
           </blockquote>
-          <figcaption className="mt-5">
-            {/* His name only: his role is in Meet your coach further down (audit, 2026-10-27). */}
-            <span className="block font-semibold">{coach.name}</span>
-          </figcaption>
+          <figcaption className="mt-4 text-sm">{coach.name}, coach</figcaption>
         </figure>
-        <ul aria-label="Classes at a glance" className="mt-8 grid grid-cols-3 text-center">
+        <ul aria-label="Classes at a glance" className="mt-6 grid grid-cols-3 border-y border-line">
           {facts.map((f) => (
-            <li key={f.label} className="px-1.5 py-2">
-              <span className="block font-display text-[1.625rem] leading-tight">{f.value}</span>
-              <span className="block text-[0.8125rem] leading-snug">{f.label}</span>
+            <li key={f.label} className="flex min-w-0 flex-col gap-0.5 py-4 pr-2.5 [&+&]:border-l [&+&]:border-line [&+&]:pl-3.5">
+              <span className="font-display text-[1.625rem] leading-tight font-bold tabular-nums">{f.value}</span>
+              <span className="text-sm leading-snug">{f.label}</span>
             </li>
           ))}
         </ul>

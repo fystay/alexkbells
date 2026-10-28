@@ -233,6 +233,14 @@
   }
 }
 
+/* /about: the line under the senses of แรง settles in when a sense is chosen (SenseEntry). */
+@keyframes sense-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 /* Opening curtain (lib/reveal.ts INTRO_SCRIPT): first visit only. The logo is
    the supplied black artwork on the cream page colour (never recoloured). */
 .intro {

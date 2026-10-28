@@ -720,10 +720,20 @@ test("/coaching: the owner's design, who it's for, three steps, the two prices a
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
   await page.goto("/about");
-  // Opens with RAENG's philosophy card, word for word (owner, 2026-10-27).
+  // Opens with แรง as a dictionary entry (owner's design, 2026-10-28): tap a sense to read its line.
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("More than strength.");
-  await expect(page.locator("header").filter({ hasText: "Our philosophy" })).toContainText("In Thai, แรง (Raeng) represents strength, power, energy and drive.");
+  const entry = page.locator("header").filter({ hasText: "Our philosophy" });
   await expect(page.locator('[lang="th"]')).toHaveText("แรง");
+  await expect(entry).toContainText("Thai, noun");
+  await expect(entry.getByRole("button", { pressed: true })).toHaveText(/strength/);
+  await entry.getByRole("button", { name: /drive/ }).click();
+  await expect(entry.getByRole("button", { pressed: true })).toHaveText(/drive/);
+  await expect(entry).toContainText("The reason you still turn up on the hard days.");
+  // "1% better, every day" as a chart: the slider reads any day.
+  const slider = page.locator("#coach").getByRole("slider", { name: "Day of the year" });
+  await slider.fill("100");
+  await expect(page.locator("#coach")).toContainText("after 100 days of 1% better");
+  await expect(page.locator("#coach")).toContainText("×2.70");
   // Facebook is in the footer; Alex's section links Instagram only (2026-10-27).
   const fb = page.getByRole("contentinfo").getByRole("link", { name: /Facebook/ });
   await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");

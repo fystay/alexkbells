@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { coach } from "@/content/coach";
 import { site } from "@/content/site";
 import { journey } from "@/content/journey";
@@ -35,6 +36,7 @@ export function CoachStory({
   showPhotos = true,
   portrait = null,
   tone = "white",
+  children,
 }: {
   headingAs?: "h2" | "h3";
   showAboutLink?: boolean;
@@ -43,6 +45,8 @@ export function CoachStory({
   /** One photo of Alex in the frame's place (/about, owner 2026-10-27). */
   portrait?: Photo | null;
   tone?: SectionTone;
+  /** Shown under the heading (/about: the "1% better" chart, owner's design 2026-10-28). */
+  children?: ReactNode;
 }) {
   const details = coachDetails();
   const showJourney = isPublishable(journey.status);
@@ -60,6 +64,7 @@ export function CoachStory({
             <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>
+            {children}
           </div>
           {photos ? (
             <figure className="lg:col-span-6 lg:row-span-2 lg:self-center">
