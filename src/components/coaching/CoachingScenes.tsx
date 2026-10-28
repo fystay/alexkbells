@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 /**
- * The drawings for the 1:1 and online coaching explainers (components/ui/Explainer.tsx).
+ * The drawings for the 1:1 coaching explainers (components/ui/Explainer.tsx).
  * Plain SVG on a 400 x 344 stage in the site's four colours, animated by the `.mx-*`
  * classes in globals.css. They are abstract on purpose: the only words are short
  * labels taken from the pages' own copy, and nothing shows a number, a duration
@@ -133,75 +133,5 @@ const sceneMovement = (
   </>
 );
 
-/* ---------- Online coaching: how it works ---------- */
-
-const sceneTellAlex = (
-  <>
-    <Label x={40} y={62} muted>
-      A few quick questions
-    </Label>
-    {[100, 162, 224].map((y, i) => (
-      <g key={y}>
-        <rect className="mx-fl mx-a mx-wipe" style={d(0.2 + i * 0.5)} x={40} y={y} width={90} height={7} />
-        <rect className="mx-ol" x={40} y={y + 18} width={320} height={30} />
-        <path className="mx-ol mx-a mx-draw" style={len(220, 0.5 + i * 0.5)} d={`M54 ${y + 33} H${150 + i * 40}`} />
-      </g>
-    ))}
-    <Label x={40} y={320} muted delay={2.2}>
-      About you
-    </Label>
-  </>
-);
-
-const sceneReview = (
-  <>
-    <Label x={40} y={62} muted>
-      Read by Alex
-    </Label>
-    <rect className="mx-ol" x={40} y={96} width={210} height={170} />
-    {[130, 170, 210].map((y, i) => (
-      <g key={y}>
-        <path className="mx-hair" d={`M60 ${y} H190`} />
-        <path className="mx-ol mx-a mx-draw" style={len(40, 0.6 + i * 0.5)} d={`M214 ${y - 2} l8 8 l16 -18`} />
-      </g>
-    ))}
-    <g className="mx-a mx-rise" style={d(0.2)}>
-      <circle className="mx-fl" cx={310} cy={150} r={20} />
-      <path className="mx-ol" strokeWidth={3} d="M270 232 C270 190 350 190 350 232" />
-    </g>
-    <Label x={310} y={262} anchor="middle" muted>
-      Alex
-    </Label>
-  </>
-);
-
-const sceneDecide = (
-  <>
-    <Label x={40} y={62} muted>
-      A good fit?
-    </Label>
-    <g className="mx-a mx-pop" style={d(0.2)}>
-      <circle className="mx-ol" cx={160} cy={172} r={66} />
-    </g>
-    <g className="mx-a mx-pop" style={d(0.6)}>
-      <circle className="mx-ol" cx={240} cy={172} r={66} />
-    </g>
-    <g className="mx-a mx-pop" style={d(1.3)}>
-      <circle className="mx-fl" cx={200} cy={172} r={22} />
-    </g>
-    <path className="mx-tick mx-a mx-fade" style={d(1.7)} d="M189 172 l8 8 l14 -16" />
-    <Label x={120} y={282} anchor="middle" muted>
-      You
-    </Label>
-    <Label x={280} y={282} anchor="middle" muted>
-      Alex
-    </Label>
-    <Label x={40} y={326} muted delay={2}>
-      Decide together
-    </Label>
-  </>
-);
-
 export const oneToOneHowScenes: ReactNode[] = [sceneRequest, sceneConfirm, sceneFaceToFace];
 export const oneToOneFocusScenes: ReactNode[] = [sceneStrength, sceneTechnique, sceneMovement];
-export const onlineHowScenes: ReactNode[] = [sceneTellAlex, sceneReview, sceneDecide];

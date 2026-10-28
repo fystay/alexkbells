@@ -689,6 +689,19 @@ test("/classes: what the classes build, then how to join in three steps (owner's
   await expect(page).toHaveURL(/#join$/);
 });
 
+test("/online-coaching: the owner's design, what you get, three steps, one monthly price (2026-10-28)", async ({ page }) => {
+  await page.goto("/online-coaching");
+  await expect(page.locator("#included").getByRole("heading", { level: 2 })).toHaveText("Structure, support and progress.");
+  await expect(page.locator("#included h3")).toHaveText(["Personalised programming", "Ongoing support", "Progression"]);
+  const how = page.locator("#how-it-works");
+  await expect(how.getByRole("heading", { level: 2 })).toHaveText("Start with a conversation.");
+  await expect(how.locator("ol > li")).toHaveCount(3);
+  const pricing = page.locator("#pricing");
+  await expect(pricing.getByRole("heading", { level: 2 })).toHaveText("One monthly price.");
+  await expect(pricing).toContainText("£79");
+  await expect(pricing.getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching/enquire");
+});
+
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
   await page.goto("/about");
   // Opens with RAENG's philosophy card, word for word (owner, 2026-10-27).

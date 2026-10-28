@@ -5,9 +5,7 @@ import { site } from "@/content/site";
 import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { Steps } from "@/components/ui/Steps";
-import { Explainer } from "@/components/ui/Explainer";
-import { onlineHowScenes } from "@/components/coaching/CoachingScenes";
+import { MonthRing, Reach, featureIcons, stepIcons } from "@/components/coaching/OnlineGraphics";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { images } from "@/content/images";
@@ -33,18 +31,26 @@ export default function OnlineCoachingPage() {
 
   // Only what is confirmed about the service (content/services.ts). Further
   // features (reviews, check-ins, platform) are added there once Alex confirms them.
+  // Wording from the owner's design (2026-10-28).
   const included = [
     { title: "Personalised programming", body: "Training written for you, not a template handed to everyone." },
-    { title: "Ongoing support", body: "Support that continues as you train, so you're never left to work it out alone." },
+    { title: "Ongoing support", body: "Help that carries on as you train, so you never have to work it out alone." },
     { title: "Progression", body: "A plan that moves forward as you do." },
   ];
 
   const steps = [
     { title: "Tell Alex about you", body: "Your goal, your experience and how to reach you, in a few quick questions." },
-    { title: "Alex reviews it personally", body: "Every enquiry is read and answered by Alex." },
-    { title: "Decide together", body: "If online coaching is a good fit, Alex explains how it works and the next steps." },
+    { title: "Alex reviews it personally", body: "Every enquiry is read and answered by Alex himself." },
+    { title: "Decide together", body: "If online coaching is a good fit, Alex explains how it works and what happens next." },
   ];
 
+  const enquire = (className: string) => (
+    <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className={className} />
+  );
+
+  // The owner's design (2026-10-28): the studio-to-you line drawing under the
+  // intro; what you get and how it works as rows with line drawings; the price
+  // in one outlined box with a month ring; then the in-person band.
   return (
     <>
       <PageHeader
@@ -52,23 +58,33 @@ export default function OnlineCoachingPage() {
         panel={<PhotoFrame photo={images.onlineCoaching} sizes="(min-width: 1248px) 480px, (min-width: 1024px) 38vw, 100vw" priority className="aspect-[4/5] w-full" />}
         eyebrow="Online coaching"
         title="Coaching that goes where you train."
-        intro="Personalised kettlebell programming with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching beyond the studio."
+        intro={
+          <>
+            <p>
+              Personalised kettlebell programming, with ongoing support and progression, wherever you are. For people outside Cumbernauld, or anyone who wants coaching
+              beyond the studio.
+            </p>
+            <Reach className="mt-6 max-w-xl" />
+          </>
+        }
       >
-        <StartTraining href={enquiry.href} label={enquiry.label} external={enquiry.external} className="w-full sm:w-[22rem]" />
-        <p className="w-full text-sm ">
-          This is an enquiry, not a sign-up: nothing is booked and there&apos;s nothing to pay.
-        </p>
+        {enquire("w-full sm:w-[22rem]")}
+        <p className="w-full text-sm">This is an enquiry, not a sign-up. Nothing is booked and there&apos;s nothing to pay.</p>
       </PageHeader>
 
-      {/* No decorative panel and no cards (2026-10-26): rows between thin lines (2026-10-27). */}
       <Section tone="white" id="included" labelledBy="included-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="What you get" title="Structure, support and progress" />
-          <ul className="lined mt-8 lg:col-span-7 lg:mt-0">
+          <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="What you get" title="Structure, support and progress." />
+          <ul className="mt-8 border-t border-line lg:col-span-7 lg:mt-0">
             {included.map((item, i) => (
-              <li key={item.title} data-reveal style={revealDelay(i)} >
-                <h3 className="font-semibold">{item.title}</h3>
-                <p className="mt-0.5">{item.body}</p>
+              <li key={item.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.75rem_1fr] gap-4 border-b border-line py-5">
+                <svg viewBox="0 0 44 44" aria-hidden="true" className="size-11">
+                  {featureIcons[i]}
+                </svg>
+                <div className="min-w-0">
+                  <h3 className="font-bold">{item.title}</h3>
+                  <p className="mt-1">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -76,44 +92,57 @@ export default function OnlineCoachingPage() {
       </Section>
 
       <Section id="how-it-works" labelledBy="how-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading id="how-heading" eyebrow="How it works" title="Start with a conversation" />
-          </div>
-          <div className="lg:col-span-7">
-            <Explainer steps={steps} scenes={onlineHowScenes} autoPlay={false} noun="step" />
-            <Steps steps={steps} className="sr-only" />
-          </div>
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="Start with a conversation." />
+          <ol className="mt-8 lg:col-span-7 lg:mt-0">
+            {steps.map((step, i) => {
+              const last = i === steps.length - 1;
+              return (
+                <li key={step.title} data-reveal style={revealDelay(i)} className={`relative grid grid-cols-[2.75rem_1fr] gap-4 ${last ? "" : "pb-8"}`}>
+                  {/* The rail joining the steps. */}
+                  {last ? null : <span aria-hidden="true" className="absolute top-12 bottom-1 left-[1.34rem] w-px bg-line" />}
+                  <span aria-hidden="true" className="relative grid size-11 place-items-center rounded-full border-[1.5px] border-ink bg-paper">
+                    <svg viewBox="0 0 22 22" className="size-[1.375rem]">
+                      {stepIcons[i]}
+                    </svg>
+                  </span>
+                  <div className="min-w-0 pt-2">
+                    <span className="block text-xs font-semibold tracking-[0.2em] tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                    <h3 className="mt-1 font-bold">{step.title}</h3>
+                    <p className="mt-1">{step.body}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </Section>
 
-      {/* Tidied (owner, 2026-10-27): one price, so the price is the heading ("£79 per month."),
-          not "Simple monthly coaching" over a "Monthly … per month" row; then one way to enquire. */}
+      {/* One price (owner's design, 2026-10-28): "One monthly price." over an outlined box with the
+          price and a month ring, then Enquire. Several prices fall back to the price list. */}
       <Section tone="white" id="pricing" labelledBy="pricing-heading">
-        {price ? (
-          <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-14">
-            <SectionHeading id="pricing-heading" className="lg:col-span-7" eyebrow="Pricing" title={`${formatGbp(price.amountGbp)} ${price.unit}`} />
-            <div className="mt-6 lg:col-span-5 lg:mt-0 lg:text-right">
-              <a
-                href={enquiry.href}
-                {...(enquiry.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline"
-              >
-                {enquiry.label}
-                {enquiry.external ? <span className="sr-only"> (opens in a new tab)</span> : null}
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-5">
-              <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Monthly coaching" />
-            </div>
-            <div className="lg:col-span-6 lg:col-start-7">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="pricing-heading" className="lg:col-span-5" eyebrow="Pricing" title={price ? "One monthly price." : "Monthly coaching."} />
+          <div className="mt-8 lg:col-span-7 lg:mt-0">
+            {price ? (
+              <>
+                <div data-reveal className="grid grid-cols-1 items-center gap-5 rounded-[1.375rem] border-[1.5px] border-ink px-5 py-6 min-[361px]:grid-cols-[auto_1fr] sm:gap-6 sm:px-7">
+                  <MonthRing className="size-24" />
+                  <div className="min-w-0">
+                    <p className="font-display text-[clamp(2.75rem,12vw,4rem)] leading-none font-bold tracking-tight tabular-nums">
+                      {formatGbp(price.amountGbp)}
+                      <span className="ml-1.5 align-baseline text-[0.32em] font-semibold tracking-normal">{price.unit}</span>
+                    </p>
+                    <p className="mt-2">Online kettlebell coaching with Alex.</p>
+                  </div>
+                </div>
+                {enquire("mt-6 w-full sm:w-[22rem]")}
+              </>
+            ) : (
               <PriceList prices={service.prices} />
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </Section>
 
       <CtaBand
