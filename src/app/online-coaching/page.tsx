@@ -6,12 +6,12 @@ import { getOnlineCoachingAction } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { MonthRing, Reach, featureIcons, stepIcons } from "@/components/coaching/OnlineGraphics";
+import { LineRows, RailSteps } from "@/components/ui/LineRows";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { images } from "@/content/images";
 import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { revealDelay } from "@/lib/reveal";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 
@@ -75,46 +75,14 @@ export default function OnlineCoachingPage() {
       <Section tone="white" id="included" labelledBy="included-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="What you get" title="Structure, support and progress." />
-          <ul className="mt-8 border-t border-line lg:col-span-7 lg:mt-0">
-            {included.map((item, i) => (
-              <li key={item.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.75rem_1fr] gap-4 border-b border-line py-5">
-                <svg viewBox="0 0 44 44" aria-hidden="true" className="size-11">
-                  {featureIcons[i]}
-                </svg>
-                <div className="min-w-0">
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="mt-1">{item.body}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <LineRows items={included.map((item, i) => ({ ...item, icon: featureIcons[i] }))} className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
 
       <Section id="how-it-works" labelledBy="how-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="Start with a conversation." />
-          <ol className="mt-8 lg:col-span-7 lg:mt-0">
-            {steps.map((step, i) => {
-              const last = i === steps.length - 1;
-              return (
-                <li key={step.title} data-reveal style={revealDelay(i)} className={`relative grid grid-cols-[2.75rem_1fr] gap-4 ${last ? "" : "pb-8"}`}>
-                  {/* The rail joining the steps. */}
-                  {last ? null : <span aria-hidden="true" className="absolute top-12 bottom-1 left-[1.34rem] w-px bg-line" />}
-                  <span aria-hidden="true" className="relative grid size-11 place-items-center rounded-full border-[1.5px] border-ink bg-paper">
-                    <svg viewBox="0 0 22 22" className="size-[1.375rem]">
-                      {stepIcons[i]}
-                    </svg>
-                  </span>
-                  <div className="min-w-0 pt-2">
-                    <span className="block text-xs font-semibold tracking-[0.2em] tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-                    <h3 className="mt-1 font-bold">{step.title}</h3>
-                    <p className="mt-1">{step.body}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <RailSteps items={steps.map((step, i) => ({ ...step, icon: stepIcons[i] }))} className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
 

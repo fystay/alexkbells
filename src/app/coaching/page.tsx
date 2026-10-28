@@ -7,9 +7,12 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { Steps } from "@/components/ui/Steps";
-import { Explainer } from "@/components/ui/Explainer";
-import { oneToOneFocusScenes, oneToOneHowScenes } from "@/components/coaching/CoachingScenes";
+import { LineRows, RailSteps } from "@/components/ui/LineRows";
+import { Duo, focusIcons, howIcons } from "@/components/coaching/OneToOneGraphics";
+import { mapsUrl, site } from "@/content/site";
+import { publishable } from "@/lib/publish";
+import { formatGbp } from "@/lib/schedule";
+import { revealDelay } from "@/lib/reveal";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { FocusFrame } from "@/components/sections/CoachingGraphics";
 import { PriceList } from "@/components/sections/PriceList";
@@ -23,26 +26,47 @@ export const metadata: Metadata = pageMetadata({
 });
 
 // What individual coaching gives you. Descriptions of the approach, not promises of results.
+// Wording from the owner's design (2026-10-28).
 const focus = [
-  { title: "Strength", body: "Build it progressively, with loads that suit you today and a plan for what comes next." },
-  { title: "Technique", body: "A coach watching every rep, with feedback you can use straight away." },
-  { title: "Movement", body: "Move well first. Better movement makes harder training safer and more effective." },
+  { title: "Strength", body: "Loads that suit you today, and a plan for what comes next." },
+  { title: "Technique", body: "Every rep watched, with feedback you can use straight away." },
+  { title: "Movement", body: "Better movement first, so harder training is safer and works better." },
 ];
 
+const linkClass = "font-semibold underline underline-offset-4 hover:no-underline";
+
+/**
+ * 1:1 coaching, the owner's design (2026-10-28): the coach photo and "you and
+ * Alex, one line" under the intro; who it's for and how it works as rows and
+ * steps with line drawings; the two prices as boxes (the bundle dark, with
+ * its per-session figure); then the closing band.
+ */
 export default function CoachingPage() {
   const service = getService("one-to-one");
   const booking = getPrimaryCtaFor("one-to-one");
   const open = booking.kind === "booking";
+  const prices = publishable(service.prices);
+  const l = site.location;
 
   const steps = [
     {
       title: open ? "Send a booking request" : "Message Alex",
       body: open
-        ? "Tell Alex the days and times that suit you and a little about your training."
+        ? "Tell Alex which days and times suit you, and a little about your training."
         : "Message Alex on Instagram with what you want from your training and when you're free.",
     },
-    { title: "Alex confirms your session", body: "Alex replies to arrange a time that works." },
-    { title: "Train face to face", body: "Sessions take place at Media House in Cumbernauld, built around you." },
+    { title: "Alex confirms your session", body: "He replies to arrange a time that works." },
+    {
+      title: "Train face to face",
+      body: (
+        <>
+          Sessions are at {l.venue}, {l.street}, {l.town}, {l.postcode}.{" "}
+          <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-11 items-center ${linkClass}`}>
+            Directions<span className="sr-only"> to {l.venue} (opens in a new tab)</span>
+          </a>
+        </>
+      ),
+    },
   ];
 
   return (
@@ -51,79 +75,79 @@ export default function CoachingPage() {
         panel={<FocusFrame photo={images.coachHeader} />}
         eyebrow="1:1 Coaching"
         title="Coaching built around you."
-        intro="Face-to-face kettlebell coaching with Alex, tailored to your goals, your experience and how you want to develop."
+        intro={
+          <>
+            <p>Face-to-face kettlebell coaching with Alex, shaped around your goals, your experience and how you progress.</p>
+            <Duo className="mt-6 max-w-xl" />
+          </>
+        }
       >
-        <StartTraining
-          href={booking.href}
-          label={booking.label}
-          srSuffix=" (1:1 coaching)"
-          external={booking.external}
-         
-          className="w-full sm:w-[22rem]"
-        />
+        <StartTraining href={booking.href} label={booking.label} srSuffix=" (1:1 coaching)" external={booking.external} className="w-full sm:w-[22rem]" />
       </PageHeader>
 
       <Section tone="white" id="who-for" labelledBy="who-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading
-              id="who-heading"
-              eyebrow="Who it's for"
-              title="Attention that stays on you"
-              intro="1:1 coaching suits anyone who wants training shaped around them as an individual, rather than a session built for a group."
-            />
-          </div>
-          <div className="lg:col-span-7">
-            {/* Tap through the three: the words are also here as a list for screen readers. */}
-            <Explainer steps={focus} scenes={oneToOneFocusScenes} autoPlay={false} noun="point" />
-            <ul className="sr-only">
-              {focus.map((f) => (
-                <li key={f.title}>
-                  <h3 className="font-semibold">{f.title}</h3>
-                  <p className="mt-0.5">{f.body}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading
+            id="who-heading"
+            className="lg:col-span-5"
+            eyebrow="Who it's for"
+            title="Attention that stays on you."
+            intro="For people who want training designed around them, not a group session."
+          />
+          <LineRows items={focus.map((f, i) => ({ ...f, icon: focusIcons[i] }))} className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
 
       <Section id="how-it-works" labelledBy="how-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading
-              id="how-heading"
-              eyebrow="How it works"
-              title="From first message to first session"
-             
-            />
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="From first message to first session." />
+          <div className="mt-8 lg:col-span-7 lg:mt-0">
+            <RailSteps items={steps.map((step, i) => ({ ...step, icon: howIcons[i] }))} />
             {/* The page opens and ends with Book now; the steps don't repeat it (2026-10-26). */}
-            {open ? <InstagramAlternative className="mt-4" /> : null}
-          </div>
-          <div className="lg:col-span-7">
-            <Explainer steps={steps} scenes={oneToOneHowScenes} autoPlay={false} noun="step" />
-            <Steps steps={steps} className="sr-only" />
+            {open ? <InstagramAlternative className="mt-6" /> : null}
           </div>
         </div>
       </Section>
 
       <Section tone="white" id="pricing" labelledBy="pricing-heading">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHeading id="pricing-heading" eyebrow="Pricing" title="Sessions and monthly coaching" />
-          </div>
-          <div className="lg:col-span-6 lg:col-start-7">
-            <PriceList prices={service.prices} />
-            <p className="mt-6 ">
-              Prefer to train in a group?{" "}
-              <Link href="/classes" className="font-semibold  underline underline-offset-4 hover:no-underline">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="pricing-heading" className="lg:col-span-5" eyebrow="Pricing" title="Sessions and monthly coaching." />
+          <div className="mt-8 lg:col-span-7 lg:mt-0">
+            {prices.length > 0 && prices.every((p) => p.sessions) ? (
+              // Boxes (owner's design): the bundle in ink, dots for its sessions.
+              <ul className="grid grid-cols-1 gap-3 min-[361px]:grid-cols-2">
+                {prices.map((p, i) => {
+                  const bundle = (p.sessions ?? 1) > 1;
+                  const note = bundle ? `${p.unit}, ${formatGbp(p.amountGbp / (p.sessions ?? 1))} a session` : `${p.prefix ? `${p.prefix.toLowerCase()}, ` : ""}${p.unit}`;
+                  return (
+                    <li
+                      key={p.label}
+                      data-reveal
+                      style={revealDelay(i)}
+                      className={`flex min-w-0 flex-col gap-2 rounded-[1.375rem] border-[1.5px] border-ink px-[1.125rem] py-[1.375rem] ${bundle ? "bg-ink text-paper" : ""}`}
+                    >
+                      <h3 className="text-[0.8125rem] font-semibold tracking-[0.12em] uppercase">{p.label}</h3>
+                      <p className="font-display text-[clamp(2rem,9vw,2.75rem)] leading-none font-bold tracking-tight tabular-nums">{formatGbp(p.amountGbp)}</p>
+                      <p>{note}</p>
+                      <span aria-hidden="true" className="mt-1.5 flex gap-1.5">
+                        {Array.from({ length: p.sessions ?? 1 }, (_, n) => (
+                          <i key={n} className="size-2.5 rounded-full border-[1.5px] border-current bg-current" />
+                        ))}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <PriceList prices={service.prices} />
+            )}
+            <p className="mt-6 flex flex-wrap gap-x-5">
+              <Link href="/classes" className={`inline-flex min-h-11 items-center ${linkClass}`}>
                 See group classes
               </Link>
-              . Further from Cumbernauld?{" "}
-              <Link href="/online-coaching" className="font-semibold  underline underline-offset-4 hover:no-underline">
+              <Link href="/online-coaching" className={`inline-flex min-h-11 items-center ${linkClass}`}>
                 See online coaching
               </Link>
-              .
             </p>
           </div>
         </div>

@@ -40,6 +40,8 @@ export interface Price {
   /** Shown after the amount, e.g. "per session". */
   unit: string;
   label: string;
+  /** Sessions the price covers, where it's a bundle (shown as dots and a per-session figure). */
+  sessions?: number;
 }
 
 export interface Service {

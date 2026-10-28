@@ -154,7 +154,7 @@ for (const route of [...publicRoutes, ...memberRoutes, ...coachRoutes]) {
       await expect(page.locator("[data-provisional]")).toHaveCount(0);
       // Only the prices the project owner confirmed may appear.
       const amounts = (await page.locator("main").innerText()).match(/£\d+/g) ?? [];
-      for (const amount of amounts) expect(["£12", "£35", "£130", "£79", "£40", "£65", "£85", "£48", "£96", "£144", "£8", "£31", "£59", "£10", "£8.13", "£7.08", "£7", "£2", "£14", "£104", "£403", "£767"]).toContain(amount); // last five: pay-as-you-go extra (week / 4 weeks / year), calculated from the prices
+      for (const amount of amounts) expect(["£12", "£35", "£130", "£79", "£40", "£65", "£85", "£48", "£96", "£144", "£8", "£31", "£59", "£10", "£8.13", "£7.08", "£7", "£2", "£14", "£104", "£403", "£767", "£32"]).toContain(amount); // last five: pay-as-you-go extra (week / 4 weeks / year), calculated from the prices; £32(.50): a 1:1 session in the four-session bundle
       // No unfilled placeholders anywhere.
       await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
     });
@@ -700,6 +700,22 @@ test("/online-coaching: the owner's design, what you get, three steps, one month
   await expect(pricing.getByRole("heading", { level: 2 })).toHaveText("One monthly price.");
   await expect(pricing).toContainText("£79");
   await expect(pricing.getByRole("link", { name: "Enquire about online coaching" })).toHaveAttribute("href", "/online-coaching/enquire");
+});
+
+test("/coaching: the owner's design, who it's for, three steps, the two prices as boxes (2026-10-28)", async ({ page }) => {
+  await page.goto("/coaching");
+  await expect(page.locator("#who-for h3")).toHaveText(["Strength", "Technique", "Movement"]);
+  const how = page.locator("#how-it-works");
+  await expect(how.locator("ol > li")).toHaveCount(3);
+  await expect(how).toContainText("1A Dunns Wood Road");
+  await expect(how.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+  const pricing = page.locator("#pricing");
+  await expect(pricing.locator("li h3")).toHaveText(["Single session", "Four sessions"]);
+  await expect(pricing).toContainText("£35");
+  await expect(pricing).toContainText("from, per session");
+  await expect(pricing).toContainText("£130");
+  await expect(pricing).toContainText("per month, £32.50 a session");
+  await expect(pricing.getByRole("link", { name: "See group classes" })).toHaveAttribute("href", "/classes");
 });
 
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
