@@ -1,7 +1,7 @@
 /**
  * A booked class as a calendar event (2026-10-28): an .ics file (Apple
- * Calendar, Outlook, and Google Calendar on import) and a Google Calendar
- * link. Times are UTC, so every calendar shows the class at its London time.
+ * Calendar, Outlook, and Google Calendar on import). Times are UTC, so
+ * every calendar shows the class at its London time.
  */
 export interface ClassEvent {
   /** Stable per booked place, so adding the same class twice updates one event. */
@@ -65,15 +65,4 @@ export function icsFor(event: ClassEvent, now: Date = new Date()): string {
     "END:VCALENDAR",
   ];
   return lines.map(fold).join("\r\n") + "\r\n";
-}
-
-export function googleCalendarUrl(event: ClassEvent): string {
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: event.title,
-    dates: `${stamp(new Date(event.startsAt))}/${stamp(endOf(event))}`,
-    location: event.location,
-    details: event.description,
-  });
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }

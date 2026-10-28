@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { googleCalendarUrl, icsFor, type ClassEvent } from "./calendar";
+import { icsFor, type ClassEvent } from "./calendar";
 
 const event: ClassEvent = {
   id: "0f6c6f0e-1b0a-4f4e-9d0e-2b1c3d4e5f60",
@@ -34,15 +34,5 @@ describe("icsFor", () => {
     for (const line of ics.split("\r\n")) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
     // Unfolding gives the description back.
     expect(ics.replace(/\r\n /g, "")).toContain("DESCRIPTION:Booked in your RAENG account\\; to cancel\\, sign in at https://raengfitness.vercel.app/account");
-  });
-});
-
-describe("googleCalendarUrl", () => {
-  it("prefills the event", () => {
-    const url = new URL(googleCalendarUrl(event));
-    expect(url.origin + url.pathname).toBe("https://calendar.google.com/calendar/render");
-    expect(url.searchParams.get("action")).toBe("TEMPLATE");
-    expect(url.searchParams.get("dates")).toBe("20261102T183000Z/20261102T193000Z");
-    expect(url.searchParams.get("location")).toBe(event.location);
   });
 });

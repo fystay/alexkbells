@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { bookingDeliveryConfig, isSpam, text, type FormState } from "@/lib/booking-request";
 import { isClassDate } from "@/lib/availability/timetable";
 import { notifyClassBookings } from "@/lib/class-checkout";
+import { MEMBERS_VIEW_PATH } from "@/lib/members-app";
 import { publishedClasses } from "@/lib/class-sessions";
 import { coachDb, isUuid } from "@/lib/coach/db";
 import { londonToday, londonToUtc } from "@/lib/coach/time";
@@ -102,6 +103,18 @@ const RULES: Record<string, string> = {
   credit_invalid: "credit_invalid",
 };
 
+/** The members view an action was used from (home, book or plan), to go back to it. */
+function back(formData: FormData): string {
+  const view = text(formData, "back");
+  return view === "book" || view === "plan" ? MEMBERS_VIEW_PATH[view] : MEMBERS_VIEW_PATH.home;
+}
+
+/** The cancelled class (date.slot), so Book stays on its week; anything else is dropped. */
+function at(formData: FormData): string {
+  const value = text(formData, "at");
+  return /^\d{4}-\d{2}-\d{2}\.[a-z0-9-]{1,40}$/.test(value) ? `&at=${value}` : "";
+}
+
 const errorFor = (result: { ok: false; error: { kind: string; rule?: string | null } }) =>
   result.error.kind === "rule" ? (RULES[result.error.rule ?? ""] ?? "failed") : "failed";
 
@@ -114,7 +127,7 @@ export async function bookClass(formData: FormData): Promise<void> {
   const member = await requireMember();
   const slot = publishedClasses().find((c) => c.id === text(formData, "slot"));
   const date = text(formData, "date");
-  if (!slot || !isClassDate(date, slot, londonToday())) redirect(`${ACCOUNT_PATH}?error=not_found`);
+  if (!slot || !isClassDate(date, slot, londonToday())) redirect(`${back(formData)}?error=not_found`);
   const result = await bookWithCredit(member.db, {
     clientId: member.clientId,
     slot: slot.id,
@@ -122,9 +135,9 @@ export async function bookClass(formData: FormData): Promise<void> {
     startsAt: londonToUtc(date, slot.start),
     durationMinutes: slot.durationMinutes ?? 60,
   });
-  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
+  if (!result.ok) redirect(`${back(formData)}?error=${errorFor(result)}`);
   // at= marks the class just booked on the page.
-  redirect(`${ACCOUNT_PATH}?done=booked&at=${date}.${slot.id}`);
+  redirect(`${back(formData)}?done=booked&at=${date}.${slot.id}`);
 }
 
 /**
@@ -135,15 +148,15 @@ export async function bookClass(formData: FormData): Promise<void> {
 export async function cancelClass(formData: FormData): Promise<void> {
   const member = await requireMember();
   const id = text(formData, "place");
-  if (!isUuid(id)) redirect(`${ACCOUNT_PATH}?error=not_found`);
+  if (!isUuid(id)) redirect(`${back(formData)}?error=not_found`);
   if (text(formData, "paid") === "yes") {
     const result = await cancelPaidPlace(member.db, member.clientId, id);
-    if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
-    redirect(`${ACCOUNT_PATH}?done=${result.data ? "cancelled_credit" : "cancelled_paid_late"}`);
+    if (!result.ok) redirect(`${back(formData)}?error=${errorFor(result)}`);
+    redirect(`${back(formData)}?done=${result.data ? "cancelled_credit" : "cancelled_paid_late"}${at(formData)}`);
   }
   const result = await cancelPlace(member.db, member.clientId, id);
-  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
-  redirect(`${ACCOUNT_PATH}?done=${result.data ? "cancelled_late" : "cancelled"}`);
+  if (!result.ok) redirect(`${back(formData)}?error=${errorFor(result)}`);
+  redirect(`${back(formData)}?done=${result.data ? "cancelled_late" : "cancelled"}${at(formData)}`);
 }
 
 /**
@@ -156,7 +169,7 @@ export async function bookClassWithCredit(formData: FormData): Promise<void> {
   const slot = publishedClasses().find((c) => c.id === text(formData, "slot"));
   const date = text(formData, "date");
   const credit = text(formData, "credit");
-  if (!slot || !isClassDate(date, slot, londonToday()) || !isUuid(credit)) redirect(`${ACCOUNT_PATH}?error=not_found`);
+  if (!slot || !isClassDate(date, slot, londonToday()) || !isUuid(credit)) redirect(`${back(formData)}?error=not_found`);
   const result = await bookWithClassCredit(member.db, {
     clientId: member.clientId,
     creditId: credit,
@@ -167,10 +180,10 @@ export async function bookClassWithCredit(formData: FormData): Promise<void> {
     // One booking per credit: pressing twice books once.
     idempotencyKey: `account-credit/${credit}`,
   });
-  if (!result.ok) redirect(`${ACCOUNT_PATH}?error=${errorFor(result)}`);
+  if (!result.ok) redirect(`${back(formData)}?error=${errorFor(result)}`);
   // Confirmed at once: email the customer and Alex now rather than at the next reconcile (best effort).
   await notifyClassBookings(member.db, publishedClasses()).catch(() => 0);
-  redirect(`${ACCOUNT_PATH}?done=booked_class_credit&at=${date}.${slot.id}`);
+  redirect(`${back(formData)}?done=booked_class_credit&at=${date}.${slot.id}`);
 }
 
 /** Signs this browser out, or every device (everywhere=yes). */

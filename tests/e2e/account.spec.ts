@@ -2,9 +2,9 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
 /**
- * Member accounts (2026-10-26) on the production configuration: one-time
- * email links, the account page, booking and cancelling with credits,
- * signing out. The member is seeded straight into the stand-in database.
+ * Member accounts (2026-10-26; the owner's members design 2026-10-28) on the
+ * production configuration: one-time email links, Home / Book / Plan, booking
+ * and cancelling in the confirm sheet, the menus, signing out. The member is seeded straight into the stand-in database.
  */
 const PROD = `http://localhost:${process.env.E2E_PRODUCTION_PORT ?? 3201}`;
 const MOCK = `http://localhost:${process.env.MOCK_EMAIL_PORT ?? 3299}`;
@@ -46,7 +46,9 @@ function linkPath(email: RecordedEmail): string {
 }
 
 test.describe("member accounts", () => {
-  test("a member signs in with an emailed link, books and cancels with credits, and signs out", async ({ page, request }) => {
+  test("a member signs in with an emailed link, books and cancels with credits, and signs out", async ({ page, request, browser }) => {
+    // The whole members journey in one test: sign in, Home, Book, the menus, cancel, Plan, no JavaScript, sign out.
+    test.slow();
     const email = `member-${Date.now()}@example.com`;
     await seedMember(request, email);
 
@@ -67,52 +69,110 @@ test.describe("member accounts", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Sign in." })).toBeVisible();
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/account$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Your membership." })).toBeVisible();
-    await expect(page.getByText("Regular · £65 / 4 weeks")).toBeVisible();
-    await expect(page.getByText("left of 8")).toBeVisible();
-    await expect(page.getByText("No classes booked yet.")).toBeVisible();
+
+    // Home (owner's members design, 2026-10-28): the members frame replaces the site's header and footer.
+    await expect(page.getByRole("heading", { level: 1, name: /^(Morning|Afternoon|Evening), Member\.$/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /RAENG\s*MEMBERS/ })).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
+    await expect(page.getByRole("img", { name: "8 of 8 credits left" })).toBeVisible();
+    await expect(page.getByText(/^Regular · renews /)).toBeVisible();
+    await expect(page.getByText("Nothing booked yet.")).toBeVisible();
+    const tabs = page.getByRole("navigation", { name: "Members" });
+    await expect(tabs.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
 
     // The session cookie: httpOnly, site-wide since 2026-10-28 (the booking form fills in details).
     const cookie = (await page.context().cookies(PROD + "/")).find((c) => c.name === "akb_member_session");
     expect(cookie).toMatchObject({ httpOnly: true, path: "/", sameSite: "Lax" });
 
-    // Book the furthest class this period (more than 24 hours away), with a credit.
-    const options = page.locator("li").filter({ has: page.getByRole("button", { name: /^Book / }) });
-    const label = (await options.last().locator("span").first().innerText()).trim();
-    await options.last().getByRole("button", { name: /^Book / }).click();
+    // Book: the last week's last bookable class, confirmed in the sheet.
+    await tabs.getByRole("link", { name: "Book" }).click();
+    await expect(page).toHaveURL(/\/account\/book$/);
+    await expect(page.getByRole("heading", { level: 1, name: "8 credits to use." })).toBeVisible();
+    const weekTabs = page.getByRole("tab");
+    let week = weekTabs.last();
+    // The last week may be after the period ("Next period"); use the latest week with a bookable class.
+    for (let i = (await weekTabs.count()) - 1; i >= 0; i--) {
+      await weekTabs.nth(i).click();
+      if ((await page.getByRole("tabpanel").getByRole("link", { name: /: Book$/ }).count()) > 0) {
+        week = weekTabs.nth(i);
+        break;
+      }
+    }
+    const weekLabel = (await week.innerText()).trim();
+    await page.getByRole("tabpanel").getByRole("link", { name: /: Book$/ }).last().click();
+    const sheet = page.getByRole("dialog");
+    await expect(sheet).toContainText("Uses 1 of your 8 credits.");
+    const label = (await sheet.getByRole("heading").innerText()).trim();
+    await sheet.getByRole("button", { name: "Book it" }).click();
     await expect(page.getByRole("status")).toHaveText("Booked. One credit used.");
-    // The message stays, but the address goes back to /account (a refresh won't say it again).
-    await expect(page).toHaveURL(/\/account$/);
-    await expect(page.locator("span.tabular-nums").first()).toHaveText("7");
-    const booked = page.locator("li").filter({ hasText: label }).filter({ has: page.locator("summary", { hasText: "Cancel" }) });
-    await expect(booked).toBeVisible();
-    await expect(booked).toContainText("Just booked");
-    await expect(booked).toContainText("Your credit comes back.");
-    // It's the next class, with directions and the calendar.
-    await expect(page.getByText("Your next class")).toBeVisible();
-    await expect(page.getByRole("link", { name: /^Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+    // The address goes back to /account/book, and Book stays on that class's week, now booked.
+    await expect(page).toHaveURL(/\/account\/book$/);
+    await expect(page.getByRole("tab", { selected: true })).toHaveText(weekLabel);
+    await expect(page.getByRole("tabpanel").getByRole("link", { name: `${label}: Booked` })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "7 credits to use." })).toBeVisible();
 
-    // Add to calendar: an .ics of this class, for this member only.
-    const ics = await page.request.get(PROD + (await booked.getByRole("link", { name: /^Add to calendar/ }).getAttribute("href"))!);
+    // Home: it's the next class, with the calendar and directions.
+    await tabs.getByRole("link", { name: "Home" }).click();
+    await expect(page.getByRole("img", { name: "7 of 8 credits left" })).toBeVisible();
+    const next = page.getByRole("region", { name: "Your next class" });
+    await expect(next).toContainText(label.replace(", ", ""));
+    await expect(next.getByRole("link", { name: /^Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+    const ics = await page.request.get(PROD + (await next.getByRole("link", { name: "Add to calendar" }).getAttribute("href"))!);
     expect(ics.headers()["content-type"]).toContain("text/calendar");
     expect(await ics.text()).toMatch(/BEGIN:VEVENT[\s\S]*DTSTART:\d{8}T\d{6}Z[\s\S]*LOCATION:Media House/);
     expect((await request.get(`${PROD}/account/calendar?place=00000000-0000-0000-0000-000000000000`, { maxRedirects: 0 })).status()).toBe(307);
 
-    // Cancel it in time: it asks first, then the credit comes back.
-    await booked.locator("summary", { hasText: "Cancel" }).click();
-    await booked.getByRole("button", { name: /^Cancel class/ }).click();
-    await expect(page.getByRole("status")).toHaveText("Cancelled. Your credit is back.");
-    await expect(page.locator("span.tabular-nums").first()).toHaveText("8");
+    // The members menu and the account menu.
+    await page.getByRole("button", { name: "Members menu" }).click();
+    const drawer = page.getByRole("dialog", { name: "Members menu" });
+    await expect(drawer).toContainText("Regular · 7 credits left");
+    await expect(drawer.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/account/book");
+    await page.keyboard.press("Escape");
+    await expect(drawer).toBeHidden();
+    await page.getByRole("button", { name: "Account menu" }).click();
+    await expect(page.getByRole("link", { name: /Plan and billing/ })).toHaveAttribute("href", "/account/plan");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "Account menu" })).toBeFocused();
 
-    // The account page passes an accessibility scan.
-    await page.waitForTimeout(1300);
+    // The page passes an accessibility scan.
+    await page.waitForTimeout(800);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
-    // The link works once only.
+    // Cancel it in time from Home: the sheet says the credit comes back, then it does.
+    await page.locator("#booked").getByRole("link", { name: /^Cancel/ }).click();
+    await expect(page.getByRole("dialog")).toContainText("Your credit comes back");
+    await page.getByRole("dialog").getByRole("button", { name: "Cancel booking" }).click();
+    await expect(page.getByRole("status")).toHaveText("Cancelled. Your credit is back.");
+    await expect(page.getByRole("img", { name: "8 of 8 credits left" })).toBeVisible();
+
+    // Plan: the plan card and what's used.
+    await tabs.getByRole("link", { name: "Plan" }).click();
+    await expect(page.getByRole("heading", { level: 2, name: "Regular" })).toBeVisible();
+    await expect(page.getByRole("progressbar", { name: "Credit period" })).toBeVisible();
+    await expect(page.getByText("0 of 8")).toBeVisible();
+
+    // Without JavaScript: a card opens its sheet as a page, and booking works.
+    // (Reduced motion: Playwright's clicks wait for animations, which don't advance with JavaScript off.)
+    const noJs = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "reduce" });
+    await noJs.addCookies(await page.context().cookies());
+    const plain = await noJs.newPage();
+    await plain.goto(`${PROD}/account/book`);
+    const card = plain.getByRole("link", { name: /: Book$/ }).first();
+    // The card's name is its screen-reader line, e.g. "Saturday 31 October, 9:00 am: Book".
+    const cardDate = (await card.locator(".sr-only").innerText()).replace(/: Book$/, "").trim();
+    await card.click();
+    await expect(plain).toHaveURL(/confirm=book\./);
+    await plain.getByRole("button", { name: "Book it" }).click();
+    // (The message is in <noscript>, which Playwright's JavaScript-off mode doesn't render; the card shows the result.)
+    await expect(plain).toHaveURL(/done=booked/);
+    await expect(plain.getByRole("link", { name: `${cardDate}: Booked` })).toBeVisible();
+    await noJs.close();
+
+    // The link works once only. Sign out from the account menu.
     await page.goto(PROD + path);
     await page.getByRole("button", { name: "Sign in" }).click();
-    // Still signed in from before, so the sign-in page sends them back to the account; sign out first to see the message.
     await page.goto(`${PROD}/account`);
+    await page.getByRole("button", { name: "Account menu" }).click();
     await page.getByRole("button", { name: "Sign out", exact: true }).click();
     await expect(page).toHaveURL(/\/account\/sign-in\?signed=out$/);
     await expect(page.getByRole("status")).toHaveText("You're signed out.");
@@ -157,25 +217,30 @@ test.describe("member accounts", () => {
     expect(sent).toHaveLength(1);
     await page.goto(PROD + linkPath(sent[0]));
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Your account." })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^(Morning|Afternoon|Evening), Pay\.$/ })).toBeVisible();
     await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
-    await expect(page.getByText("Pay as you go")).toBeVisible();
-    const place = page.locator("li").filter({ hasText: "Paid" }).filter({ has: page.locator("summary", { hasText: "Cancel" }) });
-    await expect(place).toContainText("You get a class credit for another class within 4 weeks.");
+    await expect(page.getByRole("heading", { name: "Pay as you go" })).toBeVisible();
+    const place = page.locator("#booked li").filter({ hasText: "Paid" });
+    await expect(place).toHaveCount(1);
 
-    // Cancel in time: a class credit, then book another class with it, nothing to pay.
-    await place.locator("summary", { hasText: "Cancel" }).click();
-    await place.getByRole("button", { name: /^Cancel class/ }).click();
+    // Cancel in time: the sheet says a class credit comes back; then book another class with it, nothing to pay.
+    await place.getByRole("link", { name: /^Cancel/ }).click();
+    await expect(page.getByRole("dialog")).toContainText("You get a class credit for another class within 4 weeks.");
+    await page.getByRole("dialog").getByRole("button", { name: "Cancel booking" }).click();
     await expect(page.getByRole("status")).toHaveText("Cancelled. You have a class credit for another class within 4 weeks.");
-    await expect(page.getByText("Class credits")).toBeVisible();
-    const options = page.locator("li").filter({ has: page.getByRole("button", { name: /^Book / }) });
-    await options.first().getByRole("button", { name: /^Book / }).click();
+    await expect(page.getByRole("heading", { name: /^Class credits: 1 class/ })).toBeVisible();
+    await page.getByRole("navigation", { name: "Members" }).getByRole("link", { name: "Book" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "1 class credit to use." })).toBeVisible();
+    await page.getByRole("tabpanel").getByRole("link", { name: /: Use credit$/ }).first().click();
+    await expect(page.getByRole("dialog")).toContainText("Uses your class credit, so there's nothing to pay.");
+    await page.getByRole("dialog").getByRole("button", { name: "Book it" }).click();
     await expect(page.getByRole("status")).toHaveText("Booked with your class credit. Nothing to pay.");
-    await expect(page.getByRole("listitem").filter({ has: page.getByText("Class credit", { exact: true }) })).toHaveCount(1);
-    await expect(page.getByText("Class credits")).toHaveCount(0);
+    await page.getByRole("navigation", { name: "Members" }).getByRole("link", { name: "Home" }).click();
+    await expect(page.locator("#booked li").filter({ hasText: "Class credit" })).toHaveCount(1);
+    await expect(page.getByRole("heading", { name: /^Class credits:/ })).toHaveCount(0);
 
-    // The account page passes an accessibility scan.
-    await page.waitForTimeout(1300);
+    // The page passes an accessibility scan.
+    await page.waitForTimeout(800);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
     // Signed in, the booking form fills in their details.
