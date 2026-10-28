@@ -130,7 +130,7 @@ async function Today() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 border-t border-grey pt-3.5">
-            <Link href={`${classHref}#add-heading`} className="inline-flex min-h-11 items-center rounded-full border border-paper bg-paper px-4 text-sm font-semibold text-ink">
+            <Link href={`${classHref}#walk-in-heading`} className="inline-flex min-h-11 items-center rounded-full border border-paper bg-paper px-4 text-sm font-semibold text-ink">
               Add walk-in
             </Link>
             {mail ? (

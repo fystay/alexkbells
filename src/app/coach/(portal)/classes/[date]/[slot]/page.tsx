@@ -181,7 +181,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
 
         <div>
           {cancelled ? null : (
-            <Panel title="Add someone" id="add-heading">
+            <Panel title="Add someone" id="walk-in-heading">
               {addable.length ? (
                 <ActionForm action={addAttendeeAction} label="Add someone to this class">
                   <input type="hidden" name="class" value={classValue} />
