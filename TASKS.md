@@ -125,11 +125,12 @@ See Coach portal below.
 
 ### To do
 - [x] Migration applied to Supabase 2026-10-18 (all but three functions; DEPLOYMENT.md → Coach portal)
-- [ ] **P0** Apply `20261020000000_akb_payment_functions.sql` (the three still-missing functions; awaiting approval) (DEPLOYMENT.md → Coach portal)
+- [ ] **P0** Apply `20261020000000_akb_payment_functions.sql` (the three still-missing functions, re-checked 2026-10-28; awaiting approval) (DEPLOYMENT.md → Coach portal)
 - [x] Public sign-ups off in Supabase (verified 2026-10-20)
 - [ ] **P0** Turn on leaked-password protection (Auth → Providers → Email; affects the shared project's other app too); change the temporary coach password; set `COACH_EMAIL` to Alex's at handover
 - [x] Email alerts to Alex: outcome recorded per request, one immediate retry, daily cron retry inside the provider's idempotency window, shown in the portal (2026-10-20, code only)
-- [ ] **P0** Turn alerts on: apply `20261020000100_akb_request_alerts.sql`, Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
+- [x] Alert migration `20261020000100_akb_request_alerts.sql` applied to Supabase (checked 2026-10-28)
+- [ ] **P0** Turn alerts on: Resend account + verified domain, Vercel env (`RESEND_API_KEY`, `BOOKING_NOTIFY_EMAIL`, `BOOKING_FROM_EMAIL`, `CRON_SECRET`) (DEPLOYMENT.md → Email alerts)
 - [ ] **P1** Alex adds retention periods for client and financial records to `/privacy`
 - [ ] **P1** Real-device pass of the portal on Alex's phone
 - [ ] **P2** Default class capacity per timetable slot (now set per date); public calendar showing full dates once capacities exist
