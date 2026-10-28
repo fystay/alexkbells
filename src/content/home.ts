@@ -11,11 +11,13 @@ export const hero = {
 } as const;
 
 /** Practical benefits of kettlebell training, described, not promised. No medical or results claims. */
+// `how`: the line shown when a section of the kettlebell is tapped, as the
+// owner supplied it with the kettlebell design (2026-10-28).
 export const whyKettlebells = [
-  { title: "Strength", body: "Train the whole body at once." },
-  { title: "Conditioning", body: "Fitness and stamina, built in." },
-  { title: "Movement quality", body: "Balance, timing and coordination." },
-  { title: "Efficient and adaptable", body: "One bit of kit, trained anywhere." },
+  { title: "Strength", body: "Train the whole body at once.", how: "Swings, cleans and presses load legs, back and shoulders together." },
+  { title: "Conditioning", body: "Fitness and stamina, built in.", how: "Intervals and complexes keep your heart rate up without a treadmill." },
+  { title: "Movement quality", body: "Balance, timing and coordination.", how: "Get-ups and flows build control through every position." },
+  { title: "Efficient and adaptable", body: "One bit of kit, trained anywhere.", how: "One bell and two square metres of floor is a full session." },
 ] as const;
 
 /**

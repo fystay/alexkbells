@@ -584,3 +584,104 @@
     stroke-width: 6;
   }
 }
+
+/*
+ * Why kettlebells as a line-drawn kettlebell (owner's design, 2026-10-28;
+ * components/home/KettlebellPicker.tsx). Static and complete by default; the
+ * drawing only animates once JavaScript arms it and only without Reduce Motion.
+ */
+.kb-bell {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 1000 / 1100;
+  transform-origin: 50% 1%;
+}
+.kb-line {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.kb-div {
+  stroke: var(--color-line);
+  stroke-width: 1.4;
+}
+.kb-q {
+  fill: var(--color-ink);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.kb-q-on {
+  opacity: 1;
+}
+.kb-cells {
+  position: absolute;
+  inset: 17.27% 0 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.kb-cell {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2cqw;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-ink);
+  transition: color 0.35s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.kb-cell:nth-child(1) { padding: 30% 5% 0 26%; }
+.kb-cell:nth-child(2) { padding: 30% 26% 0 8%; }
+.kb-cell:nth-child(3) { padding: 11% 5% 0 20%; }
+.kb-cell:nth-child(4) { padding: 11% 18% 0 8%; }
+.kb-cell:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -6px;
+  border-radius: 6px;
+}
+.kb-cell[aria-pressed="true"] {
+  color: var(--color-paper);
+}
+.kb-cell[aria-pressed="true"]:focus-visible {
+  outline-color: var(--color-paper);
+}
+.kb-num { font-size: 2.6cqw; font-weight: 600; letter-spacing: 0.18em; font-variant-numeric: tabular-nums; }
+.kb-ttl { font-weight: 800; font-size: 4.3cqw; letter-spacing: -0.015em; line-height: 1.15; }
+.kb-desc { font-size: 3.6cqw; line-height: 1.4; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Armed (JavaScript on, not yet on screen): hidden, ready to draw. */
+  .kb-armed:not(.kb-run) .kb-line { stroke-dashoffset: 1; }
+  .kb-armed:not(.kb-run) .kb-cell,
+  .kb-armed:not(.kb-run) .kb-caption { opacity: 0; }
+  .kb-run .kb-handle-o { animation: kb-draw 1s 0.2s cubic-bezier(0.6, 0, 0.2, 1) both; }
+  .kb-run .kb-handle-i { animation: kb-draw 0.9s 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; }
+  .kb-run .kb-body { animation: kb-draw 1.5s 0.6s cubic-bezier(0.6, 0, 0.2, 1) both; }
+  .kb-run .kb-div { animation: kb-draw 0.7s 1.6s ease-out both; }
+  .kb-run .kb-div-h { animation-delay: 1.75s; }
+  .kb-run .kb-cell { animation: kb-rise 0.6s both; }
+  .kb-run .kb-cell:nth-child(1) { animation-delay: 1.95s; }
+  .kb-run .kb-cell:nth-child(2) { animation-delay: 2.1s; }
+  .kb-run .kb-cell:nth-child(3) { animation-delay: 2.25s; }
+  .kb-run .kb-cell:nth-child(4) { animation-delay: 2.4s; }
+  .kb-run .kb-caption { animation: kb-rise 0.6s 2.7s both; }
+  .kb-run .kb-q:not(.kb-q-on) { animation: kb-flash 0.5s ease both; }
+  .kb-run .kb-bell { animation: kb-swing 4.8s 3s ease-in-out infinite alternate; }
+  .kb-run .kb-bell.kb-paused,
+  .kb-run .kb-bell:hover { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kb-replay { display: none; }
+}
+@keyframes kb-draw { from { stroke-dashoffset: 1; } }
+@keyframes kb-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes kb-flash { 0%, 100% { opacity: 0; } 40% { opacity: 0.12; } }
+@keyframes kb-swing { from { transform: rotate(-1.4deg); } to { transform: rotate(1.4deg); } }
