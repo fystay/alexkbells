@@ -7,8 +7,6 @@ import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { LineRows } from "@/components/ui/LineRows";
-import { focusIcons } from "@/components/coaching/OneToOneGraphics";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { revealDelay } from "@/lib/reveal";
@@ -74,7 +72,20 @@ export default function CoachingPage() {
             title="Attention that stays on you."
             intro="For people who want training designed around them, not a group session."
           />
-          <LineRows items={focus.map((f, i) => ({ ...f, icon: focusIcons[i] }))} className="mt-8 lg:col-span-7 lg:mt-0" />
+          {/* Plain rows, no icons (owner's pick B, 2026-10-29): the name beside its line, like "What we stand for" on About. */}
+          <ul className="mt-8 border-t border-line lg:col-span-7 lg:mt-0">
+            {focus.map((f, i) => (
+              <li
+                key={f.title}
+                data-reveal
+                style={revealDelay(i)}
+                className="grid grid-cols-1 gap-1 border-b border-line py-5 min-[421px]:grid-cols-[7.5rem_1fr] min-[421px]:gap-4"
+              >
+                <h3 className="font-bold">{f.title}</h3>
+                <p className="min-w-0">{f.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
