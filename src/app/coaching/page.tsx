@@ -8,7 +8,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { LineRows } from "@/components/ui/LineRows";
-import { Duo, focusIcons } from "@/components/coaching/OneToOneGraphics";
+import { focusIcons } from "@/components/coaching/OneToOneGraphics";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { revealDelay } from "@/lib/reveal";
@@ -51,12 +51,7 @@ export default function CoachingPage() {
         panel={<FocusFrame photo={images.coachHeader} />}
         eyebrow="1:1 Coaching"
         title="Coaching built around you."
-        intro={
-          <>
-            <p>Face-to-face kettlebell coaching with Alex, shaped around your goals, your experience and how you progress.</p>
-            <Duo className="mt-6 max-w-xl" />
-          </>
-        }
+        intro={<p>Face-to-face kettlebell coaching with Alex, shaped around your goals, your experience and how you progress.</p>}
       >
         <StartTraining href={booking.href} label={booking.label} srSuffix=" (1:1 coaching)" external={booking.external} className="w-full sm:w-[22rem]" />
       </PageHeader>

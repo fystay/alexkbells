@@ -1,30 +1,11 @@
 import { Fragment, type ReactNode } from "react";
 
 /*
- * Line drawings for /coaching (owner's design, 2026-10-28): "two points, one
- * line" for you and Alex. Thin ink strokes (`.ln` in globals.css) that draw in
- * as their data-reveal block scrolls into view. All decorative (aria-hidden).
+ * Line drawings for /coaching (owner's design, 2026-10-28). Thin ink strokes
+ * (`.ln` in globals.css) that draw in as their data-reveal block scrolls into
+ * view. All decorative (aria-hidden). The "You and Alex" line was removed at the
+ * owner's request (2026-10-29).
  */
-
-/** You and Alex, joined by one line. */
-export function Duo({ className }: { className?: string }) {
-  return (
-    <div data-reveal className={className}>
-      <svg viewBox="0 0 600 130" aria-hidden="true" className="h-auto w-full overflow-visible">
-        <path className="ln ln-faint" pathLength={1} d="M20 90 H580" />
-        <path className="ln" pathLength={1} d="M150 56 C250 6 350 6 450 56" />
-        <circle cx="150" cy="56" r="16" className="fill-paper stroke-ink" strokeWidth={2} />
-        <circle cx="450" cy="56" r="16" className="fill-ink" />
-        <text x="150" y="124" textAnchor="middle" className="fill-ink text-[18px] font-semibold tracking-[0.2em]">
-          YOU
-        </text>
-        <text x="450" y="124" textAnchor="middle" className="fill-ink text-[18px] font-semibold tracking-[0.2em]">
-          ALEX
-        </text>
-      </svg>
-    </div>
-  );
-}
 
 /** Who it's for, in order: strength, technique, movement. */
 export const focusIcons: ReactNode[] = [
