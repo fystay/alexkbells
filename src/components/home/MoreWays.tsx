@@ -27,7 +27,7 @@ export function MoreWays() {
   return (
     <Section id="ways" labelledBy="ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-        <SectionHeading id="ways-heading" className="lg:col-span-5" title="Ways to train." />
+        <SectionHeading id="ways-heading" className="lg:col-span-5" eyebrow="Services" title="Ways to train." />
         <ul className="mt-6 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
             <li key={w.href}>
