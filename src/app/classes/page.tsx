@@ -45,7 +45,8 @@ export default function ClassesPage() {
         eyebrow="Classes in Cumbernauld"
         cta={{
           href: booking.href,
-          label: booking.label,
+          // Alex's wording for the hero button (the owner, 2026-10-29), as on the home page.
+          label: booking.kind === "booking" ? "Book a class" : booking.label,
           external: booking.external,
         }}
       />
