@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getClassSession, listAttendance } from "@/lib/coach/bookings";
+import { getClassSession, getDefaultCapacity, listAttendance } from "@/lib/coach/bookings";
 import { CLASS_NAME, classDurationMinutes, defaultPrices, findSlot, isTimetableClass, occurrence } from "@/lib/coach/classes";
 import { listClients } from "@/lib/coach/clients";
 import { portalContext } from "@/lib/coach/context";
@@ -55,6 +55,8 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
   const loaded = collect(await Promise.all([getClassSession(db, slot.id, date), listRequests(db, { classDate: date, classSlot: slot.id }), listClients(db)] as const));
   if (!loaded.ok) return <LoadError message={loadMessage(loaded.error)} />;
   const [row, requests, clients] = loaded.data;
+  const usualSize = await getDefaultCapacity(db);
+  const size = row?.capacity ?? usualSize;
   const places = row ? await listAttendance(db, { sessionIds: [row.id] }) : { ok: true as const, data: [] };
   if (!places.ok) return <LoadError message={loadMessage(places.error)} />;
   const charges = places.data.length ? await listCharges(db, { attendanceIds: places.data.map((p) => p.id) }) : { ok: true as const, data: [] };
@@ -69,7 +71,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
   const onList = new Set(places.data.map((p) => p.client_id));
   const addable = clients.filter((c) => !onList.has(c.id) && c.status !== "former").sort((a, b) => a.full_name.localeCompare(b.full_name));
   const booked = places.data.filter((p) => p.status === "booked" || p.status === "attended").length;
-  const full = row?.capacity ? booked >= row.capacity : false;
+  const full = booked >= size;
   const classValue = `${date}|${slot.id}`;
   const cancelled = Boolean(row?.cancelled_at);
 
@@ -83,8 +85,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
             {formatClock(slot.start)}–{formatClock(ends)}
           </span>
           <span className="tabular-nums">
-            · {booked}
-            {row?.capacity ? ` of ${row.capacity}` : ""} booked
+            · {booked} of {size} booked
           </span>
           {cancelled ? <Badge tone="strong">Cancelled</Badge> : full ? <Badge tone="strong">Full</Badge> : null}
           {date < today ? <Badge tone="muted">Past</Badge> : null}
@@ -181,7 +182,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
 
         <div>
           {cancelled ? null : (
-            <Panel title="Add someone" id="add-heading">
+            <Panel title="Add someone" id="walk-in-heading">
               {addable.length ? (
                 <ActionForm action={addAttendeeAction} label="Add someone to this class">
                   <input type="hidden" name="class" value={classValue} />
@@ -202,7 +203,7 @@ async function ClassView({ params }: { params: PageProps<"/coach/classes/[date]/
           <Panel title="Class settings" id="settings-heading">
             <ActionForm action={updateClassAction} label="Class settings">
               <input type="hidden" name="class" value={classValue} />
-              <Field name="capacity" label="Capacity" type="number" inputMode="numeric" min={1} max={200} defaultValue={row?.capacity ?? ""} hint="Leave empty for no limit." />
+              <Field name="capacity" label="Capacity" type="number" inputMode="numeric" min={1} max={200} defaultValue={row?.capacity_set ?? ""} hint={`Leave empty to use the usual class size (${usualSize}).`} />
               <TextArea name="notes" label="Admin notes" defaultValue={row?.notes ?? ""} rows={3} maxLength={1000} />
               <div>
                 <SubmitButton variant="secondary">Save</SubmitButton>

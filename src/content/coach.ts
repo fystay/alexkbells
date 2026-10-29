@@ -17,7 +17,7 @@ export const coach = {
   /** One line under his name in the home page's "Coached by" strip; from the confirmed summary. */
   role: "Kettlebell coach in Cumbernauld",
   summary:
-    "Kettlebell coach based in Cumbernauld, running group classes and one-to-one sessions, and coaching people further afield online.",
+    "Kettlebell coach based in Cumbernauld, running group classes and one-to-one sessions.",
   /** Where Alex trained and coached before RAENG. */
   background: null as CoachField | null,
   /** Relevant, verifiable qualifications. Never published unconfirmed. */

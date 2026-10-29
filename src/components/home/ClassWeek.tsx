@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { cn } from "@/lib/cn";
+import { useClassStatus, useUsualClassSize } from "@/components/classes/useClassStatus";
 
 export interface WeekClass {
   id: string;
@@ -15,10 +16,14 @@ export interface WeekClass {
   start: number;
   /** "6:30 pm" */
   time: string;
+  /** "18:30" */
+  startTime: string;
   durationMinutes: number;
+  /** "HIIT" and its one line, from Alex's mockup; null where not given. */
+  name: string | null;
+  description: string | null;
 }
 
-const DAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 const WEEK = 7 * 1440;
 
 /** Re-reads the clock every 30 s on the client; null while server rendering. */
@@ -39,28 +44,16 @@ function ukNow(): { day: number; mins: number } {
   return { day, mins: day * 1440 + Number(parts.hour) * 60 + Number(parts.minute) };
 }
 
-function untilText(mins: number): string {
-  if (mins <= 0) return "on now";
-  const d = Math.floor(mins / 1440);
-  const h = Math.floor((mins % 1440) / 60);
-  const m = mins % 60;
-  if (d > 0) return `in ${d} d ${h} h`;
-  if (h > 0) return `in ${h} h ${m} min`;
-  return `in ${m} min`;
-}
-
-function dateIn(mins: number): string {
-  return new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "numeric", month: "long" }).format(new Date(Date.now() + mins * 60_000));
-}
+const pill = "rounded-full border border-current px-2 py-0.5 text-[0.6875rem] leading-tight font-semibold tracking-[0.1em] whitespace-nowrap uppercase";
 
 /**
- * The home page's class times (owner's design, 2026-10-28): a week strip with
- * the class days marked (today underlined, the chosen day ringed), three class
- * cards under a sliding ink selector with "Next up" (or "On now") on the next
- * class, the facts, a separate "Where we train" panel, then Book now (always
- * that label, owner rule), which opens the calendar on the chosen class. The
- * next class is chosen to begin with. Times come from the timetable; the
- * countdown is worked out in the visitor's browser in UK time.
+ * The home page's class times, kept simple (Alex via the owner, 2026-10-29: "so
+ * people know exactly what days and times"): each class as a row (day, time,
+ * "Next up" on the next one), the facts, one Book now that opens the booking
+ * calendar, and the address with Get directions (no second Book now there).
+ * A row opens the calendar on that class; a fully booked class says so and its
+ * row opens the next class with a place. Times come from the timetable; "Next
+ * up" is worked out in the visitor's browser in UK time.
  */
 export function ClassWeek({
   classes,
@@ -78,14 +71,15 @@ export function ClassWeek({
   bookHref: string;
   bookLabel: string;
   external?: boolean;
-  /** Book now with a class chosen: `<base><timetable id>` opens the calendar on it (null where booking goes elsewhere). */
+  /** A row opens the calendar on its class: `<base><timetable id>` (null where booking goes elsewhere). */
   classHrefBase: string | null;
   address: { venue: string; lines: string[]; postcode: string };
   mapsHref: string;
   beginners: string | null;
 }) {
   const tick = useSyncExternalStore(subscribe, getTick, getServerTick);
-  const [choice, setChoice] = useState<number | null>(null);
+  const size = useUsualClassSize();
+  const status = useClassStatus(classes.map((c) => ({ id: c.id, day: c.day, start: c.startTime })));
   const now = tick === null ? null : ukNow();
   const deltas = now
     ? classes.map((c) => {
@@ -95,70 +89,80 @@ export function ClassWeek({
       })
     : null;
   const next = deltas ? deltas.indexOf(Math.min(...deltas)) : null;
-  const sel = choice ?? next ?? 0;
-  const chosen = classes[sel];
-  const href = classHrefBase ? `${classHrefBase}${chosen.id}` : bookHref;
   const button = buttonClasses("action", "w-full px-6");
+  const [street, ...rest] = address.lines;
 
   return (
     <div>
-      <ol aria-hidden="true" className="ct-week grid grid-cols-7 gap-1 pt-1">
-        {DAY_LETTERS.map((letter, i) => {
-          const isClass = classes.some((c) => c.dayIndex === i);
-          return (
-            <li key={i} className={cn("flex flex-col items-center gap-2 text-xs font-semibold tracking-[0.12em]", isClass ? "text-ink" : "text-grey")}>
-              <b className={cn("font-semibold", now?.day === i && "underline decoration-2 underline-offset-4")}>{letter}</b>
-              <span className="flex h-[13px] items-center">
-              <i
-                className={cn(
-                  "relative z-10 block rounded-full border-[1.5px]",
-                  isClass ? "size-[13px] border-ink bg-ink" : "size-[9px] border-grey bg-paper",
-                  chosen.dayIndex === i && "shadow-[0_0_0_5px_var(--color-paper),0_0_0_6.5px_var(--color-ink)]",
-                )}
-              />
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-
-      <ul aria-label="Class times" className="ct-cards relative mt-6 grid grid-cols-3 gap-3">
-        <li aria-hidden="true" className="ct-pill" style={{ transform: `translateX(calc(${sel} * (100% + 0.75rem)))` }} />
+      <ul aria-label="Class times" className="border-y border-line">
         {classes.map((c, i) => {
-          const [time, period] = c.time.split(" ");
-          const isNext = next === i;
-          return (
-            <li key={c.id} className="relative min-w-0">
-              <button
-                type="button"
-                aria-pressed={sel === i}
-                aria-label={`${c.day} ${c.time}`}
-                onClick={() => setChoice(i)}
-                className={cn(
-                  "flex w-full cursor-pointer flex-col items-center gap-0.5 rounded-[1.375rem] border-[1.5px] border-ink px-1.5 pt-5 pb-4 motion-safe:transition-colors motion-safe:duration-300",
-                  "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink",
-                  sel === i ? "text-paper" : "text-ink",
-                )}
-              >
-                <span className="text-[0.8125rem] font-semibold tracking-[0.24em] uppercase">{c.day.slice(0, 3)}</span>
-                <span className="font-display text-[clamp(1.75rem,8vw,2.5rem)] leading-[1.15] tabular-nums">{time}</span>
-                <span className="text-[0.9375rem]">{period}</span>
-                <span className={cn("mt-2 rounded-full border border-current px-2 py-0.5 text-[0.6875rem] font-semibold tracking-[0.1em] whitespace-nowrap uppercase", !isNext && "invisible")}>
-                  {isNext ? (deltas && deltas[i] <= 0 ? "On now" : "Next up") : "\u00a0"}
+          const s = status?.get(c.id);
+          const isFull = s?.full ?? false;
+          const redirect = isFull ? s?.redirect : null;
+          const href = classHrefBase ? (redirect ? `${classHrefBase}${redirect.id}&date=${redirect.date}` : `${classHrefBase}${c.id}`) : null;
+          const label = isFull ? "Fully booked" : next === i ? (deltas && deltas[i] <= 0 ? "On now" : "Next up") : null;
+          const body = (
+            <>
+              <span className="flex min-w-0 flex-col gap-1">
+                <span className="flex items-baseline gap-3">
+                  <span className="text-sm font-semibold tracking-[0.16em] uppercase">{c.day.slice(0, 3)}</span>
+                  <span className={cn("font-display text-[1.75rem] leading-none tabular-nums", isFull && "text-grey")}>{c.time}</span>
                 </span>
-              </button>
+                {c.name ? (
+                  <span className="mt-1">
+                    <span className="block font-semibold">{c.name}</span>
+                    {c.description ? <span className="block text-[0.9375rem]">{c.description}</span> : null}
+                  </span>
+                ) : null}
+              </span>
+              <span className="flex shrink-0 flex-col items-end gap-1 text-right">
+                {label ? <span className={pill}>{label}</span> : null}
+                {isFull ? <span className="text-sm">{redirect ? `Next: ${redirect.day.slice(0, 3)} ${classes.find((x) => x.id === redirect.id)?.time}` : "No places for 4 weeks"}</span> : null}
+              </span>
+            </>
+          );
+          const row = "flex min-h-16 items-start justify-between gap-4 py-4";
+          return (
+            <li key={c.id} className={cn(i > 0 && "border-t border-line")}>
+              {href ? (
+                <Link href={href} aria-label={`${c.day} ${c.time}${isFull ? ", fully booked" : ""}`} className={cn(row, "hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink")}>
+                  {body}
+                </Link>
+              ) : (
+                <div className={row}>{body}</div>
+              )}
             </li>
           );
         })}
       </ul>
 
-      <p className="mt-6 flex flex-wrap justify-between gap-3 border-y border-line py-4 tabular-nums">
-        {facts.map((f) => (
+      <p className="mt-5 flex flex-wrap justify-between gap-3 tabular-nums">
+        {[...facts, ...(size ? [`${size} places max`] : [])].map((f) => (
           <span key={f}>{f}</span>
         ))}
       </p>
 
-      <section aria-labelledby="ct-venue" className="mt-6 grid grid-cols-[auto_1fr] items-start gap-x-[1.125rem] gap-y-4 rounded-[1.375rem] bg-white px-5 py-[1.375rem]">
+      <div className="mt-6">
+        {external ? (
+          <a href={bookHref} target="_blank" rel="noopener noreferrer" className={button}>
+            {bookLabel}
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+        ) : (
+          <Link href={bookHref} className={button}>
+            {bookLabel}
+            <span aria-hidden="true"> →</span>
+          </Link>
+        )}
+        <p className="mt-3">
+          {beginners ? `${beginners} ` : null}
+          <Link href="#memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
+            Save with a membership
+          </Link>
+        </p>
+      </div>
+
+      <section aria-labelledby="ct-venue" className="mt-8 grid grid-cols-[auto_1fr] items-start gap-x-[1.125rem] gap-y-4 rounded-[1.375rem] bg-white px-5 py-[1.375rem]">
         <svg viewBox="0 0 34 44" aria-hidden="true" className="ct-pin h-11 w-[2.125rem]">
           <path d="M17 42s14-14.5 14-25A14 14 0 0 0 3 17c0 10.5 14 25 14 25z" fill="none" stroke="currentColor" strokeWidth="2.2" />
           <circle cx="17" cy="17" r="5" fill="currentColor" />
@@ -166,10 +170,10 @@ export function ClassWeek({
         <div className="min-w-0">
           <p className="eyebrow mb-1.5">Where we train</p>
           <p id="ct-venue" className="text-xl font-extrabold tracking-[-0.01em]">
-            {address.venue}
+            {street}
           </p>
           <address className="mt-1 leading-normal not-italic">
-            {address.lines.map((l) => (
+            {rest.map((l) => (
               <span key={l} className="block">
                 {l}
               </span>
@@ -183,39 +187,9 @@ export function ClassWeek({
           rel="noopener noreferrer"
           className="col-span-2 flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ink px-5 font-semibold hover:bg-ink hover:text-paper motion-safe:transition-colors"
         >
-          Get directions<span className="sr-only"> to {address.venue} (opens in a new tab)</span>
+          Get directions<span className="sr-only"> to the class location (opens in a new tab)</span>
         </a>
       </section>
-
-      <div className="mt-6">
-        {external ? (
-          <a href={href} target="_blank" rel="noopener noreferrer" className={button}>
-            {bookLabel}
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
-        ) : (
-          <Link href={href} className={button}>
-            {bookLabel}
-          </Link>
-        )}
-        <p aria-live="polite" className="mt-3">
-          {deltas ? (
-            <>
-              {chosen.day} {dateIn(Math.max(deltas[sel], 0))}, {chosen.time} selected <span className="tabular-nums">({untilText(deltas[sel])})</span>. Next, add your details.
-            </>
-          ) : (
-            <>
-              {chosen.day} {chosen.time} selected. Next, add your details.
-            </>
-          )}
-        </p>
-        <p className="mt-2">
-          {beginners ? `${beginners} ` : null}
-          <Link href="#memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
-            Save with a membership
-          </Link>
-        </p>
-      </div>
     </div>
   );
 }

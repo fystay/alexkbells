@@ -185,13 +185,16 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
       : null;
   // A class chosen on the home page's day tiles (?class=<timetable id>, owner 2026-10-28):
   // its next bookable date and time arrive already chosen, until the visitor picks another.
+  // From the members area's Book cards, &date=<YYYY-MM-DD> picks that date of the class.
   const classParam = useQueryParam("class");
+  const dateParam = useQueryParam("date");
   const fromLink = (() => {
     if (picked || !classParam || !usesSessions || !avail) return null;
     const cls = classes.find((c) => c.id === classParam);
     if (!cls) return null;
     for (const d of avail.days) {
       if (WEEKDAY_NAMES[weekdayIndex(d.date)] !== cls.day) continue;
+      if (dateParam && d.date !== dateParam && avail.days.some((x) => x.date === dateParam)) continue;
       const slot = d.slots.find((s) => s.time === cls.start && s.available);
       if (slot) return { date: d.date, slotId: slot.id };
     }
@@ -398,15 +401,6 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   value={service}
                   onChange={chooseService}
                 />
-              </div>
-              <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <p className="text-sm text-muted">Coaching online, wherever you train?</p>
-                <Link
-                  href="/online-coaching"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
-                >
-                  Explore online coaching
-                </Link>
               </div>
               <ActionBar
                 onBack={leave}

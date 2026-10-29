@@ -36,6 +36,7 @@ export function CoachStory({
   showPhotos = true,
   portrait = null,
   tone = "white",
+  alex,
   children,
 }: {
   headingAs?: "h2" | "h3";
@@ -45,6 +46,8 @@ export function CoachStory({
   /** One photo of Alex in the frame's place (/about, owner 2026-10-27). */
   portrait?: Photo | null;
   tone?: SectionTone;
+  /** The home page's own words (Alex via the owner, 2026-10-29): the caption under the frame, his greeting, role and a short description. */
+  alex?: { caption: string; greeting: string; role: string; summary: string };
   /** Shown under the heading (/about: the "1% better" chart, owner's design 2026-10-28). */
   children?: ReactNode;
 }) {
@@ -68,8 +71,12 @@ export function CoachStory({
           </div>
           {photos ? (
             <figure className="lg:col-span-6 lg:row-span-2 lg:self-center">
-              <BeforeAfter before={photos.before} after={photos.after} beforeLabel={journey.beforeLabel} afterLabel={journey.afterLabel} />
-              <figcaption className="mt-3 text-sm">{journey.caption} Drag to compare.</figcaption>
+              <div className={alex ? "mx-auto max-w-[17rem] sm:max-w-xs lg:mx-0 lg:max-w-sm" : undefined}>
+                <BeforeAfter before={photos.before} after={photos.after} beforeLabel={journey.beforeLabel} afterLabel={journey.afterLabel} />
+              </div>
+              <figcaption className={alex ? "mx-auto mt-3 max-w-[17rem] text-sm sm:max-w-xs lg:mx-0 lg:max-w-sm" : "mt-3 text-sm"}>
+                {alex ? alex.caption : journey.caption} Drag to compare.
+              </figcaption>
             </figure>
           ) : portrait ? (
             <div className="lg:col-span-6 lg:row-span-2 lg:self-center">
@@ -77,8 +84,9 @@ export function CoachStory({
             </div>
           ) : null}
           <div className="lg:col-span-6 lg:mt-8 lg:self-start">
-            {showJourney ? <Sub className="card-title text-xl">{coach.name}</Sub> : null}
-            <p className="mt-2 max-w-xl text-lede">{coach.summary}</p>
+            {showJourney ? <Sub className="card-title text-xl">{alex ? alex.greeting : coach.name}</Sub> : null}
+            {alex ? <p className="eyebrow mt-1">{alex.role}</p> : null}
+            <p className="mt-2 max-w-xl text-lede">{alex ? alex.summary : coach.summary}</p>
             {details.length > 0 ? (
               <dl className="mt-8 max-w-xl space-y-6">
                 {details.map((d) => (

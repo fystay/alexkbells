@@ -24,7 +24,7 @@ export const journey: Journey = {
   status: "confirmed",
   title: "1% better, every day.",
   intro:
-    "Alex didn't start out as a coach. His own change came from turning up and getting 1% better every day. Now he helps others do the same: build strength, move better and improve their fitness, in classes, one-to-one and online.",
+    "Alex didn't start out as a coach. His own change came from turning up and getting 1% better every day. Now he helps others do the same: build strength, move better and improve their fitness, in classes and one-to-one.",
   chapters: [],
   // Supplied by the project owner 2026-10-17 (sources in assets/journey/),
   // cropped and graded by scripts/supplied_photos.py.

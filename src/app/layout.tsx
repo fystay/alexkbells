@@ -5,6 +5,7 @@ import { isIndexable, siteUrl } from "@/lib/env";
 import { DEFAULT_TITLE, baseOpenGraph } from "@/lib/metadata";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { OutsideMembersApp } from "@/components/layout/OutsideMembersApp";
 import { JsonLd } from "@/components/sections/JsonLd";
 import { INTRO_SCRIPT, REVEAL_SCRIPT } from "@/lib/reveal";
 import { PLAN_SCRIPT } from "@/lib/plan-flag";
@@ -58,11 +59,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <SiteHeader />
+        <OutsideMembersApp>
+          <SiteHeader />
+        </OutsideMembersApp>
         <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
           {children}
         </main>
-        <SiteFooter />
+        <OutsideMembersApp>
+          <SiteFooter />
+        </OutsideMembersApp>
         <JsonLd />
       </body>
     </html>

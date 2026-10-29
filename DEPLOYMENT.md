@@ -174,6 +174,30 @@ Owner's decision (2026-10-28, "the standard gym flow"): the first paid booking m
 
 How it behaves: the booking confirmation email says the bookings are in their account; the account page lists their classes (paid ones cancel for a class credit 24 hours or more before, as the emailed link does), their class credits (book with one, nothing to pay), Book now, and what a membership would have saved them (from content prices and their own bookings). Signed in, the booking and join forms fill in name, email and phone (`/api/account/details`, own details only). The sign-in cookie is now site-wide (was `/account`); people signed in before keep their old cookie until it expires or they sign out.
 
+### Account menu settings (2026-10-28, built; not live)
+
+Profile and details, Notifications, Calendar sync and Sign-in and security, each a page opened from the avatar's menu.
+
+1. **Apply `supabase/migrations/20261031000000_akb_member_settings.sql`** after `20261030…` (with the owner's go-ahead): three tables (RLS on, no policies, `anon`/`authenticated` revoked), one column with a default (`akb_member_sessions.device`), eleven new functions and a replaced `akb_member_cleanup` (adds deleting reminder records after 60 days); no existing row changes; safe to run again. Check: `select has_table_privilege('authenticated','public.akb_member_calendar_feeds','select')` is false. Tests: `src/lib/coach/member-settings.test.ts` (real migrations on PGlite).
+2. **Class reminders need email on Production** (Resend, as for sign-in links) and `CRON_SECRET`. `/api/cron/class-reminders` runs daily at 07:41 UTC (vercel.json): each member who switched reminders on gets one email on the morning of a class they're booked on. A place is reminded once (`akb_class_reminders`); cancelled, held and cancelled-class places get nothing. Without the email settings it sends nothing and records nothing, so reminders start when email goes live; the Notifications page says so while it isn't.
+3. The calendar link is `<SITE_URL>/account/calendar/feed/<token>.ics` (from `SITE_URL`, else the production URL). The token is shown once; the database keeps only its SHA-256 hash. A new link replaces the old one; Turn off removes it. Calendar apps refresh it about hourly (Google Calendar can take longer).
+4. Devices: the sign-in records the kind of device and browser from the user agent (e.g. "iPhone, Safari"), never the IP address or the user agent itself.
+5. The email address isn't editable by members (it is their sign-in and how bookings find them); Alex changes it in the coach area.
+
+### Raeng Coaching (2026-10-28, built; not live)
+
+The member side of online coaching, opened from the members area, plus the coach tools that feed it.
+
+1. **Apply `supabase/migrations/20261101000000_akb_coaching_area.sql`** after `20261031…` (with the owner's go-ahead): six tables (RLS on, no policies, `anon`/`authenticated` revoked), sixteen functions (one, `akb_coaching_inbox`, feeds the coach Inbox tab), and `akb_can_sign_in` replaced so a client with an active online coaching subscription can sign in even if they have never booked a class. Adds no column to an existing table and changes no row; safe to run again. Check: `select has_table_privilege('authenticated','public.akb_coaching_messages','select')` is false. Tests: `src/lib/coach/coaching.test.ts` (real migrations on PGlite).
+2. **Who has it:** a client with an **active** subscription in the coach area (Online coaching). Paused, cancelled or completed plans have no access (they see the unlock page). Nothing is bought in the members area: Alex starts the subscription after an enquiry.
+3. **Alex writes the programme** on the plan's page (`/coach/online/<id>` → Programme): name, goal, weeks (1 to 12), days a week, start date, and the exercises as text (`Week 1`, `Day A`, then `name | sets | reps | load | note | demo link`; a week left out repeats the one before). Demo links are `https://` links to a video hosted elsewhere (YouTube unlisted, Vimeo, Drive); **videos are never uploaded**. Saving again keeps what the client has logged.
+4. **Messages and check-ins:** clients write in their Messages and Check-in tabs; Alex sees them and replies on the same plan page, and the Online coaching list shows a badge for unread messages. **Nothing emails Alex yet** (needs Resend; TASKS.md), so he has to open the list.
+5. Prices come from `content/services.ts` (the Online coaching monthly price); a client's own plan name and price are read from their subscription.
+
+### Coach portal tabs (2026-10-28, built; not live)
+
+The coach portal now has the owner's coach design: a frame with Today, Schedule, Members and Inbox tabs (no new settings, no new tables). Every existing page is kept. The **Inbox** also shows coaching check-ins and client messages, which need `20261101000000_akb_coaching_area.sql` (Raeng Coaching, above): until it is applied the portal works as before and simply shows no coaching items (the read fails quietly and is logged). **Message class** opens your own email app with the booked people in Bcc; nothing is sent from the site.
+
 ### Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.
@@ -259,3 +283,7 @@ Steps (on the developer's machine; nothing here touches production):
    (**only with Alex's approval**). Vercel issues HTTPS automatically.
 7. After DNS resolves: share a page on WhatsApp/Facebook to check the preview
    image, and submit the sitemap in Google Search Console (Alex's account).
+
+### Class size (owner, 2026-10-29)
+
+1. **Apply `supabase/migrations/20261102000000_akb_default_class_capacity.sql`** after `20261101…` (with the owner's go-ahead): one table (`akb_settings`, RLS on, no policies, `anon`/`authenticated` revoked), two functions, the capacity trigger function and `akb_class_overview` replaced (the view's `capacity` is now the size that applies; new last column `capacity_set` is only what Alex typed for the date). Every class holds **12** until Alex changes it under Coach portal → Classes → Class size; a date's own size still wins. No existing row changes; safe to run again. Until it is applied the portal's Class size save fails with a database error and classes have no limit, as before. Check: `select public.akb_default_class_capacity()` returns 12. Tests: `src/lib/coach/bookings.test.ts` (real migrations on PGlite).

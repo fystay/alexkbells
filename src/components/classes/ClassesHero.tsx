@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Photo } from "@/content/types";
 import { classesVideo } from "@/content/media";
 import { HeroVideo } from "@/components/home/HeroVideo";
@@ -11,8 +10,6 @@ interface ClassesHeroProps {
   eyebrow: string;
   title: string;
   cta: { href: string; label: string; external?: boolean };
-  moreHref: string;
-  moreLabel: string;
 }
 
 /**
@@ -22,7 +19,7 @@ interface ClassesHeroProps {
  * content/media.ts `classesVideo`; vertical on phones; owner, 2026-10-27). Silent and looping, with a
  * pause button; visitors who prefer reduced motion get the still. The one `h1`.
  */
-export function ClassesHero({ photo, eyebrow, title, cta, moreHref, moreLabel }: ClassesHeroProps) {
+export function ClassesHero({ photo, eyebrow, title, cta }: ClassesHeroProps) {
   return (
     <section aria-labelledby="classes-hero-heading" className="bg-paper sm:pt-5 sm:pb-8">
       <div className="relative sm:container-page">
@@ -49,12 +46,6 @@ export function ClassesHero({ photo, eyebrow, title, cta, moreHref, moreLabel }:
             </h1>
             <div className="mt-6 flex items-center gap-5 sm:gap-7">
               <StartTraining href={cta.href} label={cta.label} external={cta.external} onDark className="flex-1 sm:w-56 sm:flex-none" />
-              <Link
-                href={moreHref}
-                className="hero-shadow inline-flex min-h-11 items-center text-sm font-semibold whitespace-nowrap text-white underline underline-offset-4 hover:no-underline sm:text-base"
-              >
-                {moreLabel}
-              </Link>
             </div>
           </div>
         </div>

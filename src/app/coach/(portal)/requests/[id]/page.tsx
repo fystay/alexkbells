@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { listAttendance, listClassSessions, listPackages, listPtSessions, classSessionsByIds } from "@/lib/coach/bookings";
+import { getDefaultCapacity, listAttendance, listClassSessions, listPackages, listPtSessions, classSessionsByIds } from "@/lib/coach/bookings";
 import { classOccurrences, defaultPrices, findSlot, slotLabel } from "@/lib/coach/classes";
 import { listClients } from "@/lib/coach/clients";
 import { portalContext } from "@/lib/coach/context";
@@ -225,6 +225,7 @@ async function Decide({ request, today, known, possible }: { request: BookingReq
   const prices = defaultPrices();
   const occurrences = classOccurrences(today, addDays(today, 56));
   const overview = await listClassSessions(db, today, addDays(today, 56));
+  const usualSize = await getDefaultCapacity(db);
   const packages = known ? await listPackages(db, { clientId: known.id, activeOnly: true }) : { ok: true as const, data: [] };
   const usable = packages.ok ? packages.data.filter((k) => k.sessions_remaining > 0) : [];
   const requested = details.classDate && details.classSlot ? `${details.classDate}|${details.classSlot}` : "";
@@ -239,8 +240,9 @@ async function Decide({ request, today, known, possible }: { request: BookingReq
   ];
   const classOptions = occurrences.map((o) => {
     const row = overview.ok ? overview.data.find((c) => c.slot === o.slot.id && c.class_date === o.date) : undefined;
-    const full = row?.capacity ? row.booked >= row.capacity : false;
-    const count = row ? ` · ${row.booked}${row.capacity ? `/${row.capacity}` : ""} booked` : "";
+    const size = row?.capacity ?? usualSize;
+    const full = (row?.booked ?? 0) >= size;
+    const count = ` · ${row?.booked ?? 0}/${size} booked`;
     return { value: `${o.date}|${o.slot.id}`, label: `${formatDate(o.date)}, ${slotLabel(o.slot).split(" ").slice(1).join(" ")}${count}${full ? " · full" : ""}` };
   });
   const requestedValid = classOptions.some((o) => o.value === requested);

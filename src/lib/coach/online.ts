@@ -1,4 +1,6 @@
 import { inList, insert, rpc, select, selectOne, update, type Db, type DbResult } from "./db";
+import type { CoachingOverview } from "../coaching";
+import type { ProgrammeItem } from "./programme-text";
 import type { CheckIn, Subscription, SubscriptionStatus } from "./types";
 
 export const SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = ["active", "paused", "cancelled", "completed"];
@@ -59,3 +61,37 @@ export async function addCheckIn(db: Db, subscriptionId: string, args: { checked
 export function chargeSubscriptionPeriod(db: Db, id: string): Promise<DbResult<string>> {
   return rpc<string>(db, "akb_charge_subscription_period", { p_subscription: id });
 }
+
+// ---------------------------------------------------------------------------
+// The coaching area (the member's app): programme, replies and messages
+// (migration 20261101000000_akb_coaching_area.sql)
+// ---------------------------------------------------------------------------
+
+/** Everything the client's coaching area holds, for the coach, whatever the plan's status. */
+export const getCoachingOverview = (db: Db, subscriptionId: string) => rpc<CoachingOverview>(db, "akb_coaching_overview_sub", { p_sub: subscriptionId });
+
+/** Unread client messages per subscription id, for the list. */
+export const coachingUnread = (db: Db) => rpc<Record<string, number>>(db, "akb_coaching_unread_for_coach", {});
+
+export interface ProgrammeInput {
+  name: string;
+  goal: string;
+  weeks: number;
+  daysPerWeek: number;
+  startsOn: string;
+  items: ProgrammeItem[];
+}
+
+export const saveProgramme = (db: Db, subscriptionId: string, p: ProgrammeInput) =>
+  rpc<string>(db, "akb_coaching_save_programme", {
+    p_subscription: subscriptionId,
+    p_name: p.name,
+    p_goal: p.goal,
+    p_weeks: p.weeks,
+    p_days_per_week: p.daysPerWeek,
+    p_starts_on: p.startsOn,
+    p_items: p.items,
+  });
+
+export const replyToCheckIn = (db: Db, checkInId: string, reply: string) => rpc<null>(db, "akb_coaching_reply_check_in", { p_check_in: checkInId, p_reply: reply });
+export const messageClient = (db: Db, subscriptionId: string, body: string) => rpc<number>(db, "akb_coaching_coach_message", { p_subscription: subscriptionId, p_body: body });

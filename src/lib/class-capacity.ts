@@ -28,6 +28,26 @@ interface OverviewRow {
   cancelled_at: string | null;
 }
 
+/** The usual class size (the portal setting), for the public "places max" fact; null when it can't be read. */
+export async function usualClassSize(env: Env = process.env, fetchImpl: typeof fetch = fetch): Promise<number | null> {
+  const config = supabaseConfig(env);
+  if (!config) return null;
+  try {
+    const response = await fetchImpl(`${config.url}/rest/v1/rpc/akb_default_class_capacity`, {
+      method: "POST",
+      headers: { apikey: config.secretKey, Authorization: `Bearer ${config.secretKey}`, "Content-Type": "application/json" },
+      body: "{}",
+      cache: "no-store",
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) return null;
+    const size = (await response.json()) as unknown;
+    return typeof size === "number" && Number.isInteger(size) && size > 0 ? size : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fullClasses(today: DateKey, env: Env = process.env, fetchImpl: typeof fetch = fetch): Promise<FullClasses> {
   const config = supabaseConfig(env);
   if (!config) return UNKNOWN;

@@ -4,20 +4,42 @@
  */
 export const hero = {
   // What Alex does and where, in two lines (owner's pick A, 2026-10-26; was "Train with purpose. / Build with discipline.").
-  headline: "Get stronger.",
-  headlineSecondary: "Kettlebell classes in Cumbernauld",
+  // Alex's wording, relayed by the owner 2026-10-29 (was "Get stronger.").
+  headline: "Train with intent.",
+  tagline: "Be part of something stronger.",
+  // Alex's mockup: "KETTLEBELL TRAINING IN CUMBERNAULD" and a "Book a class" button on the film (2026-10-29).
+  headlineSecondary: "Kettlebell training in Cumbernauld",
   primaryLabel: "Book now",
+  bookLabel: "Book a class",
   secondaryLabel: "Explore coaching",
 } as const;
 
-/** Practical benefits of kettlebell training, described, not promised. No medical or results claims. */
-// `how`: the line shown when a section of the kettlebell is tapped, as the
-// owner supplied it with the kettlebell design (2026-10-28).
+/**
+ * Meet your coach, further down the page (Alex via the owner, 2026-10-29: "less
+ * about me"). Alex's own words; "small group coaching" is how he describes what
+ * he offers, so it is his statement, not a page on this site yet.
+ */
+export const homeCoach = {
+  caption: "My journey. My approach to training.",
+  greeting: "Meet Alex",
+  role: "Founder & kettlebell coach",
+  summary:
+    "I'm the coach behind RAENG, helping people build strength, move with confidence and make training part of their lives. Based in Cumbernauld, I offer group kettlebell classes, one-to-one coaching, and small group coaching.",
+} as const;
+
+/**
+ * Why kettlebells, in Alex's own words from his mockup (via the owner,
+ * 2026-10-29): a heading, one line, and three practical benefits, described, not
+ * promised. No medical or results claims.
+ */
+export const whyIntro = {
+  title: "A simple tool. Real results.",
+  body: "Kettlebell training is an efficient way to build strength, improve conditioning and develop better movement.",
+} as const;
 export const whyKettlebells = [
-  { title: "Strength", body: "Train the whole body at once.", how: "Swings, cleans and presses load legs, back and shoulders together." },
-  { title: "Conditioning", body: "Fitness and stamina, built in.", how: "Intervals and complexes keep your heart rate up without a treadmill." },
-  { title: "Movement quality", body: "Balance, timing and coordination.", how: "Get-ups and flows build control through every position." },
-  { title: "Efficient and adaptable", body: "One bit of kit, trained anywhere.", how: "One bell and two square metres of floor is a full session." },
+  { title: "Build real strength", body: "Train multiple muscle groups and develop strength for everyday life." },
+  { title: "Improve conditioning", body: "Build fitness, stamina and work capacity through dynamic movements." },
+  { title: "Move better", body: "Develop balance, coordination and control." },
 ] as const;
 
 /**

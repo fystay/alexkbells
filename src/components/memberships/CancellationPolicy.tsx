@@ -5,12 +5,12 @@ import { Section, SectionHeading } from "@/components/ui/Section";
  * The owner's cancellation policy, as written. The three rules that matter
  * most are set out as a short list; the rest is quiet text beneath.
  */
-export function CancellationPolicy() {
+export function CancellationPolicy({ title = "Class cancellation policy" }: { title?: string }) {
   return (
     <Section tone="white" id="cancellation" labelledBy="cancellation-heading">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
-          <SectionHeading id="cancellation-heading" eyebrow="Class policy" title="Class cancellation policy" intro={policy.intro} />
+          <SectionHeading id="cancellation-heading" eyebrow="Class policy" title={title} intro={policy.intro} />
         </div>
         <div className="lg:col-span-7">
           <h3 className="card-title">Cancellations</h3>

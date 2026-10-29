@@ -36,7 +36,8 @@ describe("four-colour palette", () => {
       expect(text, `${file}: rgb()/hsl() colour`).not.toMatch(/(?<![-\w])(rgba?|hsla?)\(/);
       // Opacity modifiers (bg-ink/60, border-paper/20) and gradients create colours that are not in the palette.
       expect(text, `${file}: opacity colour`).not.toMatch(/\b(?:bg|text|border|outline|ring|decoration|divide|fill|stroke|from|via|to)-(?:ink|paper|white|grey|muted|line|surface)\/[\d[]/);
-      expect(text, `${file}: gradient`).not.toMatch(/bg-linear-|bg-gradient-|radial-gradient/);
+      // The one exception: the soft dark fade under the home hero's words (owner approved it, 2026-10-29).
+      if (!file.endsWith("components/home/Hero.tsx")) expect(text, `${file}: gradient`).not.toMatch(/bg-linear-|bg-gradient-|radial-gradient/);
     }
   });
 });

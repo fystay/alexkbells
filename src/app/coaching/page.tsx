@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { getService } from "@/content/services";
+import { smallGroupCoaching } from "@/content/smallGroup";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
@@ -19,9 +20,9 @@ import { PriceList } from "@/components/sections/PriceList";
 import { CtaBand } from "@/components/sections/CtaBand";
 
 export const metadata: Metadata = pageMetadata({
-  title: "1:1 Kettlebell Coaching",
+  title: "Kettlebell Coaching",
   description:
-    "Face-to-face 1:1 kettlebell coaching in Cumbernauld, Glasgow, tailored to your goals, experience and development.",
+    "Face-to-face 1:1 kettlebell coaching and small group coaching in Cumbernauld, Glasgow, tailored to your goals, experience and development.",
   path: "/coaching",
 });
 
@@ -98,6 +99,18 @@ export default function CoachingPage() {
         </div>
       </Section>
 
+      {/* Alex's layout (2026-10-29): "What's included", from the confirmed points. */}
+      <Section id="included" labelledBy="included-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="1:1 coaching" title="What's included." />
+          <ul className="lined mt-8 lg:col-span-7 lg:mt-0">
+            {service.points.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
       <Section id="how-it-works" labelledBy="how-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="From first message to first session." />
@@ -145,16 +158,23 @@ export default function CoachingPage() {
               <Link href="/classes" className={`inline-flex min-h-11 items-center ${linkClass}`}>
                 See group classes
               </Link>
-              <Link href="/online-coaching" className={`inline-flex min-h-11 items-center ${linkClass}`}>
-                See online coaching
-              </Link>
             </p>
           </div>
         </div>
       </Section>
 
+      <Section id="small-group" labelledBy="small-group-heading">
+        <SectionHeading id="small-group-heading" className="max-w-xl" eyebrow="Also" title={`${smallGroupCoaching.name}.`} intro={smallGroupCoaching.summary} />
+        <p className="mt-6">
+          <Link href={smallGroupCoaching.href} className={`inline-flex min-h-11 items-center ${linkClass}`}>
+            {smallGroupCoaching.askLabel}
+          </Link>
+        </p>
+      </Section>
+
       {/* No location section or price line here: the steps say where, the prices are just above, and the footer has the address (2026-10-26). */}
-      <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" />
+      {/* "Get in touch" here is the owner's own wording (2026-10-29); it still opens the 1:1 booking request. */}
+      <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" label="Get in touch" />
     </>
   );
 }

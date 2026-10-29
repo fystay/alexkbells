@@ -43,7 +43,7 @@ export function PlanList({ className }: { className?: string }) {
   // rules between them; the chosen row turns ink. Join / Book now sits under the box, separate (owner, 2026-10-27).
   const row = cn("relative border-line px-4 py-4 sm:px-5 [&+&]:border-t", choiceCard);
   return (
-    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Tap a plan to choose it."
+    <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Choose your plan to continue."
       className={cn("max-w-lg", className)}
       frame="overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink"
     >
@@ -62,11 +62,13 @@ export function PlanList({ className }: { className?: string }) {
                   <PlanDot />
                   {plan.name}
                 </h3>
-                <p className="shrink-0 text-2xl font-bold tabular-nums">£{plan.priceGbp}</p>
+                <p className="shrink-0 text-right tabular-nums">
+                  <span className="text-2xl font-bold">£{plan.priceGbp}</span>
+                  <span className="block text-sm">/ every {BILLING_WEEKS} weeks</span>
+                </p>
               </div>
               <div className="mt-1 space-y-0.5 pl-8 text-[0.9375rem] lg:text-base">
-                {/* "Every 4 weeks" and "against pay as you go" are said once, in the section's intro
-                    (owner, 2026-10-26 and 2026-10-27), so the saving stands alone. */}
+                {/* "/ every 4 weeks" sits under each price (Alex via the owner, 2026-10-29), so the saving stands alone. */}
                 <p>
                   {plan.credits} class credits · {formatPenceShort(f.perClassPence)} per class
                 </p>
@@ -88,9 +90,13 @@ export function PlanList({ className }: { className?: string }) {
             </h3>
             <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
           </div>
-          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">Per class. No membership needed.</p>
+          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">No membership required. Pay for each booking.</p>
         </li>
       </ul>
+      {/* Alex's mockup: how the savings are worked out. */}
+      <p className="mt-4 text-sm">
+        Savings are calculated against paying £{payg.amountGbp} per class for the same number of bookings within {BILLING_WEEKS} weeks.
+      </p>
     </ChoiceCards>
   );
 }
@@ -103,28 +109,17 @@ function PlanDot() {
 }
 
 /**
- * How a membership works, in four short lines from the published terms
- * (content/policy.ts), then the full detail a tap away on /memberships.
- * Read before choosing, so nothing restricts the visitor unexpectedly.
+ * The membership terms, kept off the page (Alex via the owner, 2026-10-29): a
+ * "Membership terms" label with one link to the full membership and
+ * cancellation policy on /memberships (content/policy.ts), so the page stays
+ * short and nothing is hidden.
  */
 export function PlanTerms({ className }: { className?: string }) {
-  // The class days are in the timetable above, so not repeated here (owner, 2026-10-26).
-  const points = [
-    "One credit books any one class.",
-    `Renews automatically every ${BILLING_WEEKS} weeks, with new credits.`,
-    "Unused credits don't roll over.",
-    "Cancel 24 hours or more before class and your credit comes back.",
-  ];
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
-      <h3 className="eyebrow mb-2">Membership rules</h3>
-      <ul className="lined">
-        {points.map((p) => (
-          <li key={p}>{p}</li>
-        ))}
-      </ul>
-      <Link href="/memberships#how-it-works" className="mt-2 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
-        How memberships work
+      <h3 className="eyebrow mb-1">Membership terms</h3>
+      <Link href="/memberships#membership-terms" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+        Membership and cancellation policy
       </Link>
     </div>
   );
