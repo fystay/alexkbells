@@ -11,10 +11,7 @@ import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { ClassesHero } from "@/components/classes/ClassesHero";
 import { ClassFocus } from "@/components/classes/ClassFocus";
-import { ClassSteps } from "@/components/classes/ClassSteps";
-import { firstClassSteps } from "@/content/home";
 import { StartTraining } from "@/components/ui/StartTraining";
-import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 
 // Read at build time like every booking setting: the request form when it's open, else a message.
 const bookingOpen = getPrimaryCtaFor("group-class").kind === "booking";
@@ -30,16 +27,15 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * The classes page, the owner's design (2026-10-28): the class film and Book
- * now; what the classes build (three line drawings); how to join in three
- * steps on a rail you open one at a time (`ClassSteps`: pick a class; the price,
- * how often you'll train and what a membership saves; where, the first session
- * and what to bring); then Book now, the memberships (the home page's, owner
- * 2026-10-29: sell them here too) and one line to the other ways to train.
+ * The classes page: the class film and Book now; what the classes build (three
+ * line drawings); the timetable and studio location (the home page's class
+ * rows); Book now and one line to the other ways to train; the memberships
+ * (the home page's); the booking and cancellation policy; the class questions.
+ * The "Start in three steps" section was removed at the owner's request
+ * (2026-10-29).
  */
 export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
-  const open = booking.kind === "booking";
 
   return (
     <>
@@ -52,24 +48,8 @@ export default function ClassesPage() {
           label: booking.label,
           external: booking.external,
         }}
-        moreHref="#join"
-        moreLabel="How to join"
       />
       <ClassFocus />
-
-      <Section id="join" labelledBy="join-heading">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <div className="lg:col-span-5">
-            <SectionHeading
-              id="join-heading"
-              eyebrow="How to join"
-              title={firstClassSteps.title}
-            />
-            {open ? <InstagramAlternative className="mt-4" /> : null}
-          </div>
-          <ClassSteps className="mt-8 lg:col-span-7 lg:mt-0" />
-        </div>
-      </Section>
 
       {/* Alex's layout (2026-10-29): the full timetable and the studio location, the home page's class rows. */}
       <Section id="timetable" labelledBy="timetable-heading">
