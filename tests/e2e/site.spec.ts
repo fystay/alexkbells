@@ -786,6 +786,29 @@ test("/coaching: the owner's design, who it's for, three steps, the two prices a
   await expect(small.getByRole("link", { name: "Ask about small group coaching" })).toHaveAttribute("href", "/contact");
 });
 
+test("Alex's layout: each page carries the parts his layout image lists (2026-10-29)", async ({ page }) => {
+  // Classes: full timetable, studio location, memberships, pay as you go, booking and cancellation policies, FAQs.
+  await page.goto("/classes");
+  const timetable = page.locator("#timetable");
+  await expect(timetable.getByRole("list", { name: "Class times" }).getByRole("link")).toHaveCount(3);
+  await expect(timetable.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
+  await expect(page.locator("#memberships").getByRole("heading", { name: "Pay as you go" })).toBeVisible();
+  await expect(page.locator("#cancellation").getByRole("heading", { level: 2 })).toHaveText("Booking and cancellation policy.");
+  await expect(page.getByRole("heading", { level: 2, name: "Questions." })).toBeVisible();
+  // Coaching: 1:1 coaching, who it's for, what's included, pricing or enquiry.
+  await page.goto("/coaching");
+  await expect(page.locator("#who-for")).toBeVisible();
+  await expect(page.locator("#included").getByRole("heading", { level: 2 })).toHaveText("What's included.");
+  await expect(page.locator("#included li")).toHaveText(["Face-to-face sessions with Alex", "Coaching tailored to the individual"]);
+  await expect(page.locator("#pricing")).toContainText("£35");
+  // FAQs & Contact: common questions, contact details, Instagram, getting started.
+  await page.goto("/contact");
+  await expect(page.locator("#getting-started")).toContainText("New? Say so when you book.");
+  await expect(page.getByRole("heading", { level: 2, name: "Questions." })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Message Alex on Instagram/i })).toBeVisible();
+  await expect(page.locator("#ways")).toContainText("Directions");
+});
+
 test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
   await page.goto("/about");
   // Opens with แรง as a dictionary entry (owner's design, 2026-10-28): tap a sense to read its line.
