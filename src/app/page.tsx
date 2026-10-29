@@ -4,10 +4,10 @@ import { pageMetadata } from "@/lib/metadata";
 import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
 import { formatPenceShort, maxSavingPence } from "@/lib/membership";
-import { CoachIntro } from "@/components/home/CoachIntro";
 import { CoachStory } from "@/components/home/CoachStory";
 import { ClassPicker, classesTitle } from "@/components/home/ClassPicker";
 import { Hero } from "@/components/home/Hero";
+import { homeCoach } from "@/content/home";
 import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
@@ -19,22 +19,19 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 
 const payg = getService("group-classes").prices[0];
 
-// Home order, fixed by the owner (2026-10-27, final; see AGENTS.md "Owner
-// rules"): the film and Book now; a slim "Coached by Alex" line; why
-// kettlebells and who coaches it (and members' words, once there are any);
-// the classes as three steps ending in Book now; what Alex offers
-// (memberships, then the other ways to train); and a last Book now. This
-// overrides Alex's earlier stated order: audits must not move these back.
+// Home order (the owner relaying Alex's feedback, 2026-10-29; replaces the
+// 2026-10-27 order, which had the slim "Coached by" line and Meet your coach
+// near the top): the film and Book now; why kettlebells; the classes (rows of
+// days and times, one Book now, the address); what Alex offers (memberships,
+// then the other ways to train); then Meet your coach (and members' words,
+// once there are any), "less about me"; and a last Book now.
 // Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <CoachIntro />
       <WhyKettlebells />
-      <CoachStory tone="plain" />
-      <Testimonials />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
           {/* The owner's class times (2026-10-28), also on /classes; the count comes from the timetable. */}
@@ -58,6 +55,8 @@ export default function HomePage() {
         </div>
       </Section>
       <MoreWays />
+      <CoachStory tone="plain" alex={homeCoach} />
+      <Testimonials />
       <CtaBand id="book" body={null} instagram={false} tone="plain" />
     </>
   );

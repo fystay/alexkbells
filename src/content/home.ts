@@ -4,10 +4,25 @@
  */
 export const hero = {
   // What Alex does and where, in two lines (owner's pick A, 2026-10-26; was "Train with purpose. / Build with discipline.").
-  headline: "Get stronger.",
+  // Alex's wording, relayed by the owner 2026-10-29 (was "Get stronger.").
+  headline: "Train with intent.",
+  tagline: "Be part of something stronger.",
   headlineSecondary: "Kettlebell classes in Cumbernauld",
   primaryLabel: "Book now",
   secondaryLabel: "Explore coaching",
+} as const;
+
+/**
+ * Meet your coach, further down the page (Alex via the owner, 2026-10-29: "less
+ * about me"). Alex's own words; "small group coaching" is how he describes what
+ * he offers, so it is his statement, not a page on this site yet.
+ */
+export const homeCoach = {
+  caption: "My journey. My approach to training.",
+  greeting: "Meet Alex",
+  role: "Founder & kettlebell coach",
+  summary:
+    "I'm the coach behind RAENG, helping people build strength, move with confidence and make training part of their lives. Based in Cumbernauld, I offer group kettlebell classes, one-to-one coaching, and small group coaching.",
 } as const;
 
 /** Practical benefits of kettlebell training, described, not promised. No medical or results claims. */

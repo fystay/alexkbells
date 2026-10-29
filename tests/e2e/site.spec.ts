@@ -469,7 +469,8 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   // What and where (owner's pick A, 2026-10-26).
-  await expect(hero.locator("h1")).toContainText("Get stronger.");
+  await expect(hero.locator("h1")).toContainText("Train with intent.");
+  await expect(hero.locator("h1")).toContainText("Be part of something stronger.");
   await expect(hero.locator("h1")).toContainText("Kettlebell classes in Cumbernauld");
   await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
@@ -487,16 +488,16 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // The owner's fixed order (2026-10-27, AGENTS.md): why kettlebells and Meet your coach straight under the hero.
+  // Alex's order (via the owner, 2026-10-29): Meet your coach lower down ("less about me"), no "Coached by" line under the hero.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "coach-intro", "why-kettlebells", "coach", "classes", "memberships", "more-ways", "book"]);
-  // A face early, without moving "About me" up: the "Coached by" line under the hero jumps to his story.
-  const intro = page.getByRole("region", { name: "Your coach" });
-  await expect(intro.getByRole("link", { name: /Coached by Alex Robertson/ })).toHaveAttribute("href", "#coach");
-  // The classes as day tiles (owner's pick A, 2026-10-28): price, level and venue in one line.
+  expect(order).toEqual(["hero-heading", "why-kettlebells", "classes", "memberships", "more-ways", "coach", "book"]);
+  await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
+  // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
-  await expect(classes.locator("address")).toContainText("1A Dunns Wood Road");
+  await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
+  await expect(classes.getByText("Media House")).toHaveCount(0);
+  await expect(classes.getByRole("link", { name: "Book now" })).toHaveCount(1);
   await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(classes).toContainText("New? Say so when you book.");
   const more = page.locator("#more-ways");
@@ -515,7 +516,9 @@ test("home coach: 1% better leads, and the before-and-after frame drags and work
   await page.goto("/");
   const coach = page.locator("#coach");
   await expect(coach.getByRole("heading", { level: 2 })).toHaveText("1% better, every day.");
-  await expect(coach.getByRole("heading", { name: "Alex Robertson" })).toBeVisible();
+  await expect(coach.getByRole("heading", { name: "Meet Alex" })).toBeVisible();
+  await expect(coach).toContainText("Founder & kettlebell coach");
+  await expect(coach).toContainText("My journey. My approach to training.");
   const slider = coach.getByRole("slider", { name: "Compare before and now" });
   await expect(slider).toHaveAttribute("aria-valuetext", "50% before");
   await slider.focus();
@@ -852,24 +855,22 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the class times (owner's design): the next class chosen, tap another, Book now opens the calendar on it", async ({ page }) => {
+test("home: the class times as simple rows; a row and Book now open the calendar", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const section = page.getByRole("region", { name: "Three classes a week." });
-  const cards = section.getByRole("list", { name: "Class times" }).getByRole("button");
-  await expect(cards).toHaveCount(3);
-  await expect(cards.nth(0)).toContainText("Mon");
-  await expect(cards.nth(2)).toContainText("9:00");
-  // One class is chosen to begin with (the next one), marked "Next up" or "On now".
-  await expect(section.getByRole("button", { pressed: true })).toHaveCount(1);
+  const rows = section.getByRole("list", { name: "Class times" }).getByRole("link");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("Mon");
+  await expect(rows.nth(0)).toContainText("6:30 pm");
+  await expect(rows.nth(2)).toContainText("9:00 am");
+  // The next class is marked "Next up" (or "On now").
   await expect(section.getByText(/^(Next up|On now)$/)).toHaveCount(1);
-  await section.getByRole("button", { name: "Saturday 9:00 am" }).click();
-  await expect(section.getByRole("button", { name: "Saturday 9:00 am" })).toHaveAttribute("aria-pressed", "true");
-  // The button always reads Book now (owner rule); the chosen class is said under it.
-  const book = section.getByRole("link", { name: "Book now" });
-  await expect(book).toHaveAttribute("href", "/book/group-class?class=sat-morning");
-  await expect(section).toContainText(/Saturday \d+ \w+, 9:00 am selected \(in /);
-  await expect(section.getByRole("link", { name: /Get directions to Media House/ })).toHaveAttribute("href", /google\.com\/maps/);
+  // A row opens the calendar on that class; Book now (always that label) opens the calendar.
+  await expect(rows.nth(2)).toHaveAttribute("href", "/book/group-class?class=sat-morning");
+  await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  // Only the address (no venue name), with directions; no Book now under it.
+  await expect(section.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
 
@@ -886,11 +887,10 @@ test("home: a fully booked class says so and Book now goes to the next class", a
   await page.goto("/");
   const section = page.getByRole("region", { name: "Three classes a week." });
   await expect(section.getByText("Fully booked")).toHaveCount(1);
-  await section.getByRole("button", { name: "Monday 6:30 pm" }).click();
-  await expect(section).toContainText("Monday 6:30 pm is fully booked.");
-  await expect(section).toContainText("We've picked the next class");
-  // Book now (always that label) opens the calendar on the next class with a place, on its date.
-  await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", /\/book\/group-class\?class=(wed-evening|sat-morning)&date=\d{4}-\d{2}-\d{2}$/);
+  // The full class's row says who's next and opens the calendar on the next class with a place, on its date.
+  const full = section.getByRole("link", { name: "Monday 6:30 pm, fully booked" });
+  await expect(full).toContainText(/Next: (Wed|Sat)/);
+  await expect(full).toHaveAttribute("href", /\/book\/group-class\?class=(wed-evening|sat-morning)&date=\d{4}-\d{2}-\d{2}$/);
   // /classes: the full class can't be picked, and the next one is offered.
   await page.goto("/classes");
   await page.getByRole("button", { name: /Pick a class/ }).click();
