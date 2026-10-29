@@ -5,12 +5,10 @@ import { getService } from "@/content/services";
 import { smallGroupCoaching } from "@/content/smallGroup";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
-import { InstagramAlternative } from "@/components/ui/InstagramAlternative";
 import { StartTraining } from "@/components/ui/StartTraining";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { LineRows, RailSteps } from "@/components/ui/LineRows";
-import { Duo, focusIcons, howIcons } from "@/components/coaching/OneToOneGraphics";
-import { mapsUrl, site } from "@/content/site";
+import { LineRows } from "@/components/ui/LineRows";
+import { Duo, focusIcons } from "@/components/coaching/OneToOneGraphics";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { revealDelay } from "@/lib/reveal";
@@ -37,38 +35,15 @@ const focus = [
 const linkClass = "font-semibold underline underline-offset-4 hover:no-underline";
 
 /**
- * 1:1 coaching, the owner's design (2026-10-28): the coach photo and "you and
- * Alex, one line" under the intro; who it's for and how it works as rows and
- * steps with line drawings; the two prices as boxes (the bundle dark, with
- * its per-session figure); then the closing band.
+ * Coaching, in the order of Alex's layout (2026-10-29): 1:1 coaching (the
+ * opening, with the coach photo), small group coaching (where online coaching
+ * used to be), who it's for, what's included, pricing or enquiry. No "how it
+ * works" steps, no extra links. The closing band is the enquiry.
  */
 export default function CoachingPage() {
   const service = getService("one-to-one");
   const booking = getPrimaryCtaFor("one-to-one");
-  const open = booking.kind === "booking";
   const prices = publishable(service.prices);
-  const l = site.location;
-
-  const steps = [
-    {
-      title: open ? "Send a booking request" : "Message Alex",
-      body: open
-        ? "Tell Alex which days and times suit you, and a little about your training."
-        : "Message Alex on Instagram with what you want from your training and when you're free.",
-    },
-    { title: "Alex confirms your session", body: "He replies to arrange a time that works." },
-    {
-      title: "Train face to face",
-      body: (
-        <>
-          Sessions are at {l.venue}, {l.street}, {l.town}, {l.postcode}.{" "}
-          <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-11 items-center ${linkClass}`}>
-            Directions<span className="sr-only"> to {l.venue} (opens in a new tab)</span>
-          </a>
-        </>
-      ),
-    },
-  ];
 
   return (
     <>
@@ -85,6 +60,15 @@ export default function CoachingPage() {
       >
         <StartTraining href={booking.href} label={booking.label} srSuffix=" (1:1 coaching)" external={booking.external} className="w-full sm:w-[22rem]" />
       </PageHeader>
+
+      <Section id="small-group" labelledBy="small-group-heading">
+        <SectionHeading id="small-group-heading" className="max-w-xl" eyebrow="Small group coaching" title={`${smallGroupCoaching.name}.`} intro={smallGroupCoaching.summary} />
+        <p className="mt-6">
+          <Link href={smallGroupCoaching.href} className={`inline-flex min-h-11 items-center ${linkClass}`}>
+            {smallGroupCoaching.askLabel}
+          </Link>
+        </p>
+      </Section>
 
       <Section tone="white" id="who-for" labelledBy="who-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
@@ -108,17 +92,6 @@ export default function CoachingPage() {
               <li key={p}>{p}</li>
             ))}
           </ul>
-        </div>
-      </Section>
-
-      <Section id="how-it-works" labelledBy="how-heading">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="From first message to first session." />
-          <div className="mt-8 lg:col-span-7 lg:mt-0">
-            <RailSteps items={steps.map((step, i) => ({ ...step, icon: howIcons[i] }))} />
-            {/* The page opens and ends with Book now; the steps don't repeat it (2026-10-26). */}
-            {open ? <InstagramAlternative className="mt-6" /> : null}
-          </div>
         </div>
       </Section>
 
@@ -154,25 +127,10 @@ export default function CoachingPage() {
             ) : (
               <PriceList prices={service.prices} />
             )}
-            <p className="mt-6 flex flex-wrap gap-x-5">
-              <Link href="/classes" className={`inline-flex min-h-11 items-center ${linkClass}`}>
-                See group classes
-              </Link>
-            </p>
           </div>
         </div>
       </Section>
 
-      <Section id="small-group" labelledBy="small-group-heading">
-        <SectionHeading id="small-group-heading" className="max-w-xl" eyebrow="Also" title={`${smallGroupCoaching.name}.`} intro={smallGroupCoaching.summary} />
-        <p className="mt-6">
-          <Link href={smallGroupCoaching.href} className={`inline-flex min-h-11 items-center ${linkClass}`}>
-            {smallGroupCoaching.askLabel}
-          </Link>
-        </p>
-      </Section>
-
-      {/* No location section or price line here: the steps say where, the prices are just above, and the footer has the address (2026-10-26). */}
       {/* "Get in touch" here is the owner's own wording (2026-10-29); it still opens the 1:1 booking request. */}
       <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" label="Get in touch" />
     </>

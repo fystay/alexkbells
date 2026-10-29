@@ -3,11 +3,10 @@ import { pillars } from "@/content/about";
 import { images } from "@/content/images";
 import { pageMetadata } from "@/lib/metadata";
 import { revealDelay } from "@/lib/reveal";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { CoachStory } from "@/components/home/CoachStory";
-import { CoachQuote } from "@/components/sections/CoachQuote";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { PageHeader } from "@/components/sections/PageHeader";
 import { Philosophy } from "@/components/sections/Philosophy";
 import { CompoundChart } from "@/components/sections/CompoundChart";
 
@@ -18,28 +17,28 @@ export const metadata: Metadata = pageMetadata({
   path: "/about",
 });
 
+/**
+ * About, in the order of Alex's layout (2026-10-29): his story, then RAENG's
+ * values and long-term vision (the philosophy card and what we stand for).
+ * "Coaching approach" has no text from Alex yet, so it is not on the page.
+ * No quote band or class facts here.
+ */
 export default function AboutPage() {
-  // Sections alternate white / cream below the cream opening, as on the home page,
-  // whether or not the quote is shown.
   let n = 0;
   const tone = (): SectionTone => (n++ % 2 === 0 ? "white" : "plain");
 
   return (
     <>
-      {/* Opens with RAENG's philosophy card, word for word (owner, 2026-10-27). */}
-      <Philosophy>
-        <ButtonLink href="/memberships" variant="secondary" className="w-full sm:w-auto">
-          View memberships
-        </ButtonLink>
-      </Philosophy>
+      <PageHeader eyebrow="About" title="About RAENG." />
 
-      <CoachQuote tone={tone()} />
+      <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()} eyebrow="Alex's story">
+        <CompoundChart className="mt-6" />
+      </CoachStory>
+
+      <Philosophy asSection />
 
       <Section tone={tone()} id="values" labelledBy="values-heading">
-        <SectionHeading
-          id="values-heading"
-          title="What we stand for."
-        />
+        <SectionHeading id="values-heading" title="What we stand for." />
         {/* Owner's /about design (2026-10-28): the value beside its line from 420 px, between thin rules. */}
         <ul className="mt-8 max-w-2xl border-t border-line">
           {pillars.map((p, i) => (
@@ -56,11 +55,6 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()}>
-        <CompoundChart className="mt-6" />
-      </CoachStory>
-
-      {/* Why kettlebells and the location are on the home page and in the footer: not repeated here (2026-10-26). */}
       <CtaBand body="Come and train with us." tone={tone()} />
     </>
   );

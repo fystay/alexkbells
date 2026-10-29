@@ -12,9 +12,11 @@ const thai = Noto_Sans_Thai_Looped({ subsets: ["thai"], weight: "900", display: 
  * line), a thin rule, then "More than strength." as the page's h1 and the
  * paragraph. The values follow in their own section.
  */
-export function Philosophy({ children }: { children?: ReactNode }) {
+export function Philosophy({ children, asSection = false }: { children?: ReactNode; /** A section with an h2 (About, under its h1) instead of the page opening with an h1. */ asSection?: boolean }) {
+  const Root = asSection ? "section" : "header";
+  const Title = asSection ? "h2" : "h1";
   return (
-    <header className="bg-paper">
+    <Root className="bg-paper" {...(asSection ? { "aria-labelledby": "philosophy-heading", id: "philosophy" } : {})}>
       <div className="container-page pt-12 pb-12 sm:pt-20 sm:pb-16 lg:py-24">
         <div className="max-w-2xl">
           <p className="eyebrow">{philosophy.eyebrow}</p>
@@ -28,7 +30,7 @@ export function Philosophy({ children }: { children?: ReactNode }) {
             </p>
             <SenseEntry senses={philosophy.senses} />
           </div>
-          <h1 className="mt-8 font-display text-h1 text-balance">{philosophy.title}</h1>
+          <Title id={asSection ? "philosophy-heading" : undefined} className="mt-8 font-display text-h1 text-balance">{philosophy.title}</Title>
           <div className="mt-5 space-y-4 text-lede">
             {philosophy.paragraphs.map((p) => (
               <p key={p}>{p}</p>
@@ -37,6 +39,6 @@ export function Philosophy({ children }: { children?: ReactNode }) {
           {children ? <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">{children}</div> : null}
         </div>
       </div>
-    </header>
+    </Root>
   );
 }
