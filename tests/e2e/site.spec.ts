@@ -983,7 +983,9 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   // Each plan states its rules as in Alex's layout.
   const regular = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").filter({ has: page.getByRole("heading", { name: "Regular" }) });
   for (const text of ["8 class credits · £8.13 per class", "Save £31"]) await expect(regular).toContainText(text);
-  await expect(page.locator("#memberships").getByRole("heading", { name: "Membership rules" })).toBeVisible();
+  await expect(page.locator("#memberships").getByRole("heading", { name: "Membership terms" })).toBeVisible();
+  // The terms are one link, not a list on the page (Alex via the owner, 2026-10-29).
+  await expect(page.locator("#memberships").getByRole("link", { name: "Membership and cancellation policy" })).toHaveAttribute("href", "/memberships#how-it-works");
   // Each fact once: the days only in the timetable, Instagram only in Meet your coach.
   await expect(page.locator("main").getByText("Sat", { exact: true })).toHaveCount(1);
   await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(0);

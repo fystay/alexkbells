@@ -105,29 +105,17 @@ function PlanDot() {
 }
 
 /**
- * How a membership works, in four short lines from the published terms
- * (content/policy.ts), then the full detail a tap away on /memberships.
- * Read before choosing, so nothing restricts the visitor unexpectedly.
+ * The membership terms, kept off the page (Alex via the owner, 2026-10-29): a
+ * "Membership terms" label with one link to the full membership and
+ * cancellation policy on /memberships (content/policy.ts), so the page stays
+ * short and nothing is hidden.
  */
 export function PlanTerms({ className }: { className?: string }) {
-  // The class days are in the timetable above, so not repeated here (owner, 2026-10-26).
-  // Reworded 2026-10-29 (Alex via the owner); the same published terms, in plainer sentences.
-  const points = [
-    "Each class you book uses one credit.",
-    `Your membership renews automatically every ${BILLING_WEEKS} weeks, with new credits.`,
-    "Unused credits expire at the end of each period and don't roll over.",
-    "Cancel at least 24 hours before a class and your credit is returned. After that, or if you miss it, the credit is used.",
-  ];
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
-      <h3 className="eyebrow mb-2">Membership rules</h3>
-      <ul className="lined">
-        {points.map((p) => (
-          <li key={p}>{p}</li>
-        ))}
-      </ul>
-      <Link href="/memberships#how-it-works" className="mt-2 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
-        How memberships work
+      <h3 className="eyebrow mb-1">Membership terms</h3>
+      <Link href="/memberships#how-it-works" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+        Membership and cancellation policy
       </Link>
     </div>
   );
