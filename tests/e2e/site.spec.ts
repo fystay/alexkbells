@@ -559,8 +559,8 @@ test.describe("memberships", () => {
       await expect(row.getByRole("heading", { name: p.name })).toBeVisible();
       await expect(row).toContainText(p.price);
       await expect(row).toContainText(p.credits);
-      // "Every 4 weeks" is said once, in the intro, not on each plan.
-      await expect(row).not.toContainText("Every 4 weeks");
+      // Each price says how often it's charged (Alex via the owner, 2026-10-29).
+      await expect(row).toContainText("/ every 4 weeks");
       await expect(row).toContainText(`${p.credits} · ${p.perClass} per class`);
       // The saving alone; the intro says it's against pay as you go (owner, 2026-10-27).
       await expect(row).toContainText(`Save ${p.save}`);
@@ -585,7 +585,7 @@ test.describe("memberships", () => {
     // No greyed-out button: the prompt sits in its place until a card is chosen.
     await expect(section.getByRole("button", { name: "Book now" })).toHaveCount(0);
     await expect(section.getByRole("link", { name: "Book now" })).toHaveCount(0);
-    await expect(section).toContainText("Tap a plan to choose it.");
+    await expect(section).toContainText("Choose your plan to continue.");
     for (const p of PLANS) {
       // Clicking anywhere on the row (here over its name) chooses it.
       await card(p.name).click({ position: { x: 120, y: 20 } });
@@ -724,7 +724,7 @@ test("/classes: what the classes build, then how to join in three steps (owner's
   await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
   // The memberships are sold on this page too, the home page's list.
   const memberships = page.locator("#memberships");
-  await expect(memberships.getByRole("heading", { level: 2 })).toHaveText("Save up to £59.");
+  await expect(memberships.getByRole("heading", { level: 2 })).toHaveText("Memberships.");
   await expect(memberships.getByRole("list", { name: "Membership plans" })).toContainText("Dedicated");
   await page.getByRole("link", { name: "How to join" }).click();
   await expect(page).toHaveURL(/#join$/);

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
-import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
-import { getService } from "@/content/services";
-import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { CoachStory } from "@/components/home/CoachStory";
 import { ClassPicker, classesTitle } from "@/components/home/ClassPicker";
 import { Hero } from "@/components/home/Hero";
@@ -16,8 +13,6 @@ import { CtaBand } from "@/components/sections/CtaBand";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
-
-const payg = getService("group-classes").prices[0];
 
 // Home order (the owner relaying Alex's feedback, 2026-10-29; replaces the
 // 2026-10-27 order, which had the slim "Coached by" line and Meet your coach
@@ -39,15 +34,10 @@ export default function HomePage() {
           <ClassPicker className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
-      <Section id="memberships" labelledBy="memberships-heading">
+      {/* Alex via the owner, 2026-10-29: no "Save up to" line or intro (each price says "every 4 weeks"), and less space before the next section. */}
+      <Section id="memberships" labelledBy="memberships-heading" className="pb-4 sm:pb-8 lg:pb-12">
         <div className={split}>
-          <SectionHeading
-            id="memberships-heading"
-            className="lg:col-span-5"
-            eyebrow="Memberships"
-            title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
-            intro={`Every ${BILLING_WEEKS} weeks, against pay as you go.`}
-          />
+          <SectionHeading id="memberships-heading" className="lg:col-span-5" title="Memberships." />
           <div className="mt-8 lg:col-span-7 lg:mt-0">
             <PlanList />
             <PlanTerms className="mt-8" />

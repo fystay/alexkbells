@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
-import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
-import { getService } from "@/content/services";
-import { formatPenceShort, maxSavingPence } from "@/lib/membership";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
@@ -40,7 +37,6 @@ export const metadata: Metadata = pageMetadata({
 export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
   const open = booking.kind === "booking";
-  const payg = getService("group-classes").prices[0];
 
   return (
     <>
@@ -109,13 +105,7 @@ export default function ClassesPage() {
 
       <Section id="memberships" labelledBy="memberships-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <SectionHeading
-            id="memberships-heading"
-            className="lg:col-span-5"
-            eyebrow="Memberships"
-            title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
-            intro={`Every ${BILLING_WEEKS} weeks, against pay as you go.`}
-          />
+          <SectionHeading id="memberships-heading" className="lg:col-span-5" title="Memberships." />
           <div className="mt-8 lg:col-span-7 lg:mt-0">
             <PlanList />
             <PlanTerms className="mt-8" />
