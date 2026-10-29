@@ -52,6 +52,7 @@ export function Hero() {
                 className="hero-shadow inline-flex min-h-11 items-center text-sm font-semibold whitespace-nowrap text-white underline underline-offset-4 hover:no-underline sm:text-base"
               >
                 {hero.secondaryLabel}
+                <span aria-hidden="true"> ↗</span>
               </Link>
             </div>
           </div>

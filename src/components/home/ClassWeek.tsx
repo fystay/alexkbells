@@ -150,6 +150,7 @@ export function ClassWeek({
         ) : (
           <Link href={bookHref} className={button}>
             {bookLabel}
+            <span aria-hidden="true"> →</span>
           </Link>
         )}
         <p className="mt-3">
