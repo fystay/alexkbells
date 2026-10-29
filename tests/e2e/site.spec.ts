@@ -936,7 +936,9 @@ test("hero film covers the phone screen edge to edge with the vertical cut", asy
 test("no arrows anywhere on the public pages", async ({ page }) => {
   for (const route of ["/", "/classes", "/memberships", "/coaching", "/online-coaching", "/about", "/contact", "/book", "/book/group-class", "/privacy"]) {
     await page.goto(route);
-    await expect(page.locator("body"), route).not.toContainText(/[→←↑↓›»]/);
+    // Except the two arrows in Alex's mockup (2026-10-29): "Explore coaching ↗" on the film and "View classes and book →".
+    const text = (await page.locator("body").innerText()).replace(/(View classes and book)\s*→/i, "$1");
+    expect(text, route).not.toMatch(/[→←↑↓›»]/);
     // The arrow icon used to be an SVG path "M1 8h13M9 3l5 5-5 5".
     await expect(page.locator('svg path[d*="M1 8h13"]'), route).toHaveCount(0);
   }
