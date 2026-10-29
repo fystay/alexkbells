@@ -226,7 +226,7 @@ See Coach portal below.
 - [ ] P2 Coaching: email Alex when a client messages or checks in (needs Resend); an exercise library with demo links reused across programmes; programme templates; coach notes on a client's session; reply-time wording on the unlock page only once Alex confirms how fast he replies
 - [x] /classes interactive steps (owner pick B, 2026-10-29): tap-to-open rail, membership calculator in step 2, bank transfer/cash removed from step 2, memberships section on the page. Not pushed live yet; bank transfer/cash still on the booking page and FAQ (ask owner)
 - [x] Class size (owner, 2026-10-29): 12 places per class, Alex changes it in Classes → Class size (a date can have its own), "Fully booked" on home tiles and /classes with the next class offered. Migration `20261102000000_akb_default_class_capacity.sql` **not yet applied**
-- [ ] P2 The rest of the owner's redesign brief (2026-10-28): home Why kettlebells and Classes sections, /classes, /coaching (and its header Book now going to group-class booking), /online-coaching, /about. Only the members area is done; only its design (`design-reference/members.html`) is in the repo
+- [x] The owner's redesign brief (2026-10-28) is done: home Why kettlebells and Classes, /classes, /coaching, /online-coaching and /about are built, and the owner is happy with them (2026-10-29); nothing left to redesign from the zip
 - [ ] **P1** Sign-in code in the email alongside the link (iPhone mail apps open links in their own browser, so the member is signed in there, not in Safari)
 - [ ] P2 Sessions that extend while in use (now a fixed 30 days from sign-in)
 - [ ] P2 Class reminder email the day before (the morning-of reminder is built, see above; this is the optional earlier one)
