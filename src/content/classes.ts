@@ -18,11 +18,11 @@ export const timetable: Timetable = {
 };
 
 /**
- * The usual group class size (owner, 2026-10-29: 12 for now). Alex changes it
+ * The usual group class size (owner, 2026-10-29: 12 for now, then 15 as in Alex's mockup). Alex changes it
  * in the coach portal (stored in the database); this is what applies until he
  * does, and if the database can't be read.
  */
-export const defaultClassCapacity = 12;
+export const defaultClassCapacity = 15;
 
 /**
  * How Alex describes every group class (his class listing, supplied by the

@@ -46,3 +46,20 @@ export const membershipKeyFacts = [
   { title: "Cancel 24 hours ahead", body: "Cancel 24 hours or more before class and your credit is returned." },
   { title: "Late or no-show", body: "Under 24 hours' notice, or not turning up, forfeits the credit." },
 ] as const;
+
+/**
+ * Membership terms in Alex's mockup wording (via the owner, 2026-10-29), shown
+ * on /memberships. His "Membership cancellation" block was placeholder text
+ * ("Explain how to cancel your recurring membership and when the cancellation
+ * takes effect"), so it is left out until he says how it works.
+ */
+export const membershipTermsAlex = {
+  title: "Membership terms",
+  intro: "Everything you need to know about using your class credits.",
+  items: [
+    { title: "Using your credits", body: "One class credit is used for each class booking. Your remaining balance is visible in your account." },
+    { title: "Four-week renewal", body: "Memberships renew automatically every four weeks, with a new allocation of class credits." },
+    { title: "Unused credits", body: "Unused credits expire at the end of your four-week membership period and do not roll over." },
+    { title: "Cancellations", body: "Cancel a class at least 24 hours before the session to have your credit returned. Late cancellations and missed classes forfeit the credit." },
+  ],
+} as const;

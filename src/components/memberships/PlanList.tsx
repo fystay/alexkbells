@@ -90,9 +90,13 @@ export function PlanList({ className }: { className?: string }) {
             </h3>
             <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
           </div>
-          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">Per class. No membership needed.</p>
+          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">No membership required. Pay for each booking.</p>
         </li>
       </ul>
+      {/* Alex's mockup: how the savings are worked out. */}
+      <p className="mt-4 text-sm">
+        Savings are calculated against paying £{payg.amountGbp} per class for the same number of bookings within {BILLING_WEEKS} weeks.
+      </p>
     </ChoiceCards>
   );
 }
@@ -114,7 +118,7 @@ export function PlanTerms({ className }: { className?: string }) {
   return (
     <div className={cn("text-[0.9375rem] lg:text-base", className)}>
       <h3 className="eyebrow mb-1">Membership terms</h3>
-      <Link href="/memberships#how-it-works" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+      <Link href="/memberships#membership-terms" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
         Membership and cancellation policy
       </Link>
     </div>

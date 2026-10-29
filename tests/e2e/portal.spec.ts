@@ -270,11 +270,11 @@ test("class capacity: a date's own size is kept, and full is refused", async ({ 
   await expect(add.getByRole("alert")).toContainText("That class is full");
 });
 
-test("class size: 12 to begin with, and Alex changes it for every class", async ({ page }) => {
+test("class size: 15 to begin with, and Alex changes it for every class", async ({ page }) => {
   await signIn(page);
   await page.goto("/coach/classes");
   const form = page.getByRole("form", { name: "Class size" });
-  await expect(form.getByLabel("Places in every class")).toHaveValue("12");
+  await expect(form.getByLabel("Places in every class")).toHaveValue("15");
   await form.getByLabel("Places in every class").fill("0");
   await form.getByRole("button", { name: "Save" }).click();
   await expect(form.getByRole("alert")).toContainText("Please check the highlighted fields");
@@ -288,9 +288,9 @@ test("class size: 12 to begin with, and Alex changes it for every class", async 
   await expect(page.locator("h1 + p")).toContainText(/of (14|\d+) booked/);
   await page.goto("/coach/classes");
   const back = page.getByRole("form", { name: "Class size" });
-  await back.getByLabel("Places in every class").fill("12");
+  await back.getByLabel("Places in every class").fill("15");
   await back.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Classes now hold 12" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Classes now hold 15" })).toBeVisible();
 });
 
 test("one-to-one: overlapping times are refused; reschedule and cancel keep the history", async ({ page, request }) => {
