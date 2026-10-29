@@ -1,15 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
-/** The hero's "Book now" button on a phone: a plain link, no swipe and no intro screen. */
+/** The hero's "Book a class" button on a phone (Alex's mockup, 2026-10-29): a plain link, no swipe and no intro screen. */
 async function heroButton(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const link = page.locator("main").getByRole("link", { name: "Book now" }).first();
+  const link = page.locator("main").getByRole("link", { name: "Book a class" }).first();
   await expect(link).toHaveAttribute("href", "/book/group-class");
   return link;
 }
 
-test("tapping Book now opens the booking page straight away", async ({ page }) => {
+test("tapping Book a class opens the booking page straight away", async ({ page }) => {
   const link = await heroButton(page);
   const box = (await link.boundingBox())!;
   expect(box.height).toBeGreaterThanOrEqual(48);

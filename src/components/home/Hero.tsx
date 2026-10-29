@@ -46,7 +46,7 @@ export function Hero() {
             </h1>
             {/* One button; the second option is a quieter text link (owner, 2026-10-23). */}
             <div className="mt-6 flex items-center gap-5 sm:mt-7 sm:gap-7">
-              <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} onDark className="flex-1 sm:w-56 sm:flex-none" />
+              <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.bookLabel : cta.label} external={cta.external} onDark className="flex-1 sm:w-56 sm:flex-none" />
               <Link
                 href="/coaching"
                 className="hero-shadow inline-flex min-h-11 items-center text-sm font-semibold whitespace-nowrap text-white underline underline-offset-4 hover:no-underline sm:text-base"

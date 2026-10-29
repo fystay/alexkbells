@@ -6,13 +6,14 @@ import type { Timetable } from "./types";
  * Confirmed for publication by the project owner on 2026-10-15; the
  * 60-minute length on 2026-10-17 (Alex's own class listing); Saturday moved to
  * 9:00 am by the owner on 2026-10-22 (latest schedule supplied by Alex). See CORE.md.
+ * Class names and one-line descriptions: from Alex's own mockup (via the owner, 2026-10-29).
  */
 export const timetable: Timetable = {
   status: "confirmed",
   sessions: [
-    { id: "mon-evening", day: "Monday", start: "18:30", durationMinutes: 60 },
-    { id: "wed-evening", day: "Wednesday", start: "18:30", durationMinutes: 60 },
-    { id: "sat-morning", day: "Saturday", start: "09:00", durationMinutes: 60 },
+    { id: "mon-evening", day: "Monday", start: "18:30", durationMinutes: 60, name: "HIIT", description: "Kettlebell conditioning and full-body training." },
+    { id: "wed-evening", day: "Wednesday", start: "18:30", durationMinutes: 60, name: "Doubles Kettlebells", description: "Build strength and coordination using two kettlebells." },
+    { id: "sat-morning", day: "Saturday", start: "09:00", durationMinutes: 60, name: "Saturday Conditioning", description: "A varied session to build strength and fitness." },
   ],
 };
 

@@ -469,8 +469,9 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   // What and where (owner's pick A, 2026-10-26).
   await expect(hero.locator("h1")).toContainText("Train with intent.");
   await expect(hero.locator("h1")).toContainText("Be part of something stronger.");
-  await expect(hero.locator("h1")).toContainText("Kettlebell classes in Cumbernauld");
-  await expect(hero.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await expect(hero.locator("h1")).toContainText("Kettlebell training in Cumbernauld");
+  // Alex's mockup: the button on the film reads "Book a class" (2026-10-29).
+  await expect(hero.getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book/group-class");
   await hero.getByRole("link", { name: "Explore coaching" }).click();
   await expect(page).toHaveURL(/\/coaching$/);
 });
@@ -478,7 +479,7 @@ test("homepage hero and its call to action are in the first screen on phones and
   for (const [width, height] of [[360, 640], [390, 844], [768, 1024], [1024, 768], [1440, 900]]) {
     await page.setViewportSize({ width, height });
     await page.goto("/");
-    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book now" }).boundingBox())!;
+    const cta = (await page.locator("section[aria-labelledby=hero-heading]").getByRole("link", { name: "Book a class" }).boundingBox())!;
     expect(cta.y + cta.height, `${width}x${height}`).toBeLessThanOrEqual(height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
   }
@@ -491,8 +492,13 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading", "book"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
+  // Why kettlebells in Alex's words (mockup, 2026-10-29).
+  const why = page.locator("#why-kettlebells");
+  await expect(why.getByRole("heading", { level: 2 })).toHaveText("A simple tool. Real results.");
+  await expect(why.locator("h3")).toHaveText(["Build real strength", "Improve conditioning", "Move better"]);
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
+  for (const name of ["HIIT", "Doubles Kettlebells", "Saturday Conditioning"]) await expect(classes).toContainText(name);
   await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
   await expect(classes.getByText("Media House")).toHaveCount(0);
   await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
@@ -686,7 +692,7 @@ test("/classes: what the classes build, then how to join in three steps (owner's
   // Steps fade in as they scroll into view; the clicks below shouldn't wait for that.
   await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important;animation:none!important}[data-reveal]{opacity:1!important;transform:none!important}" });
   const focus = page.locator("section[aria-labelledby=focus-heading]");
-  for (const word of ["Strength", "Conditioning", "Movement quality"]) await expect(focus).toContainText(word);
+  for (const word of ["Build real strength", "Improve conditioning", "Move better"]) await expect(focus).toContainText(word);
   const join = page.locator("#join");
   await expect(join.getByRole("heading", { level: 2 })).toHaveText("Start in three steps.");
   for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { level: 3, name: step })).toBeVisible();
