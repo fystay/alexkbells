@@ -485,6 +485,9 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   for (const name of ["HIIT", "Doubles Kettlebells", "Saturday Conditioning"]) await expect(classes).toContainText(name);
   await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
   await expect(classes.getByText("Media House")).toHaveCount(0);
+  // Alex's wording, exactly (audit of his chat, 2026-10-29): no "Media House" anywhere in the page body, and the caption has no extra words.
+  await expect(page.locator("main")).not.toContainText("Media House");
+  await expect(page.locator("#coach figcaption")).toHaveText("My journey. My approach to training.");
   await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
   await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(classes).toContainText("New? Say so when you book.");
