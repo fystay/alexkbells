@@ -234,7 +234,8 @@ test.describe("production configuration", () => {
 
   test("the primary button opens the booking page", async ({ page }) => {
     await page.goto(PROD);
-    await expect(page.getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
+    // The hero button reads "Book a class" (Alex, 2026-10-29); the header has no Book now.
+    await expect(page.getByRole("link", { name: "Book a class" }).first()).toHaveAttribute("href", "/book/group-class");
     const sitemap = await (await page.request.get(`${PROD}/sitemap.xml`)).text();
     expect(sitemap).toContain("/book/group-class");
     await page.goto(`${PROD}/book`);

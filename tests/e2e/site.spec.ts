@@ -232,7 +232,7 @@ test("contact: every way in, in one card, Book now first (owner's pick D, 2026-1
   await expect(page.locator("main").getByRole("link", { name: /follow/i })).toHaveCount(0);
 });
 
-test("header: menu at the left, logo centred, Book Now at the right, none overlapping", async ({ page }) => {
+test("header: menu at the left, logo centred, nothing at the right, no overlap", async ({ page }) => {
   for (const width of [320, 360, 390, 768, 900, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/");
@@ -246,11 +246,9 @@ test("header: menu at the left, logo centred, Book Now at the right, none overla
       const rects = [...el.querySelectorAll("img, span")].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 0);
       return { left: Math.min(...rects.map((r) => r.left)), right: Math.max(...rects.map((r) => r.right)) };
     });
-    const book = await box("header > div > :last-child a, header > div > a:last-child");
     expect(menu.right, `menu overlaps logo at ${width}px`).toBeLessThanOrEqual(logo.left);
-    expect(logo.right, `logo overlaps Book Now at ${width}px`).toBeLessThanOrEqual(book.left);
-    // Centred whenever the two side controls leave room; on the narrowest phones it shifts to avoid them.
-    if (width >= 600) expect(Math.abs((logo.left + logo.right) / 2 - width / 2), `logo is not centred at ${width}px`).toBeLessThan(2);
+    // No Book now at the right (Alex, 2026-10-29): the logo is centred at every width.
+    expect(Math.abs((logo.left + logo.right) / 2 - width / 2), `logo is not centred at ${width}px`).toBeLessThan(2);
   }
 });
 
@@ -946,11 +944,11 @@ test("footer groups collapse on phones and are open on desktop", async ({ page }
   await expect(footer.getByText("Media House")).toBeVisible();
 });
 
-test("no page says 'Get in touch': the main button is always 'Book now'", async ({ page }) => {
+test("no page says 'Get in touch', and the header has no Book now (Alex, 2026-10-29)", async ({ page }) => {
   for (const route of ["/", "/classes", "/memberships", "/coaching", "/about", "/contact", "/privacy"]) {
     await page.goto(route);
     await expect(page.locator("body"), route).not.toContainText(/get in touch/i);
-    await expect(page.locator("header").first().getByRole("link", { name: "Book now" }), route).toBeVisible();
+    await expect(page.locator("header").first().getByRole("link", { name: /book/i }), route).toHaveCount(0);
   }
 });
 
@@ -975,28 +973,6 @@ test("no arrows anywhere on the public pages", async ({ page }) => {
     expect(text, route).not.toMatch(/[→←↑↓›»]/);
     // The arrow icon used to be an SVG path "M1 8h13M9 3l5 5-5 5".
     await expect(page.locator('svg path[d*="M1 8h13"]'), route).toHaveCount(0);
-  }
-});
-
-test("header Book now is a black pill, white only in the booking flow", async ({ page }) => {
-  const book = () => page.locator("header").first().getByRole("link", { name: "Book now" });
-  const bg = () => book().evaluate((el) => getComputedStyle(el).backgroundColor);
-  await page.goto("/");
-  await expect(book()).not.toHaveAttribute("aria-current", "page");
-  expect(await bg()).toBe("rgb(23, 23, 23)");
-  await page.goto("/book/group-class");
-  await expect(book()).toHaveAttribute("aria-current", "page");
-  expect(await bg()).toBe("rgb(255, 255, 255)");
-  await page.goto("/classes");
-  expect(await bg()).toBe("rgb(23, 23, 23)");
-});
-
-test("header: the Book now pill sits on the page margin, like the content below", async ({ page }) => {
-  await page.goto("/");
-  for (const [width, gutter] of [[320, 16], [390, 16], [768, 24], [1440, (1440 - 1248) / 2 + 40]]) {
-    await page.setViewportSize({ width, height: 800 });
-    const right = await page.evaluate(() => window.innerWidth - document.querySelector("header .justify-self-end a")!.getBoundingClientRect().right);
-    expect(Math.abs(right - gutter), `at ${width}px`).toBeLessThan(1);
   }
 });
 
@@ -1025,7 +1001,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   // Each fact once: the days only in the timetable.
   await expect(page.locator("main").getByText("Sat", { exact: true })).toHaveCount(1);
   await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(0);
-  // No sticky Book now bar: the header's Book now is always on screen.
+  // No sticky Book now bar.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });
 
