@@ -697,6 +697,9 @@ test("/classes: Alex's order and nothing else (2026-10-29)", async ({ page }) =>
   await expect(memberships).not.toContainText("Pay as you go");
   await expect(page.locator("#pay-as-you-go")).toContainText("No membership required. Pay for each booking.");
   await expect(page.locator("#location #ct-venue")).toHaveText("1A Dunns Wood Road");
+  // One booking button only (Alex: too many Book now's): the hero's. The class rows open the calendar too.
+  await expect(page.locator("main").getByRole("link", { name: /^(Book a class|Book now|View classes and book)/ })).toHaveCount(1);
+  await expect(page.locator("#timetable").getByRole("list", { name: "Class times" }).getByRole("link")).toHaveCount(3);
 });
 
 test("/online-coaching and its enquiry form are off the site for now and go to Coaching (Alex, 2026-10-29)", async ({ page }) => {

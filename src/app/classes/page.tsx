@@ -51,7 +51,7 @@ export default function ClassesPage() {
       <Section id="timetable" labelledBy="timetable-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="timetable-heading" className="lg:col-span-5" eyebrow="Timetable" title={classesTitle()} />
-          <ClassPicker className="mt-8 lg:col-span-7 lg:mt-0" location={false} />
+          <ClassPicker className="mt-8 lg:col-span-7 lg:mt-0" location={false} button={false} />
         </div>
       </Section>
 
