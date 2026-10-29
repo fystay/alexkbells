@@ -873,6 +873,33 @@ test("home: the class times (owner's design): the next class chosen, tap another
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
 
+test("home: a fully booked class says so and Book now goes to the next class", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  // Monday 6:30 pm is full on every date in the window; the other classes have places.
+  const keys: string[] = [];
+  const day = new Date();
+  for (let i = 0; i < 40; i++) {
+    keys.push(`mon-evening|${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`);
+    day.setDate(day.getDate() + 1);
+  }
+  await page.route("**/api/classes/full", (route) => route.fulfill({ json: { full: keys, cancelled: [], known: true } }));
+  await page.goto("/");
+  const section = page.getByRole("region", { name: "Three classes a week." });
+  await expect(section.getByText("Fully booked")).toHaveCount(1);
+  await section.getByRole("button", { name: "Monday 6:30 pm" }).click();
+  await expect(section).toContainText("Monday 6:30 pm is fully booked.");
+  await expect(section).toContainText("We've picked the next class");
+  // Book now (always that label) opens the calendar on the next class with a place, on its date.
+  await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", /\/book\/group-class\?class=(wed-evening|sat-morning)&date=\d{4}-\d{2}-\d{2}$/);
+  // /classes: the full class can't be picked, and the next one is offered.
+  await page.goto("/classes");
+  await page.getByRole("button", { name: /Pick a class/ }).click();
+  await expect(page.getByRole("radio", { name: "Monday 6:30 pm" })).toBeDisabled();
+  await expect(page.locator("#join")).toContainText("Monday 6:30 pm is fully booked.");
+  await page.getByRole("button", { name: /Book the next class/ }).click();
+  await expect(page.getByRole("region", { name: "Book your place" })).toBeVisible();
+});
+
 test("footer groups collapse on phones and are open on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");

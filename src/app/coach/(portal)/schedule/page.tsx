@@ -98,7 +98,7 @@ async function Schedule({ searchParams }: { searchParams: PageProps<"/coach/sche
       ) : (
         <p className="border-y border-line py-4">Nothing scheduled this week.</p>
       )}
-      <p className="text-sm">A class shows its capacity only when you&apos;ve set one for it on its page.</p>
+      <p className="text-sm">Classes hold the usual class size unless you set a different size for a date on its page. Change the usual size under Classes.</p>
       <Link href="/coach/sessions/new" className="members-btn w-full sm:w-auto">
         Add a 1:1 session
       </Link>

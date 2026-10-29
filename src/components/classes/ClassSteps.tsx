@@ -142,6 +142,7 @@ export function ClassSteps({ className }: { className?: string }) {
         id: s.id,
         day: s.day,
         time: formatTime(s.start),
+        start: s.start,
       }))}
       minutes={minutes}
       scaled={scaled}

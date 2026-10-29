@@ -1,5 +1,5 @@
 import { classOccurrences, CLASS_NAME, classDurationMinutes, type ClassOccurrence } from "./classes";
-import { listAttendance, listClassSessions, listPtSessions } from "./bookings";
+import { getDefaultCapacity, listAttendance, listClassSessions, listPtSessions } from "./bookings";
 import { listClients } from "./clients";
 import { collect, rpc, type Db, type DbError, type DbResult } from "./db";
 import { listCharges } from "./ledger";
@@ -139,9 +139,9 @@ export interface SessionView {
 }
 
 /** A class's row from the portal's overview, as the cards show it. */
-export function sessionView(occ: ClassOccurrence, rows: readonly ClassSessionRow[]): SessionView {
+export function sessionView(occ: ClassOccurrence, rows: readonly ClassSessionRow[], usualSize: number): SessionView {
   const row = rows.find((r) => r.class_date === occ.date && r.slot === occ.slot.id) ?? null;
-  return { occurrence: occ, row, cancelled: Boolean(row?.cancelled_at), booked: row?.booked ?? 0, capacity: row?.capacity ?? null };
+  return { occurrence: occ, row, cancelled: Boolean(row?.cancelled_at), booked: row?.booked ?? 0, capacity: row?.capacity ?? usualSize };
 }
 
 /** Is the class still on or to come? (Over an hour after it started, it's done.) */
@@ -171,7 +171,8 @@ export async function loadToday(db: Db, today: DateKey, now: Date = new Date()):
   );
   if (!loaded.ok) return loaded;
   const [rows, pt, inbox, periods] = loaded.data;
-  const views = occurrences.filter((o) => stillToCome(o, now)).map((o) => sessionView(o, rows)).filter((v) => !v.cancelled);
+  const usualSize = await getDefaultCapacity(db);
+  const views = occurrences.filter((o) => stillToCome(o, now)).map((o) => sessionView(o, rows, usualSize)).filter((v) => !v.cancelled);
   const next = views[0] ?? null;
 
   let roster: RosterEntry[] = [];
@@ -250,8 +251,9 @@ export async function loadSchedule(db: Db, from: DateKey, to: DateKey, now: Date
   );
   if (!loaded.ok) return loaded;
   const [rows, pt, clients] = loaded.data;
+  const usualSize = await getDefaultCapacity(db);
   const group = classOccurrences(from, to).map((o): ScheduleEntry => {
-    const v = sessionView(o, rows);
+    const v = sessionView(o, rows, usualSize);
     return {
       startsAt: o.startsAt,
       date: o.date,
@@ -414,8 +416,8 @@ export interface ShellData {
 /** Light enough to run on every portal page; any part that can't be read is left out. */
 export async function loadShell(db: Db, today: DateKey, now: Date = new Date()): Promise<ShellData> {
   const horizon = addDays(today, 14);
-  const [inbox, rows, subs] = await Promise.all([loadInbox(db, today), listClassSessions(db, today, horizon), listSubscriptions(db, { status: "active" })]);
-  const views = rows.ok ? classOccurrences(today, horizon).filter((o) => stillToCome(o, now)).map((o) => sessionView(o, rows.data)).filter((v) => !v.cancelled) : [];
+  const [inbox, rows, subs, usualSize] = await Promise.all([loadInbox(db, today), listClassSessions(db, today, horizon), listSubscriptions(db, { status: "active" }), getDefaultCapacity(db)]);
+  const views = rows.ok ? classOccurrences(today, horizon).filter((o) => stillToCome(o, now)).map((o) => sessionView(o, rows.data, usualSize)).filter((v) => !v.cancelled) : [];
   const items = inbox.ok ? inbox.data : [];
   return { inbox: items.length, next: views[0] ?? null, online: { clients: subs.ok ? subs.data.length : 0, waiting: items.filter((i) => i.group === "coach").length } };
 }

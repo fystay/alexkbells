@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { revealDelay } from "@/lib/reveal";
+import { useClassStatus } from "./useClassStatus";
 import { costForFrequency, formatPenceShort } from "@/lib/membership";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import type { MembershipPlan } from "@/content/memberships";
@@ -12,6 +13,8 @@ export interface RailClass {
   day: string;
   /** "6:30 pm" */
   time: string;
+  /** "18:30" */
+  start: string;
 }
 
 export interface RailBook {
@@ -70,8 +73,16 @@ export function ClassStepsRail({
   const [chosen, setChosen] = useState<string | null>(null);
   const [perWeek, setPerWeek] = useState<number>(2);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const status = useClassStatus(classes);
 
-  const cls = classes.find((c) => c.id === chosen) ?? null;
+  const fullOnes = classes.filter((c) => status?.get(c.id)?.full);
+  const redirectId =
+    fullOnes.length > 0
+      ? (status?.get(fullOnes[0].id)?.redirect?.id ?? null)
+      : null;
+  const redirectClass = classes.find((c) => c.id === redirectId) ?? null;
+  const cls =
+    classes.find((c) => c.id === chosen && !status?.get(c.id)?.full) ?? null;
   const clsLabel = cls ? `${cls.day} ${cls.time}` : null;
   const figures = priceGbp ? costForFrequency(plans, perWeek, priceGbp) : null;
   const saves = figures !== null && figures.savingPence > 0;
@@ -173,12 +184,13 @@ export function ClassStepsRail({
                             {classes.map((c) => (
                               <label
                                 key={c.id}
-                                className={`${radio} min-h-[5.5rem] gap-0.5 px-1 py-3`}
+                                className={`${radio} min-h-[5.5rem] gap-0.5 px-1 py-3 ${status?.get(c.id)?.full ? "cursor-not-allowed border-grey text-grey hover:bg-transparent" : ""}`}
                               >
                                 <input
                                   type="radio"
                                   name="class"
                                   value={c.id}
+                                  disabled={status?.get(c.id)?.full ?? false}
                                   checked={chosen === c.id}
                                   onChange={() => {
                                     setChosen(c.id);
@@ -199,9 +211,39 @@ export function ClassStepsRail({
                                   {c.time.match(/[ap]m$/i)?.[0]}
                                 </span>
                                 <span className="sr-only">{`${c.day} ${c.time}`}</span>
+                                {status?.get(c.id)?.full ? (
+                                  <span className="mt-1 rounded-full border border-current px-1.5 py-px text-[0.625rem] leading-tight font-semibold tracking-[0.06em] uppercase">
+                                    Fully booked
+                                  </span>
+                                ) : null}
                               </label>
                             ))}
                           </div>
+                          {fullOnes.length > 0 ? (
+                            <p role="status" className="mt-3 text-sm">
+                              {fullOnes
+                                .map((c) => `${c.day} ${c.time}`)
+                                .join(" and ")}{" "}
+                              {fullOnes.length === 1 ? "is" : "are"} fully
+                              booked.
+                              {redirectClass ? (
+                                <>
+                                  {" "}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setChosen(redirectClass.id);
+                                      go(1);
+                                    }}
+                                    className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline"
+                                  >
+                                    Book the next class, {redirectClass.day}{" "}
+                                    {redirectClass.time}
+                                  </button>
+                                </>
+                              ) : null}
+                            </p>
+                          ) : null}
                         </fieldset>
                       ) : null}
                       {cls ? (

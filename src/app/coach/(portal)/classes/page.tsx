@@ -1,14 +1,16 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { listClassSessions } from "@/lib/coach/bookings";
+import { getDefaultCapacity, listClassSessions } from "@/lib/coach/bookings";
 import { CLASS_NAME, classOccurrences, classSlots, slotLabel } from "@/lib/coach/classes";
 import { portalContext } from "@/lib/coach/context";
 import { collect } from "@/lib/coach/db";
 import { loadMessage } from "@/lib/coach/errors";
 import { listRequests } from "@/lib/coach/requests";
 import { addDays, addMonths, endOfMonth, formatClock, formatDate, formatMonth, weekday } from "@/lib/coach/time";
+import { ActionForm, Field, SubmitButton } from "@/components/coach/form";
 import { Badge, LoadError, PageHeader, Panel, TextLink } from "@/components/coach/ui";
+import { setDefaultCapacityAction } from "./actions";
 import { cn } from "@/lib/cn";
 
 export const metadata: Metadata = { title: "Classes" };
@@ -40,6 +42,7 @@ async function Classes({ searchParams }: { searchParams: PageProps<"/coach/class
   const loaded = collect(await Promise.all([listClassSessions(db, from, to), listRequests(db, { filter: "open", limit: 500 })] as const));
   if (!loaded.ok) return <LoadError message={loadMessage(loaded.error)} />;
   const [rows, requests] = loaded.data;
+  const usualSize = await getDefaultCapacity(db);
   const rowFor = (date: string, slot: string) => rows.find((r) => r.class_date === date && r.slot === slot);
   const pendingFor = (date: string, slot: string) => requests.filter((r) => r.class_date === date && r.class_slot === slot).length;
 
@@ -55,7 +58,8 @@ async function Classes({ searchParams }: { searchParams: PageProps<"/coach/class
           {upcoming.map((o) => {
             const row = rowFor(o.date, o.slot.id);
             const pending = pendingFor(o.date, o.slot.id);
-            const full = row?.capacity ? row.booked >= row.capacity : false;
+            const size = row?.capacity ?? usualSize;
+            const full = (row?.booked ?? 0) >= size;
             return (
               <li key={`${o.date}-${o.slot.id}`}>
                 <Link href={`/coach/classes/${o.date}/${o.slot.id}`} className="flex min-h-11 flex-wrap items-center justify-between gap-2 py-3 hover:bg-white">
@@ -65,8 +69,7 @@ async function Classes({ searchParams }: { searchParams: PageProps<"/coach/class
                   </span>
                   <span className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="tabular-nums">
-                      {row?.booked ?? 0}
-                      {row?.capacity ? ` / ${row.capacity}` : ""} booked
+                      {row?.booked ?? 0} / {size} booked
                     </span>
                     {pending ? <Badge tone="strong">{pending} to confirm</Badge> : null}
                     {full ? <Badge>Full</Badge> : null}
@@ -76,7 +79,16 @@ async function Classes({ searchParams }: { searchParams: PageProps<"/coach/class
             );
           })}
         </ul>
-        <p className="mt-3 text-sm text-muted">A class shows as full only when you&apos;ve set a capacity for it and that many places are booked.</p>
+        <p className="mt-3 text-sm text-muted">A class shows as fully booked on the website once that many places are taken, and people are sent to the next class.</p>
+      </Panel>
+
+      <Panel title="Class size" id="size-heading">
+        <ActionForm action={setDefaultCapacityAction} label="Class size">
+          <Field name="size" label="Places in every class" type="number" inputMode="numeric" min={1} max={200} defaultValue={usualSize} hint="Applies to all classes. To change one date, open it and set its own size." />
+          <div>
+            <SubmitButton variant="secondary">Save</SubmitButton>
+          </div>
+        </ActionForm>
       </Panel>
 
       <Panel

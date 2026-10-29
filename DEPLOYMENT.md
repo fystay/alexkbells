@@ -283,3 +283,7 @@ Steps (on the developer's machine; nothing here touches production):
    (**only with Alex's approval**). Vercel issues HTTPS automatically.
 7. After DNS resolves: share a page on WhatsApp/Facebook to check the preview
    image, and submit the sitemap in Google Search Console (Alex's account).
+
+### Class size (owner, 2026-10-29)
+
+1. **Apply `supabase/migrations/20261102000000_akb_default_class_capacity.sql`** after `20261101…` (with the owner's go-ahead): one table (`akb_settings`, RLS on, no policies, `anon`/`authenticated` revoked), two functions, the capacity trigger function and `akb_class_overview` replaced (the view's `capacity` is now the size that applies; new last column `capacity_set` is only what Alex typed for the date). Every class holds **12** until Alex changes it under Coach portal → Classes → Class size; a date's own size still wins. No existing row changes; safe to run again. Until it is applied the portal's Class size save fails with a database error and classes have no limit, as before. Check: `select public.akb_default_class_capacity()` returns 12. Tests: `src/lib/coach/bookings.test.ts` (real migrations on PGlite).
