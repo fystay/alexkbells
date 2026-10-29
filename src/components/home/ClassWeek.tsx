@@ -19,6 +19,9 @@ export interface WeekClass {
   /** "18:30" */
   startTime: string;
   durationMinutes: number;
+  /** "HIIT" and its one line, from Alex's mockup; null where not given. */
+  name: string | null;
+  description: string | null;
 }
 
 const WEEK = 7 * 1440;
@@ -99,17 +102,25 @@ export function ClassWeek({
           const label = isFull ? "Fully booked" : next === i ? (deltas && deltas[i] <= 0 ? "On now" : "Next up") : null;
           const body = (
             <>
-              <span className="flex items-baseline gap-4">
-                <span className="w-10 text-sm font-semibold tracking-[0.16em] uppercase">{c.day.slice(0, 3)}</span>
-                <span className={cn("font-display text-[1.75rem] leading-none tabular-nums", isFull && "text-grey")}>{c.time}</span>
+              <span className="flex min-w-0 flex-col gap-1">
+                <span className="flex items-baseline gap-3">
+                  <span className="text-sm font-semibold tracking-[0.16em] uppercase">{c.day.slice(0, 3)}</span>
+                  <span className={cn("font-display text-[1.75rem] leading-none tabular-nums", isFull && "text-grey")}>{c.time}</span>
+                </span>
+                {c.name ? (
+                  <span className="mt-1">
+                    <span className="block font-semibold">{c.name}</span>
+                    {c.description ? <span className="block text-[0.9375rem]">{c.description}</span> : null}
+                  </span>
+                ) : null}
               </span>
-              <span className="flex flex-col items-end gap-1 text-right">
+              <span className="flex shrink-0 flex-col items-end gap-1 text-right">
                 {label ? <span className={pill}>{label}</span> : null}
                 {isFull ? <span className="text-sm">{redirect ? `Next: ${redirect.day.slice(0, 3)} ${classes.find((x) => x.id === redirect.id)?.time}` : "No places for 4 weeks"}</span> : null}
               </span>
             </>
           );
-          const row = "flex min-h-16 items-center justify-between gap-4 py-3";
+          const row = "flex min-h-16 items-start justify-between gap-4 py-4";
           return (
             <li key={c.id} className={cn(i > 0 && "border-t border-line")}>
               {href ? (

@@ -24,6 +24,9 @@ export interface ClassSession {
   start: TimeOfDay;
   /** Leave undefined until the client confirms class length. */
   durationMinutes?: number;
+  /** The class's name and one line about it, as Alex's mockup shows them (2026-10-29). */
+  name?: string;
+  description?: string;
 }
 
 export interface Timetable {
