@@ -486,9 +486,9 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions; no "Coached by" line and no closing Book now band.
+  // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions, then "Ready to start?"; no "Coached by" line.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading"]);
+  expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading", "book"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
   const classes = page.locator("#classes");
@@ -969,8 +969,8 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(payg.getByRole("radio", { name: /^Pay as you go/ })).toHaveCount(1);
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
-  // No closing "Ready to start? Book now" band (Alex's layout, 2026-10-29: too many Book now options).
-  await expect(page.locator("#book")).toHaveCount(0);
+  // "Ready to start?" closes the page (the owner, 2026-10-29), opening the booking flow at step 1.
+  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
   // The philosophy and the questions close the page.
   await expect(page.locator("#philosophy").getByRole("link", { name: "Read more about RAENG" })).toHaveAttribute("href", "/about");
   await expect(page.locator("main").getByRole("link", { name: "More questions and contact details" })).toHaveAttribute("href", "/contact");

@@ -9,6 +9,7 @@ import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
+import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
 import { PhilosophyTeaser } from "@/components/home/PhilosophyTeaser";
 import Link from "next/link";
@@ -21,7 +22,8 @@ export const metadata: Metadata = pageMetadata({ description: site.description, 
 // why kettlebells; the classes (rows of days and times, one box to view
 // classes and book, the address); memberships; Meet your coach ("less about
 // me"), then members' words once there are any; RAENG's philosophy; the
-// questions. No closing Book now band ("too many Book now options").
+// questions; and the closing "Ready to start?" band (the owner, 2026-10-29: it
+// isn't one of the Book now buttons Alex meant, which were in the location part).
 // Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
@@ -59,6 +61,7 @@ export default function HomePage() {
           </Link>
         }
       />
+      <CtaBand id="book" body={null} instagram={false} tone="plain" />
     </>
   );
 }
