@@ -173,7 +173,8 @@ export default function CoachingPage() {
       </Section>
 
       {/* No location section or price line here: the steps say where, the prices are just above, and the footer has the address (2026-10-26). */}
-      <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" />
+      {/* "Get in touch" here is the owner's own wording (2026-10-29); it still opens the 1:1 booking request. */}
+      <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" label="Get in touch" />
     </>
   );
 }

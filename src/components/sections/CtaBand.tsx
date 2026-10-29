@@ -19,6 +19,8 @@ interface CtaBandProps {
   /** Where Book now goes: the /book chooser at step 1 (default, owner 2026-10-27), or a service's own step. */
   service?: BookableService | "any";
   tone?: SectionTone;
+  /** The button's words where a page wants its own (Coaching: "Get in touch", the owner, 2026-10-29). */
+  label?: string;
   /** The quieter Instagram link; off on home, where Meet your coach already links it. */
   instagram?: boolean;
 }
@@ -28,7 +30,7 @@ interface CtaBandProps {
  * own), one booking button and Instagram as a quieter link. No arrow (owner rule). Nothing here books anything: the button opens
  * the booking request flow.
  */
-export function CtaBand({ title = "Ready to start?", body, headingId = "cta-heading", id, service = "any", tone = "white", instagram: showInstagram = true }: CtaBandProps) {
+export function CtaBand({ title = "Ready to start?", body, headingId = "cta-heading", id, service = "any", tone = "white", instagram: showInstagram = true, label }: CtaBandProps) {
   const { instagram } = site.social;
   const cta = getPrimaryCtaFor(service);
   const times = isPublishable(timetable.status) ? groupedSessions(timetable.sessions) : [];
@@ -47,7 +49,7 @@ export function CtaBand({ title = "Ready to start?", body, headingId = "cta-head
           )}
         </div>
         <div data-reveal className="lg:col-span-5">
-          <StartTraining href={cta.href} label={cta.kind === "booking" ? hero.primaryLabel : cta.label} external={cta.external} className="w-full" />
+          <StartTraining href={cta.href} label={label ?? (cta.kind === "booking" ? hero.primaryLabel : cta.label)} external={cta.external} className="w-full" />
           {showInstagram ? (
             <a
               href={instagram.url}

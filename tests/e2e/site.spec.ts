@@ -886,12 +886,20 @@ test("footer groups collapse on phones and are open on desktop", async ({ page }
   await expect(footer.getByText("Media House")).toBeVisible();
 });
 
-test("no page says 'Get in touch', and the header has no Book now (Alex, 2026-10-29)", async ({ page }) => {
+test("'Get in touch' only on Coaching's closing button (owner, 2026-10-29), and the header has no Book now", async ({ page }) => {
   for (const route of ["/", "/classes", "/memberships", "/coaching", "/about", "/contact", "/privacy"]) {
     await page.goto(route);
-    await expect(page.locator("body"), route).not.toContainText(/get in touch/i);
+    if (route === "/coaching") {
+      await expect(page.locator("body"), route).toContainText(/get in touch/i);
+      await expect(page.locator("#main").getByRole("link", { name: "Get in touch" }), route).toHaveAttribute("href", "/book/one-to-one");
+    } else {
+      await expect(page.locator("body"), route).not.toContainText(/get in touch/i);
+    }
     await expect(page.locator("header").first().getByRole("link", { name: /book/i }), route).toHaveCount(0);
   }
+  // The classes page hero says "Book a class", like the home page's.
+  await page.goto("/classes");
+  await expect(page.locator("section[aria-labelledby=classes-hero-heading]").getByRole("link", { name: "Book a class" })).toBeVisible();
 });
 
 test("hero film covers the phone screen edge to edge with the vertical cut", async ({ page }) => {
