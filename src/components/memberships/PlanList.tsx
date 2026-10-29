@@ -22,7 +22,7 @@ const payg = getService("group-classes").prices[0];
  * calculated from the price and credits (lib/membership.ts). Home and
  * /memberships share it.
  */
-export function PlanList({ className }: { className?: string }) {
+export function PlanList({ className, includePayg = true }: { className?: string; /** Pay as you go as a row of its own (/memberships); off where it has its own section (Alex's layout, 2026-10-29). */ includePayg?: boolean }) {
   const book = getPrimaryCtaFor("group-class");
   // Joining has its own journey (owner, 2026-10-26): plan, first class, details, terms. Where booking
   // goes to an outside page or isn't open, Join follows Book now instead.
@@ -37,7 +37,7 @@ export function PlanList({ className }: { className?: string }) {
       next: online ? "Next, your first class and details, then pay with Square." : "Next, your first class and details. Nothing to pay now.",
       external: book.external,
     })),
-    { value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external },
+    ...(includePayg ? [{ value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external }] : []),
   ];
   // Framed (owner, 2026-10-27, option C): the plans in one box with a thin ink edge and fine grey
   // rules between them; the chosen row turns ink. Join / Book now sits under the box, separate (owner, 2026-10-27).
@@ -81,23 +81,42 @@ export function PlanList({ className }: { className?: string }) {
             </li>
           );
         })}
-        <li className={row}>
-          <ChoiceCover name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
-          <div className="flex items-baseline justify-between gap-4">
-            <h3 className="card-title flex items-center gap-3 text-xl">
-              <PlanDot />
-              Pay as you go
-            </h3>
-            <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
-          </div>
-          <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">No membership required. Pay for each booking.</p>
-        </li>
+        {includePayg ? (
+          <li className={row}>
+            <ChoiceCover name="plan" value="payg" label={`Pay as you go, £${payg.amountGbp} per class`} />
+            <div className="flex items-baseline justify-between gap-4">
+              <h3 className="card-title flex items-center gap-3 text-xl">
+                <PlanDot />
+                Pay as you go
+              </h3>
+              <p className="shrink-0 text-2xl font-bold tabular-nums">£{payg.amountGbp}</p>
+            </div>
+            <p className="mt-1 pl-8 text-[0.9375rem] lg:text-base">No membership required. Pay for each booking.</p>
+          </li>
+        ) : null}
       </ul>
       {/* Alex's mockup: how the savings are worked out. */}
       <p className="mt-4 text-sm">
         Savings are calculated against paying £{payg.amountGbp} per class for the same number of bookings within {BILLING_WEEKS} weeks.
       </p>
     </ChoiceCards>
+  );
+}
+
+/**
+ * Pay as you go as a topic of its own (Alex's layout, 2026-10-29): the price, no
+ * membership, and the way to book a class (the calendar).
+ */
+export function PayAsYouGo({ className }: { className?: string }) {
+  const book = getPrimaryCtaFor("group-class");
+  return (
+    <div className={cn("max-w-lg", className)}>
+      <p className="text-2xl font-bold tabular-nums">£{payg.amountGbp} <span className="text-base font-normal">a class</span></p>
+      <p className="mt-2">No membership required. Pay for each booking.</p>
+      <Link href={book.href} className="mt-4 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+        {book.kind === "booking" ? "View classes and book" : book.label}
+      </Link>
+    </div>
   );
 }
 

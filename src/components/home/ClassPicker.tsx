@@ -2,10 +2,10 @@ import { timetable } from "@/content/classes";
 import { faq } from "@/content/faq";
 import { firstClassSteps } from "@/content/home";
 import { getService } from "@/content/services";
-import { mapsUrl, site } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { isPublishable, publishable } from "@/lib/publish";
 import { formatTime, sortSessions } from "@/lib/schedule";
+import { StudioLocation } from "@/components/classes/StudioLocation";
 import { ClassWeek, type WeekClass } from "./ClassWeek";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -22,7 +22,7 @@ export function classesTitle(): string {
  * figure from content. Book now opens the calendar on the chosen class
  * (`/book/group-class?class=<timetable id>`) where booking is on.
  */
-export function ClassPicker({ className }: { className?: string }) {
+export function ClassPicker({ className, location = true }: { className?: string; /** The address panel under the rows (home); Classes shows it as its own "Studio location" section. */ location?: boolean }) {
   const sessions = isPublishable(timetable.status) ? sortSessions(timetable.sessions) : [];
   if (sessions.length === 0) return null;
   const cta = getPrimaryCtaFor("group-class");
@@ -34,7 +34,6 @@ export function ClassPicker({ className }: { className?: string }) {
     return { id: s.id, day: s.day, dayIndex: DAYS.indexOf(s.day), start: hours * 60 + m, time: formatTime(s.start), startTime: s.start, durationMinutes: s.durationMinutes ?? 60, name: s.name ?? null, description: s.description ?? null };
   });
   const bookable = cta.kind === "booking" && !cta.external;
-  const l = site.location;
   return (
     <div className={className}>
       <ClassWeek
@@ -44,10 +43,9 @@ export function ClassPicker({ className }: { className?: string }) {
         bookLabel={cta.kind === "booking" ? "View classes and book" : cta.label}
         external={cta.external}
         classHrefBase={bookable ? `${cta.href}?class=` : null}
-        address={{ venue: l.venue, lines: [l.street, `${l.town}, ${l.city}`], postcode: l.postcode }}
-        mapsHref={mapsUrl()}
         beginners={beginners && isPublishable(beginners.status) ? firstClassSteps.beginners : null}
       />
+      {location ? <StudioLocation /> : null}
     </div>
   );
 }

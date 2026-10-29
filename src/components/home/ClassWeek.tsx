@@ -62,8 +62,6 @@ export function ClassWeek({
   bookLabel,
   external,
   classHrefBase,
-  address,
-  mapsHref,
   beginners,
 }: {
   classes: WeekClass[];
@@ -73,8 +71,6 @@ export function ClassWeek({
   external?: boolean;
   /** A row opens the calendar on its class: `<base><timetable id>` (null where booking goes elsewhere). */
   classHrefBase: string | null;
-  address: { venue: string; lines: string[]; postcode: string };
-  mapsHref: string;
   beginners: string | null;
 }) {
   const tick = useSyncExternalStore(subscribe, getTick, getServerTick);
@@ -90,7 +86,6 @@ export function ClassWeek({
     : null;
   const next = deltas ? deltas.indexOf(Math.min(...deltas)) : null;
   const button = buttonClasses("action", "w-full px-6");
-  const [street, ...rest] = address.lines;
 
   return (
     <div>
@@ -161,35 +156,6 @@ export function ClassWeek({
           </Link>
         </p>
       </div>
-
-      <section aria-labelledby="ct-venue" className="mt-8 grid grid-cols-[auto_1fr] items-start gap-x-[1.125rem] gap-y-4 rounded-[1.375rem] bg-white px-5 py-[1.375rem]">
-        <svg viewBox="0 0 34 44" aria-hidden="true" className="ct-pin h-11 w-[2.125rem]">
-          <path d="M17 42s14-14.5 14-25A14 14 0 0 0 3 17c0 10.5 14 25 14 25z" fill="none" stroke="currentColor" strokeWidth="2.2" />
-          <circle cx="17" cy="17" r="5" fill="currentColor" />
-        </svg>
-        <div className="min-w-0">
-          <p className="eyebrow mb-1.5">Where we train</p>
-          <p id="ct-venue" className="text-xl font-extrabold tracking-[-0.01em]">
-            {street}
-          </p>
-          <address className="mt-1 leading-normal not-italic">
-            {rest.map((l) => (
-              <span key={l} className="block">
-                {l}
-              </span>
-            ))}
-            <span className="block font-semibold tracking-[0.06em]">{address.postcode}</span>
-          </address>
-        </div>
-        <a
-          href={mapsHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="col-span-2 flex min-h-12 items-center justify-center rounded-full border-[1.5px] border-ink px-5 font-semibold hover:bg-ink hover:text-paper motion-safe:transition-colors"
-        >
-          Get directions<span className="sr-only"> to the class location (opens in a new tab)</span>
-        </a>
-      </section>
     </div>
   );
 }

@@ -44,7 +44,7 @@ export default function HomePage() {
         <div className={split}>
           <SectionHeading id="memberships-heading" className="lg:col-span-5" title="Memberships." />
           <div className="mt-8 lg:col-span-7 lg:mt-0">
-            <PlanList />
+            <PlanList includePayg={false} />
             <PlanTerms className="mt-8" />
           </div>
         </div>

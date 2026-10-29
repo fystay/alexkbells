@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { pageMetadata } from "@/lib/metadata";
-import { formatAddressLines, mapsUrl, site } from "@/content/site";
-import { getPrimaryCta } from "@/lib/booking";
+import { mapsUrl, site } from "@/content/site";
 import { faq } from "@/content/faq";
 import { firstClassSteps } from "@/content/home";
 import { isPublishable } from "@/lib/publish";
@@ -34,16 +33,14 @@ function Way({ title, detail, children }: { title: string; detail?: ReactNode; c
 }
 
 /**
- * Every way to reach RAENG in one framed card (owner's pick D, 2026-10-28; the
- * same box as the plan list): Book now first (the main action on every page),
- * then Instagram, Facebook,
- * email and phone (only once confirmed) and the venue with directions. Then
- * the questions not answered elsewhere.
+ * FAQs & Contact, in the order of Alex's layout (2026-10-29): common questions,
+ * contact details (email and phone only once confirmed, then the address with
+ * directions), Instagram, getting started. Nothing else (no Book row, no
+ * Facebook; the footer has it).
  */
 export default function ContactPage() {
   const { email, phone } = site.contact;
-  const booking = getPrimaryCta();
-  const [venue, ...rest] = formatAddressLines();
+  const l = site.location;
   const live = (id: string) => {
     const item = faq.find((f) => f.id === id);
     return item !== undefined && isPublishable(item.status);
@@ -57,57 +54,48 @@ export default function ContactPage() {
     <>
       <PageHeader eyebrow="FAQs & Contact" title="FAQs & Contact" intro="Book, message Alex, or come and find us." />
 
-      <Section tone="white" labelledBy="ways-heading" className="pt-0 sm:pt-0 lg:pt-0">
-        <h2 id="ways-heading" className="sr-only">
-          Ways to reach us
-        </h2>
-        <ul id="ways" className="max-w-2xl overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink">
-          <Way title="Book a class or 1:1">
-            {booking.external ? (
-              <a href={booking.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                {booking.label}
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            ) : (
-              <Link href={booking.href} className={linkClass}>
-                {booking.label}
-              </Link>
-            )}
-          </Way>
-          <Way title="Instagram" detail={site.social.instagram.handle}>
-            <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
-              Message<span className="sr-only"> Alex on Instagram (opens in a new tab)</span>
-            </a>
-          </Way>
-          <Way title="Facebook" detail={site.social.facebook.name}>
-            <a href={site.social.facebook.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
-              Open<span className="sr-only"> Alex on Facebook (opens in a new tab)</span>
-            </a>
-          </Way>
-          {email ? (
-            <Way title="Email" detail={email}>
-              <a href={`mailto:${email}`} className={linkClass}>
-                Email<span className="sr-only"> {email}</span>
+      <Faq tone="plain" />
+
+      <Section tone="white" id="contact-details" labelledBy="details-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="details-heading" className="lg:col-span-5" eyebrow="Contact details" title="Find us." />
+          <ul id="ways" className="mt-8 max-w-2xl overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink lg:col-span-7 lg:mt-0">
+            {email ? (
+              <Way title="Email" detail={email}>
+                <a href={`mailto:${email}`} className={linkClass}>
+                  Email<span className="sr-only"> {email}</span>
+                </a>
+              </Way>
+            ) : null}
+            {phone ? (
+              <Way title="Phone" detail={phone}>
+                <a href={`tel:${phone.replace(/\s+/g, "")}`} className={linkClass}>
+                  Call<span className="sr-only"> {phone}</span>
+                </a>
+              </Way>
+            ) : null}
+            <Way title={l.street} detail={<address className="not-italic">{`${l.town}, ${l.city}, ${l.postcode}`}</address>}>
+              <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                Directions<span className="sr-only"> to the class location (opens in a new tab)</span>
               </a>
             </Way>
-          ) : null}
-          {phone ? (
-            <Way title="Phone" detail={phone}>
-              <a href={`tel:${phone.replace(/\s+/g, "")}`} className={linkClass}>
-                Call<span className="sr-only"> {phone}</span>
-              </a>
-            </Way>
-          ) : null}
-          <Way title={venue} detail={<address className="not-italic">{rest.join(", ")}</address>}>
-            <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={linkClass}>
-              Directions<span className="sr-only"> to {venue} (opens in a new tab)</span>
-            </a>
-          </Way>
-        </ul>
+          </ul>
+        </div>
       </Section>
-      {/* Getting started (Alex's layout, 2026-10-29): the first-class lines, each shown only while its FAQ answer is confirmed. */}
+
+      <Section tone="plain" id="instagram" labelledBy="instagram-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="instagram-heading" className="lg:col-span-5" eyebrow="Instagram" title={site.social.instagram.handle} />
+          <p className="mt-6 lg:col-span-7 lg:mt-0">
+            <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              Message Alex on Instagram<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </p>
+        </div>
+      </Section>
+
       {started.length > 0 ? (
-        <Section tone="plain" id="getting-started" labelledBy="started-heading">
+        <Section tone="white" id="getting-started" labelledBy="started-heading">
           <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
             <SectionHeading id="started-heading" className="lg:col-span-5" eyebrow="Getting started" title="Your first class." />
             <div className="mt-8 lg:col-span-7 lg:mt-0">
@@ -123,8 +111,6 @@ export default function ContactPage() {
           </div>
         </Section>
       ) : null}
-      {/* Every common question (Alex's layout, 2026-10-29). */}
-      <Faq tone="plain" />
     </>
   );
 }

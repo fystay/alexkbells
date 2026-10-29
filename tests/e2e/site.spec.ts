@@ -208,28 +208,23 @@ test("skip link moves focus to main content", async ({ page }) => {
 test("the contact page leads to Alex's Instagram", async ({ page }) => {
   await page.goto("/contact");
   await expect(page.locator("h1")).toHaveText("FAQs & Contact.");
-  // The action is in the first screen on phones and desktop.
-  for (const [width, height] of [[390, 844], [1440, 900]]) {
-    await page.setViewportSize({ width, height });
-    await page.goto("/contact");
-    const ig = page.getByRole("link", { name: /message alex on instagram/i });
-    await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
-    await expect(ig).toHaveAttribute("target", "_blank");
-    const box = (await ig.boundingBox())!;
-    expect(box.y + box.height, `${width}px`).toBeLessThanOrEqual(height);
-  }
+  // In Alex's order (2026-10-29) the questions come first, then the contact details, then Instagram.
+  const ig = page.getByRole("link", { name: /message alex on instagram/i });
+  await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+  await expect(ig).toHaveAttribute("target", "_blank");
 });
 
-test("contact: every way in, in one card, Book now first (owner's pick D, 2026-10-28)", async ({ page }) => {
+test("FAQs & Contact: questions, contact details, Instagram, getting started, in that order and nothing else (Alex, 2026-10-29)", async ({ page }) => {
   await page.goto("/contact");
-  const ways = page.locator("#ways > li");
-  await expect(ways.first()).toContainText("Book a class or 1:1");
-  await expect(ways.first().getByRole("link", { name: "Book now" })).toBeVisible();
-  await expect(page.locator("#ways")).toContainText("@alex.kbells");
-  await expect(page.locator("#ways").getByRole("link", { name: /Directions to Media House/ })).toHaveAttribute("href", /google\.com\/maps/);
-  await expect(page.locator("#ways")).toContainText("1A Dunns Wood Road");
-  // No "Follow" button repeating Instagram (2026-10-26).
-  await expect(page.locator("main").getByRole("link", { name: /follow/i })).toHaveCount(0);
+  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["faq-heading", "contact-details", "instagram", "getting-started"]);
+  const ways = page.locator("#ways");
+  await expect(ways).toContainText("1A Dunns Wood Road");
+  await expect(ways.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
+  // No Book row and no Facebook here (the footer has Facebook); no "Follow" button.
+  await expect(ways.getByRole("link", { name: /book/i })).toHaveCount(0);
+  await expect(page.locator("main").getByRole("link", { name: /facebook|follow/i })).toHaveCount(0);
+  await expect(page.locator("#instagram")).toContainText("@alex.kbells");
 });
 
 test("header: menu at the left, logo centred, nothing at the right, no overlap", async ({ page }) => {
@@ -387,22 +382,14 @@ for (const [server, base] of [
     await page.goto(base + "/classes");
     // The "Start in three steps" section is gone (owner, 2026-10-29): the timetable, then Book now.
     await expect(page.locator("#join")).toHaveCount(0);
-    await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-    await expect(page.locator("#main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book/group-class");
+    await expect(page.locator("#main").getByRole("link", { name: /Book a class|View classes and book/ }).first()).toHaveAttribute("href", "/book/group-class");
 
     await page.goto(base + "/coaching");
-    const how = page.locator("#how-it-works");
-    await expect(how.getByRole("heading", { name: "Send a booking request" })).toBeVisible();
     await expect(page.locator("#main").getByRole("link", { name: /Book now/ }).first()).toHaveAttribute("href", "/book/one-to-one");
-    await expect(how.getByRole("link", { name: /Message Alex on Instagram/ })).toBeVisible();
 
     // Online coaching is off the site for now (Alex, 2026-10-29): its address goes to Coaching.
     await page.goto(base + "/online-coaching");
     await expect(page).toHaveURL(/\/coaching$/);
-
-    // Contact's main button is Book now, like every page (audit, 2026-10-27).
-    await page.goto(base + "/contact");
-    await expect(page.locator("main").getByRole("link", { name: "Book now" }).first()).toHaveAttribute("href", "/book");
   });
 }
 
@@ -694,19 +681,22 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("/classes: what the classes build, the timetable and the memberships; no three steps (2026-10-29)", async ({ page }) => {
+test("/classes: Alex's order and nothing else (2026-10-29)", async ({ page }) => {
   await page.goto("/classes");
-  const focus = page.locator("section[aria-labelledby=focus-heading]");
-  for (const word of ["Build real strength", "Improve conditioning", "Move better"]) await expect(focus).toContainText(word);
-  // "Start in three steps" was removed at the owner's request.
+  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["classes-hero-heading", "timetable", "location", "memberships", "pay-as-you-go", "cancellation", "faq-heading"]);
+  // Gone: the three steps, "what the classes build", the other-ways line and the extra Book now.
   await expect(page.locator("#join")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Start in three steps." })).toHaveCount(0);
+  await expect(page.locator("section[aria-labelledby=focus-heading]")).toHaveCount(0);
+  await expect(page.locator("section[aria-labelledby=book-heading]")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "How to join" })).toHaveCount(0);
-  await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
-  // The memberships are sold on this page too, the home page's list.
+  // Memberships: the plans only; pay as you go is its own topic.
   const memberships = page.locator("#memberships");
   await expect(memberships.getByRole("heading", { level: 2 })).toHaveText("Memberships.");
-  await expect(memberships.getByRole("list", { name: "Membership plans" })).toContainText("Dedicated");
+  await expect(memberships.getByRole("list", { name: "Membership plans" }).locator("> li")).toHaveCount(3);
+  await expect(memberships).not.toContainText("Pay as you go");
+  await expect(page.locator("#pay-as-you-go")).toContainText("No membership required. Pay for each booking.");
+  await expect(page.locator("#location #ct-venue")).toHaveText("1A Dunns Wood Road");
 });
 
 test("/online-coaching and its enquiry form are off the site for now and go to Coaching (Alex, 2026-10-29)", async ({ page }) => {
@@ -720,20 +710,20 @@ test("/online-coaching and its enquiry form are off the site for now and go to C
   await expect(page.getByRole("navigation", { name: "Main" }).filter({ visible: true }).getByRole("link", { name: /online/i })).toHaveCount(0);
 });
 
-test("/coaching: the owner's design, who it's for, three steps, the two prices as boxes (2026-10-28)", async ({ page }) => {
+test("/coaching: Alex's order and nothing else (2026-10-29)", async ({ page }) => {
   await page.goto("/coaching");
+  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["small-group", "who-for", "included", "pricing", "cta-heading"]);
+  // No "how it works" steps and no group-classes link.
+  await expect(page.locator("#how-it-works")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "See group classes" })).toHaveCount(0);
   await expect(page.locator("#who-for h3")).toHaveText(["Strength", "Technique", "Movement"]);
-  const how = page.locator("#how-it-works");
-  await expect(how.locator("ol > li")).toHaveCount(3);
-  await expect(how).toContainText("1A Dunns Wood Road");
-  await expect(how.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   const pricing = page.locator("#pricing");
   await expect(pricing.locator("li h3")).toHaveText(["Single session", "Four sessions"]);
   await expect(pricing).toContainText("£35");
   await expect(pricing).toContainText("from, per session");
   await expect(pricing).toContainText("£130");
   await expect(pricing).toContainText("per month, £32.50 a session");
-  await expect(pricing.getByRole("link", { name: "See group classes" })).toHaveAttribute("href", "/classes");
   // Small group coaching is named, with no invented details (Alex, 2026-10-29).
   const small = page.locator("#small-group");
   await expect(small.getByRole("heading", { level: 2 })).toHaveText("Small group coaching.");
@@ -743,31 +733,29 @@ test("/coaching: the owner's design, who it's for, three steps, the two prices a
 test("Alex's layout: each page carries the parts his layout image lists (2026-10-29)", async ({ page }) => {
   // Classes: full timetable, studio location, memberships, pay as you go, booking and cancellation policies, FAQs.
   await page.goto("/classes");
-  const timetable = page.locator("#timetable");
-  await expect(timetable.getByRole("list", { name: "Class times" }).getByRole("link")).toHaveCount(3);
-  await expect(timetable.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
-  await expect(page.locator("#memberships").getByRole("heading", { name: "Pay as you go" })).toBeVisible();
+  await expect(page.locator("#timetable").getByRole("list", { name: "Class times" }).getByRole("link")).toHaveCount(3);
+  await expect(page.locator("#location #ct-venue")).toHaveText("1A Dunns Wood Road");
+  await expect(page.locator("#pay-as-you-go").getByRole("heading", { level: 2 })).toHaveText("Pay as you go.");
   await expect(page.locator("#cancellation").getByRole("heading", { level: 2 })).toHaveText("Booking and cancellation policy.");
   await expect(page.getByRole("heading", { level: 2, name: "Questions." })).toBeVisible();
-  // Coaching: 1:1 coaching, who it's for, what's included, pricing or enquiry.
+  // Coaching: 1:1 coaching, small group coaching (where online was), who it's for, what's included, pricing or enquiry.
   await page.goto("/coaching");
   await expect(page.locator("#who-for")).toBeVisible();
   await expect(page.locator("#included").getByRole("heading", { level: 2 })).toHaveText("What's included.");
   await expect(page.locator("#included li")).toHaveText(["Face-to-face sessions with Alex", "Coaching tailored to the individual"]);
   await expect(page.locator("#pricing")).toContainText("£35");
-  // FAQs & Contact: common questions, contact details, Instagram, getting started.
-  await page.goto("/contact");
-  await expect(page.locator("#getting-started")).toContainText("New? Say so when you book.");
-  await expect(page.getByRole("heading", { level: 2, name: "Questions." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Message Alex on Instagram/i })).toBeVisible();
-  await expect(page.locator("#ways")).toContainText("Directions");
+  // About: his story, then RAENG's values and long-term vision.
+  await page.goto("/about");
+  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["coach", "philosophy", "values", "cta-heading"]);
 });
 
-test("About RAENG: Facebook and Instagram open safely in a new tab, and the quote is Alex's own words", async ({ page }) => {
+test("About: Alex's story, then the philosophy and values; no quote band (2026-10-29)", async ({ page }) => {
   await page.goto("/about");
-  // Opens with แรง as a dictionary entry (owner's design, 2026-10-28): tap a sense to read its line.
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("More than strength.");
-  const entry = page.locator("header").filter({ hasText: "Our philosophy" });
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("About RAENG.");
+  // The philosophy as a dictionary entry (owner's design, 2026-10-28): tap a sense to read its line.
+  const entry = page.locator("#philosophy");
+  await expect(entry.getByRole("heading", { level: 2 })).toHaveText("More than strength.");
   await expect(page.locator('[lang="th"]')).toHaveText("แรง");
   await expect(entry).toContainText("Thai, noun");
   await expect(entry.getByRole("button", { pressed: true })).toHaveText(/strength/);
@@ -788,11 +776,9 @@ test("About RAENG: Facebook and Instagram open safely in a new tab, and the quot
   await expect(ig).toHaveAttribute("target", "_blank");
   await expect(ig).toHaveAttribute("rel", /noopener/);
   await expect(page.locator("#coach").getByRole("link", { name: /Facebook/ })).toHaveCount(0);
-  // From his launch post (Instagram, 26 Oct 2026), nothing written for him.
-  const story = page.locator("#story");
-  await expect(story.locator("blockquote")).toHaveText("“Be part of something bigger than just a workout.”");
-  await expect(story.getByRole("list", { name: "Classes at a glance" })).toContainText("£12");
-  await expect(story.getByRole("link", { name: "Book now" })).toBeVisible();
+  // The quote band with the class facts is gone.
+  await expect(page.locator("#story")).toHaveCount(0);
+  await expect(page.locator("blockquote")).toHaveCount(0);
 });
 
 test("hero film: silent, plays on its own with no on-screen control, and offers MP4 and WebM", async ({ page }) => {
@@ -933,8 +919,8 @@ test("home: each plan row is one choice, class times appear once, and secondary 
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
     await expect(card.getByRole("radio", { name: new RegExp(`^${name},`) })).toHaveCount(1);
   }
-  const payg = cards.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
-  await expect(payg.getByRole("radio", { name: /^Pay as you go/ })).toHaveCount(1);
+  // Pay as you go has its own topic on Classes, not a row in the home preview (Alex's layout, 2026-10-29).
+  await expect(cards).toHaveCount(3);
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   // "Ready to start?" closes the page (the owner, 2026-10-29), opening the booking flow at step 1.

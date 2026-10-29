@@ -37,6 +37,7 @@ export function CoachStory({
   portrait = null,
   tone = "white",
   alex,
+  eyebrow = "Meet your coach",
   children,
 }: {
   headingAs?: "h2" | "h3";
@@ -47,6 +48,8 @@ export function CoachStory({
   portrait?: Photo | null;
   tone?: SectionTone;
   /** The home page's own words (Alex via the owner, 2026-10-29): the caption under the frame, his greeting, role and a short description. */
+  /** The small label above the heading (About: "Alex's story"). */
+  eyebrow?: string;
   alex?: { caption: string; greeting: string; role: string; summary: string };
   /** Shown under the heading (/about: the "1% better" chart, owner's design 2026-10-28). */
   children?: ReactNode;
@@ -63,7 +66,7 @@ export function CoachStory({
       <Section tone={tone} id="coach" labelledBy="coach-heading">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-0">
           <div data-reveal className="lg:col-span-6 lg:self-end">
-            <p className="eyebrow mb-3">Meet your coach</p>
+            <p className="eyebrow mb-3">{eyebrow}</p>
             <Heading id="coach-heading" className="font-display text-h2 text-balance">
               {lead}
             </Heading>

@@ -45,7 +45,7 @@ test("without JavaScript it is a plain link to the booking page", async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   const page = await context.newPage();
   await page.goto("/");
-  await page.locator("main").getByRole("link", { name: "Book now" }).first().click();
+  await page.locator("main").getByRole("link", { name: "Book a class" }).first().click();
   await expect(page).toHaveURL(/\/book\/group-class$/);
   await context.close();
 });
