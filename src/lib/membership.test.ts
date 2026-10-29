@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { membershipPlans } from "@/content/memberships";
 import { getService } from "@/content/services";
-import { bestPlanFor, extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "./membership";
+import { bestPlanFor, costForFrequency, extraCostPence, formatPenceShort, maxSavingPence, planFigures } from "./membership";
 
 const payg = getService("group-classes").prices[0].amountGbp;
 
@@ -68,5 +68,33 @@ describe("bestPlanFor (pay-as-you-go account)", () => {
     expect(bestPlanFor(membershipPlans, 4, payg)).toMatchObject({ plan: { id: "starter" }, savingPence: 800 });
     // 8 classes: £96 singly; Regular £65 saves £31, Starter £40 + 4 × £12 = £88 saves £8.
     expect(bestPlanFor(membershipPlans, 8, payg)).toMatchObject({ plan: { id: "regular" }, savingPence: 3100 });
+  });
+});
+
+describe("costForFrequency (how often will you train?)", () => {
+  const payg = getService("group-classes").prices[0].amountGbp;
+
+  it("matches each plan to how often someone trains and shows the saving over pay as you go", () => {
+    const once = costForFrequency(membershipPlans, 1, payg);
+    expect(once).toMatchObject({ classes: 4, payAsYouGoPence: 4800, planPence: 4000, savingPence: 800 });
+    expect(once.plan.id).toBe("starter");
+    const twice = costForFrequency(membershipPlans, 2, payg);
+    expect(twice).toMatchObject({ classes: 8, plan: { id: "regular" }, savingPence: 8 * 1200 - 6500 });
+    const thrice = costForFrequency(membershipPlans, 3, payg);
+    expect(thrice).toMatchObject({ classes: 12, plan: { id: "dedicated" }, savingPence: 12 * 1200 - 8500 });
+  });
+
+  it("counts classes beyond a plan's credits at the pay-as-you-go price", () => {
+    const four = costForFrequency(membershipPlans, 4, payg);
+    expect(four.classes).toBe(16);
+    expect(four.plan.id).toBe("dedicated");
+    expect(four.planPence).toBe(8500 + 4 * 1200);
+  });
+
+  it("agrees with the plan cards' own savings", () => {
+    for (const plan of membershipPlans) {
+      const perWeek = plan.credits / 4;
+      expect(costForFrequency(membershipPlans, perWeek, payg).savingPence).toBe(planFigures(plan, payg).savingPence);
+    }
   });
 });

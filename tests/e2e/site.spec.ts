@@ -678,25 +678,72 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("/classes: what the classes build, then how to join in three steps (owner's design, 2026-10-28)", async ({ page }) => {
+test("/classes: what the classes build, then how to join in three steps (owner's design, 2026-10-28; interactive 2026-10-29)", async ({ page }) => {
   await page.goto("/classes");
+  // Steps fade in as they scroll into view; the clicks below shouldn't wait for that.
+  await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important;animation:none!important}[data-reveal]{opacity:1!important;transform:none!important}" });
   const focus = page.locator("section[aria-labelledby=focus-heading]");
   for (const word of ["Strength", "Conditioning", "Movement quality"]) await expect(focus).toContainText(word);
   const join = page.locator("#join");
   await expect(join.getByRole("heading", { level: 2 })).toHaveText("Start in three steps.");
   for (const step of ["Pick a class", "Book your place", "Turn up and train"]) await expect(join.getByRole("heading", { level: 3, name: step })).toBeVisible();
-  const week = join.getByRole("list", { name: "Class days and times" });
-  for (const time of ["Monday 6:30 pm", "Wednesday 6:30 pm", "Saturday 9:00 am"]) await expect(week).toContainText(time);
+  // Step 1 is open: pick a class from the timetable.
+  const classes = join.getByRole("group", { name: "Choose a class" });
+  for (const time of ["Monday 6:30 pm", "Wednesday 6:30 pm", "Saturday 9:00 am"]) await expect(classes.getByRole("radio", { name: time })).toBeAttached();
+  await expect(join.getByRole("button", { name: "Pick a class" })).toHaveAttribute("aria-expanded", "true");
+  await classes.getByRole("radio", { name: "Saturday 9:00 am" }).check();
+  // Choosing one opens step 2 and moves focus there; step 1 shows what was chosen.
+  await expect(join.getByRole("button", { name: "Book your place" })).toHaveAttribute("aria-expanded", "true");
+  await expect(join.getByRole("button", { name: "Book your place" })).toBeFocused();
+  await expect(join).toContainText("Saturday 9:00 am · 60 min");
   await expect(join).toContainText("£12");
-  await expect(join.getByRole("link", { name: "membership" })).toHaveAttribute("href", "/memberships");
-  await expect(join.getByRole("list", { name: "How to pay" }).getByRole("listitem")).not.toHaveCount(0);
+  // Bank transfer and cash are not listed (owner, 2026-10-29).
+  await expect(join).not.toContainText("Bank transfer");
+  await expect(join).not.toContainText("Cash");
+  // How often will you train? What pay as you go costs against the plan that fits.
+  const often = join.getByRole("group", { name: "How often will you train?" });
+  await often.getByRole("radio", { name: "3 a week" }).check();
+  await expect(join).toContainText("£144");
+  await expect(join).toContainText("Dedicated plan");
+  await expect(join).toContainText("You'd save £59 every 4 weeks.");
+  await expect(join.getByRole("link", { name: "Join Dedicated" })).toHaveAttribute("href", "/memberships/join?plan=dedicated");
+  await expect(join.getByRole("link", { name: "Book Saturday 9:00 am" })).toHaveAttribute("href", "/book/group-class?class=sat-morning");
+  await often.getByRole("radio", { name: "1 a week" }).check();
+  await expect(join).toContainText("You'd save £8 every 4 weeks.");
+  await expect(join.getByRole("link", { name: "Join Starter" })).toBeVisible();
+  await expect(join.getByRole("link", { name: "How memberships work" })).toHaveAttribute("href", "/memberships#how-it-works");
+  // Step 3.
+  await join.getByRole("button", { name: "Next: turn up and train" }).click();
   await expect(join.locator("address")).toContainText("1A Dunns Wood Road");
   await expect(join.getByRole("link", { name: /Directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(join.getByRole("list", { name: "What to bring" }).getByRole("listitem")).toHaveCount(4);
   await expect(join).toContainText("Kettlebells are provided.");
   await expect(page.locator("section[aria-labelledby=book-heading]").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  // The memberships are sold on this page too, the home page's list.
+  const memberships = page.locator("#memberships");
+  await expect(memberships.getByRole("heading", { level: 2 })).toHaveText("Save up to £59.");
+  await expect(memberships.getByRole("list", { name: "Membership plans" })).toContainText("Dedicated");
   await page.getByRole("link", { name: "How to join" }).click();
   await expect(page).toHaveURL(/#join$/);
+});
+
+test("/classes steps: keyboard and screen reader, and every step shows without JavaScript", async ({ page }) => {
+  await page.goto("/classes");
+  await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important;animation:none!important}[data-reveal]{opacity:1!important;transform:none!important}" });
+  const join = page.locator("#join");
+  // Keyboard: the step buttons and radios are in the tab order; Space/arrows choose.
+  await join.getByRole("button", { name: "Book your place" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(join.getByRole("button", { name: "Book your place" })).toHaveAttribute("aria-expanded", "true");
+  await expect(join.getByRole("region", { name: "Book your place" })).toBeVisible();
+  await expect(join.getByRole("region", { name: "Pick a class" })).toBeHidden();
+  expect((await new AxeBuilder({ page }).include("#join").analyze()).violations).toEqual([]);
+  // Without JavaScript every step must show. (Playwright's JavaScript-off mode doesn't apply <noscript>, so the
+  // server's own HTML is checked: the steps are in it, and a <noscript> rule un-hides the closed panels.)
+  const html = await (await page.request.get("/classes")).text();
+  expect(html).toMatch(/<noscript><style>\.step-panel\[hidden\]\{display:flex!important\}<\/style><\/noscript>/);
+  for (const step of ["Pick a class", "Book your place", "Turn up and train"]) expect(html).toContain(`aria-labelledby="step-${["Pick a class", "Book your place", "Turn up and train"].indexOf(step)}-button"`);
+  expect(html).toContain("1A Dunns Wood Road");
 });
 
 test("/online-coaching: the owner's design, what you get, three steps, one monthly price (2026-10-28)", async ({ page }) => {
