@@ -402,15 +402,6 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   onChange={chooseService}
                 />
               </div>
-              <div className="mt-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <p className="text-sm text-muted">Coaching online, wherever you train?</p>
-                <Link
-                  href="/online-coaching"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline"
-                >
-                  Explore online coaching
-                </Link>
-              </div>
               <ActionBar
                 onBack={leave}
                 next={{ label: "Continue", disabled: !service, onClick: () => setStep(1) }}

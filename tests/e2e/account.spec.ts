@@ -407,7 +407,7 @@ test.describe("member accounts", () => {
     await expect(page).toHaveURL(/\/account\/sign-in$/);
   });
 
-  test("a member without coaching sees Unlock coaching, not the programme", async ({ page, request }) => {
+  test("a member without coaching sees no coaching card or unlock page while online coaching is off (Alex, 2026-10-29)", async ({ page, request }) => {
     test.slow();
     const email = `nocoach-${Date.now()}@example.com`;
     await seedMember(request, email);
@@ -416,32 +416,20 @@ test.describe("member accounts", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/account$/);
 
-    // Home: the card sits at the bottom, below Booked, so it never pushes class booking down.
-    const card = page.getByRole("link", { name: /Raeng Coaching\s*Train with Alex/ });
-    await expect(card).toHaveAttribute("href", "/account/coaching/unlock");
-    expect((await card.boundingBox())!.y).toBeGreaterThan((await page.locator("#booked").boundingBox())!.y);
+    // Nothing is sold: no card on Home, no Coaching in the menu, no "Add coaching" on Plan.
+    await expect(page.getByRole("link", { name: /Raeng Coaching/ })).toHaveCount(0);
     await page.getByRole("button", { name: "Account menu" }).click();
-    await expect(page.locator("#account-menu").getByRole("link", { name: /^Coaching\s*Unlock$/ })).toBeVisible();
+    await expect(page.locator("#account-menu").getByRole("link", { name: /^Coaching/ })).toHaveCount(0);
     await page.keyboard.press("Escape");
-
-    // Plan: what coaching adds, with the published price.
     await page.goto(`${PROD}/account/plan`);
-    await expect(page.getByRole("heading", { name: "Add coaching" })).toBeVisible();
-    await expect(page.getByText("+£79 a month")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Add coaching" })).toHaveCount(0);
 
-    // The area itself is the unlock page.
-    await page.goto(`${PROD}/account/coaching`);
-    await expect(page).toHaveURL(/\/account\/coaching\/unlock$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Train with Alex, wherever you are." })).toBeVisible();
-    await expect(page.getByText("£79 a month").first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Unlock coaching" })).toHaveAttribute("href", /online-coaching\/enquire/);
-    for (const path of ["/account/coaching/programme", "/account/coaching/check-in", "/account/coaching/messages"]) {
+    // The coaching pages lead back to the members area.
+    for (const path of ["/account/coaching", "/account/coaching/unlock", "/account/coaching/programme", "/account/coaching/check-in", "/account/coaching/messages"]) {
       await page.goto(PROD + path);
-      await expect(page).toHaveURL(/\/account\/coaching\/unlock$/);
+      await expect(page, path).toHaveURL(/\/account$/);
     }
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-    await page.setViewportSize({ width: 320, height: 640 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   });
 
   test("an address with no account gets the same answer and no email", async ({ page, request }) => {

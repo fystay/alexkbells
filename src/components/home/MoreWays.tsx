@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { getService } from "@/content/services";
+import { smallGroupCoaching } from "@/content/smallGroup";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
-function leadPrice(id: "one-to-one" | "online-coaching") {
+function leadPrice(id: "one-to-one") {
   const price = publishable(getService(id).prices)[0];
   return price ? `${price.prefix ? `${price.prefix} ` : ""}${formatGbp(price.amountGbp)} ${price.unit}` : null;
 }
 
 /**
- * The other two ways to train, after the memberships (option 1 of the card
+ * The other ways to train, after the memberships (option 1 of the card
  * overhaul, owner 2026-10-26): one row each between thin rules, name and
  * price on the first line, what it is and "Explore" on the second. The whole
  * row is the way into its page. Only confirmed prices are shown.
@@ -18,7 +19,7 @@ function leadPrice(id: "one-to-one" | "online-coaching") {
 export function MoreWays() {
   const ways = [
     { href: "/coaching", title: "1:1 coaching", body: "Face-to-face coaching with Alex.", price: leadPrice("one-to-one") },
-    { href: "/online-coaching", title: "Online coaching", body: "Personalised programming, wherever you train.", price: leadPrice("online-coaching") },
+    { href: "/coaching#small-group", title: smallGroupCoaching.name, body: smallGroupCoaching.summary, price: null },
   ];
   return (
     <Section id="more-ways" labelledBy="more-ways-heading">

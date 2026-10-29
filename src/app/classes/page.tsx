@@ -93,10 +93,10 @@ export default function ClassesPage() {
             </Link>{" "}
             or{" "}
             <Link
-              href="/online-coaching"
+              href="/coaching#small-group"
               className="font-semibold underline underline-offset-4 hover:no-underline"
             >
-              online coaching
+              small group coaching
             </Link>
             .
           </p>

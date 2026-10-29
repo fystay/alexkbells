@@ -19,10 +19,9 @@ import { Toast } from "./Toast";
 
 const PUBLIC_LINKS: [string, string][] = [
   ["/classes", "Classes"],
-  ["/memberships", "Memberships"],
-  ["/coaching", "1:1 Coaching"],
-  ["/online-coaching", "Online Coaching"],
-  ["/about", "About RAENG"],
+  ["/coaching", "Coaching"],
+  ["/about", "About"],
+  ["/contact", "FAQs & Contact"],
 ];
 
 
