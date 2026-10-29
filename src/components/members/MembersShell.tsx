@@ -83,7 +83,7 @@ export function MembersShell({
               <span className="text-[0.6875rem] font-semibold tracking-[0.2em] uppercase opacity-75">Next class</span>
               <span className="text-lg font-bold tracking-[-0.01em]">{next ? shortWhen(next.starts_at) : "Nothing booked"}</span>
               <span className="text-[0.8125rem] opacity-80">
-                {next ? `${countdown(next.starts_at, now)} · ${site.location.venue}` : m ? `${left} credit${left === 1 ? "" : "s"} to use` : "Book a class to see it here"}
+                {next ? `${countdown(next.starts_at, now)} · ${site.location.town}` : m ? `${left} credit${left === 1 ? "" : "s"} to use` : "Book a class to see it here"}
               </span>
             </Link>
             {coaching ? <CoachingCard coaching={coaching} small className="mt-3" /> : null}

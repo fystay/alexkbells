@@ -17,7 +17,7 @@ export function JsonLd() {
     sameAs: [site.social.instagram.url, site.social.facebook.url],
     address: {
       "@type": "PostalAddress",
-      streetAddress: `${l.venue}, ${l.street}`,
+      streetAddress: l.street,
       addressLocality: l.town,
       addressRegion: l.region,
       postalCode: l.postcode,

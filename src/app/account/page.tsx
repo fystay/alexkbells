@@ -149,7 +149,7 @@ function NextClass({ place, now }: { place: MemberPlace; now: Date }) {
         {formatClock(time)}
       </p>
       <p className="text-[0.9375rem] opacity-80">
-        {groupClass.name} · {site.location.venue}, {site.location.town}
+        {groupClass.name} · {site.location.street}, {site.location.town}
       </p>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-grey pt-3.5">
         <span className="font-semibold tabular-nums">{countdown(place.starts_at, now)}</span>

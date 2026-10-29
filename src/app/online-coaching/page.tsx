@@ -115,7 +115,7 @@ export default function OnlineCoachingPage() {
 
       <CtaBand
         title="Rather train in person?"
-        body={`Book a group class or a 1:1 session at ${site.location.venue}, ${site.location.town}.`}
+        body={`Book a group class or a 1:1 session in ${site.location.town}.`}
         service="any"
         tone="plain"
       />

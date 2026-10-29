@@ -186,7 +186,7 @@ export async function notifyClassBookings(db: Db, classes: PublishedClass[], env
           subject: `You're booked: ${when}`,
           text: [
             `Your place on the group class on ${when} is confirmed (${paid}).`,
-            `${site.location.venue}, ${site.location.street}, ${site.location.town}, ${site.location.postcode}.`,
+            `${site.location.street}, ${site.location.town}, ${site.location.postcode}.`,
             "",
             "Need to cancel? Use this private link:",
             `${memberLinkOrigin(env)}${BOOK_MANAGE_PATH}?token=${token}`,

@@ -29,7 +29,7 @@ export default function JoinMembershipPage() {
     <section aria-labelledby="join-heading" className="bg-paper">
       <div className="container-page pt-6 pb-16 sm:pt-10 lg:pb-24">
         <header className="max-w-2xl">
-          <p className="eyebrow">Memberships · {site.location.venue}, {site.location.town}</p>
+          <p className="eyebrow">Memberships · {site.location.town}</p>
           <h1 id="join-heading" className="mt-3 font-display text-h2 text-balance">
             Join a membership.
           </h1>

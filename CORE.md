@@ -36,7 +36,7 @@ The business is now **RAENG** (brand themes STRENGTH · COMMUNITY · DISCIPLINE;
 | Brand | Alex K Bells (logo wordmark: ALEX.KBELLS) |
 | Descriptor | Kettlebell Coach |
 | Services | Group classes, one-to-one coaching, online coaching |
-| Venue | Media House, 1A Dunns Wood Road, Cumbernauld, Glasgow, G67 3EN, Scotland |
+| Address | 1A Dunns Wood Road, Cumbernauld, Glasgow, G67 3EN, Scotland (no venue name anywhere on the site: owner, 2026-10-29) |
 | Instagram | https://www.instagram.com/alex.kbells/ |
 | Previous site | https://alexkbells-coaching.lovable.app (reference only) |
 | Project terms | Free build for the client; client pays hosting and running costs. Portfolio case study. |

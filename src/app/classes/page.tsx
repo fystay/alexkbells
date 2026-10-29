@@ -18,9 +18,9 @@ export const metadata: Metadata = pageMetadata({
   title: "Group Kettlebell Classes",
   description: bookingOpen
     ? onlineJoinEnabled()
-      ? "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and book and pay online."
-      : "Group kettlebell classes at Media House, Cumbernauld. See the class times and price, and request your place online."
-    : "Group kettlebell classes at Media House, Cumbernauld. Book now to join a session.",
+      ? "Group kettlebell classes in Cumbernauld. See the class times and price, and book and pay online."
+      : "Group kettlebell classes in Cumbernauld. See the class times and price, and request your place online."
+    : "Group kettlebell classes in Cumbernauld. Book now to join a session.",
   path: "/classes",
 });
 

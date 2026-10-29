@@ -12,7 +12,7 @@ export const services: Service[] = [
     shortName: "Classes",
     href: "/classes",
     summary:
-      "Coached group kettlebell sessions at Media House in Cumbernauld.",
+      "Coached group kettlebell sessions in Cumbernauld.",
     points: [],
     prices: [
       {

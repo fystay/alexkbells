@@ -485,7 +485,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   for (const name of ["HIIT", "Doubles Kettlebells", "Saturday Conditioning"]) await expect(classes).toContainText(name);
   await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
   await expect(classes.getByText("Media House")).toHaveCount(0);
-  // Alex's wording, exactly (audit of his chat, 2026-10-29): no "Media House" anywhere in the page body, and the caption has no extra words.
+  // Alex's wording, exactly (audit of his chat, 2026-10-29): no "Media House" anywhere (the owner, 2026-10-29: not on the whole website), and the caption has no extra words.
   await expect(page.locator("main")).not.toContainText("Media House");
   await expect(page.locator("#coach figcaption")).toHaveText("My journey. My approach to training.");
   await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
@@ -875,7 +875,7 @@ test("footer groups collapse on phones and are open on desktop", async ({ page }
   await expect(footer.getByRole("link", { name: "Classes" })).toBeVisible();
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(footer.getByRole("link", { name: "FAQs & Contact" })).toBeVisible();
-  await expect(footer.getByText("Media House")).toBeVisible();
+  await expect(footer.getByText("1A Dunns Wood Road")).toBeVisible();
 });
 
 test("'Get in touch' only on Coaching's closing button (owner, 2026-10-29), and the header has no Book now", async ({ page }) => {
