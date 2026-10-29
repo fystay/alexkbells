@@ -104,18 +104,16 @@ export function PlanList({ className, includePayg = true }: { className?: string
 }
 
 /**
- * Pay as you go as a topic of its own (Alex's layout, 2026-10-29): the price, no
- * membership, and the way to book a class (the calendar).
+ * Pay as you go as a topic of its own (Alex's layout, 2026-10-29): the price and
+ * no membership. No button: the class rows and the hero open the calendar.
  */
 export function PayAsYouGo({ className }: { className?: string }) {
-  const book = getPrimaryCtaFor("group-class");
   return (
     <div className={cn("max-w-lg", className)}>
-      <p className="text-2xl font-bold tabular-nums">£{payg.amountGbp} <span className="text-base font-normal">a class</span></p>
+      <p className="text-2xl font-bold tabular-nums">
+        £{payg.amountGbp} <span className="text-base font-normal">a class</span>
+      </p>
       <p className="mt-2">No membership required. Pay for each booking.</p>
-      <Link href={book.href} className="mt-4 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
-        {book.kind === "booking" ? "View classes and book" : book.label}
-      </Link>
     </div>
   );
 }

@@ -22,7 +22,7 @@ export function classesTitle(): string {
  * figure from content. Book now opens the calendar on the chosen class
  * (`/book/group-class?class=<timetable id>`) where booking is on.
  */
-export function ClassPicker({ className, location = true }: { className?: string; /** The address panel under the rows (home); Classes shows it as its own "Studio location" section. */ location?: boolean }) {
+export function ClassPicker({ className, location = true, button = true }: { className?: string; /** The booking button under the rows (home). */ button?: boolean; /** The address panel under the rows (home); Classes shows it as its own "Studio location" section. */ location?: boolean }) {
   const sessions = isPublishable(timetable.status) ? sortSessions(timetable.sessions) : [];
   if (sessions.length === 0) return null;
   const cta = getPrimaryCtaFor("group-class");
@@ -43,6 +43,7 @@ export function ClassPicker({ className, location = true }: { className?: string
         bookLabel={cta.kind === "booking" ? "View classes and book" : cta.label}
         external={cta.external}
         classHrefBase={bookable ? `${cta.href}?class=` : null}
+        showBook={button}
         beginners={beginners && isPublishable(beginners.status) ? firstClassSteps.beginners : null}
       />
       {location ? <StudioLocation /> : null}

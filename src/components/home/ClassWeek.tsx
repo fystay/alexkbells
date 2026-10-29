@@ -63,6 +63,7 @@ export function ClassWeek({
   external,
   classHrefBase,
   beginners,
+  showBook = true,
 }: {
   classes: WeekClass[];
   facts: string[];
@@ -72,6 +73,8 @@ export function ClassWeek({
   /** A row opens the calendar on its class: `<base><timetable id>` (null where booking goes elsewhere). */
   classHrefBase: string | null;
   beginners: string | null;
+  /** The booking button under the rows (home); Classes leaves it out, the rows and the hero open the calendar (owner, 2026-10-29). */
+  showBook?: boolean;
 }) {
   const tick = useSyncExternalStore(subscribe, getTick, getServerTick);
   const size = useUsualClassSize();
@@ -138,7 +141,7 @@ export function ClassWeek({
       </p>
 
       <div className="mt-6">
-        {external ? (
+        {!showBook ? null : external ? (
           <a href={bookHref} target="_blank" rel="noopener noreferrer" className={button}>
             {bookLabel}
             <span className="sr-only">(opens in a new tab)</span>
@@ -149,7 +152,7 @@ export function ClassWeek({
             <span aria-hidden="true"> →</span>
           </Link>
         )}
-        <p className="mt-3">
+        <p className={showBook ? "mt-3" : ""}>
           {beginners ? `${beginners} ` : null}
           <Link href="#memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
             Save with a membership
