@@ -1,6 +1,6 @@
 import { timetable } from "@/content/classes";
 import { faq } from "@/content/faq";
-import { firstClassSteps, hero } from "@/content/home";
+import { firstClassSteps } from "@/content/home";
 import { getService } from "@/content/services";
 import { mapsUrl, site } from "@/content/site";
 import { getPrimaryCtaFor } from "@/lib/booking";
@@ -41,7 +41,7 @@ export function ClassPicker({ className }: { className?: string }) {
         classes={classes}
         facts={[price ? `£${price.amountGbp} a class` : null, minutes ? `${minutes} minutes` : null, "All levels"].filter((f): f is string => Boolean(f))}
         bookHref={cta.href}
-        bookLabel={cta.kind === "booking" ? hero.primaryLabel : cta.label}
+        bookLabel={cta.kind === "booking" ? "View classes and book" : cta.label}
         external={cta.external}
         classHrefBase={bookable ? `${cta.href}?class=` : null}
         address={{ venue: l.venue, lines: [l.street, `${l.town}, ${l.city}`], postcode: l.postcode }}

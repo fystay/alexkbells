@@ -11,20 +11,23 @@ function leadPrice(id: "one-to-one") {
 }
 
 /**
- * The other ways to train, after the memberships (option 1 of the card
- * overhaul, owner 2026-10-26): one row each between thin rules, name and
- * price on the first line, what it is and "Explore" on the second. The whole
- * row is the way into its page. Only confirmed prices are shown.
+ * Services, straight under the hero (Alex's layout, 2026-10-29; he offers group
+ * kettlebell classes, 1:1 coaching and small group coaching): one row each
+ * between thin rules, name and price on the first line, what it is and "Explore"
+ * on the second. The whole row is the way into its page. Only confirmed prices
+ * are shown (small group coaching has none yet).
  */
 export function MoreWays() {
+  const classPrice = publishable(getService("group-classes").prices)[0];
   const ways = [
+    { href: "/classes", title: "Group classes", body: "Coached kettlebell sessions, all levels.", price: classPrice ? `${formatGbp(classPrice.amountGbp)} a class` : null },
     { href: "/coaching", title: "1:1 coaching", body: "Face-to-face coaching with Alex.", price: leadPrice("one-to-one") },
     { href: "/coaching#small-group", title: smallGroupCoaching.name, body: smallGroupCoaching.summary, price: null },
   ];
   return (
-    <Section id="more-ways" labelledBy="more-ways-heading">
+    <Section id="ways" labelledBy="ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-        <SectionHeading id="more-ways-heading" className="lg:col-span-5" title="More ways to train." />
+        <SectionHeading id="ways-heading" className="lg:col-span-5" title="Ways to train." />
         <ul className="mt-6 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
             <li key={w.href}>

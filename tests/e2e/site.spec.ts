@@ -486,19 +486,20 @@ test("homepage hero and its call to action are in the first screen on phones and
 
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
-  // Alex's order (via the owner, 2026-10-29): Meet your coach lower down ("less about me"), no "Coached by" line under the hero.
+  // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions; no "Coached by" line and no closing Book now band.
   const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "why-kettlebells", "classes", "memberships", "more-ways", "coach", "book"]);
+  expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
   await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
   await expect(classes.getByText("Media House")).toHaveCount(0);
-  await expect(classes.getByRole("link", { name: "Book now" })).toHaveCount(1);
+  await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
   await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   await expect(classes).toContainText("New? Say so when you book.");
-  const more = page.locator("#more-ways");
+  const more = page.locator("#ways");
+  await expect(more.getByRole("link", { name: /Group classes/ })).toHaveAttribute("href", "/classes");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
   // Online coaching is off the site for now; small group coaching is named, with no price (Alex, 2026-10-29).
   await expect(more.getByRole("link", { name: /Small group coaching/ })).toHaveAttribute("href", "/coaching#small-group");
@@ -848,7 +849,7 @@ test("with Reduce Motion the hero shows the still poster and the film stays stil
   await context.close();
 });
 
-test("home: the class times as simple rows; a row and Book now open the calendar", async ({ page }) => {
+test("home: the class times as simple rows; a row and View classes and book open the calendar", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const section = page.getByRole("region", { name: "Three classes a week." });
@@ -861,7 +862,7 @@ test("home: the class times as simple rows; a row and Book now open the calendar
   await expect(section.getByText(/^(Next up|On now)$/)).toHaveCount(1);
   // A row opens the calendar on that class; Book now (always that label) opens the calendar.
   await expect(rows.nth(2)).toHaveAttribute("href", "/book/group-class?class=sat-morning");
-  await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
+  await expect(section.getByRole("link", { name: "View classes and book" })).toHaveAttribute("href", "/book/group-class");
   // Only the address (no venue name), with directions; no Book now under it.
   await expect(section.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
@@ -968,21 +969,20 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   await expect(payg.getByRole("radio", { name: /^Pay as you go/ })).toHaveCount(1);
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
-  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toBeVisible();
-  // Ready to start? opens the booking flow at step 1, choosing the service (owner, 2026-10-27).
-  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
-  // The times are at the top; the closing band doesn't repeat them.
-  await expect(page.locator("#book")).not.toContainText("Classes run");
+  // No closing "Ready to start? Book now" band (Alex's layout, 2026-10-29: too many Book now options).
+  await expect(page.locator("#book")).toHaveCount(0);
+  // The philosophy and the questions close the page.
+  await expect(page.locator("#philosophy").getByRole("link", { name: "Read more about RAENG" })).toHaveAttribute("href", "/about");
+  await expect(page.locator("main").getByRole("link", { name: "More questions and contact details" })).toHaveAttribute("href", "/contact");
   // Each plan states its rules as in Alex's layout.
   const regular = page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").filter({ has: page.getByRole("heading", { name: "Regular" }) });
   for (const text of ["8 class credits · £8.13 per class", "Save £31"]) await expect(regular).toContainText(text);
   await expect(page.locator("#memberships").getByRole("heading", { name: "Membership terms" })).toBeVisible();
   // The terms are one link, not a list on the page (Alex via the owner, 2026-10-29).
   await expect(page.locator("#memberships").getByRole("link", { name: "Membership and cancellation policy" })).toHaveAttribute("href", "/memberships#how-it-works");
-  // Each fact once: the days only in the timetable, Instagram only in Meet your coach.
+  // Each fact once: the days only in the timetable.
   await expect(page.locator("main").getByText("Sat", { exact: true })).toHaveCount(1);
   await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(0);
-  await expect(page.locator("#book").getByRole("link", { name: /Instagram/ })).toHaveCount(0);
   // No sticky Book now bar: the header's Book now is always on screen.
   await expect(page.locator("aside[aria-label='Book a class']")).toHaveCount(0);
 });

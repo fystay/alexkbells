@@ -51,13 +51,7 @@ export const faq: FaqItem[] = [
     answer: "60 minutes, including a warm-up.",
     status: "confirmed",
   },
-  {
-    id: "online",
-    question: "Can I be coached if I don't live near Cumbernauld?",
-    answer:
-      "Yes. Online coaching gives you personalised programming, support and progression wherever you train.",
-    status: "confirmed",
-  },
+  // The "Can I be coached if I don't live near Cumbernauld?" answer (online coaching) is removed while online coaching is off (Alex, 2026-10-29); restore it from git history.
   {
     id: "one-to-one",
     question: "Do you offer one-to-one sessions?",

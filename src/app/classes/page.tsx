@@ -3,6 +3,7 @@ import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
+import { Faq } from "@/components/sections/Faq";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -112,6 +113,9 @@ export default function ClassesPage() {
           </div>
         </div>
       </Section>
+
+      {/* Alex's layout (2026-10-29): the class questions at the foot of Classes. */}
+      <Faq tone="plain" ids={["when", "where", "length", "beginners", "first-session", "bring"]} />
     </>
   );
 }

@@ -1,11 +1,12 @@
 import { faq } from "@/content/faq";
 import { publishable } from "@/lib/publish";
+import type { ReactNode } from "react";
 import { Section, SectionHeading, type SectionTone } from "@/components/ui/Section";
 import { Provisional } from "@/components/ui/Provisional";
 import { revealDelay } from "@/lib/reveal";
 
 /** Native <details> so it works without JavaScript and with keyboards. */
-export function Faq({ headingId = "faq-heading", ids, tone = "white" }: { headingId?: string; ids?: readonly string[]; tone?: SectionTone }) {
+export function Faq({ headingId = "faq-heading", ids, tone = "white", footer }: { headingId?: string; ids?: readonly string[]; tone?: SectionTone; footer?: ReactNode }) {
   // `ids` picks questions for a page (in the order given); without it every question shows.
   const all = ids ? ids.flatMap((id) => faq.filter((f) => f.id === id)) : faq;
   const items = publishable(all);
@@ -36,6 +37,7 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white" }: { headin
               </li>
             ))}
           </ul>
+          {footer ? <div className="mt-4">{footer}</div> : null}
         </div>
       </div>
     </Section>

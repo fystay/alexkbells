@@ -94,8 +94,8 @@ export default function ContactPage() {
           </Way>
         </ul>
       </Section>
-      {/* Only what isn't answered elsewhere (2026-10-27). */}
-      <Faq tone="plain" ids={["one-to-one", "contact"]} />
+      {/* Every common question (Alex's layout, 2026-10-29). */}
+      <Faq tone="plain" />
     </>
   );
 }

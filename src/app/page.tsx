@@ -9,23 +9,26 @@ import { MoreWays } from "@/components/home/MoreWays";
 import { Testimonials } from "@/components/home/Testimonials";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
-import { CtaBand } from "@/components/sections/CtaBand";
+import { Faq } from "@/components/sections/Faq";
+import { PhilosophyTeaser } from "@/components/home/PhilosophyTeaser";
+import Link from "next/link";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
 export const metadata: Metadata = pageMetadata({ description: site.description, path: "/" });
 
-// Home order (the owner relaying Alex's feedback, 2026-10-29; replaces the
-// 2026-10-27 order, which had the slim "Coached by" line and Meet your coach
-// near the top): the film and Book now; why kettlebells; the classes (rows of
-// days and times, one Book now, the address); what Alex offers (memberships,
-// then the other ways to train); then Meet your coach (and members' words,
-// once there are any), "less about me"; and a last Book now.
+// Home order: Alex's layout (2026-10-29; his feedback overrides earlier owner
+// decisions, including the 2026-10-27 order): the film and Book now; services;
+// why kettlebells; the classes (rows of days and times, one box to view
+// classes and book, the address); memberships; Meet your coach ("less about
+// me"), then members' words once there are any; RAENG's philosophy; the
+// questions. No closing Book now band ("too many Book now options").
 // Phones read top to bottom; from lg the heading sits left of its content.
 const split = "lg:grid lg:grid-cols-12 lg:gap-x-14";
 export default function HomePage() {
   return (
     <>
       <Hero />
+      <MoreWays />
       <WhyKettlebells />
       <Section id="classes" labelledBy="classes-heading">
         <div className={split}>
@@ -44,10 +47,18 @@ export default function HomePage() {
           </div>
         </div>
       </Section>
-      <MoreWays />
       <CoachStory tone="plain" alex={homeCoach} />
       <Testimonials />
-      <CtaBand id="book" body={null} instagram={false} tone="plain" />
+      <PhilosophyTeaser />
+      <Faq
+        tone="plain"
+        ids={["beginners", "first-session", "bring", "length", "where"]}
+        footer={
+          <Link href="/contact" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+            More questions and contact details
+          </Link>
+        }
+      />
     </>
   );
 }
