@@ -15,41 +15,33 @@ import {
  * Null until it has loaded, and if it can't be read: every class then looks
  * open, and the server still refuses a full class when someone books.
  */
-export function useClassStatus(
-  classes: readonly StatusClass[],
-): Map<string, ClassStatus> | null {
+interface FullBody {
+  full?: unknown;
+  cancelled?: unknown;
+  known?: unknown;
+}
+
+/** One request shared by every component on the page (the rail and the timetable both ask), reused for 20 s. */
+let shared: { at: number; body: Promise<FullBody | null> } | null = null;
+function loadFull(): Promise<FullBody | null> {
+  if (shared && Date.now() - shared.at < 20_000) return shared.body;
+  const body = fetch("/api/classes/full")
+    .then((r) => (r.ok ? (r.json() as Promise<FullBody>) : null))
+    .catch(() => null);
+  shared = { at: Date.now(), body };
+  return body;
+}
+
+export function useClassStatus(classes: readonly StatusClass[]): Map<string, ClassStatus> | null {
   const [status, setStatus] = useState<Map<string, ClassStatus> | null>(null);
   const key = classes.map((c) => `${c.id}${c.day}${c.start}`).join();
   useEffect(() => {
     let live = true;
-    fetch("/api/classes/full")
-      .then((r) =>
-        r.ok
-          ? (r.json() as Promise<{
-              full?: unknown;
-              cancelled?: unknown;
-              known?: unknown;
-            }>)
-          : null,
-      )
-      .then((body) => {
-        if (!live || !body || body.known !== true) return;
-        const keys = (list: unknown) =>
-          new Set(
-            Array.isArray(list)
-              ? list.filter((k): k is string => typeof k === "string")
-              : [],
-          );
-        setStatus(
-          classStatuses(
-            classes,
-            toDateKey(new Date()),
-            keys(body.full),
-            keys(body.cancelled),
-          ),
-        );
-      })
-      .catch(() => {});
+    loadFull().then((body) => {
+      if (!live || !body || body.known !== true) return;
+      const keys = (list: unknown) => new Set(Array.isArray(list) ? list.filter((k): k is string => typeof k === "string") : []);
+      setStatus(classStatuses(classes, toDateKey(new Date()), keys(body.full), keys(body.cancelled)));
+    });
     return () => {
       live = false;
     };

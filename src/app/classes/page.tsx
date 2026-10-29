@@ -4,6 +4,8 @@ import { pageMetadata } from "@/lib/metadata";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { Faq } from "@/components/sections/Faq";
+import { ClassPicker, classesTitle } from "@/components/home/ClassPicker";
+import { CancellationPolicy } from "@/components/memberships/CancellationPolicy";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -69,6 +71,14 @@ export default function ClassesPage() {
         </div>
       </Section>
 
+      {/* Alex's layout (2026-10-29): the full timetable and the studio location, the home page's class rows. */}
+      <Section id="timetable" labelledBy="timetable-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="timetable-heading" className="lg:col-span-5" eyebrow="Timetable" title={classesTitle()} />
+          <ClassPicker className="mt-8 lg:col-span-7 lg:mt-0" />
+        </div>
+      </Section>
+
       <Section
         spacing="compact"
         labelledBy="book-heading"
@@ -114,7 +124,9 @@ export default function ClassesPage() {
         </div>
       </Section>
 
-      {/* Alex's layout (2026-10-29): the class questions at the foot of Classes. */}
+      {/* Alex's layout (2026-10-29): Booking and cancellation policies, then the class questions. */}
+      <CancellationPolicy title="Booking and cancellation policy" />
+
       <Faq tone="plain" ids={["when", "where", "length", "beginners", "first-session", "bring"]} />
     </>
   );

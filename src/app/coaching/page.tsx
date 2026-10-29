@@ -99,6 +99,18 @@ export default function CoachingPage() {
         </div>
       </Section>
 
+      {/* Alex's layout (2026-10-29): "What's included", from the confirmed points. */}
+      <Section id="included" labelledBy="included-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading id="included-heading" className="lg:col-span-5" eyebrow="1:1 coaching" title="What's included." />
+          <ul className="lined mt-8 lg:col-span-7 lg:mt-0">
+            {service.points.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
       <Section id="how-it-works" labelledBy="how-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="how-heading" className="lg:col-span-5" eyebrow="How it works" title="From first message to first session." />
