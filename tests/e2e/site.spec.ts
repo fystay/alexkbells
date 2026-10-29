@@ -927,7 +927,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   // "Ready to start?" closes the page (the owner, 2026-10-29), opening the booking flow at step 1.
-  await expect(page.locator("#book").getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book");
+  await expect(page.locator("#book").getByRole("link", { name: "Book a class" })).toHaveAttribute("href", "/book");
   // The philosophy and the questions close the page.
   await expect(page.locator("#philosophy").getByRole("link", { name: "Read more about RAENG" })).toHaveAttribute("href", "/about");
   await expect(page.locator("main").getByRole("link", { name: "More questions and contact details" })).toHaveAttribute("href", "/contact");

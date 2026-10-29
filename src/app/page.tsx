@@ -10,6 +10,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { WhyKettlebells } from "@/components/home/WhyKettlebells";
 import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { getPrimaryCtaFor } from "@/lib/booking";
 import { Faq } from "@/components/sections/Faq";
 import { PhilosophyTeaser } from "@/components/home/PhilosophyTeaser";
 import Link from "next/link";
@@ -61,7 +62,8 @@ export default function HomePage() {
           </Link>
         }
       />
-      <CtaBand id="book" body={null} instagram={false} tone="plain" />
+      {/* The closing button reads "Book a class" (owner, 2026-10-29), like the hero; where booking is off it keeps the page's honest wording. */}
+      <CtaBand id="book" body={null} instagram={false} tone="plain" label={getPrimaryCtaFor("any").kind === "booking" ? "Book a class" : undefined} />
     </>
   );
 }
