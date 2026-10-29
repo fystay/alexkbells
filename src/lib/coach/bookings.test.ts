@@ -91,12 +91,12 @@ describe("class attendance", () => {
 describe("the usual class size", () => {
   const date = { slot: "sat-morning", date: "2026-11-07", startsAt: "2026-11-07T08:00:00.000Z", duration: 60 };
 
-  it("is 12 until Alex changes it, applies to every class without its own size, and refuses a place once full", async () => {
-    expect(await getDefaultCapacity(db)).toBe(12);
+  it("is 15 until Alex changes it, applies to every class without its own size, and refuses a place once full", async () => {
+    expect(await getDefaultCapacity(db)).toBe(15);
     const id = await ensureClassSession(db, date);
     if (!id.ok) throw new Error("no session");
     let row = await getClassSession(db, date.slot, date.date);
-    expect(row.ok && row.data).toMatchObject({ capacity: 12, capacity_set: null, booked: 0 });
+    expect(row.ok && row.data).toMatchObject({ capacity: 15, capacity_set: null, booked: 0 });
 
     expect((await setDefaultCapacity(db, 2)).ok).toBe(true);
     expect(await getDefaultCapacity(db)).toBe(2);
@@ -116,13 +116,13 @@ describe("the usual class size", () => {
     row = await getClassSession(db, date.slot, date.date);
     expect(row.ok && row.data).toMatchObject({ capacity: 2, capacity_set: null });
 
-    expect((await setDefaultCapacity(db, 12)).ok).toBe(true);
+    expect((await setDefaultCapacity(db, 15)).ok).toBe(true);
   });
 
   it("refuses a size outside 1 to 200", async () => {
     expect(await setDefaultCapacity(db, 0)).toMatchObject({ ok: false, error: { rule: "invalid_capacity" } });
     expect(await setDefaultCapacity(db, 201)).toMatchObject({ ok: false, error: { rule: "invalid_capacity" } });
-    expect(await getDefaultCapacity(db)).toBe(12);
+    expect(await getDefaultCapacity(db)).toBe(15);
   });
 });
 

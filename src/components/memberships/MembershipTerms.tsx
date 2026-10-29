@@ -1,4 +1,4 @@
-import { membershipTerms } from "@/content/policy";
+import { membershipTerms, membershipTermsAlex } from "@/content/policy";
 import { getService } from "@/content/services";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { MembershipExplainer } from "@/components/memberships/MembershipExplainer";
@@ -23,6 +23,19 @@ export function MembershipTerms() {
           </li>
         ))}
       </ol>
+      {/* Alex's mockup (2026-10-29): the terms with a title each; this is what the home page's "Membership and cancellation policy" link opens. */}
+      <div id="membership-terms" className="mt-12 max-w-2xl scroll-mt-24">
+        <h2 className="font-display text-h2 text-balance">{membershipTermsAlex.title}</h2>
+        <p className="mt-3 text-lede">{membershipTermsAlex.intro}</p>
+        <ul className="lined mt-6">
+          {membershipTermsAlex.items.map((item) => (
+            <li key={item.title}>
+              <h3 className="card-title">{item.title}</h3>
+              <p className="mt-1">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Section>
   );
 }

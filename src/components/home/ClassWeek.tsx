@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { cn } from "@/lib/cn";
-import { useClassStatus } from "@/components/classes/useClassStatus";
+import { useClassStatus, useUsualClassSize } from "@/components/classes/useClassStatus";
 
 export interface WeekClass {
   id: string;
@@ -78,6 +78,7 @@ export function ClassWeek({
   beginners: string | null;
 }) {
   const tick = useSyncExternalStore(subscribe, getTick, getServerTick);
+  const size = useUsualClassSize();
   const status = useClassStatus(classes.map((c) => ({ id: c.id, day: c.day, start: c.startTime })));
   const now = tick === null ? null : ukNow();
   const deltas = now
@@ -136,7 +137,7 @@ export function ClassWeek({
       </ul>
 
       <p className="mt-5 flex flex-wrap justify-between gap-3 tabular-nums">
-        {facts.map((f) => (
+        {[...facts, ...(size ? [`${size} places max`] : [])].map((f) => (
           <span key={f}>{f}</span>
         ))}
       </p>

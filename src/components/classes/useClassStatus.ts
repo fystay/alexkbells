@@ -19,6 +19,7 @@ interface FullBody {
   full?: unknown;
   cancelled?: unknown;
   known?: unknown;
+  size?: unknown;
 }
 
 /** One request shared by every component on the page (the rail and the timetable both ask), reused for 20 s. */
@@ -48,4 +49,19 @@ export function useClassStatus(classes: readonly StatusClass[]): Map<string, Cla
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` stands for the classes' content
   }, [key]);
   return status;
+}
+
+/** The usual class size for the "places max" fact; null until it has loaded, and if it can't be read. */
+export function useUsualClassSize(): number | null {
+  const [size, setSize] = useState<number | null>(null);
+  useEffect(() => {
+    let live = true;
+    loadFull().then((body) => {
+      if (live && body && typeof body.size === "number" && Number.isInteger(body.size) && body.size > 0) setSize(body.size);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return size;
 }

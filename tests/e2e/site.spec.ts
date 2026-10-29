@@ -498,6 +498,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await expect(why.locator("h3")).toHaveText(["Build real strength", "Improve conditioning", "Move better"]);
   const classes = page.locator("#classes");
   await expect(classes).toContainText("£12 a class");
+  await expect(classes).toContainText("places max");
   for (const name of ["HIIT", "Doubles Kettlebells", "Saturday Conditioning"]) await expect(classes).toContainText(name);
   await expect(classes.locator("#ct-venue")).toHaveText("1A Dunns Wood Road");
   await expect(classes.getByText("Media House")).toHaveCount(0);
@@ -574,12 +575,22 @@ test.describe("memberships", () => {
     }
     const payg = rows.filter({ has: page.getByRole("heading", { name: "Pay as you go" }) });
     await expect(payg).toContainText("£12");
-    await expect(payg).toContainText("Per class. No membership needed.");
+    await expect(payg).toContainText("No membership required. Pay for each booking.");
+    await expect(page.locator("#memberships")).toContainText("Savings are calculated against paying £12 per class for the same number of bookings within 4 weeks.");
     // What pay as you go costs on top: closed behind one link, the figures calculated from the prices.
     await page.getByText("What pay as you go costs on top").click();
     const extra = page.getByRole("table", { name: /what you.d pay on top/i });
     await expect(extra.getByRole("row", { name: /^Dedicated/ })).toHaveText(/Dedicated\s*£14\.75\s*£59\s*£767/);
     await expect(extra.getByRole("row")).toHaveCount(4);
+  });
+
+  test("the terms in Alex's wording, with no placeholder cancellation text", async ({ page }) => {
+    await page.goto("/memberships");
+    const terms = page.locator("#membership-terms");
+    await expect(terms.getByRole("heading", { level: 2 })).toHaveText("Membership terms");
+    await expect(terms.locator("h3")).toHaveText(["Using your credits", "Four-week renewal", "Unused credits", "Cancellations"]);
+    await expect(terms).toContainText("Late cancellations and missed classes forfeit the credit.");
+    await expect(terms).not.toContainText("Explain how to cancel");
   });
 
   test("select, then Book now: the chosen row turns ink and the button opens the calendar with the plan", async ({ page }) => {
@@ -1010,7 +1021,7 @@ test("home: each plan row is one choice, class times appear once, and secondary 
   for (const text of ["8 class credits · £8.13 per class", "Save £31"]) await expect(regular).toContainText(text);
   await expect(page.locator("#memberships").getByRole("heading", { name: "Membership terms" })).toBeVisible();
   // The terms are one link, not a list on the page (Alex via the owner, 2026-10-29).
-  await expect(page.locator("#memberships").getByRole("link", { name: "Membership and cancellation policy" })).toHaveAttribute("href", "/memberships#how-it-works");
+  await expect(page.locator("#memberships").getByRole("link", { name: "Membership and cancellation policy" })).toHaveAttribute("href", "/memberships#membership-terms");
   // Each fact once: the days only in the timetable.
   await expect(page.locator("main").getByText("Sat", { exact: true })).toHaveCount(1);
   await expect(page.locator("main").getByText("Saturday", { exact: true })).toHaveCount(0);
