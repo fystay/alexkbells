@@ -1,3 +1,4 @@
+import { defaultClassCapacity } from "@/content/classes";
 import { inList, rpc, select, selectOne, update, type Db, type DbResult } from "./db";
 import type { Attendance, AttendanceStatus, ClassSessionRow, Package, PtSession, PtStatus } from "./types";
 
@@ -13,6 +14,16 @@ export function listClassSessions(db: Db, from: string, to: string): Promise<DbR
 export async function getClassSession(db: Db, slot: string, date: string): Promise<DbResult<ClassSessionRow | null>> {
   const result = await select<ClassSessionRow>(db, "akb_class_overview", [["slot", `eq.${slot}`], ["class_date", `eq.${date}`], ["limit", "1"]]);
   return result.ok ? { ok: true, data: result.data[0] ?? null } : result;
+}
+
+/** The usual class size (the portal setting; 12 until Alex changes it, and if it can't be read). */
+export async function getDefaultCapacity(db: Db): Promise<number> {
+  const result = await rpc<number>(db, "akb_default_class_capacity", {});
+  return result.ok && Number.isInteger(result.data) && result.data > 0 ? result.data : defaultClassCapacity;
+}
+
+export function setDefaultCapacity(db: Db, capacity: number): Promise<DbResult<null>> {
+  return rpc<null>(db, "akb_set_default_class_capacity", { p_capacity: capacity });
 }
 
 /** The class row for a timetable date, created if needed. Only call for a date checked with isTimetableClass. */

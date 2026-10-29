@@ -246,7 +246,7 @@ test("class pages exist only for real timetable dates", async ({ page }) => {
   }
 });
 
-test("class capacity: not full until a capacity is set and reached", async ({ page, request }) => {
+test("class capacity: a date's own size is kept, and full is refused", async ({ page, request }) => {
   const date = next(0, 3);
   const p1 = unique("Cap One");
   const p2 = unique("Cap Two");
@@ -259,7 +259,7 @@ test("class capacity: not full until a capacity is set and reached", async ({ pa
   await expect(page.getByText("Full", { exact: true })).toHaveCount(0);
   await page.getByLabel("Capacity").fill(String(booked + 1));
   await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText(/Capacity: \d+/)).toBeVisible();
+  await expect(page.getByText(/This class holds \d+/)).toBeVisible();
   const add = page.getByRole("form", { name: "Add someone to this class" });
   await add.getByLabel("Client").selectOption({ label: p1.name });
   await add.getByRole("button", { name: "Add to class" }).click();
@@ -268,6 +268,29 @@ test("class capacity: not full until a capacity is set and reached", async ({ pa
   await add.getByLabel("Client").selectOption({ label: p2.name });
   await add.getByRole("button", { name: "Add to class" }).click();
   await expect(add.getByRole("alert")).toContainText("That class is full");
+});
+
+test("class size: 12 to begin with, and Alex changes it for every class", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/coach/classes");
+  const form = page.getByRole("form", { name: "Class size" });
+  await expect(form.getByLabel("Places in every class")).toHaveValue("12");
+  await form.getByLabel("Places in every class").fill("0");
+  await form.getByRole("button", { name: "Save" }).click();
+  await expect(form.getByRole("alert")).toContainText("Please check the highlighted fields");
+  await form.getByLabel("Places in every class").fill("14");
+  await form.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Classes now hold 14" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("form", { name: "Class size" }).getByLabel("Places in every class")).toHaveValue("14");
+  // A date shows the usual size until it has its own.
+  await page.goto(`/coach/classes/${next(0, 3)}/mon-evening`);
+  await expect(page.locator("h1 + p")).toContainText(/of (14|\d+) booked/);
+  await page.goto("/coach/classes");
+  const back = page.getByRole("form", { name: "Class size" });
+  await back.getByLabel("Places in every class").fill("12");
+  await back.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Classes now hold 12" })).toBeVisible();
 });
 
 test("one-to-one: overlapping times are refused; reschedule and cancel keep the history", async ({ page, request }) => {

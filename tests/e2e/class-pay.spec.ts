@@ -83,6 +83,8 @@ test.describe("booking a group class and paying online", () => {
     await page.goto(`${PAY}${manage}`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("You're booked.");
     await expect(page.getByText(/cancelling now gives you a credit/)).toBeVisible();
+    // Contrast is measured on the finished page, not mid fade-in.
+    await page.addStyleTag({ content: "*,*::before,*::after{transition:none!important;animation:none!important}[data-reveal]{opacity:1!important;transform:none!important}" });
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.getByRole("button", { name: "Cancel my place" }).click();
     await expect(page.getByText("Your place is cancelled.")).toBeVisible();

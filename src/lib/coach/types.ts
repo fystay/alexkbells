@@ -80,7 +80,10 @@ export interface ClassSessionRow {
   class_date: string;
   starts_at: string;
   duration_minutes: number;
+  /** The size that applies: the date's own, else the usual class size. */
   capacity: number | null;
+  /** Only what Alex set for this date (null: the usual size applies). */
+  capacity_set?: number | null;
   notes: string;
   booked: number;
   attended: number;

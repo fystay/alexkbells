@@ -31,7 +31,7 @@ export function ClassPicker({ className }: { className?: string }) {
   const minutes = sessions[0]?.durationMinutes;
   const classes: WeekClass[] = sessions.map((s) => {
     const [hours, m] = s.start.split(":").map(Number);
-    return { id: s.id, day: s.day, dayIndex: DAYS.indexOf(s.day), start: hours * 60 + m, time: formatTime(s.start), durationMinutes: s.durationMinutes ?? 60 };
+    return { id: s.id, day: s.day, dayIndex: DAYS.indexOf(s.day), start: hours * 60 + m, time: formatTime(s.start), startTime: s.start, durationMinutes: s.durationMinutes ?? 60 };
   });
   const bookable = cta.kind === "booking" && !cta.external;
   const l = site.location;

@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { failure, success, type ActionState } from "@/lib/coach/action-state";
-import { addAttendee, ATTENDANCE_STATUSES, cancelClass, ensureClassSession, getAttendance, setAttendance, updateClassSession } from "@/lib/coach/bookings";
+import { addAttendee, ATTENDANCE_STATUSES, cancelClass, ensureClassSession, getAttendance, setAttendance, setDefaultCapacity, updateClassSession } from "@/lib/coach/bookings";
 import { classChargeDescription, classDurationMinutes, findSlot, isTimetableClass, occurrence } from "@/lib/coach/classes";
 import { getClient } from "@/lib/coach/clients";
 import { actionContext } from "@/lib/coach/context";
@@ -112,5 +112,18 @@ export async function updateClassAction(_prev: ActionState, formData: FormData):
   const result = await updateClassSession(ctx.db, id.data, { capacity, notes });
   if (!result.ok) return failure(dbMessage(result.error));
   refresh();
-  return success(capacity ? `Saved. Capacity: ${capacity}.` : "Saved. No capacity set, so the class never shows as full.");
+  return success(capacity ? `Saved. This class holds ${capacity}.` : "Saved. This class uses the usual class size.");
+}
+
+/** The usual class size, for every class without its own. */
+export async function setDefaultCapacityAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const ctx = await actionContext();
+  if ("error" in ctx) return ctx.error;
+  const form = new FormReader(formData);
+  const size = form.int("size", { label: "the class size", min: 1, max: 200, required: true });
+  if (!form.ok || size === null) return failure(CHECK, form.errors);
+  const result = await setDefaultCapacity(ctx.db, size);
+  if (!result.ok) return failure(dbMessage(result.error));
+  refresh();
+  return success(`Saved. Classes now hold ${size} unless you set a different size for a date.`);
 }

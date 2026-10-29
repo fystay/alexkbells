@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { cn } from "@/lib/cn";
+import { useClassStatus } from "@/components/classes/useClassStatus";
 
 export interface WeekClass {
   id: string;
@@ -15,6 +16,8 @@ export interface WeekClass {
   start: number;
   /** "6:30 pm" */
   time: string;
+  /** "18:30" */
+  startTime: string;
   durationMinutes: number;
 }
 
@@ -95,9 +98,15 @@ export function ClassWeek({
       })
     : null;
   const next = deltas ? deltas.indexOf(Math.min(...deltas)) : null;
-  const sel = choice ?? next ?? 0;
+  const status = useClassStatus(classes.map((c) => ({ id: c.id, day: c.day, start: c.startTime })));
+  const wanted = choice ?? next ?? 0;
+  // A fully booked class sends people to the next class with a place, and says so.
+  const fullChoice = status?.get(classes[wanted].id);
+  const redirect = fullChoice?.full ? fullChoice.redirect : null;
+  const redirectIndex = redirect ? classes.findIndex((c) => c.id === redirect.id) : -1;
+  const sel = redirectIndex >= 0 ? redirectIndex : wanted;
   const chosen = classes[sel];
-  const href = classHrefBase ? `${classHrefBase}${chosen.id}` : bookHref;
+  const href = classHrefBase ? `${classHrefBase}${chosen.id}${redirect ? `&date=${redirect.date}` : ""}` : bookHref;
   const button = buttonClasses("action", "w-full px-6");
 
   return (
@@ -127,6 +136,7 @@ export function ClassWeek({
         {classes.map((c, i) => {
           const [time, period] = c.time.split(" ");
           const isNext = next === i;
+          const isFull = status?.get(c.id)?.full ?? false;
           return (
             <li key={c.id} className="relative min-w-0">
               <button
@@ -143,8 +153,8 @@ export function ClassWeek({
                 <span className="text-[0.8125rem] font-semibold tracking-[0.24em] uppercase">{c.day.slice(0, 3)}</span>
                 <span className="font-display text-[clamp(1.75rem,8vw,2.5rem)] leading-[1.15] tabular-nums">{time}</span>
                 <span className="text-[0.9375rem]">{period}</span>
-                <span className={cn("mt-2 rounded-full border border-current px-2 py-0.5 text-[0.6875rem] font-semibold tracking-[0.1em] whitespace-nowrap uppercase", !isNext && "invisible")}>
-                  {isNext ? (deltas && deltas[i] <= 0 ? "On now" : "Next up") : "\u00a0"}
+                <span className={cn("mt-2 rounded-full border border-current px-2 py-0.5 text-[0.6875rem] font-semibold tracking-[0.1em] whitespace-nowrap uppercase", isFull && "px-1.5 text-[0.625rem] tracking-[0.04em]", !isNext && !isFull && "invisible")}>
+                  {isFull ? "Fully booked" : isNext ? (deltas && deltas[i] <= 0 ? "On now" : "Next up") : "\u00a0"}
                 </span>
               </button>
             </li>
@@ -199,6 +209,12 @@ export function ClassWeek({
           </Link>
         )}
         <p aria-live="polite" className="mt-3">
+          {fullChoice?.full ? (
+            <>
+              {classes[wanted].day} {classes[wanted].time} is fully booked.{" "}
+              {redirect ? <>We&apos;ve picked the next class, {redirect.day} {classes[sel].time}. </> : "There are no places in the next four weeks. "}
+            </>
+          ) : null}
           {deltas ? (
             <>
               {chosen.day} {dateIn(Math.max(deltas[sel], 0))}, {chosen.time} selected <span className="tabular-nums">({untilText(deltas[sel])})</span>. Next, add your details.
