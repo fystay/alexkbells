@@ -10,7 +10,7 @@ export const site = {
   /** Brand themes, shown together as "STRENGTH • COMMUNITY • DISCIPLINE" (as in Alex's launch post). */
   themes: ["Strength", "Community", "Discipline"] as const,
   description:
-    "RAENG Fitness in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and online coaching.",
+    "RAENG Fitness in Cumbernauld, Glasgow: group kettlebell classes with flexible memberships, plus 1:1 and small group coaching.",
 
   /**
    * The supplied logo (assets/brand/raeng-fitness-logo-source.jpg: RAENG FITNESS,
@@ -67,18 +67,21 @@ export const site = {
   },
 } as const;
 
-/** Main navigation: one real page each, in this order. */
+/**
+ * Main navigation: Alex's five pages, in his layout (2026-10-29). Memberships
+ * live on Classes; Online Coaching is off the site for now (the page redirects
+ * to Coaching).
+ */
 export const mainNav = [
   { label: "Home", href: "/" },
   { label: "Classes", href: "/classes" },
-  { label: "Memberships", href: "/memberships" },
-  { label: "1:1 Coaching", href: "/coaching" },
-  { label: "Online Coaching", href: "/online-coaching" },
-  { label: "About RAENG", href: "/about" },
+  { label: "Coaching", href: "/coaching" },
+  { label: "About", href: "/about" },
+  { label: "FAQs & Contact", href: "/contact" },
 ] as const;
 
-/** Extra page listed in the phone menu and footer, after mainNav. */
-export const pageNav = [{ label: "Contact", href: "/contact" }] as const;
+/** Extra pages listed in the phone menu and footer, after mainNav (none now: Contact is in mainNav). */
+export const pageNav: readonly { label: string; href: string }[] = [];
 
 /** Sign-in for members and anyone who has booked (2026-10-26; "Sign in" since 2026-10-28): in the menu and the footer, before Alex's. */
 export const memberSignInNav = { label: "Sign in", href: "/account/sign-in" } as const;

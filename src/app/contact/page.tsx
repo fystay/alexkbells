@@ -3,15 +3,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { pageMetadata } from "@/lib/metadata";
 import { formatAddressLines, mapsUrl, site } from "@/content/site";
-import { getOnlineCoachingAction, getPrimaryCta } from "@/lib/booking";
+import { getPrimaryCta } from "@/lib/booking";
 import { Section } from "@/components/ui/Section";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Faq } from "@/components/sections/Faq";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact",
+  title: "FAQs & Contact",
   description:
-    "Contact RAENG Fitness about classes, memberships, 1:1 coaching or online coaching in Cumbernauld, Glasgow.",
+    "Common questions and contact details for RAENG Fitness: classes, memberships, 1:1 coaching and small group coaching in Cumbernauld, Glasgow.",
   path: "/contact",
 });
 
@@ -33,19 +33,18 @@ function Way({ title, detail, children }: { title: string; detail?: ReactNode; c
 /**
  * Every way to reach RAENG in one framed card (owner's pick D, 2026-10-28; the
  * same box as the plan list): Book now first (the main action on every page),
- * then Instagram, Facebook, online coaching (only while its form can send),
+ * then Instagram, Facebook,
  * email and phone (only once confirmed) and the venue with directions. Then
  * the questions not answered elsewhere.
  */
 export default function ContactPage() {
   const { email, phone } = site.contact;
-  const online = getOnlineCoachingAction();
   const booking = getPrimaryCta();
   const [venue, ...rest] = formatAddressLines();
 
   return (
     <>
-      <PageHeader eyebrow="Contact" title="Contact RAENG" intro="Book, message Alex, or come and find us." />
+      <PageHeader eyebrow="FAQs & Contact" title="FAQs & Contact" intro="Book, message Alex, or come and find us." />
 
       <Section tone="white" labelledBy="ways-heading" className="pt-0 sm:pt-0 lg:pt-0">
         <h2 id="ways-heading" className="sr-only">
@@ -74,13 +73,6 @@ export default function ContactPage() {
               Open<span className="sr-only"> Alex on Facebook (opens in a new tab)</span>
             </a>
           </Way>
-          {online.href !== "/contact" ? (
-            <Way title="Online coaching" detail="Enquiry, nothing to pay">
-              <Link href={online.href} className={linkClass}>
-                Enquire<span className="sr-only"> about online coaching</span>
-              </Link>
-            </Way>
-          ) : null}
           {email ? (
             <Way title="Email" detail={email}>
               <a href={`mailto:${email}`} className={linkClass}>
@@ -102,8 +94,8 @@ export default function ContactPage() {
           </Way>
         </ul>
       </Section>
-      {/* Only what isn't answered elsewhere (2026-10-27). */}
-      <Faq tone="plain" ids={["online", "one-to-one", "contact"]} />
+      {/* Every common question (Alex's layout, 2026-10-29). */}
+      <Faq tone="plain" />
     </>
   );
 }

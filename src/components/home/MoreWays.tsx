@@ -1,29 +1,33 @@
 import Link from "next/link";
 import { getService } from "@/content/services";
+import { smallGroupCoaching } from "@/content/smallGroup";
 import { publishable } from "@/lib/publish";
 import { formatGbp } from "@/lib/schedule";
 import { Section, SectionHeading } from "@/components/ui/Section";
 
-function leadPrice(id: "one-to-one" | "online-coaching") {
+function leadPrice(id: "one-to-one") {
   const price = publishable(getService(id).prices)[0];
   return price ? `${price.prefix ? `${price.prefix} ` : ""}${formatGbp(price.amountGbp)} ${price.unit}` : null;
 }
 
 /**
- * The other two ways to train, after the memberships (option 1 of the card
- * overhaul, owner 2026-10-26): one row each between thin rules, name and
- * price on the first line, what it is and "Explore" on the second. The whole
- * row is the way into its page. Only confirmed prices are shown.
+ * Services, straight under the hero (Alex's layout, 2026-10-29; he offers group
+ * kettlebell classes, 1:1 coaching and small group coaching): one row each
+ * between thin rules, name and price on the first line, what it is and "Explore"
+ * on the second. The whole row is the way into its page. Only confirmed prices
+ * are shown (small group coaching has none yet).
  */
 export function MoreWays() {
+  const classPrice = publishable(getService("group-classes").prices)[0];
   const ways = [
+    { href: "/classes", title: "Group classes", body: "Coached kettlebell sessions, all levels.", price: classPrice ? `${formatGbp(classPrice.amountGbp)} a class` : null },
     { href: "/coaching", title: "1:1 coaching", body: "Face-to-face coaching with Alex.", price: leadPrice("one-to-one") },
-    { href: "/online-coaching", title: "Online coaching", body: "Personalised programming, wherever you train.", price: leadPrice("online-coaching") },
+    { href: "/coaching#small-group", title: smallGroupCoaching.name, body: smallGroupCoaching.summary, price: null },
   ];
   return (
-    <Section id="more-ways" labelledBy="more-ways-heading">
+    <Section id="ways" labelledBy="ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-        <SectionHeading id="more-ways-heading" className="lg:col-span-5" title="More ways to train." />
+        <SectionHeading id="ways-heading" className="lg:col-span-5" title="Ways to train." />
         <ul className="mt-6 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
             <li key={w.href}>

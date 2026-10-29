@@ -41,6 +41,7 @@ export function Hero() {
                 shadow keeps the white words readable on the film. */}
             <h1 id="hero-heading">
               <span className="hero-shadow block font-display text-[clamp(3rem,1.9rem+4.6vw,5.25rem)] leading-[1.02]">{hero.headline}</span>
+              <span className="hero-shadow mt-3 block text-xl leading-snug font-semibold sm:text-2xl">{hero.tagline}</span>
               <span className="hero-shadow eyebrow mt-4 block text-white">{hero.headlineSecondary}</span>
             </h1>
             {/* One button; the second option is a quieter text link (owner, 2026-10-23). */}

@@ -6,8 +6,6 @@ export const publicRoutes = [
   "/memberships/join",
   "/coaching",
   "/contact",
-  "/online-coaching",
-  "/online-coaching/enquire",
   "/about",
   "/privacy",
   "/book",

@@ -20,6 +20,13 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Online coaching is off the site for now (Alex, 2026-10-29); its pages go to Coaching until it returns.
+  async redirects() {
+    return [
+      { source: "/online-coaching", destination: "/coaching", permanent: false },
+      { source: "/online-coaching/enquire", destination: "/coaching", permanent: false },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders() }];
   },

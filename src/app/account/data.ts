@@ -2,6 +2,7 @@ import { fullClasses } from "@/lib/class-capacity";
 import { londonToday } from "@/lib/coach/time";
 import { memberOverview } from "@/lib/member-auth";
 import { coachingOverview, coachingStatus } from "@/lib/coaching";
+import { onlineCoachingOffered } from "@/content/services";
 import { memberSettings } from "@/lib/member-settings";
 import { requireMember } from "@/lib/member-session";
 import { paymentDue } from "@/lib/membership-checkout";
@@ -72,7 +73,7 @@ export async function loadMembers(searchParams: Promise<Params>) {
   const one = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : null);
   const done = one("done") ? (DONE[one("done")!] ?? null) : null;
   const error = one("error") ? (ERRORS[one("error")!] ?? ERRORS.failed) : null;
-  return { member, now, today, overview, settings: settings.ok ? settings.data : null, coaching: coaching.ok ? coaching.data : null, full, due, done, error, justBooked: done ? one("at") : null, confirm: one("confirm") };
+  return { member, now, today, overview, settings: settings.ok ? settings.data : null, coaching: coaching.ok && (coaching.data.active || onlineCoachingOffered) ? coaching.data : null, full, due, done, error, justBooked: done ? one("at") : null, confirm: one("confirm") };
 }
 
 

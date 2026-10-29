@@ -217,77 +217,9 @@ test.describe("booking prototype (demo availability)", () => {
   });
 });
 
-test.describe("online coaching onboarding", () => {
-  test("site navigation → tailored questions → review → sent to Alex", async ({ page, request }) => {
-    await page.goto("/");
-    await page.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Online Coaching" }).click();
-    await expect(page).toHaveURL(/\/online-coaching$/);
-    await page.getByRole("link", { name: "Enquire about online coaching" }).first().click();
-    await expect(page).toHaveURL(/\/online-coaching\/enquire$/);
-    await expect(page.getByRole("radio", { name: /Get stronger/ })).toBeVisible();
-    // Worded as an enquiry, never as signing up.
-    await expect(page.getByRole("heading", { level: 1, name: "Ask about online coaching" })).toBeVisible();
-    await expect(page.locator("p:visible", { hasText: "This is an enquiry, not a sign-up: nothing is booked and there's nothing to pay." })).toBeVisible();
-    await expect(page.locator("main")).not.toContainText(/get started|sign up|join now/i);
-    // Not a calendar booking.
-    await expect(page.getByTestId("calendar-grid")).toHaveCount(0);
-
-    // Progressive disclosure: "Something else" asks for detail.
-    await expect(continueButton(page)).toBeDisabled();
-    await choose(page, "Something else");
-    await expect(continueButton(page)).toBeDisabled();
-    await page.getByLabel("Tell Alex what you'd like to achieve").fill("Prepare for a kettlebell sport event");
-    await continueButton(page).click();
-
-    await expect(page.getByRole("heading", { name: "Your training" })).toBeFocused();
-    await choose(page, "Some experience");
-    await continueButton(page).click();
-
-    // Phone is only asked for when chosen, and then required.
-    await expect(page.getByRole("textbox", { name: "Phone" })).toHaveCount(0);
-    await page.getByRole("textbox", { name: "Name" }).fill("Online Tester");
-    await page.getByRole("textbox", { name: "Email" }).fill("online@example.com");
-    await choose(page, "Phone");
-    await page.getByRole("button", { name: "Review" }).click();
-    await expect(page.getByText("Enter your phone number.")).toBeVisible();
-    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByRole("button", { name: "Review" }).click();
-
-    await expect(page.getByRole("heading", { name: "Review and send" })).toBeFocused();
-    await expect(page.getByText("Prepare for a kettlebell sport event")).toBeVisible();
-    // Edit an answer and come back.
-    await page.getByRole("button", { name: "Edit training" }).click();
-    await choose(page, "I train with kettlebells regularly");
-    await continueButton(page).click();
-    await page.getByRole("button", { name: "Review" }).click();
-    await expect(page.getByText("I train with kettlebells regularly")).toBeVisible();
-
-    await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "Send to Alex" }).click();
-    await expect(page.getByRole("status")).toContainText("Alex will reply personally");
-
-    const sent = (await emails(request)).find((e) => e.payload.subject === "Online coaching enquiry: Online Tester");
-    expect(sent).toBeDefined();
-    expect(sent!.payload.reply_to).toBe("online@example.com");
-    expect(sent!.payload.text).toContain("Main goal: Something else: Prepare for a kettlebell sport event");
-    expect(sent!.payload.text).toContain("Prefers contact by: Phone (07700 900123)");
-  });
-
-  test("an email-service failure is reported, never shown as sent", async ({ page }) => {
-    await page.goto("/online-coaching/enquire");
-    await choose(page, "Get stronger");
-    await continueButton(page).click();
-    await choose(page, "New to kettlebells");
-    await continueButton(page).click();
-    await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Online");
-    await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
-    await page.getByRole("button", { name: "Review" }).click();
-    await page.waitForTimeout(3100);
-    await page.getByRole("button", { name: "Send to Alex" }).click();
-    await expect(page.locator("main [role=alert]")).toContainText("couldn't be sent");
-    await expect(page.getByText("Enquiry sent")).toHaveCount(0);
-  });
-});
+// The online coaching enquiry journey (site → questions → review → sent to Alex) is off the site for now
+// (Alex, 2026-10-29: "something I'll come into at a later time"); site.spec.ts checks the redirect.
+// The code stays (components/booking/OnlineOnboarding, lib/online-enquiry); restore these tests from git history when it returns.
 
 test.describe("production configuration", () => {
   for (const path of ["/", "/book", "/book/group-class", "/book/one-to-one", "/online-coaching", "/online-coaching/enquire", "/classes", "/about"]) {

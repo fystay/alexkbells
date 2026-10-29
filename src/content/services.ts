@@ -71,6 +71,15 @@ export const services: Service[] = [
   },
 ];
 
+/**
+ * Whether online coaching is sold (Alex, 2026-10-29: removed "for now", he'll
+ * "come into it at a later time"). Off: the public pages redirect to Coaching,
+ * members who don't have it see no "Unlock coaching" cards, and members who
+ * already have it keep their coaching area. Switch on, and restore the
+ * /online-coaching redirects (next.config.ts) and routes, when it returns.
+ */
+export const onlineCoachingOffered = false;
+
 export function getService(id: Service["id"]): Service {
   const service = services.find((s) => s.id === id);
   if (!service) throw new Error(`Unknown service: ${id}`);

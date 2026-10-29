@@ -4,6 +4,7 @@ import { AccountUnavailable } from "@/components/members/Cards";
 import { CoachingShell } from "@/components/members/CoachingShell";
 import { Icon } from "@/components/members/icons";
 import { getOnlineCoachingAction } from "@/lib/booking";
+import { onlineCoachingOffered } from "@/content/services";
 import { COACHING_PATH, onlineCoachingPrice } from "@/lib/coaching";
 import { site } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
@@ -44,6 +45,8 @@ export default async function CoachingUnlockPage({ searchParams }: { searchParam
   const d = await loadCoaching(searchParams);
   if (!d.overview.ok) return <AccountUnavailable />;
   if (d.coaching?.active) redirect(COACHING_PATH);
+  // Online coaching is off for now (content/services.ts): nothing to unlock.
+  if (!onlineCoachingOffered) redirect("/account");
   const price = onlineCoachingPrice();
   const enquiry = getOnlineCoachingAction();
 
