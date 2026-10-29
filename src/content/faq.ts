@@ -14,7 +14,8 @@ export const faq: FaqItem[] = [
   {
     id: "where",
     question: "Where are classes held?",
-    answer: `At ${site.location.venue}, ${site.location.street}, ${site.location.town}, ${site.location.postcode}.`,
+    // Without the venue name, as Alex asked for the location (2026-10-29): just the address.
+    answer: `At ${site.location.street}, ${site.location.town}, ${site.location.postcode}.`,
     status: "confirmed",
   },
   {

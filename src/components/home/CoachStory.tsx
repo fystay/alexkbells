@@ -78,7 +78,7 @@ export function CoachStory({
                 <BeforeAfter before={photos.before} after={photos.after} beforeLabel={journey.beforeLabel} afterLabel={journey.afterLabel} />
               </div>
               <figcaption className={alex ? "mx-auto mt-3 max-w-[17rem] text-sm sm:max-w-xs lg:mx-0 lg:max-w-sm" : "mt-3 text-sm"}>
-                {alex ? alex.caption : journey.caption} Drag to compare.
+                {alex ? alex.caption : `${journey.caption} Drag to compare.`}
               </figcaption>
             </figure>
           ) : portrait ? (

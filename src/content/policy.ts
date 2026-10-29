@@ -57,7 +57,7 @@ export const membershipTermsAlex = {
   title: "Membership terms",
   intro: "Everything you need to know about using your class credits.",
   items: [
-    { title: "Using your credits", body: "One class credit is used for each class booking. Your remaining balance is visible in your account." },
+    { title: "Using your credits", body: "One class credit is used for each class booking. Your remaining balance should be visible in your booking account." },
     { title: "Four-week renewal", body: "Memberships renew automatically every four weeks, with a new allocation of class credits." },
     { title: "Unused credits", body: "Unused credits expire at the end of your four-week membership period and do not roll over." },
     { title: "Cancellations", body: "Cancel a class at least 24 hours before the session to have your credit returned. Late cancellations and missed classes forfeit the credit." },
