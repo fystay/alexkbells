@@ -6,8 +6,8 @@ import { onlineJoinEnabled } from "@/lib/membership-checkout";
 export const metadata: Metadata = pageMetadata({
   title: "Book a Group Class",
   description: onlineJoinEnabled()
-    ? "Book a coached group kettlebell class at Media House, Cumbernauld, and pay online."
-    : "Book a coached group kettlebell class at Media House, Cumbernauld. Alex confirms every booking personally.",
+    ? "Book a coached group kettlebell class in Cumbernauld, and pay online."
+    : "Book a coached group kettlebell class in Cumbernauld. Alex confirms every booking personally.",
   path: "/book/group-class",
 });
 

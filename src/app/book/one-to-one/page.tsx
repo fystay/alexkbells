@@ -4,7 +4,7 @@ import { BookingPage } from "@/components/booking/BookingPage";
 
 export const metadata: Metadata = pageMetadata({
   title: "Book a One-to-One Session",
-  description: "Book an individual kettlebell coaching session with Alex at Media House, Cumbernauld.",
+  description: "Book an individual kettlebell coaching session with Alex in Cumbernauld.",
   path: "/book/one-to-one",
 });
 

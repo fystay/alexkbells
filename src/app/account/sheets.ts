@@ -11,7 +11,7 @@ import type { SheetPayload } from "@/components/members/sheet";
  * Each has a key for its no-JavaScript link (?confirm=…).
  */
 
-const where = `${groupClass.name} at ${site.location.venue}, ${site.location.town}.`;
+const where = `${groupClass.name} at ${site.location.street}, ${site.location.town}.`;
 
 export const sheetKey = {
   book: (s: WeekSlot) => `book.${s.date}.${s.slot}`,

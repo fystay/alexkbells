@@ -39,13 +39,13 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
           ? "Choose a service, then when suits you. Group classes are booked and paid online; Alex confirms one-to-one sessions personally."
           : mode === "request"
             ? `${initialService ? "Choose when suits you." : "Choose a service, then when suits you."} Alex confirms every place personally.`
-            : "Group classes and one-to-one coaching at Media House, Cumbernauld.";
+            : "Group classes and one-to-one coaching in Cumbernauld.";
 
   return (
     <section aria-labelledby="book-heading" className="bg-paper">
       <div className="container-page pt-6 pb-16 sm:pt-10 lg:pb-24">
         <header className="max-w-2xl">
-          <p className="eyebrow text-muted">Book · {site.location.venue}, {site.location.town}</p>
+          <p className="eyebrow text-muted">Book · {site.location.town}</p>
           <h1 id="book-heading" className="mt-3 font-display text-h2 text-balance">
             {statement(title)}
           </h1>

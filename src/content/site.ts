@@ -32,7 +32,6 @@ export const site = {
   },
 
   location: {
-    venue: "Media House",
     street: "1A Dunns Wood Road",
     town: "Cumbernauld",
     city: "Glasgow",
@@ -99,11 +98,11 @@ export const footerNav = [
 
 export function formatAddressLines(): string[] {
   const l = site.location;
-  return [l.venue, l.street, `${l.town}, ${l.city}`, l.postcode];
+  return [l.street, `${l.town}, ${l.city}`, l.postcode];
 }
 
 export function mapsUrl(): string {
   const l = site.location;
-  const query = [l.venue, l.street, l.town, l.postcode].join(", ");
+  const query = [l.street, l.town, l.postcode].join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }

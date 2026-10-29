@@ -28,7 +28,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Who we are",
     body: (
       <p>
-        This website belongs to {site.name}, a kettlebell coach based at {site.location.venue},{" "}
+        This website belongs to {site.name}, a kettlebell coach based at{" "}
         {site.location.street}, {site.location.town}, {site.location.postcode}. You can contact us on
         Instagram at{" "}
         <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">

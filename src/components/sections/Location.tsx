@@ -12,7 +12,7 @@ export function Location({ headingId = "location-heading", tone = "white" }: { h
             eyebrow="Location"
             title={
               <>
-                {site.location.venue},<br />
+                {site.location.street},<br />
                 {site.location.town}.
               </>
             }

@@ -111,7 +111,7 @@ export function CoachShell({ email, shell, children }: { email: string; shell: S
                 Memberships
               </Link>
               <a href={mapsUrl()} {...external} className="inline-flex min-h-11 items-center hover:underline">
-                Media House{NEW_TAB}
+                Directions{NEW_TAB}
               </a>
             </nav>
           </MembersDrawer>
