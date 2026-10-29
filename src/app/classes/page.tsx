@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/metadata";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
+import { BILLING_WEEKS, membershipPlans } from "@/content/memberships";
+import { getService } from "@/content/services";
+import { formatPenceShort, maxSavingPence } from "@/lib/membership";
+import { PlanList, PlanTerms } from "@/components/memberships/PlanList";
 import { images } from "@/content/images";
 import { getPrimaryCtaFor } from "@/lib/booking";
 import { Section, SectionHeading } from "@/components/ui/Section";
@@ -28,13 +32,15 @@ export const metadata: Metadata = pageMetadata({
 /**
  * The classes page, the owner's design (2026-10-28): the class film and Book
  * now; what the classes build (three line drawings); how to join in three
- * steps on a rail (`ClassSteps`: the week, the price and how to pay, where,
- * the first session and what to bring); then Book now and one line to the
- * other ways to train.
+ * steps on a rail you open one at a time (`ClassSteps`: pick a class; the price,
+ * how often you'll train and what a membership saves; where, the first session
+ * and what to bring); then Book now, the memberships (the home page's, owner
+ * 2026-10-29: sell them here too) and one line to the other ways to train.
  */
 export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
   const open = booking.kind === "booking";
+  const payg = getService("group-classes").prices[0];
 
   return (
     <>
@@ -42,7 +48,11 @@ export default function ClassesPage() {
         photo={images.classes}
         title="Group kettlebell training."
         eyebrow="Classes in Cumbernauld"
-        cta={{ href: booking.href, label: booking.label, external: booking.external }}
+        cta={{
+          href: booking.href,
+          label: booking.label,
+          external: booking.external,
+        }}
         moreHref="#join"
         moreLabel="How to join"
       />
@@ -51,30 +61,65 @@ export default function ClassesPage() {
       <Section id="join" labelledBy="join-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <div className="lg:col-span-5">
-            <SectionHeading id="join-heading" eyebrow="How to join" title={firstClassSteps.title} />
+            <SectionHeading
+              id="join-heading"
+              eyebrow="How to join"
+              title={firstClassSteps.title}
+            />
             {open ? <InstagramAlternative className="mt-4" /> : null}
           </div>
           <ClassSteps className="mt-8 lg:col-span-7 lg:mt-0" />
         </div>
       </Section>
 
-      <Section spacing="compact" labelledBy="book-heading" className="pt-0 sm:pt-0">
+      <Section
+        spacing="compact"
+        labelledBy="book-heading"
+        className="pt-0 sm:pt-0"
+      >
         <h2 id="book-heading" className="sr-only">
           Book
         </h2>
         <div className="border-t border-line pt-8 lg:ml-[calc(41.666%+1.4rem)]">
-          <StartTraining href={booking.href} label={booking.label} external={booking.external} className="w-full sm:w-auto sm:px-10" />
+          <StartTraining
+            href={booking.href}
+            label={booking.label}
+            external={booking.external}
+            className="w-full sm:w-auto sm:px-10"
+          />
           <p className="mt-5">
             Prefer personal coaching? Try{" "}
-            <Link href="/coaching" className="font-semibold underline underline-offset-4 hover:no-underline">
+            <Link
+              href="/coaching"
+              className="font-semibold underline underline-offset-4 hover:no-underline"
+            >
               1:1 coaching
             </Link>{" "}
             or{" "}
-            <Link href="/online-coaching" className="font-semibold underline underline-offset-4 hover:no-underline">
+            <Link
+              href="/online-coaching"
+              className="font-semibold underline underline-offset-4 hover:no-underline"
+            >
               online coaching
             </Link>
             .
           </p>
+        </div>
+      </Section>
+
+      <Section id="memberships" labelledBy="memberships-heading">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
+          <SectionHeading
+            id="memberships-heading"
+            className="lg:col-span-5"
+            eyebrow="Memberships"
+            title={`Save up to ${formatPenceShort(maxSavingPence(membershipPlans, payg.amountGbp))}.`}
+            intro={`Every ${BILLING_WEEKS} weeks, against pay as you go.`}
+          />
+          <div className="mt-8 lg:col-span-7 lg:mt-0">
+            <PlanList />
+            <PlanTerms className="mt-8" />
+          </div>
         </div>
       </Section>
     </>
