@@ -96,7 +96,7 @@ export function PlanList({ className, includePayg = true }: { className?: string
         ) : null}
       </ul>
       {/* Alex's mockup: how the savings are worked out. */}
-      <p className="mt-4 text-sm">
+      <p className="border-t border-line px-4 py-4 text-sm sm:px-5">
         Savings are calculated against paying £{payg.amountGbp} per class for the same number of bookings within {BILLING_WEEKS} weeks.
       </p>
     </ChoiceCards>
