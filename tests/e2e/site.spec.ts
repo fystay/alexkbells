@@ -472,7 +472,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await page.goto("/");
   // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions, then "Ready to start?"; no "Coached by" line.
   const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading", "book"]);
+  expect(order).toEqual(["hero-heading", "ways", "classes", "memberships", "why-kettlebells", "coach", "philosophy", "faq-heading", "book"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
   // Why kettlebells in Alex's words (mockup, 2026-10-29).

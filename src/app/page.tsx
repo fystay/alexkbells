@@ -36,7 +36,6 @@ export default function HomePage() {
       <Hero />
       <div className="section-rules">
         <MoreWays />
-        <WhyKettlebells />
         <Section id="classes" labelledBy="classes-heading">
           <div className={split}>
             {/* The owner's class times (2026-10-28), also on /classes; the count comes from the timetable. */}
@@ -67,6 +66,8 @@ export default function HomePage() {
             </div>
           </div>
         </Section>
+        {/* Why kettlebells sits under Memberships (owner, 2026-10-30). */}
+        <WhyKettlebells />
         <CoachStory tone="plain" alex={homeCoach} showAboutLink={false} />
         <Testimonials />
         <PhilosophyTeaser />
