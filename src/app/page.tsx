@@ -67,7 +67,7 @@ export default function HomePage() {
             </div>
           </div>
         </Section>
-        <CoachStory tone="plain" alex={homeCoach} />
+        <CoachStory tone="plain" alex={homeCoach} showAboutLink={false} />
         <Testimonials />
         <PhilosophyTeaser />
         <Faq

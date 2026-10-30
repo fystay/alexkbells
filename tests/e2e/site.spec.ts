@@ -500,7 +500,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await expect(more).toContainText("From £35 per session");
   await expect(page.locator("blockquote")).toHaveCount(0);
   const coach = page.locator("#coach");
-  await expect(coach.getByRole("link", { name: "About RAENG" })).toHaveAttribute("href", "/about");
+  await expect(coach.getByRole("link", { name: "About RAENG" })).toHaveCount(0); // removed (owner, 2026-10-30)
   await expect(coach.getByText("Before", { exact: true })).toBeVisible();
   await expect(coach.getByText("Now", { exact: true })).toBeVisible();
 });
