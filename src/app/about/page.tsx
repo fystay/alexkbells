@@ -8,7 +8,6 @@ import { CoachStory } from "@/components/home/CoachStory";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PageHeader } from "@/components/sections/PageHeader";
 import { Philosophy } from "@/components/sections/Philosophy";
-import { CompoundChart } from "@/components/sections/CompoundChart";
 
 export const metadata: Metadata = pageMetadata({
   title: "About RAENG",
@@ -31,9 +30,7 @@ export default function AboutPage() {
     <div className="section-rules">
       <PageHeader eyebrow="About" title="About RAENG." />
 
-      <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()} eyebrow="Alex's story">
-        <CompoundChart className="mt-6" />
-      </CoachStory>
+      <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()} eyebrow="Alex's story" />
 
       <Philosophy asSection />
 

@@ -771,11 +771,8 @@ test("About: Alex's story, then the philosophy and values; no quote band (2026-1
   await entry.getByRole("button", { name: /drive/ }).click();
   await expect(entry.getByRole("button", { pressed: true })).toHaveText(/drive/);
   await expect(entry).toContainText("The reason you still turn up on the hard days.");
-  // "1% better, every day" as a chart: the slider reads any day.
-  const slider = page.locator("#coach").getByRole("slider", { name: "Day of the year" });
-  await slider.fill("100");
-  await expect(page.locator("#coach")).toContainText("after 100 days of 1% better");
-  await expect(page.locator("#coach")).toContainText("×2.70");
+  // The "1% better, every day" chart is off About (owner, 2026-10-30).
+  await expect(page.getByRole("slider", { name: "Day of the year" })).toHaveCount(0);
   // Facebook is in the footer; Alex's section links Instagram only (2026-10-27).
   const fb = page.getByRole("contentinfo").getByRole("link", { name: /Facebook/ });
   await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");
