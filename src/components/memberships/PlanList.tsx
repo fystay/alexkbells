@@ -34,7 +34,7 @@ export function PlanList({ className, includePayg = true }: { className?: string
       label: `${plan.name} plan`,
       href: planHref(plan.id),
       action: `Join ${plan.name}`,
-      next: online ? "Next, your first class and details, then pay with Square." : "Next, your first class and details. Nothing to pay now.",
+      next: online ? "Next, your first class and details, then pay with Stripe." : "Next, your first class and details. Nothing to pay now.",
       external: book.external,
     })),
     ...(includePayg ? [{ value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external }] : []),

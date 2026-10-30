@@ -636,7 +636,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                         </button>
                       </>
                     ) : (
-                      <p>Square&apos;s secure page takes the payment. {pay.hold}</p>
+                      <p>Stripe&apos;s secure page takes the payment. {pay.hold}</p>
                     )}
                     <p className="text-muted">{pay.cancel}</p>
                   </div>

@@ -3,7 +3,7 @@
  * they never know the provider.
  *
  * Booking modes, in order of preference:
- * 1. "external": a real booking page (BOOKING_URL), e.g. Setmore or Square.
+ * 1. "external": a real booking page (BOOKING_URL), e.g. Setmore or Stripe.
  * 2. "demo": the guided booking interface with labelled demonstration
  *    availability, for showing Alex. Never on Vercel production, never sends
  *    or books anything.
@@ -156,8 +156,8 @@ export function getOnlineCoachingAction(env: Env = process.env): CallToAction {
  * real billing set-up that doesn't exist yet, so until a sign-up page is
  * configured this is an enquiry to /contact. Set MEMBERSHIP_URL_STARTER,
  * MEMBERSHIP_URL_REGULAR and MEMBERSHIP_URL_DEDICATED (https), or one shared
- * MEMBERSHIP_URL, to a hosted sign-up page (e.g. a Square subscription link
- * created in the Square Dashboard). It never pretends anyone has joined or paid.
+ * MEMBERSHIP_URL, to a hosted sign-up page (e.g. a Stripe subscription link
+ * created in the Stripe Dashboard). It never pretends anyone has joined or paid.
  */
 export function getMembershipAction(
   planName: string,

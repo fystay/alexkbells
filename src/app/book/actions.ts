@@ -21,14 +21,14 @@ import { idempotencyKey } from "@/lib/send-email";
 import { startClassCheckout } from "@/lib/class-checkout";
 import { coachDb } from "@/lib/coach/db";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
-import { squareConfig } from "@/lib/square/config";
+import { stripeConfig } from "@/lib/stripe/config";
 
 /**
  * Validates a booking request on the server and gets it to Alex: stored in
  * Supabase for the coach area and/or emailed. Reports success only once one
  * of those has accepted it. Never runs for demonstration availability.
  * Where online payment is on, a group class (without a membership plan) is
- * booked instead: the place is held and the visitor sent to Square to pay
+ * booked instead: the place is held and the visitor sent to Stripe to pay
  * (lib/class-checkout.ts), or booked straight away with a class credit link.
  * One-to-one always stays a request (owner, 2026-10-27).
  */
@@ -82,10 +82,10 @@ export async function submitBookingRequest(
   ]);
 
   const db = coachDb();
-  const square = squareConfig();
-  if (onlineJoinEnabled() && db && square && data.service === "group-class" && data.classDate && slot && !data.plan) {
+  const stripe = stripeConfig();
+  if (onlineJoinEnabled() && db && stripe && data.service === "group-class" && data.classDate && slot && !data.plan) {
     const credit = formData.get("credit");
-    const checkout = await startClassCheckout(db, square, { name: data.name, email: data.email, phone: data.phone }, slot, data.classDate, {
+    const checkout = await startClassCheckout(db, stripe, { name: data.name, email: data.email, phone: data.phone }, slot, data.classDate, {
       idempotencyKey: key,
       creditToken: typeof credit === "string" && credit ? credit : null,
     });

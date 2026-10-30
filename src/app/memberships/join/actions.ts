@@ -12,13 +12,13 @@ import { MEMBERSHIP_SERVICE, membershipEmail, membershipSummary, parseMembership
 import { idempotencyKey } from "@/lib/send-email";
 import { coachDb } from "@/lib/coach/db";
 import { onlineJoinEnabled, startCheckout } from "@/lib/membership-checkout";
-import { squareConfig } from "@/lib/square/config";
+import { stripeConfig } from "@/lib/stripe/config";
 
 /**
  * Validates a membership join on the server. Where online joining is on
- * (Square configured: lib/membership-checkout.ts), it creates the sign-up and
- * its first charge and sends the visitor to Square's payment page; the
- * membership starts only when Square's verified webhook records the payment
+ * (Stripe configured: lib/membership-checkout.ts), it creates the sign-up and
+ * its first charge and sends the visitor to Stripe's payment page; the
+ * membership starts only when Stripe's verified webhook records the payment
  * (owner, 2026-10-26: no confirmation by Alex). Otherwise it's a request to
  * Alex as before (stored for the coach area and/or emailed), reporting
  * success only once a route accepted it. Never runs on demonstration previews.
@@ -62,9 +62,9 @@ export async function submitMembershipRequest(
   const key = await idempotencyKey([data.submissionId, "membership", data.plan, data.email, data.name, data.session, data.classDate, data.message]);
 
   const db = coachDb();
-  const square = squareConfig();
-  if (onlineJoinEnabled() && db && square) {
-    const checkout = await startCheckout(db, square, data, data.classDate && slot ? slot : null, { agreedAt, idempotencyKey: key });
+  const stripe = stripeConfig();
+  if (onlineJoinEnabled() && db && stripe) {
+    const checkout = await startCheckout(db, stripe, data, data.classDate && slot ? slot : null, { agreedAt, idempotencyKey: key });
     if (checkout.ok) redirect(checkout.url);
     if (checkout.reason === "already_member") {
       return { status: "error", message: "You're already a member. Sign in to your account to book classes, or reply to Alex to change plan.", errors: { email: "This email already has a membership." } };

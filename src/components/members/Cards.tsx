@@ -17,7 +17,7 @@ export function PaymentDue({ due }: { due: { amountPence: number; url: string | 
       <p className="mt-1 text-ink">This period&apos;s credits work as soon as it&apos;s paid.</p>
       {due.url ? (
         <a href={due.url} className="members-btn members-btn-solid mt-4 w-full sm:w-auto">
-          Pay with Square
+          Pay with Stripe
         </a>
       ) : (
         <p className="mt-3 text-sm">The payment link is in your email. If you can&apos;t find it, message Alex.</p>

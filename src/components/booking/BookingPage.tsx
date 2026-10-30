@@ -25,7 +25,7 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
 
   const price = publishable(getService("group-classes").prices)[0];
   const classInfo: ClassInfo = groupClass;
-  // Group classes are booked and paid online where Square is set up (owner, 2026-10-27); 1:1 stays a request.
+  // Group classes are booked and paid online where Stripe is set up (owner, 2026-10-27); 1:1 stays a request.
   const pay = mode === "request" && price && onlineJoinEnabled() ? { price: formatGbp(price.amountGbp), ...onlineClassBooking } : null;
 
   const intro =

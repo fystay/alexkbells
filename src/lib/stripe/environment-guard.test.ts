@@ -6,7 +6,7 @@ import { addCharge } from "../coach/ledger";
 import { testDb } from "../coach/test-support";
 
 /**
- * The database-level safeguard (supabase/migrations/20261021000000_akb_square.sql):
+ * The database-level safeguard (supabase/migrations/20261021000000_akb_square.sql, 20261104000000_akb_stripe.sql):
  * a database with no role marker is production and refuses every Sandbox
  * record; one marked 'test' refuses live ones. Two separate databases.
  */
@@ -41,18 +41,18 @@ describe("production database (no marker)", () => {
     expect(link).toMatchObject({ ok: false, error: { rule: "sandbox_in_production" } });
     const event = await insert(p.db, "akb_square_events", { event_id: "evt-sb", environment: "sandbox", type: "payment.updated" });
     expect(event).toMatchObject({ ok: false, error: { rule: "sandbox_in_production" } });
-    const pay = await insert(p.db, "akb_payments", payment(p.client, "square_sandbox"));
+    const pay = await insert(p.db, "akb_payments", payment(p.client, "stripe_test"));
     expect(pay).toMatchObject({ ok: false, error: { rule: "sandbox_in_production" } });
     // Even as the database owner, outside the app.
     await expect(p.sql("insert into akb_square_events (event_id, environment, type) values ('evt-sb2', 'sandbox', 'x')")).rejects.toThrow(/sandbox_in_production/);
     const applied = await rpc(p.db, "akb_apply_square_payment", { p_environment: "sandbox", p_payment_id: "PAY-1", p_order_id: "ORDER-1", p_status: "COMPLETED", p_amount_pence: 3500, p_currency: "GBP", p_paid_on: "2026-10-24" });
     expect(applied).toMatchObject({ ok: true, data: "unknown_order" });
-    expect(await p.sql("select count(*)::int as n from akb_payments where provider = 'square_sandbox'")).toEqual([{ n: 0 }]);
+    expect(await p.sql("select count(*)::int as n from akb_payments where provider = 'stripe_test'")).toEqual([{ n: 0 }]);
   });
 
   it("accepts live records and leaves manual payments alone", async () => {
     expect((await insert(p.db, "akb_square_payment_links", { environment: "production", charge_id: p.charge, client_id: p.client, amount_pence: 3500 })).ok).toBe(true);
-    expect((await insert(p.db, "akb_payments", payment(p.client, "square"))).ok).toBe(true);
+    expect((await insert(p.db, "akb_payments", payment(p.client, "stripe"))).ok).toBe(true);
     expect((await insert(p.db, "akb_payments", { ...payment(p.client, "manual"), method: "cash", idempotency_key: "cash-1", provider_payment_id: null })).ok).toBe(true);
   });
 
@@ -83,8 +83,8 @@ describe("test database (marked 'test')", () => {
 
   it("accepts Sandbox records and refuses live ones", async () => {
     expect((await insert(t.db, "akb_square_payment_links", { environment: "sandbox", charge_id: t.charge, client_id: t.client, amount_pence: 3500 })).ok).toBe(true);
-    expect((await insert(t.db, "akb_payments", payment(t.client, "square_sandbox"))).ok).toBe(true);
-    expect(await insert(t.db, "akb_payments", { ...payment(t.client, "square"), idempotency_key: "square:PAY-2", provider_payment_id: "PAY-2" })).toMatchObject({ ok: false, error: { rule: "live_in_test" } });
+    expect((await insert(t.db, "akb_payments", payment(t.client, "stripe_test"))).ok).toBe(true);
+    expect(await insert(t.db, "akb_payments", { ...payment(t.client, "stripe"), idempotency_key: "stripe:PAY-2", provider_payment_id: "PAY-2" })).toMatchObject({ ok: false, error: { rule: "live_in_test" } });
     expect(await insert(t.db, "akb_square_events", { event_id: "evt-live", environment: "production", type: "payment.updated" })).toMatchObject({ ok: false, error: { rule: "live_in_test" } });
   });
 

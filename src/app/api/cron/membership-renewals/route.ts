@@ -5,7 +5,7 @@ import { rpc } from "@/lib/coach/db";
 import { renewMemberships } from "@/lib/coach/memberships";
 import { londonToday } from "@/lib/coach/time";
 import { sendRenewalLinks } from "@/lib/membership-checkout";
-import { squareConfig } from "@/lib/square/config";
+import { stripeConfig } from "@/lib/stripe/config";
 
 /**
  * Renews memberships every four weeks (vercel.json "crons", daily): each
@@ -15,8 +15,8 @@ import { squareConfig } from "@/lib/square/config";
  * <CRON_SECRET>"; anything else gets 401 and does nothing. Counts only.
  * Also tidies member sign-ins (akb_member_cleanup: links after a day, ended
  * sessions after 30 days); a failure there is logged and never stops renewals.
- * Then, for members who joined and pay online, emails a Square pay link for
- * each new period still to pay (once each; needs Square and email settings).
+ * Then, for members who joined and pay online, emails a Stripe pay link for
+ * each new period still to pay (once each; needs Stripe and email settings).
  * And releases class places held for online payment that ran out
  * (akb_release_class_holds; an unpaid charge is cancelled a day later).
  */
@@ -36,8 +36,8 @@ export async function GET(request: Request) {
   if (!tidied.ok) console.error(`Member sign-in clean-up failed (${tidied.error.kind} ${tidied.error.code})`);
   const holds = await rpc<number>(db, "akb_release_class_holds", {});
   if (!holds.ok) console.error(`Class hold release failed (${holds.error.kind} ${holds.error.code})`);
-  const square = squareConfig();
-  const links = square ? await sendRenewalLinks(db, square, londonToday()) : null;
+  const stripe = stripeConfig();
+  const links = stripe ? await sendRenewalLinks(db, stripe, londonToday()) : null;
   if (links?.failed) console.error(`Membership pay links: ${links.failed} couldn't be sent`);
   return NextResponse.json(
     { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null, classHoldsReleased: holds.ok ? holds.data : null },

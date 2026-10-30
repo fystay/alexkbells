@@ -441,7 +441,7 @@ test.describe("member accounts", () => {
 
   test("pay as you go (2026-10-28): the paid booking is the account; cancel for a class credit, book with it, and the form fills in", async ({ page, request }) => {
     const email = `payg-${Date.now()}@example.com`;
-    // A class booked and paid online 5 days from now (as Square's webhook would record it).
+    // A class booked and paid online 5 days from now (as Stripe's webhook would record it).
     const [booking] = await sql(
       request,
       `select akb_create_class_booking('Pay Go', $1, '07700 900123', 'mon-evening', akb_london_today() + 5,

@@ -18,8 +18,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * Where Square's payment page sends people back to. It only reads the
- * sign-up's state from the database, which changes once Square's verified
+ * Where Stripe's payment page sends people back to. It only reads the
+ * sign-up's state from the database, which changes once Stripe's verified
  * webhook has recorded the payment: arriving here proves nothing, so the page
  * never says "paid" until the database does. While it waits, it refreshes
  * itself every few seconds. Shows the plan and the state only (the id in the
@@ -62,14 +62,14 @@ function Body({ signup }: { signup: SignupStatus | null }) {
       <>
         <p className="eyebrow">{signup.plan_name} membership</p>
         <h1 id="done-heading" className={heading}>
-          Waiting for Square to confirm.
+          Waiting for Stripe to confirm.
         </h1>
         <p className="mt-5 text-lede">This usually takes a few seconds. This page updates by itself.</p>
         {signup.payUrl ? (
           <p className="mt-6">
             Didn&apos;t finish paying?{" "}
             <a href={signup.payUrl} className="font-semibold underline underline-offset-4 hover:no-underline">
-              Go back to Square to pay
+              Go back to Stripe to pay
             </a>
           </p>
         ) : null}

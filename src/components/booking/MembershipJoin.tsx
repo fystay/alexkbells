@@ -35,8 +35,8 @@ const AvailabilityCalendar = dynamic(() => loadCalendar().then((m) => m.Availabi
 interface MembershipJoinProps {
   /**
    * "demo": previews only; nothing is sent. "request": the request reaches
-   * Alex, who confirms. "pay": the member pays on Square's page and the
-   * membership starts once Square confirms (owner, 2026-10-26).
+   * Alex, who confirms. "pay": the member pays on Stripe's page and the
+   * membership starts once Stripe confirms (owner, 2026-10-26).
    */
   mode: "demo" | "request" | "pay";
   /** Confirmed weekly classes the first class can be chosen from. */
@@ -67,8 +67,8 @@ const getServerToday = () => null;
 /**
  * Joining a membership (owner, 2026-10-26): its own short journey instead of
  * the booking form. Plan → first class (optional) → details → check the plan,
- * the terms and the cancellation policy, agree, then pay on Square's page
- * ("pay": the membership starts as soon as Square confirms the payment, and
+ * the terms and the cancellation policy, agree, then pay on Stripe's page
+ * ("pay": the membership starts as soon as Stripe confirms the payment, and
  * the first class is booked then) or, where online payment isn't set up,
  * send a request that Alex confirms ("request").
  */
@@ -470,9 +470,9 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                 <div className="card px-5 py-5 sm:px-6">
                   {pay ? (
                     <>
-                      <h3 className="card-title">Pay securely with Square</h3>
+                      <h3 className="card-title">Pay securely with Stripe</h3>
                       <p className="mt-1.5">
-                        Next, Square&apos;s secure page takes £{plan.priceGbp} for your first {BILLING_WEEKS} weeks. Your membership starts as soon as
+                        Next, Stripe&apos;s secure page takes £{plan.priceGbp} for your first {BILLING_WEEKS} weeks. Your membership starts as soon as
                         it&apos;s paid{chosenClass ? " and your first class is booked" : ""}. After that, you&apos;ll get a payment link by email every{" "}
                         {BILLING_WEEKS} weeks.
                       </p>
@@ -532,7 +532,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
                 <PrivacyLine action={demo ? "continuing" : pay ? "paying" : "sending this request"} />
                 <ActionBar
                   onBack={() => setStep(2)}
-                  next={{ label: demo ? "Finish demo" : pay ? (pending ? "Opening Square…" : `Pay £${plan.priceGbp}`) : "Send request", type: "submit", pending }}
+                  next={{ label: demo ? "Finish demo" : pay ? (pending ? "Opening Stripe…" : `Pay £${plan.priceGbp}`) : "Send request", type: "submit", pending }}
                 />
               </form>
             </section>
@@ -553,7 +553,7 @@ export function MembershipJoin({ mode, classes, paygGbp }: MembershipJoinProps) 
             ))}
           </dl>
           <p className="border-t border-line px-5 py-4 text-sm">
-            {pay ? "Pay on Square's secure page. Your membership starts as soon as it's paid." : "Nothing to pay now. Alex confirms every membership personally."}
+            {pay ? "Pay on Stripe's secure page. Your membership starts as soon as it's paid." : "Nothing to pay now. Alex confirms every membership personally."}
           </p>
         </div>
       </div>

@@ -6,7 +6,7 @@ import { onlineCoachingOffered } from "@/content/services";
 import { memberSettings } from "@/lib/member-settings";
 import { requireMember } from "@/lib/member-session";
 import { paymentDue } from "@/lib/membership-checkout";
-import { squareConfig } from "@/lib/square/config";
+import { stripeConfig } from "@/lib/stripe/config";
 
 /** After an action: what happened (?done=). Shown as a toast. */
 export const DONE: Record<string, string> = {
@@ -33,7 +33,7 @@ export const ERRORS: Record<string, string> = {
   already_booked: "You're already booked on that class.",
   class_started: "That class has already started.",
   outside_period: "Credits can only be used in the period they belong to. That date is in your next period.",
-  period_unpaid: "Please pay for this period first. Its credits work as soon as Square confirms.",
+  period_unpaid: "Please pay for this period first. Its credits work as soon as Stripe confirms.",
   not_found: "That class couldn't be found. Please try again.",
   credit_invalid: "That class credit can't be used for that class. It may have been used, or the class is after it runs out.",
   invalid_name: "Please enter your name (up to 100 characters).",
@@ -68,7 +68,7 @@ export async function loadMembers(searchParams: Promise<Params>) {
     coachingStatus(member.db, member.clientId),
     fullClasses(today),
     // Members who pay online: this period's payment, if it's still to pay (credits wait for it).
-    paymentDue(member.db, squareConfig(), member.clientId),
+    paymentDue(member.db, stripeConfig(), member.clientId),
   ]);
   const one = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : null);
   const done = one("done") ? (DONE[one("done")!] ?? null) : null;

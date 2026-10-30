@@ -6,8 +6,8 @@ import { classAvailability } from "../../src/lib/availability/timetable";
 
 /**
  * Booking a group class and paying online (owner, 2026-10-27: no confirmation
- * by Alex; 1:1 stays a request), on the build with Square in Sandbox mode
- * against the Square stand-in (tests/e2e/mock-square.mjs). The place is
+ * by Alex; 1:1 stays a request), on the build with Stripe in Sandbox mode
+ * against the Stripe stand-in (tests/e2e/mock-stripe.mjs). The place is
  * confirmed only after the signed webhook's payment is recorded. The emailed
  * private link cancels it, and (24 hours or more before) gives a credit link
  * that books another class with nothing to pay.
@@ -15,7 +15,7 @@ import { classAvailability } from "../../src/lib/availability/timetable";
 const PAY = `http://localhost:${process.env.E2E_PAY_PORT ?? 3202}`;
 const MOCK = `http://localhost:${process.env.MOCK_EMAIL_PORT ?? 3299}`;
 const SUPABASE = `http://localhost:${process.env.MOCK_SUPABASE_PORT ?? 3298}`;
-const SQUARE = `http://localhost:${process.env.MOCK_SQUARE_PORT ?? 3297}`;
+const STRIPE = `http://localhost:${process.env.MOCK_STRIPE_PORT ?? 3297}`;
 
 interface RecordedEmail {
   payload: { to: string[]; subject: string; text: string };
@@ -57,14 +57,14 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.describe("booking a group class and paying online", () => {
-  test("pay on Square's page, come back booked; cancel by the emailed link; the credit books another class free", async ({ page, request }) => {
+  test("pay on Stripe's page, come back booked; cancel by the emailed link; the credit books another class free", async ({ page, request }) => {
     const email = `class-${Date.now()}@example.com`;
     await toDetails(page, `${PAY}/book/group-class`, 0, "Class Payer", email);
     await expect(page.getByText("Your place is held for 15 minutes while you pay.")).toBeVisible();
     await expect(page.getByText(/^Cancel 24 hours or more before/)).toBeVisible();
     await page.getByRole("button", { name: "Pay £12" }).click();
 
-    await expect(page).toHaveURL(new RegExp(`^${SQUARE}/checkout/`));
+    await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/^Group class, /);
     await page.getByRole("button", { name: "Pay £12.00" }).click();
 
@@ -94,7 +94,7 @@ test.describe("booking a group class and paying online", () => {
     expect(href).toMatch(/\/book\/group-class\?credit=[A-Za-z0-9_-]{43}$/);
     await expect.poll(async () => (await emailsTo(request, email)).some((e) => e.payload.subject === "Your class credit")).toBe(true);
 
-    // The credit link: nothing to pay, booked straight away, with no Square page.
+    // The credit link: nothing to pay, booked straight away, with no Stripe page.
     await toDetails(page, href!, 1, "Class Payer", `other-${email}`);
     await expect(page.getByText("Booking with your class credit: nothing to pay.")).toBeVisible();
     await page.getByRole("button", { name: "Book with your credit" }).click();
@@ -115,15 +115,15 @@ test.describe("booking a group class and paying online", () => {
     await expect(page.getByRole("button", { name: "Pay £12" })).toBeVisible();
   });
 
-  test("leaving Square's page without paying books nothing, and the page says it's waiting", async ({ page, request }) => {
+  test("leaving Stripe's page without paying books nothing, and the page says it's waiting", async ({ page, request }) => {
     const email = `class-leaver-${Date.now()}@example.com`;
     await toDetails(page, `${PAY}/book/group-class`, 3, "Not Paying", email);
     await page.getByRole("button", { name: "Pay £12" }).click();
-    await expect(page).toHaveURL(new RegExp(`^${SQUARE}/checkout/`));
+    await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));
     const [booking] = await sql(request, "select b.id from akb_class_bookings b join akb_clients c on c.id = b.client_id where c.email = $1", [email]);
     await page.goto(`${PAY}/book/done?booking=${booking.id}`);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Waiting for Square to confirm.");
-    await expect(page.getByRole("link", { name: "Go back to Square to pay" })).toHaveAttribute("href", new RegExp(`^${SQUARE}/checkout/`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Waiting for Stripe to confirm.");
+    await expect(page.getByRole("link", { name: "Go back to Stripe to pay" })).toHaveAttribute("href", new RegExp(`^${STRIPE}/checkout/`));
     expect(await emailsTo(request, email)).toEqual([]);
   });
 

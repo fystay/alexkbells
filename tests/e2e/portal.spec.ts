@@ -611,7 +611,7 @@ test("memberships: start the plan chosen on the site, pay places with credits, 2
     expect(renew.headers()["cache-control"]).toContain("no-store");
     const body = (await renew.json()) as Record<string, unknown>;
     expect(Object.keys(body).sort()).toEqual(["classHoldsReleased", "ok", "payLinksSent", "periodsCreated", "signInsRemoved"]);
-    // Square isn't configured here, so no pay links are sent (null, not 0).
+    // Stripe isn't configured here, so no pay links are sent (null, not 0).
     expect(body.payLinksSent).toBeNull();
     // The same daily run tidies member sign-ins (a count, not null: the clean-up ran).
     expect(typeof body.signInsRemoved).toBe("number");

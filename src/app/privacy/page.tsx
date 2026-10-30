@@ -50,8 +50,8 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         contacted and the phone number or Instagram username you give for that. When you send a
         membership request we also receive the plan you choose, your first class if you pick one, and the
         date and time you agreed to the membership terms and cancellation policy. If you pay online, you pay on
-        Square&apos;s secure page: Square receives your card details, and we never see them; we receive the amount,
-        the date and Square&apos;s reference for the payment. If you book a class online, we also keep a coded copy
+        Stripe&apos;s secure page: Stripe receives your card details, and we never see them; we receive the amount,
+        the date and Stripe&apos;s reference for the payment. If you book a class online, we also keep a coded copy
         of the private link we email you to cancel it, and of any class credit link. Once you&apos;ve paid for a
         class or a membership, you have an account: you can sign in with your email to see your classes and
         credits, and we keep your name, email and phone so the booking form can fill them in next time. When
@@ -85,7 +85,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         What you send is stored in our database (Supabase, hosted in the EU, Ireland) so Alex can see
         it in his password-protected coach area, and may also be sent to him by email using our email
         provider (Resend). Sign-in links, membership confirmations and payment links are emailed to you by the same
-        provider. Online payments are taken by Square, which also processes them under its own privacy notice. These providers handle it on our behalf. The website is hosted by Vercel, which processes
+        provider. Online payments are taken by Stripe, which also processes them under its own privacy notice. These providers handle it on our behalf. The website is hosted by Vercel, which processes
         standard technical information such as IP addresses to deliver and protect the site. These
         providers may process data outside the UK under appropriate safeguards.
       </p>

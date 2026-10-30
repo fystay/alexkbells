@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
 
 /**
  * Joining a membership (owner, 2026-10-26): its own journey, reached from
- * "Join <plan>" on the plan list (`?plan=`). Paid on Square's page where
+ * "Join <plan>" on the plan list (`?plan=`). Paid on Stripe's page where
  * online joining is on (lib/membership-checkout.ts); otherwise the same switch
  * as booking: requests reach Alex when booking requests are on, previews show
  * a demonstration, otherwise an honest Instagram route.
@@ -35,7 +35,7 @@ export default function JoinMembershipPage() {
           </h1>
           <p className="mt-5 text-lede">
             {mode === "pay"
-              ? "Choose your plan and first class, then pay securely with Square. Your membership starts straight away."
+              ? "Choose your plan and first class, then pay securely with Stripe. Your membership starts straight away."
               : "Choose your plan and first class. Alex confirms every membership personally, and there's nothing to pay now."}
           </p>
         </header>

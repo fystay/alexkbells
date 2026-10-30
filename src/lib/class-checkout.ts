@@ -10,15 +10,15 @@ import { isToken, memberLinkOrigin, randomToken, sha256Hex, SIGN_IN_PATH } from 
 import { publishable } from "./publish";
 import { formatTime } from "./schedule";
 import { sendEmail } from "./send-email";
-import type { SquareConfig } from "./square/config";
-import { createChargeLink } from "./square/sync";
+import type { StripeConfig } from "./stripe/config";
+import { createChargeLink } from "./stripe/sync";
 
 /**
  * Booking a group class and paying online, with nothing for Alex to confirm
  * (owner, 2026-10-27; 1:1 stays a request). The database decides
  * (supabase/migrations/20261029000000_akb_instant_class_booking.sql): a place
  * is held for 15 minutes and confirmed only when a payment is recorded
- * against its charge, which happens only after Square's verified webhook.
+ * against its charge, which happens only after Stripe's verified webhook.
  * Cancelling by the private link 24 hours or more before gives a single-use
  * class credit link (28 days). Online booking is on wherever online joining
  * is (onlineJoinEnabled in lib/membership-checkout.ts).
@@ -40,13 +40,13 @@ export function classWhen(date: string, cls: Pick<PublishedClass, "start">): str
 }
 
 /**
- * Holds a place and opens Square's page for the class price (from content,
+ * Holds a place and opens Stripe's page for the class price (from content,
  * never the form), or, with a valid credit link, books it straight away.
  * The class's start and length come from the published timetable.
  */
 export async function startClassCheckout(
   db: Db,
-  square: SquareConfig,
+  stripe: StripeConfig,
   booker: { name: string; email: string; phone: string },
   cls: PublishedClass,
   date: DateKey,
@@ -73,7 +73,7 @@ export async function startClassCheckout(
   if (created.data.status === "confirmed" || !created.data.charge_id) {
     return { ok: true, url: done, bookingId: created.data.booking_id, confirmed: true };
   }
-  const link = await createChargeLink(db, square, created.data.charge_id, options.fetchImpl, { buyerEmail: booker.email, redirectUrl: done });
+  const link = await createChargeLink(db, stripe, created.data.charge_id, options.fetchImpl, { buyerEmail: booker.email, redirectUrl: done });
   if (!link.ok) return { ok: false, reason: "unavailable" };
   return { ok: true, url: link.url, bookingId: created.data.booking_id, confirmed: false };
 }
@@ -95,7 +95,7 @@ interface BookingRow {
 export interface ClassBookingStatus {
   status: BookingRow["status"];
   when: string | null;
-  /** The open Square link, while it still waits for payment. */
+  /** The open Stripe link, while it still waits for payment. */
   payUrl: string | null;
 }
 

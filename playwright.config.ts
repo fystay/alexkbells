@@ -5,8 +5,8 @@ const port = Number(process.env.E2E_PORT ?? 3200);
 export const productionPort = Number(process.env.E2E_PRODUCTION_PORT ?? 3201);
 export const mockEmailPort = Number(process.env.MOCK_EMAIL_PORT ?? 3299);
 export const mockSupabasePort = Number(process.env.MOCK_SUPABASE_PORT ?? 3298);
-export const mockSquarePort = Number(process.env.MOCK_SQUARE_PORT ?? 3297);
-/** A build where members join and pay online (Square Sandbox settings, against the Square stand-in). */
+export const mockStripePort = Number(process.env.MOCK_STRIPE_PORT ?? 3297);
+/** A build where members join and pay online (Stripe test-key settings, against the Stripe stand-in). */
 export const payPort = Number(process.env.E2E_PAY_PORT ?? 3202);
 // Optional: point at a preinstalled Chromium (e.g. /opt/pw-browsers/chromium).
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined;
@@ -27,14 +27,11 @@ const coachEnv = {
   COACH_EMAIL: "coach-e2e@example.com",
 };
 
-// Square in Sandbox mode against tests/e2e/mock-square.mjs (never real Square).
-const squareEnv = {
-  SQUARE_ENVIRONMENT: "sandbox",
-  SQUARE_ACCESS_TOKEN: "EAAA-e2e-not-real",
-  SQUARE_LOCATION_ID: "LOC-E2E",
-  SQUARE_API_URL: `http://localhost:${mockSquarePort}`,
-  SQUARE_WEBHOOK_SIGNATURE_KEY: "e2e-square-signature-key",
-  SQUARE_WEBHOOK_URL: `http://localhost:${payPort}/api/square/webhook`,
+// Stripe with a test key against tests/e2e/mock-stripe.mjs (never real Stripe).
+const stripeEnv = {
+  STRIPE_SECRET_KEY: "sk_test_e2e_not_real",
+  STRIPE_API_URL: `http://localhost:${mockStripePort}`,
+  STRIPE_WEBHOOK_SECRET: "whsec_e2e_not_real",
 };
 
 export default defineConfig({
@@ -66,10 +63,10 @@ export default defineConfig({
       env: { MOCK_SUPABASE_PORT: String(mockSupabasePort) },
     },
     {
-      command: `node tests/e2e/mock-square.mjs`,
-      url: `http://localhost:${mockSquarePort}/`,
+      command: `node tests/e2e/mock-stripe.mjs`,
+      url: `http://localhost:${mockStripePort}/`,
       reuseExistingServer: !process.env.CI,
-      env: { MOCK_SQUARE_PORT: String(mockSquarePort), MOCK_SQUARE_WEBHOOK_URL: squareEnv.SQUARE_WEBHOOK_URL, MOCK_SQUARE_SIGNATURE_KEY: squareEnv.SQUARE_WEBHOOK_SIGNATURE_KEY },
+      env: { MOCK_STRIPE_PORT: String(mockStripePort), MOCK_STRIPE_WEBHOOK_URL: `http://localhost:${payPort}/api/stripe/webhook`, MOCK_STRIPE_WEBHOOK_SECRET: stripeEnv.STRIPE_WEBHOOK_SECRET },
     },
     // Main server: a production build without CONTENT_PREVIEW, with booking
     // demo mode on (as on a Vercel preview) and email wired to the mock.
@@ -88,13 +85,13 @@ export default defineConfig({
       timeout: 300_000,
       env: { NEXT_DIST_DIR: ".next-e2e-production", VERCEL_ENV: "production", BOOKING_DEMO: "true", CONTENT_PREVIEW: "true", ...emailEnv, ...coachEnv },
     },
-    // Joining and paying online: booking requests on (no demo), Square Sandbox against the stand-in.
+    // Joining and paying online: booking requests on (no demo), Stripe test key against the stand-in.
     {
       command: `npx next build && npx next start -p ${payPort}`,
       url: `http://localhost:${payPort}`,
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
-      env: { NEXT_DIST_DIR: ".next-e2e-pay", CONTENT_PREVIEW: "false", SITE_URL: `http://localhost:${payPort}`, ...emailEnv, ...coachEnv, ...squareEnv },
+      env: { NEXT_DIST_DIR: ".next-e2e-pay", CONTENT_PREVIEW: "false", SITE_URL: `http://localhost:${payPort}`, ...emailEnv, ...coachEnv, ...stripeEnv },
     },
   ],
 });

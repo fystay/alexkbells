@@ -9,29 +9,29 @@ import { ACCOUNT_PATH, SIGN_IN_PATH, memberLinkOrigin } from "./member-auth";
 import { formatPenceShort } from "./membership";
 import { describeFirstClass, type MembershipRequest } from "./membership-request";
 import { sendEmail } from "./send-email";
-import { squareConfig, type SquareConfig } from "./square/config";
-import { createChargeLink } from "./square/sync";
+import { stripeConfig, type StripeConfig } from "./stripe/config";
+import { createChargeLink } from "./stripe/sync";
 
 /**
  * Joining a membership and paying online, with nothing for Alex to confirm
  * (owner, 2026-10-26). The database decides everything that matters
  * (supabase/migrations/20261028000000_akb_self_serve_memberships.sql): the
  * membership only starts when a payment is recorded against the first
- * charge, and a payment is only recorded after Square's webhook has been
- * verified and the payment re-read from Square. Nothing here ever trusts the
+ * charge, and a payment is only recorded after Stripe's webhook has been
+ * verified and the payment re-read from Stripe. Nothing here ever trusts the
  * browser about payment.
  */
 
 export const JOIN_DONE_PATH = "/memberships/join/done";
 
 /**
- * Online joining is on only where a real Square checkout can open: booking
- * requests on, the database reachable, and Square configured for this
- * deployment (live Square only on Vercel production; previews share the live
+ * Online joining is on only where a real Stripe checkout can open: booking
+ * requests on, the database reachable, and Stripe configured for this
+ * deployment (live Stripe only on Vercel production; previews share the live
  * database, so they never qualify). Otherwise joining stays a request to Alex.
  */
 export function onlineJoinEnabled(env: Env = process.env): boolean {
-  return bookingMode(env) === "request" && coachDb(env) !== null && squareConfig(env) !== null;
+  return bookingMode(env) === "request" && coachDb(env) !== null && stripeConfig(env) !== null;
 }
 
 export type CheckoutResult =
@@ -46,12 +46,12 @@ interface SignupCreated {
 
 /**
  * Creates (or, for the same submission, finds) the sign-up and its first
- * charge, then the Square payment link for that charge. The plan's price and
+ * charge, then the Stripe payment link for that charge. The plan's price and
  * credits come from content, never from the form.
  */
 export async function startCheckout(
   db: Db,
-  square: SquareConfig,
+  stripe: StripeConfig,
   data: MembershipRequest,
   firstClass: PublishedClass | null,
   options: { agreedAt: string; idempotencyKey: string; env?: Env; fetchImpl?: typeof fetch },
@@ -76,7 +76,7 @@ export async function startCheckout(
   });
   if (!created.ok) return { ok: false, reason: ruleReason(created.error) };
   const signupId = created.data.signup_id;
-  const link = await createChargeLink(db, square, created.data.charge_id, options.fetchImpl, {
+  const link = await createChargeLink(db, stripe, created.data.charge_id, options.fetchImpl, {
     buyerEmail: data.email,
     redirectUrl: `${memberLinkOrigin(options.env)}${JOIN_DONE_PATH}?signup=${signupId}`,
   });
@@ -95,7 +95,7 @@ export interface SignupStatus {
   plan_name: string;
   first_class: "none" | "requested" | "booked" | "unavailable";
   class_date: string | null;
-  /** The open Square link, while it's still waiting for payment. */
+  /** The open Stripe link, while it's still waiting for payment. */
   payUrl: string | null;
 }
 
@@ -219,11 +219,11 @@ interface UnpaidPeriod {
 
 /**
  * Renewals for members who pay online: each new period's charge gets a
- * Square link, emailed to the member once. Their credits for the period wait
- * until it's paid. Needs Square and email; marks a period only once its
+ * Stripe link, emailed to the member once. Their credits for the period wait
+ * until it's paid. Needs Stripe and email; marks a period only once its
  * email went out, so a failure is retried on the next daily run.
  */
-export async function sendRenewalLinks(db: Db, square: SquareConfig, today: DateKey, env: Env = process.env, fetchImpl: typeof fetch = fetch): Promise<{ sent: number; failed: number }> {
+export async function sendRenewalLinks(db: Db, stripe: StripeConfig, today: DateKey, env: Env = process.env, fetchImpl: typeof fetch = fetch): Promise<{ sent: number; failed: number }> {
   const email = bookingDeliveryConfig(env);
   if (!email) return { sent: 0, failed: 0 };
   const due = await rpc<UnpaidPeriod[]>(db, "akb_unpaid_online_periods", { p_today: today });
@@ -231,7 +231,7 @@ export async function sendRenewalLinks(db: Db, square: SquareConfig, today: Date
   let sent = 0;
   let failed = 0;
   for (const p of due.data) {
-    const link = await createChargeLink(db, square, p.charge_id, fetchImpl, { buyerEmail: p.email, redirectUrl: `${memberLinkOrigin(env)}${ACCOUNT_PATH}` });
+    const link = await createChargeLink(db, stripe, p.charge_id, fetchImpl, { buyerEmail: p.email, redirectUrl: `${memberLinkOrigin(env)}${ACCOUNT_PATH}` });
     if (!link.ok) {
       failed += 1;
       continue;
@@ -246,7 +246,7 @@ export async function sendRenewalLinks(db: Db, square: SquareConfig, today: Date
         text: [
           `Your ${p.plan_name} membership has renewed for ${formatDate(p.period_start as DateKey)} to ${formatDate(p.period_end as DateKey)}.`,
           "",
-          `Pay ${formatPenceShort(link.amountPence)} securely with Square to use this period's credits:`,
+          `Pay ${formatPenceShort(link.amountPence)} securely with Stripe to use this period's credits:`,
           link.url,
           "",
           "To stop your membership, reply to this email.",
@@ -266,12 +266,12 @@ export async function sendRenewalLinks(db: Db, square: SquareConfig, today: Date
 }
 
 /** A member's current period still to pay (pay-online members only), with a link to pay it. */
-export async function paymentDue(db: Db, square: SquareConfig | null, clientId: string, env: Env = process.env): Promise<{ amountPence: number; url: string | null; periodEnd: string } | null> {
+export async function paymentDue(db: Db, stripe: StripeConfig | null, clientId: string, env: Env = process.env): Promise<{ amountPence: number; url: string | null; periodEnd: string } | null> {
   const due = await rpc<{ charge_id: string; outstanding_pence: number; period_end: string } | null>(db, "akb_member_payment_due", { p_client: clientId });
   if (!due.ok || !due.data) return null;
   let url: string | null = null;
-  if (square) {
-    const link = await createChargeLink(db, square, due.data.charge_id, fetch, { redirectUrl: `${memberLinkOrigin(env)}${ACCOUNT_PATH}` });
+  if (stripe) {
+    const link = await createChargeLink(db, stripe, due.data.charge_id, fetch, { redirectUrl: `${memberLinkOrigin(env)}${ACCOUNT_PATH}` });
     url = link.ok ? link.url : null;
   }
   return { amountPence: due.data.outstanding_pence, url, periodEnd: due.data.period_end };

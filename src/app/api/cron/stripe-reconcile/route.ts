@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { coachDb } from "@/lib/coach/db";
 import { cronAuthorized } from "@/lib/cron-auth";
-import { squareConfig } from "@/lib/square/config";
-import { reconcileOpenLinks } from "@/lib/square/sync";
+import { stripeConfig } from "@/lib/stripe/config";
+import { reconcileOpenLinks } from "@/lib/stripe/sync";
 import { publishedClasses } from "@/lib/class-sessions";
 import { notifyNewMembers } from "@/lib/membership-checkout";
 import { notifyClassBookings } from "@/lib/class-checkout";
 
-/** Daily safety net for missed Square webhooks (vercel.json "crons"). Same CRON_SECRET check as request alerts. */
+/** Daily safety net for missed Stripe webhooks (vercel.json "crons"). Same CRON_SECRET check as request alerts. */
 export async function GET(request: Request) {
   const noStore = { "Cache-Control": "no-store" };
   if (!cronAuthorized(request.headers.get("authorization"))) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: noStore });
   }
   const db = coachDb();
-  const square = squareConfig();
+  const square = stripeConfig();
   if (!db || !square) return NextResponse.json({ skipped: "not-configured" }, { headers: noStore });
   const summary = await reconcileOpenLinks(db, square);
   // Also catches sign-ups started by a payment the webhook missed (or recorded in the portal).

@@ -3,15 +3,15 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
 
 /**
  * Joining a membership and paying online (owner, 2026-10-26: no confirmation
- * by Alex), on a build with Square in Sandbox mode against the Square
- * stand-in (tests/e2e/mock-square.mjs). Paying on the stand-in's checkout
- * page sends a signed webhook, as Square does; the site records the payment
- * only after re-reading it from "Square", and only then starts the membership.
+ * by Alex), on a build with Stripe in Sandbox mode against the Stripe
+ * stand-in (tests/e2e/mock-stripe.mjs). Paying on the stand-in's checkout
+ * page sends a signed webhook, as Stripe does; the site records the payment
+ * only after re-reading it from "Stripe", and only then starts the membership.
  */
 const PAY = `http://localhost:${process.env.E2E_PAY_PORT ?? 3202}`;
 const MOCK = `http://localhost:${process.env.MOCK_EMAIL_PORT ?? 3299}`;
 const SUPABASE = `http://localhost:${process.env.MOCK_SUPABASE_PORT ?? 3298}`;
-const SQUARE = `http://localhost:${process.env.MOCK_SQUARE_PORT ?? 3297}`;
+const STRIPE = `http://localhost:${process.env.MOCK_STRIPE_PORT ?? 3297}`;
 
 interface RecordedEmail {
   payload: { to: string[]; reply_to: string; subject: string; text: string };
@@ -42,24 +42,24 @@ async function toCheckStep(page: Page, plan: string, name: string, email: string
 }
 
 test.beforeAll(async ({ request }) => {
-  // The stand-in database is a test database (Square Sandbox records allowed), as DEPLOYMENT.md sets up.
+  // The stand-in database is a test database (Stripe Sandbox records allowed), as DEPLOYMENT.md sets up.
   await sql(request, "insert into akb_database_role (role) select 'test' where not exists (select 1 from akb_database_role)");
 });
 
 test.describe("joining and paying online", () => {
-  test("pay on Square's page, come back, and the membership has started: nothing for Alex to confirm", async ({ page, request }) => {
+  test("pay on Stripe's page, come back, and the membership has started: nothing for Alex to confirm", async ({ page, request }) => {
     const email = `payer-${Date.now()}@example.com`;
     await toCheckStep(page, "regular", "Online Payer", email);
     await expect(page.getByRole("heading", { name: "Check and pay" })).toBeVisible();
-    await expect(page.getByText("Square's secure page takes £65 for your first 4 weeks")).toBeVisible();
+    await expect(page.getByText("Stripe's secure page takes £65 for your first 4 weeks")).toBeVisible();
     // The agreement is still required before paying.
     await page.getByRole("button", { name: "Pay £65" }).click();
     await expect(page.locator("#agree-error")).toBeVisible();
     await page.getByLabel(/I've read and agree to the membership terms/).check();
     await page.getByRole("button", { name: "Pay £65" }).click();
 
-    // Square's (stand-in) checkout: the plan and the price come from the server, not the form.
-    await expect(page).toHaveURL(new RegExp(`^${SQUARE}/checkout/`));
+    // Stripe's (stand-in) checkout: the plan and the price come from the server, not the form.
+    await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));
     await expect(page.getByRole("heading", { name: "Regular membership, first 4 weeks" })).toBeVisible();
     await page.getByRole("button", { name: "Pay £65.00" }).click();
 
@@ -67,11 +67,11 @@ test.describe("joining and paying online", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("You're in.", { timeout: 15_000 });
     await expect(page.getByRole("link", { name: "Sign in to your account" })).toHaveAttribute("href", "/account/sign-in");
 
-    // In the database: an online-paying membership on the paid charge, and a card payment from Square.
+    // In the database: an online-paying membership on the paid charge, and a card payment from Stripe.
     const [m] = await sql(request, "select m.pay_online, m.plan, m.credits from akb_memberships m join akb_clients c on c.id = m.client_id where c.email = $1", [email]);
     expect(m).toEqual({ pay_online: true, plan: "regular", credits: 8 });
     const pays = await sql(request, "select p.method, p.provider, p.amount_pence from akb_payments p join akb_clients c on c.id = p.client_id where c.email = $1", [email]);
-    expect(pays).toEqual([{ method: "card", provider: "square_sandbox", amount_pence: 6500 }]);
+    expect(pays).toEqual([{ method: "card", provider: "stripe_test", amount_pence: 6500 }]);
 
     // Alex is told it's done (not asked to confirm), and the member is welcomed.
     await expect.poll(async () => (await emailsTo(request, "alex-e2e@example.com")).filter((e) => e.payload.subject.includes("Online Payer")).length).toBe(1);
@@ -82,17 +82,17 @@ test.describe("joining and paying online", () => {
     expect(welcome.payload.subject).toBe("Welcome to RAENG: your Regular membership has started");
   });
 
-  test("leaving Square's page without paying starts nothing, and the page says it's waiting", async ({ page, request }) => {
+  test("leaving Stripe's page without paying starts nothing, and the page says it's waiting", async ({ page, request }) => {
     const email = `leaver-${Date.now()}@example.com`;
     await toCheckStep(page, "starter", "Not Paying", email);
     await page.getByLabel(/I've read and agree to the membership terms/).check();
     await page.getByRole("button", { name: "Pay £40" }).click();
-    await expect(page).toHaveURL(new RegExp(`^${SQUARE}/checkout/`));
+    await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));
     const [signup] = await sql(request, "select s.id from akb_membership_signups s join akb_clients c on c.id = s.client_id where c.email = $1", [email]);
     // Coming back by the address alone proves nothing.
     await page.goto(`${PAY}/memberships/join/done?signup=${signup.id}`);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Waiting for Square to confirm.");
-    await expect(page.getByRole("link", { name: "Go back to Square to pay" })).toHaveAttribute("href", new RegExp(`^${SQUARE}/checkout/`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Waiting for Stripe to confirm.");
+    await expect(page.getByRole("link", { name: "Go back to Stripe to pay" })).toHaveAttribute("href", new RegExp(`^${STRIPE}/checkout/`));
     expect(await sql(request, "select count(*)::int as n from akb_memberships m join akb_clients c on c.id = m.client_id where c.email = $1", [email])).toEqual([{ n: 0 }]);
     expect(await emailsTo(request, email)).toEqual([]);
   });
@@ -104,10 +104,10 @@ test.describe("joining and paying online", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("We couldn't find that sign-up.");
   });
 
-  test("the plan list and the join page say you pay with Square, and the check step is accessible", async ({ page }) => {
+  test("the plan list and the join page say you pay with Stripe, and the check step is accessible", async ({ page }) => {
     await page.goto(`${PAY}/memberships`);
     await page.locator("#memberships").getByRole("list", { name: "Membership plans" }).locator("> li").first().click({ position: { x: 120, y: 20 } });
-    await expect(page.locator("#memberships")).toContainText("Next, your first class and details, then pay with Square.");
+    await expect(page.locator("#memberships")).toContainText("Next, your first class and details, then pay with Stripe.");
     await toCheckStep(page, "dedicated", "Axe Payer", "axe-payer@example.com");
     await page.waitForTimeout(1300);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

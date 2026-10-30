@@ -5,71 +5,52 @@ import { addDays, londonToday, type DateKey } from "./coach/time";
 import { testDb } from "./coach/test-support";
 import { notifyNewMembers, sendRenewalLinks, signupStatus, startCheckout } from "./membership-checkout";
 import type { MembershipRequest } from "./membership-request";
-import type { SquareConfig, SquareWebhookConfig } from "./square/config";
-import { squareSignature } from "./square/signature";
-import { handleSquareWebhook } from "./square/sync";
+import { deliverStripeEvent, stripeStandIn, testStripe } from "./stripe/test-support";
 
 /**
  * Joining and paying online, end to end against the real migrations: the
- * join creates a sign-up and a Square link; a signed webhook (re-read from the
- * Square stand-in) records the payment; the database starts the membership;
- * Alex and the member are emailed once; renewals email a pay link once.
+ * join creates a sign-up and a Stripe checkout; a signed webhook (re-read from
+ * the Stripe stand-in) records the payment; the database starts the
+ * membership; Alex and the member are emailed once; renewals email a pay link once.
  */
 
-const square: SquareConfig = { environment: "sandbox", baseUrl: "https://connect.squareupsandbox.com", accessToken: "EAAA-sandbox-token-not-real", locationId: "LOC-TEST" };
-const webhook: SquareWebhookConfig = { environment: "sandbox", signatureKey: "test-signature-key-not-real", notificationUrl: "https://alexkbells.vercel.app/api/square/webhook" };
+const stripe = testStripe;
 const RESEND = "http://localhost:3299/emails";
 const env = { RESEND_API_KEY: "re_test", BOOKING_NOTIFY_EMAIL: "alex@example.com", BOOKING_FROM_EMAIL: "RAENG <bookings@example.com>", RESEND_API_URL: RESEND, SITE_URL: "https://raeng.example" };
 
 let db: Db;
 let sql: (q: string, p?: unknown[]) => Promise<Record<string, unknown>[]>;
-let ids = 0;
 
-/** Square and Resend stand-ins: payment links (idempotent, like Square), payments, and sent emails. */
+/** Stripe and Resend stand-ins: checkout sessions (idempotent, like Stripe), payments, and sent emails. */
 function services() {
-  const links = new Map<string, { id: string; order_id: string; url: string }>();
-  const payments = new Map<string, Record<string, unknown>>();
-  const linkCalls: Record<string, unknown>[] = [];
   const emails: { to: string[]; subject: string; text: string; key: string }[] = [];
-  const fetchImpl = (async (url: string, init: RequestInit = {}) => {
-    const u = String(url);
-    const body = init.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : null;
-    if (u === RESEND) {
+  const stripeApi = stripeStandIn(async (url, init = {}) => {
+    if (String(url) === RESEND) {
+      const body = JSON.parse(String(init.body)) as { to: string[]; subject: string; text: string };
       const key = (init.headers as Record<string, string>)["Idempotency-Key"];
-      if (!emails.some((e) => e.key === key)) emails.push({ ...(body as { to: string[]; subject: string; text: string }), key });
+      if (!emails.some((e) => e.key === key)) emails.push({ ...body, key });
       return Response.json({ id: "email" });
     }
-    if (!u.startsWith(square.baseUrl)) return db.fetchImpl(url, init);
-    const path = u.slice(square.baseUrl.length);
-    if (path === "/v2/online-checkout/payment-links") {
-      linkCalls.push(body!);
-      const key = String(body!.idempotency_key);
-      if (!links.has(key)) {
-        const i = ++ids;
-        links.set(key, { id: `LINK-${i}`, order_id: `ORDER-${i}`, url: `https://sandbox.square.link/u/join${i}` });
-      }
-      return Response.json({ payment_link: links.get(key) });
-    }
-    const [, , kind, id] = path.split("/");
-    if (kind === "payments") return payments.has(id) ? Response.json({ payment: payments.get(id) }) : Response.json({ errors: [] }, { status: 404 });
-    return Response.json({}, { status: 404 });
-  }) as typeof fetch;
+    return db.fetchImpl(url, init);
+  });
   return {
-    fetchImpl,
-    linkCalls,
+    fetchImpl: stripeApi.fetchImpl,
+    stripeApi,
+    /** The checkout sessions opened so far, as the form Stripe received. */
+    get linkCalls() {
+      return stripeApi.calls.filter((c) => c.method === "POST" && c.path === "/v1/checkout/sessions").map((c) => c.form);
+    },
     emails,
-    pay(orderId: string, amount: number) {
-      const id = `PAY-${++ids}`;
-      payments.set(id, { id, status: "COMPLETED", order_id: orderId, location_id: square.locationId, total_money: { amount, currency: "GBP" }, created_at: new Date().toISOString() });
-      return id;
+    /** Pays a session; returns its id (what the webhook is about). */
+    pay(sessionId: string, amount: number) {
+      stripeApi.pay(sessionId, amount);
+      return sessionId;
     },
   };
 }
 
-let e = 0;
-function deliver(api: ReturnType<typeof services>, paymentId: string) {
-  const raw = JSON.stringify({ merchant_id: "MLTEST", type: "payment.updated", event_id: `join-evt-${++e}`, created_at: new Date().toISOString(), data: { type: "payment", id: paymentId, object: {} } });
-  return handleSquareWebhook(db, square, webhook, raw, squareSignature(raw, webhook.signatureKey, webhook.notificationUrl), api.fetchImpl);
+function deliver(api: ReturnType<typeof services>, sessionId: string) {
+  return deliverStripeEvent(db, api.stripeApi, "checkout.session.completed", { id: sessionId });
 }
 
 /** The next date (2 to 8 days on) that a published class runs, so it's inside the first four weeks. */
@@ -100,31 +81,32 @@ beforeAll(async () => {
 }, 60_000);
 
 describe("joining and paying online", () => {
-  it("opens Square's page for the plan's price from content, coming back to the site afterwards", async () => {
+  it("opens Stripe's page for the plan's price from content, coming back to the site afterwards", async () => {
     const api = services();
     const data = request({ plan: "regular" });
-    const out = await startCheckout(db, square, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
+    const out = await startCheckout(db, stripe, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
     expect(out.ok).toBe(true);
     if (!out.ok) return;
-    expect(out.url).toMatch(/^https:\/\/sandbox\.square\.link\/u\/join\d+$/);
-    expect(api.linkCalls[0]).toMatchObject({
-      quick_pay: { name: "Regular membership, first 4 weeks", price_money: { amount: 6500, currency: "GBP" }, location_id: "LOC-TEST" },
-      pre_populated_data: { buyer_email: data.email },
-      checkout_options: { redirect_url: `https://raeng.example/memberships/join/done?signup=${out.signupId}` },
-    });
-    // Nothing starts before Square confirms.
+    expect(out.url).toMatch(/^https:\/\/checkout\.stripe\.test\/c\/pay\/cs_test_\d+$/);
+    const form = api.linkCalls[0];
+    expect(form.get("line_items[0][price_data][product_data][name]")).toBe("Regular membership, first 4 weeks");
+    expect(form.get("line_items[0][price_data][unit_amount]")).toBe("6500");
+    expect(form.get("line_items[0][price_data][currency]")).toBe("gbp");
+    expect(form.get("customer_email")).toBe(data.email);
+    expect(form.get("success_url")).toBe(`https://raeng.example/memberships/join/done?signup=${out.signupId}`);
+    // Nothing starts before Stripe confirms.
     expect(await signupStatus(db, out.signupId)).toMatchObject({ status: "awaiting_payment", plan_name: "Regular", payUrl: out.url });
     expect(await sql("select count(*)::int as n from akb_memberships m join akb_membership_signups s on s.client_id = m.client_id where s.id = $1", [out.signupId])).toEqual([{ n: 0 }]);
     // The same submission again opens the same link, with no second charge.
-    const again = await startCheckout(db, square, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
+    const again = await startCheckout(db, stripe, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
     expect(again.ok && again.url).toBe(out.url);
   });
 
-  it("starts the membership when Square's verified payment arrives, books the first class, and emails Alex and the member once", async () => {
+  it("starts the membership when Stripe's verified payment arrives, books the first class, and emails Alex and the member once", async () => {
     const api = services();
     const { cls, date } = upcomingClass();
     const data = request({ plan: "starter", session: cls.label, classDate: date });
-    const out = await startCheckout(db, square, data, cls, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
+    const out = await startCheckout(db, stripe, data, cls, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
     if (!out.ok) throw new Error(out.reason);
 
     const pid = api.pay(await orderFor(out.signupId), 4000);
@@ -143,23 +125,23 @@ describe("joining and paying online", () => {
     expect(api.emails).toHaveLength(2);
     // A repeated webhook records nothing twice.
     expect((await deliver(api, pid)).status).toBe(200);
-    expect(await sql("select count(*)::int as n from akb_payments where provider_payment_id = $1", [pid])).toEqual([{ n: 1 }]);
+    expect(await sql("select count(*)::int as n from akb_payments p join akb_membership_signups s on s.client_id = p.client_id where s.id = $1 and p.provider = 'stripe_test'", [out.signupId])).toEqual([{ n: 1 }]);
   });
 
   it("an existing member can't join twice", async () => {
     const api = services();
     const data = request();
-    const out = await startCheckout(db, square, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
+    const out = await startCheckout(db, stripe, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
     if (!out.ok) throw new Error(out.reason);
     await deliver(api, api.pay(await orderFor(out.signupId), 6500));
-    const second = await startCheckout(db, square, { ...data, submissionId: "another" }, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}-b`, env, fetchImpl: api.fetchImpl });
+    const second = await startCheckout(db, stripe, { ...data, submissionId: "another" }, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}-b`, env, fetchImpl: api.fetchImpl });
     expect(second).toEqual({ ok: false, reason: "already_member" });
   });
 
   it("renewals: a pay link for each new period is emailed once, and the credits wait for it", async () => {
     const api = services();
     const data = request({ plan: "dedicated" });
-    const out = await startCheckout(db, square, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
+    const out = await startCheckout(db, stripe, data, null, { agreedAt: new Date().toISOString(), idempotencyKey: `join-key-${n}`, env, fetchImpl: api.fetchImpl });
     if (!out.ok) throw new Error(out.reason);
     await deliver(api, api.pay(await orderFor(out.signupId), 8500));
     // Four weeks on: move the first period back and renew today.
@@ -169,13 +151,13 @@ describe("joining and paying online", () => {
     expect(await rpc(db, "akb_renew_memberships", { p_today: londonToday() })).toMatchObject({ ok: true });
     expect(await rpc(db, "akb_member_payment_due", { p_client: cid })).toMatchObject({ ok: true, data: { outstanding_pence: 8500 } });
 
-    const sent = await sendRenewalLinks(db, square, londonToday(), env, api.fetchImpl);
+    const sent = await sendRenewalLinks(db, stripe, londonToday(), env, api.fetchImpl);
     expect(sent.sent).toBeGreaterThanOrEqual(1);
     const mail = api.emails.find((x) => x.to[0] === data.email);
     expect(mail?.subject).toBe("Your RAENG Dedicated membership has renewed");
-    expect(mail?.text).toMatch(/Pay £85 securely with Square to use this period's credits:\nhttps:\/\/sandbox\.square\.link\/u\/join\d+/);
+    expect(mail?.text).toMatch(/Pay £85 securely with Stripe to use this period's credits:\nhttps:\/\/checkout\.stripe\.test\/c\/pay\/cs_test_\d+/);
     const before = api.emails.length;
-    await sendRenewalLinks(db, square, londonToday(), env, api.fetchImpl);
+    await sendRenewalLinks(db, stripe, londonToday(), env, api.fetchImpl);
     expect(api.emails.length).toBe(before);
   });
 });
