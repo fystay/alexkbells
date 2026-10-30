@@ -126,7 +126,7 @@ export function parseBookingRequest(
   }
   if (!BOOKING_EXPERIENCE.some((o) => o.value === experience)) errors.experience = "Choose the option that best describes you.";
 
-  const fieldErrors = { name: nameError(name), email: emailError(email), phone: phoneError(phone), message: messageError(message) };
+  const fieldErrors = { name: nameError(name), email: emailError(email), phone: phoneError(phone, true), message: messageError(message) };
   for (const [field, error] of Object.entries(fieldErrors)) if (error) errors[field as BookingField] = error;
 
   if (Object.keys(errors).length > 0) return { kind: "invalid", errors };

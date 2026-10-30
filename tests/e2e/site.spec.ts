@@ -450,7 +450,7 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   // What and where (owner's pick A, 2026-10-26).
-  await expect(hero.locator("h1")).toContainText("Train with intent.");
+  await expect(hero.locator("h1")).toContainText("Welcome to RAENG.");
   await expect(hero.locator("h1")).toContainText("Be part of something stronger.");
   await expect(hero.locator("h1")).toContainText("Kettlebell training in Cumbernauld");
   // Alex's mockup: the button on the film reads "Book a class" (2026-10-29).
@@ -472,7 +472,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await page.goto("/");
   // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions, then "Ready to start?"; no "Coached by" line.
   const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
-  expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading", "book"]);
+  expect(order).toEqual(["hero-heading", "ways", "classes", "memberships", "why-kettlebells", "coach", "philosophy", "faq-heading", "book"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
   // Why kettlebells in Alex's words (mockup, 2026-10-29).
@@ -490,7 +490,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await expect(page.locator("#coach figcaption")).toHaveText("My journey. My approach to training.");
   await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
   await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
-  await expect(classes).toContainText("New? Say so when you book.");
+  await expect(classes).toContainText("New to RAENG? Let us know when booking.");
   const more = page.locator("#ways");
   await expect(more.getByRole("link", { name: /Group classes/ })).toHaveAttribute("href", "/classes");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");
@@ -500,7 +500,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await expect(more).toContainText("From £35 per session");
   await expect(page.locator("blockquote")).toHaveCount(0);
   const coach = page.locator("#coach");
-  await expect(coach.getByRole("link", { name: "About RAENG" })).toHaveAttribute("href", "/about");
+  await expect(coach.getByRole("link", { name: "About RAENG" })).toHaveCount(0); // removed (owner, 2026-10-30)
   await expect(coach.getByText("Before", { exact: true })).toBeVisible();
   await expect(coach.getByText("Now", { exact: true })).toBeVisible();
 });
@@ -771,11 +771,8 @@ test("About: Alex's story, then the philosophy and values; no quote band (2026-1
   await entry.getByRole("button", { name: /drive/ }).click();
   await expect(entry.getByRole("button", { pressed: true })).toHaveText(/drive/);
   await expect(entry).toContainText("The reason you still turn up on the hard days.");
-  // "1% better, every day" as a chart: the slider reads any day.
-  const slider = page.locator("#coach").getByRole("slider", { name: "Day of the year" });
-  await slider.fill("100");
-  await expect(page.locator("#coach")).toContainText("after 100 days of 1% better");
-  await expect(page.locator("#coach")).toContainText("×2.70");
+  // The "1% better, every day" chart is off About (owner, 2026-10-30).
+  await expect(page.getByRole("slider", { name: "Day of the year" })).toHaveCount(0);
   // Facebook is in the footer; Alex's section links Instagram only (2026-10-27).
   const fb = page.getByRole("contentinfo").getByRole("link", { name: /Facebook/ });
   await expect(fb).toHaveAttribute("href", "https://www.facebook.com/profile.php?id=61589486540520");
@@ -928,8 +925,9 @@ test("home: each plan row is one choice, class times appear once, and secondary 
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
     await expect(card.getByRole("radio", { name: new RegExp(`^${name},`) })).toHaveCount(1);
   }
-  // Pay as you go has its own topic on Classes, not a row in the home preview (Alex's layout, 2026-10-29).
-  await expect(cards).toHaveCount(3);
+  // Pay as you go is the fourth card, below Dedicated (owner, 2026-10-30).
+  await expect(cards).toHaveCount(4);
+  await expect(cards.nth(3).getByRole("heading", { name: "Pay as you go" })).toBeVisible();
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   // "Ready to start?" closes the page (the owner, 2026-10-29), opening the booking flow at step 1.

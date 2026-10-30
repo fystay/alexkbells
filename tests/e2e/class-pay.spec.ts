@@ -47,6 +47,7 @@ async function toDetails(page: Page, url: string, nth: number, name: string, ema
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("textbox", { name: "Name" }).fill(name);
   await page.getByRole("textbox", { name: "Email" }).fill(email);
+  await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
   // The form's anti-spam check refuses anything sent within 3 seconds of opening it.
   await page.waitForTimeout(3100);
 }

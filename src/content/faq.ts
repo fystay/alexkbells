@@ -43,7 +43,7 @@ export const faq: FaqItem[] = [
     id: "bring",
     question: "What should I bring?",
     answer:
-      "Comfortable clothes you can move in, a water bottle and a small towel. Kettlebells are provided. Flat shoes or bare feet work best.",
+      "Comfortable clothes you can move in, a water bottle and a small towel. Kettlebells are provided. Can workout with bare feet or socks.",
     status: "confirmed",
   },
   {

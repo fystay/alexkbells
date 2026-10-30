@@ -99,6 +99,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
   const demo = mode === "demo";
   const chosenPlan = useChosenPlan();
   const [full, setFull] = useState<{ full: string[]; cancelled: string[] }>({ full: [], cancelled: [] });
+  // Places left per "slot|date" (only dates with a row) and the usual class size, for "N places left" on each class.
+  const [places, setPlaces] = useState<{ left: Record<string, number>; size: number | null }>({ left: {}, size: null });
   const fullSet = new Set(full.full);
   const cancelledSet = new Set(full.cancelled);
   const initialStep = initialService ? 1 : 0;
@@ -223,10 +225,17 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
     if (demo || service !== "group-class") return;
     let live = true;
     fetch("/api/classes/full")
-      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown; cancelled?: unknown }>) : { full: [], cancelled: [] }))
+      .then((r) => (r.ok ? (r.json() as Promise<{ full?: unknown; cancelled?: unknown; left?: unknown; size?: unknown; known?: unknown }>) : { full: [], cancelled: [] }))
       .then((body) => {
         const keys = (list: unknown) => (Array.isArray(list) ? list.filter((k): k is string => typeof k === "string") : []);
-        if (live) setFull({ full: keys(body.full), cancelled: keys(body.cancelled) });
+        if (!live) return;
+        setFull({ full: keys(body.full), cancelled: keys(body.cancelled) });
+        const left: Record<string, number> = {};
+        const raw = "left" in body && typeof body.left === "object" && body.left !== null ? (body.left as Record<string, unknown>) : {};
+        for (const [k, v] of Object.entries(raw)) if (typeof v === "number" && Number.isInteger(v) && v >= 0) left[k] = v;
+        const size = "size" in body && typeof body.size === "number" && Number.isInteger(body.size) && body.size > 0 ? body.size : null;
+        // Only trust the counts when the server could read them.
+        setPlaces("known" in body && body.known === true ? { left, size } : { left: {}, size: null });
       })
       .catch(() => {});
     return () => {
@@ -316,7 +325,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
     const checks = {
       name: nameError(details.name.trim()),
       email: emailError(details.email.trim().toLowerCase()),
-      phone: phoneError(details.phone.trim()),
+      phone: phoneError(details.phone.trim(), true),
       message: messageError(details.message),
     };
     for (const [field, error] of Object.entries(checks)) if (error) errors[field as BookingField] = error;
@@ -440,6 +449,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                         date={date}
                         slotId={slotId}
                         noun={noun}
+                        placesLeft={service === "group-class" && places.size !== null ? (slot, day) => places.left[`${slot}|${day}`] ?? places.size : undefined}
                         onDate={(d) => {
                           setDate(d);
                           setSlotId(null);
@@ -576,7 +586,6 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
-                  optional
                   maxLength={30}
                   value={details.phone}
                   onChange={update("phone")}

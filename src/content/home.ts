@@ -4,8 +4,8 @@
  */
 export const hero = {
   // What Alex does and where, in two lines (owner's pick A, 2026-10-26; was "Train with purpose. / Build with discipline.").
-  // Alex's wording, relayed by the owner 2026-10-29 (was "Get stronger.").
-  headline: "Train with intent.",
+  // Owner, 2026-10-30: "Welcome to RAENG" (was Alex's "Train with intent.", 2026-10-29; before that "Get stronger.").
+  headline: "Welcome to RAENG.",
   tagline: "Be part of something stronger.",
   // Alex's mockup: "KETTLEBELL TRAINING IN CUMBERNAULD" and a "Book a class" button on the film (2026-10-29).
   headlineSecondary: "Kettlebell training in Cumbernauld",
@@ -51,11 +51,11 @@ export const whyKettlebells = [
 export const firstClassSteps = {
   title: "Start in three steps.",
   // The first session says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
-  beginners: "New? Say so when you book.",
+  beginners: "New to RAENG? Let us know when booking.",
   firstSession: "Alex asks about your goals and any injuries, teaches the key movements and gets your technique solid before you go heavier.",
-  bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Flat shoes or bare feet work best.",
+  bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Can workout with bare feet or socks.",
   // The same answers, short, for /classes (owner's classes design, 2026-10-28).
   scaled: "Every movement is scaled to you.",
-  bringItems: ["Comfy clothes", "Water", "Small towel", "Flat shoes or bare feet"],
+  bringItems: ["Comfy clothes", "Water", "Small towel", "Bare feet or socks"],
   provided: "Kettlebells are provided.",
 } as const;
