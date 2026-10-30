@@ -92,7 +92,7 @@ export function ClassWeek({
 
   return (
     <div>
-      <ul aria-label="Class times" className="border-y border-line">
+      <ul aria-label="Class times">
         {classes.map((c, i) => {
           const s = status?.get(c.id);
           const isFull = s?.full ?? false;
@@ -134,7 +134,7 @@ export function ClassWeek({
         })}
       </ul>
 
-      <p className="mt-5 flex flex-wrap justify-between gap-3 tabular-nums">
+      <p className="mt-6 flex flex-wrap justify-between gap-3 tabular-nums">
         {[...facts, ...(size ? [`${size} places max`] : [])].map((f) => (
           <span key={f}>{f}</span>
         ))}
