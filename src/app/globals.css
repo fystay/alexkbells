@@ -189,6 +189,36 @@
 }
 
 /*
+ * A hairline where one home-page section ends and the next begins (owner,
+ * 2026-10-30: "not too obvious, not too blocky"). It sits in the space between
+ * sections at the page's text width, none after the film. Decorative only.
+ */
+.section-rules > section {
+  position: relative;
+}
+.section-rules > section + section:not(:nth-child(2))::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  right: 1rem;
+  max-width: calc(78rem - 2rem);
+  margin-inline: auto;
+  border-top: 1px solid var(--color-line);
+  pointer-events: none;
+  @media (width >= 40rem) {
+    left: 1.5rem;
+    right: 1.5rem;
+    max-width: calc(78rem - 3rem);
+  }
+  @media (width >= 64rem) {
+    left: 2.5rem;
+    right: 2.5rem;
+    max-width: calc(78rem - 5rem);
+  }
+}
+
+/*
  * Scroll reveal (lib/reveal.ts). Elements marked data-reveal fade up the
  * first time they enter the viewport. Only active once the head script has
  * set html[data-reveal-ready], which it never does under reduced motion or
