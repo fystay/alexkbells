@@ -216,7 +216,7 @@ test("the contact page leads to Alex's Instagram", async ({ page }) => {
 
 test("FAQs & Contact: questions, contact details, Instagram, getting started, in that order and nothing else (Alex, 2026-10-29)", async ({ page }) => {
   await page.goto("/contact");
-  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
   expect(order).toEqual(["faq-heading", "contact-details", "instagram", "getting-started"]);
   const ways = page.locator("#ways");
   await expect(ways).toContainText("1A Dunns Wood Road");
@@ -471,7 +471,7 @@ test("homepage hero and its call to action are in the first screen on phones and
 test("homepage: one idea per section, in order, and no testimonial is invented", async ({ page }) => {
   await page.goto("/");
   // Alex's layout (2026-10-29): services under the hero, Meet your coach lower down ("less about me"), then the philosophy and the questions, then "Ready to start?"; no "Coached by" line.
-  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
   expect(order).toEqual(["hero-heading", "ways", "why-kettlebells", "classes", "memberships", "coach", "philosophy", "faq-heading", "book"]);
   await expect(page.getByRole("region", { name: "Your coach" })).toHaveCount(0);
   // The classes as rows (2026-10-29): price and level in one line, the address without the venue name, no second Book now.
@@ -689,7 +689,7 @@ test("menu open on mobile has no accessibility violations and is keyboard operab
 
 test("/classes: Alex's order and nothing else (2026-10-29)", async ({ page }) => {
   await page.goto("/classes");
-  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
   expect(order).toEqual(["classes-hero-heading", "timetable", "location", "memberships", "pay-as-you-go", "cancellation", "faq-heading"]);
   // Gone: the three steps, "what the classes build", the other-ways line and the extra Book now.
   await expect(page.locator("#join")).toHaveCount(0);
@@ -721,7 +721,7 @@ test("/online-coaching and its enquiry form are off the site for now and go to C
 
 test("/coaching: Alex's order and nothing else (2026-10-29)", async ({ page }) => {
   await page.goto("/coaching");
-  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
   expect(order).toEqual(["small-group", "who-for", "included", "pricing", "cta-heading"]);
   // No "how it works" steps and no group-classes link.
   await expect(page.locator("#how-it-works")).toHaveCount(0);
@@ -755,7 +755,7 @@ test("Alex's layout: each page carries the parts his layout image lists (2026-10
   await expect(page.locator("#pricing")).toContainText("£35");
   // About: his story, then RAENG's values and long-term vision.
   await page.goto("/about");
-  const order = await page.locator("main > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
+  const order = await page.locator("main > section, main > .section-rules > section").evaluateAll((els) => els.map((e) => e.id || e.getAttribute("aria-labelledby")));
   expect(order).toEqual(["coach", "philosophy", "values", "cta-heading"]);
 });
 
