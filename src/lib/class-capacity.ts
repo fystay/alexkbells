@@ -6,7 +6,7 @@ import { CLASS_WINDOW_DAYS } from "./availability/timetable";
  * Which upcoming group classes can't be booked: full (a capacity is set for
  * that date in the coach portal and its booked places have reached it) or
  * cancelled by the coach (view akb_class_overview). Read on the server with
- * the secret key; only "slot|date" keys leave it, never names or counts.
+ * the secret key; only "slot|date" keys and the number of places left leave it, never names.
  * When the database isn't configured or doesn't answer, nothing is marked
  * (Alex still confirms every place), and the caller is told it's unknown.
  */
@@ -16,7 +16,10 @@ export function fullKey(slot: string, date: string): string {
   return `${slot}|${date}`;
 }
 
-export type FullClasses = { known: true; keys: string[]; cancelled: string[] } | { known: false; keys: []; cancelled: [] };
+/** `left`: places still free on a date that has a row (a date Alex hasn't touched has none: every place is free). */
+export type FullClasses =
+  | { known: true; keys: string[]; cancelled: string[]; left?: Record<string, number> }
+  | { known: false; keys: []; cancelled: []; left?: undefined };
 
 const UNKNOWN: FullClasses = { known: false, keys: [], cancelled: [] };
 
@@ -71,6 +74,9 @@ export async function fullClasses(today: DateKey, env: Env = process.env, fetchI
       known: true,
       keys: rows.filter((r) => !r.cancelled_at && r.capacity !== null && r.booked >= r.capacity).map((r) => fullKey(r.slot, r.class_date)),
       cancelled: rows.filter((r) => r.cancelled_at).map((r) => fullKey(r.slot, r.class_date)),
+      left: Object.fromEntries(
+        rows.filter((r) => !r.cancelled_at && r.capacity !== null).map((r) => [fullKey(r.slot, r.class_date), Math.max(0, (r.capacity as number) - r.booked)]),
+      ),
     };
   } catch {
     console.error("Reading class capacity failed (network)");

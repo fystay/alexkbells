@@ -16,6 +16,8 @@ interface Props {
   onSlot: (slotId: string) => void;
   /** e.g. "class" or "session", for the times heading. */
   noun: string;
+  /** Places still free on a class date (group classes, when the count is known); shown beside each time. */
+  placesLeft?: (slotId: string, date: DateKey) => number;
 }
 
 /**
@@ -23,7 +25,7 @@ interface Props {
  * radios: arrow keys move between the dates that can be chosen, and dates
  * without availability are disabled and labelled.
  */
-export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSlot, noun }: Props) {
+export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSlot, noun, placesLeft }: Props) {
   const byDate = new Map(avail.days.map((d) => [d.date, d]));
   const months = [...new Set([monthKey(avail.from), monthKey(avail.to)])];
   // Open on the chosen date's month, else the month of the first date that can be booked.
@@ -138,7 +140,9 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
               <label
                 key={slot.id}
                 className={cn(
-                  "flex min-h-12 items-center justify-between gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors duration-150",
+                  "flex min-h-12 rounded-xl border px-4 text-sm font-semibold transition-colors duration-150",
+                  // With a places-left line the time and the line stack (two columns of tiles on a phone are narrow).
+                  placesLeft && slot.available ? "flex-col justify-center py-2" : "items-center justify-between gap-2",
                   slot.available
                     ? "cursor-pointer border-line hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper"
                     : "cursor-not-allowed border-dashed border-line text-muted",
@@ -155,7 +159,11 @@ export function AvailabilityCalendar({ window: avail, date, slotId, onDate, onSl
                   className="sr-only"
                 />
                 <span>{formatTime(slot.time)}</span>
-                {!slot.available ? <span className="text-xs font-normal">Full</span> : null}
+                {!slot.available ? (
+                  <span className="text-xs font-normal">Full</span>
+                ) : placesLeft && date ? (
+                  <span className="text-xs font-normal">{placesLabel(placesLeft(slot.id, date))}</span>
+                ) : null}
               </label>
             ))}
           </div>
@@ -179,4 +187,9 @@ function MonthButton({ direction, disabled, onClick }: { direction: "previous" |
       {direction === "previous" ? "Previous" : "Next"}
     </button>
   );
+}
+
+/** "1 place left" / "7 places left". */
+function placesLabel(n: number): string {
+  return `${n} ${n === 1 ? "place" : "places"} left`;
 }
