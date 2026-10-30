@@ -490,7 +490,7 @@ test("homepage: one idea per section, in order, and no testimonial is invented",
   await expect(page.locator("#coach figcaption")).toHaveText("My journey. My approach to training.");
   await expect(classes.getByRole("link", { name: "View classes and book" })).toHaveCount(1);
   await expect(classes.getByRole("link", { name: /Get directions/ })).toHaveAttribute("href", /google\.com\/maps/);
-  await expect(classes).toContainText("New? Say so when you book.");
+  await expect(classes).toContainText("New to RAENG? Let us know when booking.");
   const more = page.locator("#ways");
   await expect(more.getByRole("link", { name: /Group classes/ })).toHaveAttribute("href", "/classes");
   await expect(more.getByRole("link", { name: /1:1 coaching/ })).toHaveAttribute("href", "/coaching");

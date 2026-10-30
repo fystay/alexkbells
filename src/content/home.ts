@@ -51,7 +51,7 @@ export const whyKettlebells = [
 export const firstClassSteps = {
   title: "Start in three steps.",
   // The first session says Alex teaches the key movements, so this stays short (fewer repeats, owner 2026-10-26).
-  beginners: "New? Say so when you book.",
+  beginners: "New to RAENG? Let us know when booking.",
   firstSession: "Alex asks about your goals and any injuries, teaches the key movements and gets your technique solid before you go heavier.",
   bring: "Bring comfortable clothes, water and a small towel. Kettlebells provided. Flat shoes or bare feet work best.",
   // The same answers, short, for /classes (owner's classes design, 2026-10-28).

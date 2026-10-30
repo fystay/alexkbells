@@ -157,6 +157,7 @@ export function ClassWeek({
           <Link href="#memberships" className="font-semibold underline underline-offset-4 hover:no-underline">
             Save with a membership
           </Link>
+          .
         </p>
       </div>
     </div>
