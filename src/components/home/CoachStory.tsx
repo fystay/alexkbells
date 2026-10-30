@@ -1,3 +1,4 @@
+import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import type { ReactNode } from "react";
 import { coach } from "@/content/coach";
 import { site } from "@/content/site";
@@ -111,7 +112,8 @@ export function CoachStory({
             ) : null}
             {/* Instagram only (2026-10-27): the follower count and Facebook are in the footer and on /contact. */}
             <p className="mt-3 text-sm">
-              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:no-underline">
+              <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 font-semibold underline underline-offset-4 hover:no-underline">
+                <InstagramIcon className="size-5 shrink-0" />
                 Instagram {site.social.instagram.handle}
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>

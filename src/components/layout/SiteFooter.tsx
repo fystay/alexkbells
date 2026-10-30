@@ -1,3 +1,4 @@
+import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import { RevealPhone } from "@/components/ui/RevealPhone";
 import { scramblePhone } from "@/lib/phone";
 import Link from "next/link";
@@ -65,7 +66,10 @@ export function SiteFooter() {
                   rel="noopener noreferrer"
                   className={footerLink}
                 >
-                  Instagram
+                  <span className="inline-flex items-center gap-2">
+                    <InstagramIcon className="size-4 shrink-0" />
+                    Instagram
+                  </span>
                   <span className="sr-only"> {site.social.instagram.handle} (opens in a new tab)</span>
                 </a>
               </li>

@@ -1,3 +1,4 @@
+import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import { RevealPhone } from "@/components/ui/RevealPhone";
 import { scramblePhone } from "@/lib/phone";
 import type { Metadata } from "next";
@@ -81,9 +82,17 @@ export default function ContactPage() {
 
       <Section tone="plain" id="instagram" labelledBy="instagram-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <SectionHeading id="instagram-heading" className="lg:col-span-5" eyebrow="Instagram" title={site.social.raeng.handle} />
+          <SectionHeading id="instagram-heading" className="lg:col-span-5" eyebrow="Instagram"
+            title={
+              <span className="inline-flex items-center gap-3">
+                <InstagramIcon className="size-8 shrink-0 sm:size-10" />
+                {site.social.raeng.handle}
+              </span>
+            }
+          />
           <p className="mt-6 lg:col-span-7 lg:mt-0">
-            <a href={site.social.raeng.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
+            <a href={site.social.raeng.url} target="_blank" rel="noopener noreferrer" className={`${linkClass} gap-2`}>
+              <InstagramIcon className="size-5 shrink-0" />
               Message RAENG on Instagram<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </p>
