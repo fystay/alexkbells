@@ -19,9 +19,9 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white", footer }: 
           <SectionHeading id={headingId} eyebrow="FAQ" title="Questions." />
         </div>
         <div className="lg:col-span-8">
-          <ul className="rule-list">
+          <ul className="flex flex-col gap-3">
             {items.map((item, i) => (
-              <li key={item.id} data-reveal style={revealDelay(i)} className="border-b border-line">
+              <li key={item.id} data-reveal style={revealDelay(i)} className="rounded-[1.25rem] bg-white px-5">
                 <Provisional status={item.status}>
                   <details className="group">
                     <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 py-3 font-semibold [&::-webkit-details-marker]:hidden">
@@ -37,7 +37,7 @@ export function Faq({ headingId = "faq-heading", ids, tone = "white", footer }: 
               </li>
             ))}
           </ul>
-          {footer ? <div className="mt-4">{footer}</div> : null}
+          {footer ? <div className="mt-6">{footer}</div> : null}
         </div>
       </div>
     </Section>
