@@ -92,7 +92,7 @@ export function ClassWeek({
 
   return (
     <div>
-      <ul aria-label="Class times">
+      <ul aria-label="Class times" className="flex flex-col gap-3">
         {classes.map((c, i) => {
           const s = status?.get(c.id);
           const isFull = s?.full ?? false;
@@ -119,11 +119,11 @@ export function ClassWeek({
               </span>
             </>
           );
-          const row = "flex min-h-16 items-start justify-between gap-4 py-4";
+          const row = "flex min-h-16 items-start justify-between gap-4 px-5 py-4";
           return (
-            <li key={c.id} className={cn(i > 0 && "border-t border-line")}>
+            <li key={c.id} className={cn("overflow-hidden rounded-[1.25rem] border-[1.5px] bg-white", label === "Next up" || label === "On now" ? "border-ink" : "border-transparent")}>
               {href ? (
-                <Link href={href} aria-label={`${c.day} ${c.time}${isFull ? ", fully booked" : ""}`} className={cn(row, "hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink")}>
+                <Link href={href} aria-label={`${c.day} ${c.time}${isFull ? ", fully booked" : ""}`} className={cn(row, "hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink")}>
                   {body}
                 </Link>
               ) : (
