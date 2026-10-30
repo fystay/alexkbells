@@ -52,8 +52,14 @@ describe("parseBookingRequest", () => {
     }
   });
 
-  it("allows phone, message and time of day to be blank", () => {
-    expect(parseBookingRequest(form({ ...valid, phone: "", message: "", times: [] }), { now: NOW }).kind).toBe("valid");
+  it("allows message and time of day to be blank", () => {
+    expect(parseBookingRequest(form({ ...valid, message: "", times: [] }), { now: NOW }).kind).toBe("valid");
+  });
+
+  it("requires a phone number (owner, 2026-10-30)", () => {
+    const result = parseBookingRequest(form({ ...valid, phone: "" }), { now: NOW });
+    expect(result.kind).toBe("invalid");
+    if (result.kind === "invalid") expect(result.errors.phone).toBe("Enter your phone number.");
   });
 
   it("requires at least one day when no class times are published", () => {

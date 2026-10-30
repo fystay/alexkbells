@@ -316,7 +316,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
     const checks = {
       name: nameError(details.name.trim()),
       email: emailError(details.email.trim().toLowerCase()),
-      phone: phoneError(details.phone.trim()),
+      phone: phoneError(details.phone.trim(), true),
       message: messageError(details.message),
     };
     for (const [field, error] of Object.entries(checks)) if (error) errors[field as BookingField] = error;
@@ -576,7 +576,6 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
-                  optional
                   maxLength={30}
                   value={details.phone}
                   onChange={update("phone")}

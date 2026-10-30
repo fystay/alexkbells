@@ -102,6 +102,10 @@ test.describe("booking prototype (demo availability)", () => {
     await page.getByRole("button", { name: "Finish demo" }).click();
     await expect(page.getByText("Enter a valid email address")).toBeVisible();
     await page.getByRole("textbox", { name: "Email" }).fill("demo@example.com");
+    // The phone number is required (owner, 2026-10-30).
+    await page.getByRole("button", { name: "Finish demo" }).click();
+    await expect(page.getByText("Enter your phone number.")).toBeVisible();
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.getByRole("button", { name: "Finish demo" }).click();
 
     const outcome = page.getByRole("status");
@@ -284,6 +288,7 @@ test.describe("production configuration", () => {
     await choose(page, "Advanced");
     await page.getByRole("textbox", { name: "Name" }).fill("Prod Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("prod@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.getByRole("button", { name: /add a note/i }).click();
     await page.getByLabel(/^Note/).fill("First class");
     await page.waitForTimeout(3100);
@@ -332,6 +337,7 @@ test.describe("production configuration", () => {
     await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("EMAIL-DOWN Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("email-down@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     // Stored, so the visitor is told it was sent; nothing claims a confirmed booking.
@@ -369,6 +375,7 @@ test.describe("production configuration", () => {
     await choose(page, "Advanced");
     await page.getByRole("textbox", { name: "Name" }).fill("Plan Chooser");
     await page.getByRole("textbox", { name: "Email" }).fill("plan-chooser@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.getByRole("status")).toContainText("Request sent");
@@ -524,6 +531,7 @@ test.describe("production configuration", () => {
     await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("couldn't be sent");
@@ -538,6 +546,7 @@ test.describe("production configuration", () => {
     await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("Speedy Bot");
     await page.getByRole("textbox", { name: "Email" }).fill("bot@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.locator('input[name="startedAt"]').evaluate((el: HTMLInputElement) => (el.value = String(Date.now())));
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Please wait a few seconds");
@@ -553,6 +562,7 @@ test.describe("production configuration", () => {
     await choose(page, "Intermediate");
     await page.getByRole("textbox", { name: "Name" }).fill("Slot Poster");
     await page.getByRole("textbox", { name: "Email" }).fill("slot@example.com");
+    await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
     await page.locator("form").evaluate((form) => {
       const input = document.createElement("input");
       input.type = "hidden";
