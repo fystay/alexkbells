@@ -450,7 +450,7 @@ test("homepage hero: headline, Book now and Explore coaching (owner, 2026-10-26)
   await page.goto("/");
   const hero = page.locator("section[aria-labelledby=hero-heading]");
   // What and where (owner's pick A, 2026-10-26).
-  await expect(hero.locator("h1")).toContainText("Train with intent.");
+  await expect(hero.locator("h1")).toContainText("Welcome to RAENG.");
   await expect(hero.locator("h1")).toContainText("Be part of something stronger.");
   await expect(hero.locator("h1")).toContainText("Kettlebell training in Cumbernauld");
   // Alex's mockup: the button on the film reads "Book a class" (2026-10-29).

@@ -4,8 +4,8 @@
  */
 export const hero = {
   // What Alex does and where, in two lines (owner's pick A, 2026-10-26; was "Train with purpose. / Build with discipline.").
-  // Alex's wording, relayed by the owner 2026-10-29 (was "Get stronger.").
-  headline: "Train with intent.",
+  // Owner, 2026-10-30: "Welcome to RAENG" (was Alex's "Train with intent.", 2026-10-29; before that "Get stronger.").
+  headline: "Welcome to RAENG.",
   tagline: "Be part of something stronger.",
   // Alex's mockup: "KETTLEBELL TRAINING IN CUMBERNAULD" and a "Book a class" button on the film (2026-10-29).
   headlineSecondary: "Kettlebell training in Cumbernauld",
