@@ -16,9 +16,9 @@ export interface LineItem {
  */
 export function LineRows({ items, className }: { items: LineItem[]; className?: string }) {
   return (
-    <ul className={cn("border-t border-line", className)}>
+    <ul className={cn("flex flex-col gap-3", className)}>
       {items.map((item, i) => (
-        <li key={item.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.75rem_1fr] gap-4 border-b border-line py-5">
+        <li key={item.title} data-reveal style={revealDelay(i)} className="grid grid-cols-[2.75rem_1fr] gap-4 rounded-[1.25rem] bg-white px-5 py-5">
           <svg viewBox="0 0 44 44" aria-hidden="true" className="size-11">
             {item.icon}
           </svg>

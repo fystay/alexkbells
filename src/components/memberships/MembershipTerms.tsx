@@ -7,7 +7,7 @@ import { revealDelay } from "@/lib/reveal";
 /** How memberships work: Alex's five terms, as rows between thin rules (no cards, 2026-10-26). */
 export function MembershipTerms() {
   return (
-    <Section id="how-it-works" labelledBy="terms-heading" className="pt-0 sm:pt-0 lg:pt-0">
+    <Section id="how-it-works" labelledBy="terms-heading">
       <SectionHeading id="terms-heading" title="The five terms" className="sr-only" />
       <div>
         <MembershipExplainer terms={membershipTerms} extraClassPrice={`£${getService("group-classes").prices[0].amountGbp}`} />

@@ -25,7 +25,7 @@ const payg = getService("group-classes").prices[0];
 // you go costs on top is one plain link under the plans, closed until asked for.
 export default function MembershipsPage() {
   return (
-    <>
+    <div className="section-rules">
       <PageHeader eyebrow="Kettlebell memberships" title="How memberships work." intro={`Class credits, renewed every ${BILLING_WEEKS} weeks.`} />
       <MembershipTerms />
       <Section id="memberships" labelledBy="plans-heading" className="pt-0 sm:pt-0 lg:pt-0">
@@ -39,6 +39,6 @@ export default function MembershipsPage() {
       </Section>
       <CtaBand body={null} tone="plain" />
       <CancellationPolicy />
-    </>
+    </div>
   );
 }
