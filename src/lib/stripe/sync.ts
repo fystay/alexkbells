@@ -1,6 +1,6 @@
 import { insert, rpc, select, update, type Db, type DbError } from "../coach/db";
 import { toLondon } from "../coach/time";
-import { createPaymentSession, getCheckoutSession, getRefund, listRefundsForPaymentIntent, listSessionsForPaymentIntent, type StripeRefund, type StripeResult } from "./api";
+import { createPaymentSession, getCheckoutSession, getPaymentIntent, getRefund, getSetupIntent, listRefundsForPaymentIntent, listSessionsForPaymentIntent, type CheckoutSession, type StripeRefund, type StripeResult } from "./api";
 import type { StripeConfig, StripeWebhookConfig } from "./config";
 import { verifyStripeSignature } from "./signature";
 
@@ -14,7 +14,7 @@ import { verifyStripeSignature } from "./signature";
  * types, outcomes and status codes only.
  */
 
-type Outcome = "recorded" | "duplicate" | "unknown_order" | "unknown_payment" | "pending" | "not_paid" | "not_refunded" | "ignored";
+type Outcome = "recorded" | "duplicate" | "unknown_order" | "unknown_payment" | "pending" | "not_paid" | "not_refunded" | "ignored" | "active" | "unknown_client" | "mismatch" | "succeeded" | "failed" | "paused" | "unknown_collection";
 export type SyncResult = { ok: true; outcome: Outcome } | { ok: false; reason: string };
 
 const stripeFailure = (what: string, r: StripeResult<unknown>): SyncResult => ({ ok: false, reason: `stripe-${what}-${r.ok ? "ok" : (r.status ?? "network")}` });
@@ -25,6 +25,7 @@ export async function syncCheckoutSession(db: Db, stripe: StripeConfig, sessionI
   const found = await getCheckoutSession(stripe, sessionId, fetchImpl);
   if (!found.ok) return stripeFailure("session", found);
   const c = found.data;
+  if (c.mode === "setup") return syncSetupSession(db, stripe, c, fetchImpl);
   if (c.mode !== "payment") return { ok: true, outcome: "ignored" };
   // Square's statuses are what the database function understands: paid is COMPLETED, an expired unpaid session CANCELED.
   const status = c.paymentStatus === "paid" ? "COMPLETED" : c.status === "expired" ? "CANCELED" : "PENDING";
@@ -44,10 +45,58 @@ export async function syncCheckoutSession(db: Db, stripe: StripeConfig, sessionI
   return result.ok ? { ok: true, outcome: result.data } : dbFailure(result.error);
 }
 
+/** A Direct Debit set-up page finished: record the member's method and mandate. */
+async function syncSetupSession(db: Db, stripe: StripeConfig, session: CheckoutSession, fetchImpl: typeof fetch): Promise<SyncResult> {
+  if (session.status !== "complete" || !session.setupIntentId || !session.clientReference) return { ok: true, outcome: "pending" };
+  const intent = await getSetupIntent(stripe, session.setupIntentId, fetchImpl);
+  if (!intent.ok) return stripeFailure("setup", intent);
+  const i = intent.data;
+  if (i.status !== "succeeded" || !i.paymentMethodId) return { ok: true, outcome: "pending" };
+  const result = await rpc<Outcome>(db, "akb_dd_set_method", {
+    p_client: session.clientReference,
+    p_environment: stripe.environment,
+    p_customer: i.customerId ?? session.customerId,
+    p_method: i.paymentMethodId,
+    p_mandate: i.mandateId ?? "",
+  });
+  return result.ok ? { ok: true, outcome: result.data } : dbFailure(result.error);
+}
+
+/**
+ * A Direct Debit collection ended. Succeeded: the payment is re-read from
+ * Stripe and recorded against the period's charge (through its link row), then
+ * the collection is marked. Failed: the collection is marked, and a third
+ * failure pauses the membership. Payment intents that aren't collections (a
+ * card checkout's own) are ignored by the database.
+ */
+async function syncPaymentIntent(db: Db, stripe: StripeConfig, paymentIntentId: string, failed: boolean, fetchImpl: typeof fetch): Promise<SyncResult> {
+  if (failed) {
+    const marked = await rpc<Outcome>(db, "akb_dd_mark", { p_payment_intent: paymentIntentId, p_status: "failed" });
+    return marked.ok ? { ok: true, outcome: marked.data } : dbFailure(marked.error);
+  }
+  const found = await getPaymentIntent(stripe, paymentIntentId, fetchImpl);
+  if (!found.ok) return stripeFailure("intent", found);
+  const p = found.data;
+  if (p.status !== "succeeded") return { ok: true, outcome: "pending" };
+  const applied = await rpc<Outcome>(db, "akb_apply_square_payment", {
+    p_environment: stripe.environment,
+    p_payment_id: p.id,
+    p_order_id: p.id,
+    p_status: "COMPLETED",
+    p_amount_pence: p.amountPence,
+    p_currency: p.currency,
+    p_paid_on: toLondon(p.createdAt).date,
+  });
+  if (!applied.ok) return dbFailure(applied.error);
+  if (applied.data === "recorded" || applied.data === "duplicate") await rpc<Outcome>(db, "akb_dd_mark", { p_payment_intent: p.id, p_status: "succeeded" });
+  return { ok: true, outcome: applied.data };
+}
+
 /** Applies one Stripe refund; its payment is synced first, so order of arrival doesn't matter. */
 async function applyRefund(db: Db, stripe: StripeConfig, r: StripeRefund, fetchImpl: typeof fetch): Promise<SyncResult> {
   const sessions = await listSessionsForPaymentIntent(stripe, r.paymentIntentId, fetchImpl);
   if (!sessions.ok) return stripeFailure("sessions", sessions);
+  // A card checkout's payment is synced first; a Direct Debit payment has no session and is already recorded.
   for (const session of sessions.data) {
     const payment = await syncCheckoutSession(db, stripe, session.id, fetchImpl);
     if (!payment.ok) return payment;
@@ -148,6 +197,8 @@ export async function handleStripeWebhook(
   let result: SyncResult;
   if (!objectId) result = { ok: true, outcome: "ignored" };
   else if (type.startsWith("checkout.session.")) result = await syncCheckoutSession(db, stripe, objectId, fetchImpl);
+  else if (type === "payment_intent.succeeded") result = await syncPaymentIntent(db, stripe, objectId, false, fetchImpl);
+  else if (type === "payment_intent.payment_failed") result = await syncPaymentIntent(db, stripe, objectId, true, fetchImpl);
   else if (type === "refund.created" || type === "refund.updated") result = await syncRefund(db, stripe, objectId, fetchImpl);
   else if (type === "charge.refunded" && text(object.payment_intent, 100)) result = await syncPaymentRefunds(db, stripe, text(object.payment_intent, 100), fetchImpl);
   else result = { ok: true, outcome: "ignored" };
@@ -184,7 +235,7 @@ interface ChargeBalance {
   outstanding_pence: number;
 }
 
-export type LinkResult = { ok: true; url: string; amountPence: number } | { ok: false; reason: "not-found" | "nothing-owed" | "stripe" | "db" };
+export type LinkResult = { ok: true; url: string; amountPence: number } | { ok: false; reason: "not-found" | "nothing-owed" | "direct-debit" | "stripe" | "db" };
 
 /** Stripe's checkout pages last 24 hours; a link older than this is replaced rather than shown. */
 const LINK_LIFETIME_MS = 20 * 60 * 60 * 1000;
@@ -205,6 +256,8 @@ export async function createChargeLink(
   const live = await select<LinkRow>(db, "akb_square_payment_links", [["charge_id", `eq.${chargeId}`], ["status", "in.(creating,open)"]]);
   if (!live.ok) return { ok: false, reason: "db" };
   let link: LinkRow | undefined = live.data[0];
+  // A Direct Debit collection is how this charge is being paid: there is no page to open.
+  if (link?.status === "open" && !link.url.startsWith("http")) return { ok: false, reason: "direct-debit" };
   if (link?.status === "open") {
     const age = link.created_at ? Date.now() - Date.parse(link.created_at) : 0;
     if (age < LINK_LIFETIME_MS) return { ok: true, url: link.url, amountPence: link.amount_pence };

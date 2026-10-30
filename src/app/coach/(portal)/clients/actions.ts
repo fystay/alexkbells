@@ -202,6 +202,7 @@ export async function stripeLinkAction(_prev: ActionState, formData: FormData): 
     const message = {
       "not-found": "That charge no longer exists.",
       "nothing-owed": "Nothing is owed on this charge.",
+      "direct-debit": "This charge is being collected by the member's Direct Debit, so there is no card link to send.",
       stripe: "Stripe didn't create the link. Nothing was charged; try again in a moment.",
       db: "The database isn't responding, so nothing was saved. Try again in a moment.",
     }[result.reason];

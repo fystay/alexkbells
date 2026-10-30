@@ -236,9 +236,11 @@ describe("webhooks → ledger", () => {
     a.sessions.set("cs_test_foreign", { id: "cs_test_foreign", mode: "payment", status: "complete", payment_status: "paid", payment_intent: "pi_foreign", amount_total: 2500, currency: "gbp", created: 1_792_000_000 });
     expect((await completed(a, "cs_test_foreign")).body).toEqual({ outcome: "unknown_order" });
     expect((await deliverStripeEvent(db, a, "customer.created", { id: "cus_1" })).body).toEqual({ outcome: "ignored" });
-    // Not a one-off payment (a later set-up session, say).
-    a.sessions.set("cs_test_setup", { id: "cs_test_setup", mode: "setup", status: "complete", payment_status: "no_payment_required", created: 1_792_000_000 });
-    expect((await completed(a, "cs_test_setup")).body).toEqual({ outcome: "ignored" });
+    // A Direct Debit set-up page that isn't finished records nothing (see direct-debit.test.ts), and other modes are ignored.
+    a.sessions.set("cs_test_setup", { id: "cs_test_setup", mode: "setup", status: "open", payment_status: "no_payment_required", created: 1_792_000_000 });
+    expect((await completed(a, "cs_test_setup")).body).toEqual({ outcome: "pending" });
+    a.sessions.set("cs_test_sub", { id: "cs_test_sub", mode: "subscription", status: "complete", payment_status: "paid", created: 1_792_000_000 });
+    expect((await completed(a, "cs_test_sub")).body).toEqual({ outcome: "ignored" });
   });
 
   it("refuses a non-GBP payment and keeps asking for redelivery", async () => {

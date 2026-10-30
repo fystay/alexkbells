@@ -27,6 +27,11 @@ export function stripeStandIn(fallback: (url: string, init?: RequestInit) => Pro
   const sessions = new Map<string, Record<string, unknown>>();
   const byKey = new Map<string, string>();
   const refunds = new Map<string, Record<string, unknown>>();
+  const customers = new Map<string, string>(); // idempotency key -> customer id
+  const setupIntents = new Map<string, Record<string, unknown>>();
+  const intents = new Map<string, Record<string, unknown>>();
+  const intentByKey = new Map<string, string>();
+  let intentStatus = 0; // when set, creating a payment intent is refused with this status
   const calls: StripeCall[] = [];
   let down = false;
   const created = () => Math.floor(Date.parse("2026-10-20T10:00:00Z") / 1000);
@@ -40,6 +45,37 @@ export function stripeStandIn(fallback: (url: string, init?: RequestInit) => Pro
     calls.push({ method: init.method ?? "GET", path, headers, form });
     if (down) return Response.json({ error: { type: "api_error" } }, { status: 500 });
 
+    if (init.method === "POST" && path === "/v1/customers") {
+      const key = headers["Idempotency-Key"];
+      if (!byKey.has(`c:${key}`)) byKey.set(`c:${key}`, `cus_test_${++ids}`);
+      customers.set(byKey.get(`c:${key}`)!, form.get("email") ?? "");
+      return Response.json({ id: byKey.get(`c:${key}`), object: "customer" });
+    }
+    if (init.method === "POST" && path === "/v1/payment_intents") {
+      if (intentStatus) return Response.json({ error: { type: "invalid_request_error" } }, { status: intentStatus });
+      const key = headers["Idempotency-Key"];
+      if (!intentByKey.has(key)) {
+        const id = `pi_test_${++ids}`;
+        intents.set(id, { id, object: "payment_intent", status: "processing", amount: Number(form.get("amount")), currency: form.get("currency"), created: created() });
+        intentByKey.set(key, id);
+      }
+      return Response.json(intents.get(intentByKey.get(key)!));
+    }
+    const oneIntent = path.match(/^\/v1\/payment_intents\/([\w-]+)$/);
+    if (init.method !== "POST" && oneIntent) return intents.has(oneIntent[1]) ? Response.json(intents.get(oneIntent[1])) : Response.json({ error: {} }, { status: 404 });
+    const oneSetup = path.match(/^\/v1\/setup_intents\/([\w-]+)$/);
+    if (init.method !== "POST" && oneSetup) return setupIntents.has(oneSetup[1]) ? Response.json(setupIntents.get(oneSetup[1])) : Response.json({ error: {} }, { status: 404 });
+    if (init.method === "POST" && path === "/v1/checkout/sessions" && form.get("mode") === "setup") {
+      const id = `cs_test_${++ids}`;
+      const setup = `seti_test_${++ids}`;
+      setupIntents.set(setup, { id: setup, status: "requires_payment_method", customer: form.get("customer"), payment_method: null, mandate: null });
+      sessions.set(id, {
+        id, object: "checkout.session", mode: "setup", status: "open", payment_status: "no_payment_required", setup_intent: setup,
+        customer: form.get("customer"), client_reference_id: form.get("client_reference_id"), amount_total: null, currency: null,
+        created: created(), url: `https://checkout.stripe.test/c/setup/${id}`,
+      });
+      return Response.json(sessions.get(id));
+    }
     if (init.method === "POST" && path === "/v1/checkout/sessions") {
       const key = headers["Idempotency-Key"];
       if (!key || !byKey.has(key)) {
@@ -93,6 +129,25 @@ export function stripeStandIn(fallback: (url: string, init?: RequestInit) => Pro
     patch(sessionId: string, patch: Record<string, unknown>) {
       sessions.set(sessionId, { ...sessions.get(sessionId)!, ...patch });
     },
+    customers,
+    intents,
+    /** The member finished Stripe's Direct Debit page: a Bacs method and mandate are on file. */
+    completeSetup(sessionId: string) {
+      const s = sessions.get(sessionId)!;
+      const seti = String(s.setup_intent);
+      setupIntents.set(seti, { ...setupIntents.get(seti)!, status: "succeeded", payment_method: `pm_test_${++ids}`, mandate: `mandate_test_${++ids}` });
+      sessions.set(sessionId, { ...s, status: "complete" });
+      return setupIntents.get(seti)!;
+    },
+    /** Bacs cleared (about three working days after submission). */
+    succeedIntent(id: string) {
+      intents.set(id, { ...intents.get(id)!, status: "succeeded" });
+    },
+    failIntent(id: string) {
+      intents.set(id, { ...intents.get(id)!, status: "requires_payment_method" });
+    },
+    /** Stripe refuses to create payment intents from now on (0 = accepts again). */
+    refuseIntents: (status: number) => (intentStatus = status),
     refund(paymentIntent: string, amountPence: number, status = "succeeded") {
       const id = `re_test_${++ids}`;
       refunds.set(id, { id, object: "refund", status, payment_intent: paymentIntent, amount: amountPence, currency: "gbp", created: created() + 86_400 });

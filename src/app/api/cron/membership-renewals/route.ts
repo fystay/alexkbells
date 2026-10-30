@@ -5,6 +5,7 @@ import { rpc } from "@/lib/coach/db";
 import { renewMemberships } from "@/lib/coach/memberships";
 import { londonToday } from "@/lib/coach/time";
 import { sendRenewalLinks } from "@/lib/membership-checkout";
+import { collectDirectDebits, notifyDirectDebitFailures } from "@/lib/stripe/direct-debit";
 import { stripeConfig } from "@/lib/stripe/config";
 
 /**
@@ -17,6 +18,9 @@ import { stripeConfig } from "@/lib/stripe/config";
  * sessions after 30 days); a failure there is logged and never stops renewals.
  * Then, for members who joined and pay online, emails a Stripe pay link for
  * each new period still to pay (once each; needs Stripe and email settings).
+ * Members with a Direct Debit are not sent a link: their next period is created
+ * a few days early and its collection submitted to Stripe (lib/stripe/direct-debit.ts);
+ * members are told if a collection fails.
  * And releases class places held for online payment that ran out
  * (akb_release_class_holds; an unpaid charge is cancelled a day later).
  */
@@ -39,8 +43,10 @@ export async function GET(request: Request) {
   const stripe = stripeConfig();
   const links = stripe ? await sendRenewalLinks(db, stripe, londonToday()) : null;
   if (links?.failed) console.error(`Membership pay links: ${links.failed} couldn't be sent`);
+  const collections = stripe ? await collectDirectDebits(db, stripe, londonToday()) : null;
+  const ddNotified = stripe ? await notifyDirectDebitFailures(db).catch(() => 0) : null;
   return NextResponse.json(
-    { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null, classHoldsReleased: holds.ok ? holds.data : null },
+    { ok: true, periodsCreated: result.data, signInsRemoved: tidied.ok ? tidied.data : null, payLinksSent: links ? links.sent : null, directDebitsSubmitted: collections ? collections.submitted : null, directDebitFailures: ddNotified, classHoldsReleased: holds.ok ? holds.data : null },
     { headers: noStore },
   );
 }

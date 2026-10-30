@@ -190,3 +190,138 @@ export function listRefundsForPaymentIntent(config: StripeConfig, paymentIntentI
     return Array.isArray(data) ? data.map(readRefund).filter((r): r is StripeRefund => r !== null) : null;
   }, fetchImpl);
 }
+
+// ---------------------------------------------------------------------------
+// Direct Debit (Bacs): a customer, a set-up checkout that collects the bank
+// details and mandate, and off-session payments against the saved method.
+// ---------------------------------------------------------------------------
+
+export function createCustomer(
+  config: StripeConfig,
+  args: { idempotencyKey: string; email: string; name: string; clientId: string },
+  fetchImpl: typeof fetch = fetch,
+): Promise<StripeResult<{ id: string }>> {
+  return call(
+    config,
+    "POST",
+    "/v1/customers",
+    { email: args.email, name: args.name.slice(0, 200), metadata: { client: args.clientId } },
+    (json) => {
+      const id = str(obj(json)?.id);
+      return id ? { id } : null;
+    },
+    fetchImpl,
+    args.idempotencyKey,
+  );
+}
+
+/**
+ * Stripe-hosted page that collects a Direct Debit mandate (bank details) for a
+ * customer without taking money. `clientReference` comes back on the session so
+ * the webhook knows whose it is.
+ */
+export function createDirectDebitSetupSession(
+  config: StripeConfig,
+  args: { idempotencyKey: string; customerId: string; clientReference: string; successUrl: string; cancelUrl: string },
+  fetchImpl: typeof fetch = fetch,
+): Promise<StripeResult<CheckoutSessionLink>> {
+  return call(
+    config,
+    "POST",
+    "/v1/checkout/sessions",
+    {
+      mode: "setup",
+      currency: "gbp",
+      payment_method_types: { 0: "bacs_debit" },
+      customer: args.customerId,
+      client_reference_id: args.clientReference,
+      success_url: args.successUrl,
+      cancel_url: args.cancelUrl,
+    },
+    (json) => {
+      const s = obj(json);
+      const id = str(s?.id);
+      const url = str(s?.url);
+      const ok = url?.startsWith("https://") || (config.baseUrl.startsWith("http://localhost:") && url?.startsWith("http://localhost:"));
+      return id && url && ok ? { id, url } : null;
+    },
+    fetchImpl,
+    args.idempotencyKey,
+  );
+}
+
+export interface StripeSetupIntent {
+  id: string;
+  /** "succeeded" | "processing" | "requires_payment_method" | "canceled" | ... */
+  status: string;
+  customerId: string | null;
+  paymentMethodId: string | null;
+  mandateId: string | null;
+}
+
+export function getSetupIntent(config: StripeConfig, id: string, fetchImpl: typeof fetch = fetch): Promise<StripeResult<StripeSetupIntent>> {
+  return call(config, "GET", `/v1/setup_intents/${encodeURIComponent(id)}`, undefined, (json) => {
+    const s = obj(json);
+    const sid = str(s?.id);
+    const status = str(s?.status);
+    if (!sid || !status) return null;
+    return { id: sid, status, customerId: idOf(s?.customer), paymentMethodId: idOf(s?.payment_method), mandateId: idOf(s?.mandate) };
+  }, fetchImpl);
+}
+
+export interface StripePaymentIntent {
+  id: string;
+  /** "succeeded" | "processing" | "requires_payment_method" | "canceled" | ... */
+  status: string;
+  amountPence: number;
+  currency: string;
+  createdAt: string;
+}
+
+function readPaymentIntent(json: unknown): StripePaymentIntent | null {
+  const p = obj(json);
+  const id = str(p?.id);
+  const status = str(p?.status);
+  const amount = int(p?.amount);
+  const currency = str(p?.currency);
+  const createdAt = iso(p?.created);
+  if (!id || !status || amount === null || !currency || !createdAt) return null;
+  return { id, status, amountPence: amount, currency: currency.toUpperCase(), createdAt };
+}
+
+export function getPaymentIntent(config: StripeConfig, id: string, fetchImpl: typeof fetch = fetch): Promise<StripeResult<StripePaymentIntent>> {
+  return call(config, "GET", `/v1/payment_intents/${encodeURIComponent(id)}`, undefined, readPaymentIntent, fetchImpl);
+}
+
+/**
+ * Takes a Direct Debit payment from a saved Bacs method, off session (the
+ * member isn't there). Bacs takes about three working days: the intent is
+ * "processing" at first, and `payment_intent.succeeded` / `.payment_failed`
+ * say how it ended. The idempotency key (one per period and try) means a
+ * retried call never collects twice.
+ */
+export function createDirectDebitPayment(
+  config: StripeConfig,
+  args: { idempotencyKey: string; customerId: string; paymentMethodId: string; amountPence: number; description: string; metadata?: Record<string, string> },
+  fetchImpl: typeof fetch = fetch,
+): Promise<StripeResult<StripePaymentIntent>> {
+  return call(
+    config,
+    "POST",
+    "/v1/payment_intents",
+    {
+      amount: args.amountPence,
+      currency: "gbp",
+      customer: args.customerId,
+      payment_method: args.paymentMethodId,
+      payment_method_types: { 0: "bacs_debit" },
+      confirm: true,
+      off_session: true,
+      description: args.description.slice(0, 500),
+      ...(args.metadata ? { metadata: args.metadata } : {}),
+    },
+    readPaymentIntent,
+    fetchImpl,
+    args.idempotencyKey,
+  );
+}
