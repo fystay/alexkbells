@@ -593,9 +593,10 @@ test.describe("memberships", () => {
     const terms = page.locator("#membership-terms");
     await expect(terms.getByRole("heading", { level: 2 })).toHaveText("Membership terms");
     await expect(terms.locator("h3")).toHaveText(["Using your credits", "Four-week renewal", "Unused credits", "Cancellations", "Membership cancellation"]);
-    // The class cancellation policy, as written (the owner's choice for Alex's placeholder block).
-    await expect(terms).toContainText("Your class credit will be returned to your account");
-    await expect(terms).toContainText("Failure to attend a booked class without cancelling will result in the credit being forfeited.");
+    // How cancelling a membership works, as the owner wrote it (2026-10-30): any time, Direct Debit, credits stay for the paid period.
+    await expect(terms).toContainText("You can cancel your membership at any time from your account");
+    await expect(terms).toContainText("after that each four weeks is paid by Direct Debit");
+    await expect(terms).toContainText("it doesn't refund a period you've already paid for");
     await expect(terms).toContainText("Late cancellations and missed classes forfeit the credit.");
     await expect(terms).not.toContainText("Explain how to cancel");
   });

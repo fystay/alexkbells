@@ -13,6 +13,8 @@ const webhookUrl = process.env.MOCK_STRIPE_WEBHOOK_URL ?? "http://localhost:3202
 let n = 0;
 const byKey = new Map(); // idempotency key -> session id
 const sessions = new Map(); // session id -> session
+const setupIntents = new Map(); // setup intent id -> setup intent
+const customers = new Map(); // idempotency key -> customer id
 
 const json = (res, status, body) => {
   res.writeHead(status, { "Content-Type": "application/json" });
@@ -29,8 +31,28 @@ createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname === "/") return res.end("ok");
   if (req.method === "GET" && url.pathname === "/sessions") return json(res, 200, [...sessions.values()]);
 
+  if (req.method === "POST" && url.pathname === "/v1/customers") {
+    await read(req);
+    const key = String(req.headers["idempotency-key"] ?? n);
+    if (!customers.has(key)) customers.set(key, `cus_test_e2e_${++n}`);
+    return json(res, 200, { id: customers.get(key), object: "customer" });
+  }
+  const oneSetup = url.pathname.match(/^\/v1\/setup_intents\/([\w-]+)$/);
+  if (req.method === "GET" && oneSetup) return setupIntents.has(oneSetup[1]) ? json(res, 200, setupIntents.get(oneSetup[1])) : json(res, 404, { error: {} });
+
   if (req.method === "POST" && url.pathname === "/v1/checkout/sessions") {
     const form = new URLSearchParams(await read(req));
+    if (form.get("mode") === "setup") {
+      const id = `cs_test_e2e_${++n}`;
+      const setup = `seti_test_e2e_${++n}`;
+      setupIntents.set(setup, { id: setup, status: "requires_payment_method", customer: form.get("customer"), payment_method: null, mandate: null });
+      sessions.set(id, {
+        id, object: "checkout.session", mode: "setup", status: "open", payment_status: "no_payment_required", setup_intent: setup,
+        customer: form.get("customer"), client_reference_id: form.get("client_reference_id"), amount_total: null, currency: null,
+        created: Math.floor(Date.now() / 1000), url: `http://localhost:${port}/checkout/${id}`, name: "Set up Direct Debit", success_url: form.get("success_url") ?? "",
+      });
+      return json(res, 200, sessions.get(id));
+    }
     const key = req.headers["idempotency-key"];
     if (!key || !byKey.has(key)) {
       const id = `cs_test_e2e_${++n}`;
@@ -63,7 +85,19 @@ createServer(async (req, res) => {
     const session = sessions.get(checkout[1]);
     if (req.method === "GET") {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      if (session.mode === "setup") return res.end(`<!doctype html><title>Stripe test Direct Debit</title><h1>${session.name}</h1><form method="post"><button>Authorise Direct Debit</button></form>`);
       return res.end(`<!doctype html><title>Stripe test checkout</title><h1>${session.name}</h1><p>£${(session.amount_total / 100).toFixed(2)}</p><form method="post"><button>Pay £${(session.amount_total / 100).toFixed(2)}</button></form>`);
+    }
+    if (session.mode === "setup") {
+      // Authorise: the bank details and mandate are on file; tell the site (signed), send the member back.
+      session.status = "complete";
+      setupIntents.set(session.setup_intent, { ...setupIntents.get(session.setup_intent), status: "succeeded", payment_method: `pm_test_e2e_${++n}`, mandate: `mandate_test_e2e_${++n}` });
+      const raw = JSON.stringify({ id: `evt_e2e_${++n}`, object: "event", type: "checkout.session.completed", created: Math.floor(Date.now() / 1000), data: { object: { id: session.id } } });
+      const t = Math.floor(Date.now() / 1000);
+      const signature = createHmac("sha256", signingSecret).update(`${t}.${raw}`).digest("hex");
+      await fetch(webhookUrl, { method: "POST", headers: { "Content-Type": "application/json", "Stripe-Signature": `t=${t},v1=${signature}` }, body: raw });
+      res.writeHead(303, { Location: session.success_url || "/" });
+      return res.end();
     }
     // Pay: complete the session, tell the site (signed, as Stripe does), send the buyer back.
     session.status = "complete";

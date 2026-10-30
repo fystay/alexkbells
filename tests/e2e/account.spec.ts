@@ -432,6 +432,27 @@ test.describe("member accounts", () => {
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 
+  test("a member cancels their own membership: nothing more is taken and the credits stay (owner, 2026-10-30)", async ({ page, request }) => {
+    const email = `cancel-${Date.now()}@example.com`;
+    await seedMember(request, email);
+    await askForLink(page, email);
+    await page.goto(PROD + linkPath((await emailsTo(request, email))[0]));
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/account$/);
+    await page.goto(`${PROD}/account/plan`);
+    await expect(page.getByRole("heading", { level: 2, name: "Regular" })).toBeVisible();
+    // Direct Debit isn't set up here (no Stripe on this build), so the page doesn't offer it; cancelling is always there.
+    await expect(page.getByRole("button", { name: "Set up Direct Debit" })).toHaveCount(0);
+    await page.locator("summary", { hasText: "Cancel my membership" }).click();
+    await expect(page.getByText("You keep the credits you've already paid for until the end of this period")).toBeVisible();
+    await page.getByRole("button", { name: "Yes, cancel my membership" }).click();
+    await expect(page.getByText(/Cancelled from/)).toBeVisible();
+    const [m] = await sql(request, "select m.status, m.cancelled_on is not null as has_date from akb_memberships m join akb_clients c on c.id = m.client_id where c.email = $1", [email]);
+    expect(m).toEqual({ status: "cancelled", has_date: true });
+    // Nothing is left to cancel or set up.
+    await expect(page.getByRole("button", { name: "Yes, cancel my membership" })).toHaveCount(0);
+  });
+
   test("an address with no account gets the same answer and no email", async ({ page, request }) => {
     const email = `not-a-member-${Date.now()}@example.com`;
     await askForLink(page, email);

@@ -5,6 +5,7 @@ import { BILLING_WEEKS } from "@/content/memberships";
 import { coachDb, isUuid } from "@/lib/coach/db";
 import { formatLongDate, type DateKey } from "@/lib/coach/time";
 import { SIGN_IN_PATH } from "@/lib/member-auth";
+import { startSignupDirectDebit } from "../direct-debit-actions";
 import { signupStatus, type SignupStatus } from "@/lib/membership-checkout";
 import { pageMetadata } from "@/lib/metadata";
 import { buttonClasses } from "@/components/ui/ButtonLink";
@@ -31,17 +32,19 @@ export default async function JoinDonePage({ searchParams }: { searchParams: Pro
   const id = typeof raw === "string" && isUuid(raw) ? raw : null;
   const db = coachDb();
   const signup = id && db ? await signupStatus(db, id) : null;
+  const params = await searchParams;
+  const ddMessage = params.dd === "unavailable" ? "Sorry, the Direct Debit page couldn't be opened just now. Please try again in a minute." : null;
   return (
     <Section labelledBy="done-heading">
       {signup?.status === "awaiting_payment" ? <meta httpEquiv="refresh" content="4" /> : null}
       <div className="max-w-xl" role="status">
-        <Body signup={signup} />
+        <Body signup={signup} signupId={id} ddMessage={ddMessage} />
       </div>
     </Section>
   );
 }
 
-function Body({ signup }: { signup: SignupStatus | null }) {
+function Body({ signup, signupId, ddMessage }: { signup: SignupStatus | null; signupId: string | null; ddMessage: string | null }) {
   const heading = "mt-3 font-display text-h1 text-balance";
   if (!signup || signup.status === "replaced") {
     return (
@@ -101,8 +104,34 @@ function Body({ signup }: { signup: SignupStatus | null }) {
             ? "Your payment went through and your membership has started. Your first class couldn't be booked (it may have filled up), so please book another from your account."
             : "Your payment went through and your membership has started. Book your classes from your account."}
       </p>
-      <p className="mt-4">You&apos;ll get a payment link by email every {BILLING_WEEKS} weeks when it renews.</p>
-      <Link href={SIGN_IN_PATH} className={buttonClasses("action", "mt-8 w-full px-6 sm:w-auto")}>
+      {signup.dd === "active" ? (
+        <div className="mt-6 rounded-[1.25rem] bg-white p-5">
+          <p className="font-semibold">Direct Debit is set up.</p>
+          <p className="mt-1">
+            Your membership continues every {BILLING_WEEKS} weeks and each payment is collected by Direct Debit. You can cancel at any time from your account: you keep the credits you&apos;ve paid for until the end of the period.
+          </p>
+        </div>
+      ) : signupId ? (
+        <div className="mt-6 rounded-[1.25rem] bg-white p-5">
+          <p className="font-semibold">Set up your Direct Debit.</p>
+          <p className="mt-1">
+            Your first {BILLING_WEEKS} weeks are paid. Set up a Direct Debit now and your membership continues every {BILLING_WEEKS} weeks without you doing anything. Your bank details go straight to Stripe, not to us. You can cancel at any time.
+          </p>
+          {ddMessage ? (
+            <p role="alert" className="mt-3 font-semibold">
+              {ddMessage}
+            </p>
+          ) : null}
+          <form action={startSignupDirectDebit}>
+            <input type="hidden" name="signup" value={signupId} />
+            <button type="submit" className={buttonClasses("action", "mt-4 w-full px-6 sm:w-auto")}>
+              Set up Direct Debit
+            </button>
+          </form>
+          <p className="mt-3 text-sm">Until it&apos;s set up, we&apos;ll email you a payment link when your membership renews.</p>
+        </div>
+      ) : null}
+      <Link href={SIGN_IN_PATH} className={buttonClasses(signup.dd === "active" ? "action" : "secondary", "mt-6 w-full px-6 sm:w-auto")}>
         Sign in to your account
       </Link>
     </>

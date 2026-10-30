@@ -20,6 +20,8 @@ import {
   isToken,
   LEGACY_COOKIE_PATH,
   MEMBER_SESSION_COOKIE,
+  memberLinkOrigin,
+  memberOverview,
   memberCookieOptions,
   randomToken,
   redeemLoginLink,
@@ -32,6 +34,8 @@ import {
 import { deviceLabel, labelSession } from "@/lib/member-settings";
 import { requireMember } from "@/lib/member-session";
 import { sendEmailWithRetry } from "@/lib/send-email";
+import { stripeConfig } from "@/lib/stripe/config";
+import { cancelOwnMembership, startDirectDebitSetup } from "@/lib/stripe/direct-debit";
 
 export type SignInField = "email";
 
@@ -197,4 +201,28 @@ export async function signOutMember(formData: FormData): Promise<void> {
   jar.delete({ name: MEMBER_SESSION_COOKIE, path: "/" });
   jar.delete({ name: MEMBER_SESSION_COOKIE, path: LEGACY_COOKIE_PATH });
   redirect(`${SIGN_IN_PATH}?signed=out`);
+}
+
+/** Opens Stripe's Direct Debit set-up page for the signed-in member (their next periods are collected from it). */
+export async function setUpDirectDebit(): Promise<void> {
+  const member = await requireMember();
+  const stripe = stripeConfig();
+  const overview = await memberOverview(member.db, member.clientId);
+  if (!stripe || !overview.ok) redirect(`${ACCOUNT_PATH}/plan?error=direct_debit_unavailable`);
+  const result = await startDirectDebitSetup(
+    member.db,
+    stripe,
+    { clientId: member.clientId, email: overview.data.client.email, name: overview.data.client.name },
+    `${memberLinkOrigin()}${ACCOUNT_PATH}/plan`,
+  );
+  if (!result.ok) redirect(`${ACCOUNT_PATH}/plan?error=${result.reason === "already_set_up" ? "failed" : "direct_debit_unavailable"}`);
+  redirect(result.url);
+}
+
+/** The member cancels their own membership: nothing more is taken; credits already given stay until the period ends. */
+export async function cancelMembership(): Promise<void> {
+  const member = await requireMember();
+  const result = await cancelOwnMembership(member.db, member.clientId, londonToday());
+  if (!result.ok) redirect(`${ACCOUNT_PATH}/plan?error=failed`);
+  redirect(`${ACCOUNT_PATH}/plan?done=membership_cancelled`);
 }

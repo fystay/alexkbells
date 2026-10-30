@@ -191,3 +191,26 @@ export async function notifyDirectDebitFailures(db: Db, env: Env = process.env, 
   }
   return sent;
 }
+
+export type DirectDebitState = "none" | "pending" | "active" | "ended";
+
+/** Whether the member has a Direct Debit set up (for their account page). */
+export async function directDebitState(db: Db, clientId: string): Promise<DirectDebitState> {
+  const state = await rpc<DirectDebitState>(db, "akb_dd_state", { p_client: clientId });
+  return state.ok ? state.data : "none";
+}
+
+/**
+ * The member cancels their own membership: no new periods and no more
+ * collections (the database stops both), and the credits already given stay
+ * usable until their period ends. Returns the membership's last day.
+ */
+export async function cancelOwnMembership(db: Db, clientId: string, today: DateKey): Promise<{ ok: true; endsOn: string | null } | { ok: false }> {
+  const rows = await select<{ id: string }>(db, "akb_memberships", [["select", "id"], ["client_id", `eq.${clientId}`], ["status", "in.(active,paused)"], ["order", "created_at.desc"], ["limit", "1"]]);
+  const membership = rows.ok ? rows.data[0] : undefined;
+  if (!membership) return { ok: false };
+  const done = await rpc<null>(db, "akb_set_membership_status", { p_membership: membership.id, p_status: "cancelled", p_on: today });
+  if (!done.ok) return { ok: false };
+  const period = await select<{ period_end: string }>(db, "akb_membership_periods", [["select", "period_end"], ["membership_id", `eq.${membership.id}`], ["order", "period_end.desc"], ["limit", "1"]]);
+  return { ok: true, endsOn: period.ok ? (period.data[0]?.period_end ?? null) : null };
+}

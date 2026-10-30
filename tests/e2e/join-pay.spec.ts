@@ -67,6 +67,18 @@ test.describe("joining and paying online", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("You're in.", { timeout: 15_000 });
     await expect(page.getByRole("link", { name: "Sign in to your account" })).toHaveAttribute("href", "/account/sign-in");
 
+    // Next the Direct Debit (owner, 2026-10-30): set up on Stripe's page, which brings the member back; only Stripe's signed word makes it active.
+    await expect(page.getByText("Set up your Direct Debit.")).toBeVisible();
+    await expect(page.getByText("Your bank details go straight to Stripe, not to us.")).toBeVisible();
+    await page.getByRole("button", { name: "Set up Direct Debit" }).click();
+    await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));
+    await expect(page.getByRole("heading", { name: "Set up Direct Debit" })).toBeVisible();
+    await page.getByRole("button", { name: "Authorise Direct Debit" }).click();
+    await expect(page).toHaveURL(new RegExp(`^${PAY}/memberships/join/done\\?signup=`));
+    await expect(page.getByText("Direct Debit is set up.")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Set up Direct Debit" })).toHaveCount(0);
+    expect(await sql(request, "select d.dd_status, d.environment from akb_stripe_customers d join akb_clients c on c.id = d.client_id where c.email = $1", [email])).toEqual([{ dd_status: "active", environment: "sandbox" }]);
+
     // In the database: an online-paying membership on the paid charge, and a card payment from Stripe.
     const [m] = await sql(request, "select m.pay_online, m.plan, m.credits from akb_memberships m join akb_clients c on c.id = m.client_id where c.email = $1", [email]);
     expect(m).toEqual({ pay_online: true, plan: "regular", credits: 8 });

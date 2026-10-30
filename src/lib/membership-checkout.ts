@@ -97,14 +97,26 @@ export interface SignupStatus {
   class_date: string | null;
   /** The open Stripe link, while it's still waiting for payment. */
   payUrl: string | null;
+  /** The member's Direct Debit: "none" until they set it up on Stripe's page. */
+  dd: "none" | "pending" | "active" | "ended";
+}
+
+/** The member behind an active sign-up, for opening their Direct Debit set-up. */
+export async function signupMember(db: Db, signupId: string): Promise<{ clientId: string; email: string; name: string } | null> {
+  const rows = await select<{ client_id: string; status: string }>(db, "akb_membership_signups", [["select", "client_id,status"], ["id", `eq.${signupId}`]]);
+  const row = rows.ok ? rows.data[0] : undefined;
+  if (!row || row.status !== "active") return null;
+  const people = await select<{ email: string; full_name: string }>(db, "akb_clients", [["select", "email,full_name"], ["id", `eq.${row.client_id}`]]);
+  const person = people.ok ? people.data[0] : undefined;
+  return person ? { clientId: row.client_id, email: person.email, name: person.full_name } : null;
 }
 
 /** What the "after paying" page shows. Only the plan and the state: no personal details. */
 export async function signupStatus(db: Db, signupId: string): Promise<SignupStatus | null> {
-  const rows = await select<{ status: SignupStatus["status"]; plan_name: string; first_class: SignupStatus["first_class"]; class_date: string | null; charge_id: string }>(
+  const rows = await select<{ status: SignupStatus["status"]; plan_name: string; first_class: SignupStatus["first_class"]; class_date: string | null; charge_id: string; client_id: string }>(
     db,
     "akb_membership_signups",
-    [["select", "status,plan_name,first_class,class_date,charge_id"], ["id", `eq.${signupId}`]],
+    [["select", "status,plan_name,first_class,class_date,charge_id,client_id"], ["id", `eq.${signupId}`]],
   );
   const row = rows.ok ? rows.data[0] : undefined;
   if (!row) return null;
@@ -113,7 +125,8 @@ export async function signupStatus(db: Db, signupId: string): Promise<SignupStat
     const links = await select<{ url: string }>(db, "akb_square_payment_links", [["select", "url"], ["charge_id", `eq.${row.charge_id}`], ["status", "eq.open"]]);
     payUrl = links.ok ? (links.data[0]?.url ?? null) : null;
   }
-  return { status: row.status, plan_name: row.plan_name, first_class: row.first_class, class_date: row.class_date, payUrl };
+  const state = await rpc<SignupStatus["dd"]>(db, "akb_dd_state", { p_client: row.client_id });
+  return { status: row.status, plan_name: row.plan_name, first_class: row.first_class, class_date: row.class_date, payUrl, dd: state.ok ? state.data : "none" };
 }
 
 interface ActivatedSignup {
@@ -266,13 +279,16 @@ export async function sendRenewalLinks(db: Db, stripe: StripeConfig, today: Date
 }
 
 /** A member's current period still to pay (pay-online members only), with a link to pay it. */
-export async function paymentDue(db: Db, stripe: StripeConfig | null, clientId: string, env: Env = process.env): Promise<{ amountPence: number; url: string | null; periodEnd: string } | null> {
+export async function paymentDue(db: Db, stripe: StripeConfig | null, clientId: string, env: Env = process.env): Promise<{ amountPence: number; url: string | null; periodEnd: string; direct: boolean } | null> {
   const due = await rpc<{ charge_id: string; outstanding_pence: number; period_end: string } | null>(db, "akb_member_payment_due", { p_client: clientId });
   if (!due.ok || !due.data) return null;
   let url: string | null = null;
+  let direct = false;
   if (stripe) {
     const link = await createChargeLink(db, stripe, due.data.charge_id, fetch, { redirectUrl: `${memberLinkOrigin(env)}${ACCOUNT_PATH}` });
     url = link.ok ? link.url : null;
+    // Being collected by Direct Debit: nothing for the member to pay.
+    direct = !link.ok && link.reason === "direct-debit";
   }
-  return { amountPence: due.data.outstanding_pence, url, periodEnd: due.data.period_end };
+  return { amountPence: due.data.outstanding_pence, url, periodEnd: due.data.period_end, direct };
 }

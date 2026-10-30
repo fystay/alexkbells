@@ -198,7 +198,29 @@ The member side of online coaching, opened from the members area, plus the coach
 
 The coach portal now has the owner's coach design: a frame with Today, Schedule, Members and Inbox tabs (no new settings, no new tables). Every existing page is kept. The **Inbox** also shows coaching check-ins and client messages, which need `20261101000000_akb_coaching_area.sql` (Raeng Coaching, above): until it is applied the portal works as before and simply shows no coaching items (the read fails quietly and is logged). **Message class** opens your own email app with the booked people in Bcc; nothing is sent from the site.
 
-### Square card payments (2026-10-21, not live; needs the owner)
+### Stripe payments and Direct Debit memberships (2026-10-30, not live; needs the owner)
+
+**Replaces Square completely** (the `lib/square` code, `/api/square/webhook` and `square-reconcile` are gone; the Square sections below are history). Built and tested against a Stripe stand-in only (unit tests with the real migrations, and e2e against `tests/e2e/mock-stripe.mjs`). **Not verified against Stripe's test mode yet**: no Stripe account or keys exist. Until the two variables below are set, online payment stays off and bookings and joins stay requests that Alex confirms.
+
+How it works: a class (or a membership's first 4 weeks) is paid by card on **Stripe Checkout**. A member then sets up a **Bacs Direct Debit** on Stripe's page (their bank details never touch this site), and each later 4 weeks is collected from it: the next period is created about 6 days early, its collection is submitted to Stripe (Bacs takes about 3 working days), and credits work as soon as Stripe's signed webhook says it cleared. A failed collection is retried 3 days later, up to 3 tries, then the membership is paused and the member and Alex are emailed. A member can cancel any time from their account (`/account/plan`): no more periods or collections, and the credits already given stay until the period ends. Nothing is recorded from a redirect: only the signed webhook, re-read from Stripe's API.
+
+| Variable | Where | Notes |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | Sensitive. `sk_live_…` (or a restricted `rk_live_…`) only on Vercel **Production**; `sk_test_…` everywhere else | A live key is ignored off production and a test key is ignored on production and against the live Supabase project, on purpose |
+| `STRIPE_WEBHOOK_SECRET` | Sensitive. `whsec_…` of the webhook endpoint | One endpoint per environment |
+| `CRON_SECRET`, `SITE_URL` | Already needed | `SITE_URL` is where Stripe sends people back to |
+
+Owner steps (Stripe account holder):
+1. Create the Stripe account (UK, GBP) and finish activation. In **Settings → Payment methods**, turn on **Cards** and **Bacs Direct Debit** (Bacs needs Stripe's approval; ask for it early).
+2. Developers → API keys: copy the **test** secret key. Add `STRIPE_SECRET_KEY` (test) to Vercel **Preview** only, and a **test** Supabase project marked as a test database (`insert into akb_database_role (role) values ('test')`) as in the Sandbox notes below.
+3. Developers → Webhooks → add an endpoint `https://<site>/api/stripe/webhook` with these events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`, `refund.created`, `refund.updated`. Copy its signing secret to `STRIPE_WEBHOOK_SECRET`.
+4. Apply `20261104000000_akb_stripe.sql` then `20261105000000_akb_direct_debit.sql` (both additive and safe to re-run).
+5. Test plan in test mode (no real money): pay a class with card `4242 4242 4242 4242`; join a membership; set up a Direct Debit with Stripe's test sort code `10-88-00` and account `00012345`; confirm the next period's collection appears in the Stripe Dashboard and the payment is recorded when it succeeds (Stripe's test clock can fast-forward the 3 days); try the failing test account `10-88-00` / `90012345`; cancel from `/account/plan`.
+6. Only after that passes: the live key and a live webhook endpoint on Production. Refunds are made in the Stripe Dashboard and mirrored automatically.
+
+Not built yet: a coach-portal button to retry or end a Direct Debit by hand (Alex asks the member or pauses/cancels the membership in the portal), automatic detach of a cancelled mandate in Stripe (the membership just stops being collected), and an email reminding the member before each collection (Stripe's mandate emails and the Direct Debit Guarantee cover advance notice; check Stripe's Bacs settings).
+
+### (Superseded by Stripe, kept as history) Square card payments (2026-10-21, not live; needs the owner)
 
 Built and tested against a Square stand-in only. **Not verified against Square Sandbox yet**: no Sandbox credentials exist in this project. Nothing here is active until the settings below are added.
 

@@ -49,9 +49,8 @@ export const membershipKeyFacts = [
 
 /**
  * Membership terms in Alex's mockup wording (via the owner, 2026-10-29), shown
- * on /memberships. His "Membership cancellation" block was placeholder text
- * ("Explain how to cancel your recurring membership and when the cancellation
- * takes effect"), so it is left out until he says how it works.
+ * on /memberships. His "Membership cancellation" block was placeholder text, so
+ * the owner wrote how it works (2026-10-30): `membershipCancellation` below.
  */
 export const membershipTermsAlex = {
   title: "Membership terms",
@@ -61,5 +60,20 @@ export const membershipTermsAlex = {
     { title: "Four-week renewal", body: "Memberships renew automatically every four weeks, with a new allocation of class credits." },
     { title: "Unused credits", body: "Unused credits expire at the end of your four-week membership period and do not roll over." },
     { title: "Cancellations", body: "Cancel a class at least 24 hours before the session to have your credit returned. Late cancellations and missed classes forfeit the credit." },
+  ],
+} as const;
+
+/**
+ * How cancelling a membership works (owner, 2026-10-30, the way the big gyms do
+ * it): the first four weeks are paid by card, then each four weeks by Direct
+ * Debit. The Direct Debit for a period is collected a few days before it starts
+ * (Bacs takes about three working days), which is why "before then".
+ */
+export const membershipCancellation = {
+  title: "Membership cancellation",
+  lines: [
+    "You can cancel your membership at any time from your account, or by messaging Alex.",
+    "Your first four weeks are paid by card; after that each four weeks is paid by Direct Debit. Each payment is collected a few days before the new period starts, so cancel before then to stop the next one.",
+    "Once a period is paid you get its credits and keep them until the period ends. Cancelling stops further payments and new periods; it doesn't refund a period you've already paid for.",
   ],
 } as const;

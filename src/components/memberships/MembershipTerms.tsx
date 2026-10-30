@@ -1,4 +1,4 @@
-import { cancellationPolicy, membershipTerms, membershipTermsAlex } from "@/content/policy";
+import { membershipCancellation, membershipTerms, membershipTermsAlex } from "@/content/policy";
 import { getService } from "@/content/services";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { MembershipExplainer } from "@/components/memberships/MembershipExplainer";
@@ -34,17 +34,13 @@ export function MembershipTerms() {
               <p className="mt-1">{item.body}</p>
             </li>
           ))}
-          {/* Alex's "Membership cancellation" block was placeholder text (2026-10-29). The owner chose the class cancellation policy for it: the owner's written policy, unchanged. How to cancel the membership itself is not written down, so it is not claimed here. */}
+          {/* Alex's "Membership cancellation" block was placeholder text (2026-10-29); the owner wrote how it works on 2026-10-30 (content/policy.ts). */}
           <li>
-            <h3 className="card-title">Membership cancellation</h3>
+            <h3 className="card-title">{membershipCancellation.title}</h3>
             <div className="mt-1 space-y-2">
-              {cancellationPolicy.cancellations.map((c) => (
-                <p key={c.when}>
-                  <span className="font-semibold">{c.when}.</span> {c.outcome}
-                </p>
+              {membershipCancellation.lines.map((line) => (
+                <p key={line}>{line}</p>
               ))}
-              <p>{cancellationPolicy.credits}</p>
-              <p>{cancellationPolicy.coachCancellations}</p>
             </div>
           </li>
         </ul>

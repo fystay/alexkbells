@@ -241,3 +241,6 @@ See Coach portal below.
 - [ ] **P0, needs Alex** Resend in production (also turns on booking alerts); without it members can't get sign-in links
 - [ ] **P1, needs Alex** Confirm the privacy wording; a retention period and a contact email if he wants one listed
 - [ ] **P2** A "Sign out everywhere" button for a member in the coach area (today: `select akb_member_end_sessions('<client id>')`)
+- [x] Payments moved from Square to Stripe (2026-10-30, owner): Checkout, signed webhook, refunds, reconcile; Direct Debit memberships (card first, then Bacs Direct Debit every 4 weeks, early collection, retries then pause, member cancel any time). Built against a Stripe stand-in.
+- [ ] **P0** Owner: create the Stripe account, enable Cards and Bacs Direct Debit, add `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`, apply `20261104000000_akb_stripe.sql` and `20261105000000_akb_direct_debit.sql`, run the test-mode plan in DEPLOYMENT.md (not verified against Stripe yet)
+- [ ] **P1** Owner/Alex: confirm the membership cancellation wording (content/policy.ts `membershipCancellation`): collections are submitted ~6 days before each period, so cancelling later than that still takes the next payment

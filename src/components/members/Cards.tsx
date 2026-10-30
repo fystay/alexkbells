@@ -7,7 +7,18 @@ import { bestPlanFor, formatPenceShort, maxSavingPence } from "@/lib/membership"
 import type { MemberOverview } from "@/lib/member-auth";
 
 /** This period's payment, when a member pays online and it's still to pay (credits wait for it). */
-export function PaymentDue({ due }: { due: { amountPence: number; url: string | null } }) {
+export function PaymentDue({ due }: { due: { amountPence: number; url: string | null; direct?: boolean } }) {
+  if (due.direct) {
+    return (
+      <section aria-labelledby="due-heading" className="rounded-3xl bg-white p-5.5">
+        <p className="members-eyebrow">Direct Debit</p>
+        <h2 id="due-heading" className="mt-1 text-2xl font-extrabold tracking-[-0.02em]">
+          {formatPenceShort(due.amountPence)} is being collected
+        </h2>
+        <p className="mt-1 text-ink">Your bank takes about three working days. This period&apos;s credits work as soon as it clears.</p>
+      </section>
+    );
+  }
   return (
     <section aria-labelledby="due-heading" className="rounded-3xl border-2 border-ink bg-white p-5.5">
       <p className="members-eyebrow">Payment due</p>

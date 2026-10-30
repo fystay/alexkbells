@@ -9,6 +9,8 @@ import { periodProgress } from "@/lib/member-view";
 import { AccountUnavailable, ClassCredits, PayAsYouGo, PaymentDue } from "@/components/members/Cards";
 import { PlanCoaching } from "@/components/members/CoachingCards";
 import { MembersShell } from "@/components/members/MembersShell";
+import { BILLING_WEEKS } from "@/content/memberships";
+import { cancelMembership, setUpDirectDebit } from "../actions";
 import { loadMembers } from "../data";
 
 export const metadata: Metadata = pageMetadata({
@@ -23,8 +25,11 @@ const external = { target: "_blank", rel: "noopener noreferrer" } as const;
 /**
  * Members Plan (owner's members design, 2026-10-28): the plan card with how
  * far through the credit period today is, credits used, the renewal, and
- * where to change plan or ask about it. Changing, pausing or cancelling a
- * membership stays with Alex. Pay-as-you-go customers see their plan instead.
+ * where to change plan or ask about it. Memberships are paid by Direct Debit
+ * after the first period (set up here), and the member can cancel at any time:
+ * nothing more is taken and the credits already given stay until the period
+ * ends (owner, 2026-10-30). Pausing or changing plan stays with Alex.
+ * Pay-as-you-go customers see their plan instead.
  */
 export default async function AccountPlanPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const d = await loadMembers(searchParams);
@@ -96,6 +101,49 @@ export default async function AccountPlanPage({ searchParams }: { searchParams: 
               </div>
             ))}
           </dl>
+
+          {m.status !== "cancelled" ? (
+            <section aria-labelledby="payments-heading" className="flex flex-col gap-3">
+              <h2 id="payments-heading" className="members-eyebrow">
+                Payments
+              </h2>
+              <div className="flex flex-col gap-2 rounded-3xl bg-white p-5">
+                {d.dd === "active" ? (
+                  <>
+                    <p className="font-semibold">Direct Debit is set up.</p>
+                    <p className="text-ink">
+                      {formatPenceShort(m.price_pence)} is collected by Direct Debit every {BILLING_WEEKS} weeks, a few days before each new period starts.
+                    </p>
+                  </>
+                ) : d.ddAvailable ? (
+                  <>
+                    <p className="font-semibold">Set up your Direct Debit.</p>
+                    <p className="text-ink">
+                      Your first {BILLING_WEEKS} weeks are paid. Set up a Direct Debit and your membership continues every {BILLING_WEEKS} weeks without you doing anything. Your bank details go straight to Stripe, not to us.
+                    </p>
+                    <form action={setUpDirectDebit}>
+                      <button type="submit" className="members-btn members-btn-solid mt-2 w-full sm:w-auto">
+                        Set up Direct Debit
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <p className="text-ink">Payments are made on Stripe&apos;s secure page. Alex will let you know when Direct Debit is ready.</p>
+                )}
+              </div>
+              <details className="rounded-3xl bg-white p-5">
+                <summary className="cursor-pointer font-semibold">Cancel my membership</summary>
+                <p className="mt-3 text-ink">
+                  You can cancel at any time. Nothing more will be taken. You keep the credits you&apos;ve already paid for until the end of this period, and they aren&apos;t refunded.
+                </p>
+                <form action={cancelMembership}>
+                  <button type="submit" className="members-btn mt-4 w-full sm:w-auto">
+                    Yes, cancel my membership
+                  </button>
+                </form>
+              </details>
+            </section>
+          ) : null}
         </>
       ) : (
         <>
@@ -122,7 +170,7 @@ export default async function AccountPlanPage({ searchParams }: { searchParams: 
           </li>
           <li className="flex items-center justify-between gap-3 border-b border-line py-3">
             <div className="flex min-w-0 flex-col">
-              <span className="font-semibold">{m ? "Pause, cancel or questions" : "Change your details or questions"}</span>
+              <span className="font-semibold">{m ? "Pause or questions" : "Change your details or questions"}</span>
               <span className="text-sm text-ink">Message Alex</span>
             </div>
             <a href={site.social.instagram.url} {...external} className="members-link">
