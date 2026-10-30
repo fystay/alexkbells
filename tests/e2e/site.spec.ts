@@ -603,8 +603,8 @@ test.describe("memberships", () => {
     await expect(section.getByRole("link", { name: "Book now" })).toHaveAttribute("href", "/book/group-class");
     await card("Regular").click({ position: { x: 120, y: 20 } });
     await expect.poll(() => card("Regular").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(23, 23, 23)");
-    // Rows, not cards: the others stay on the cream page.
-    await expect.poll(() => card("Starter").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    // White cards (owner, 2026-10-30): the others stay white.
+    await expect.poll(() => card("Starter").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
     await expect(section).toContainText("Regular plan selected. Next, your first class and details. Nothing to pay now.");
     // Choosing doesn't leave the page; the button does.
     await expect(page).toHaveURL(/\/memberships$/);

@@ -39,15 +39,13 @@ export function PlanList({ className, includePayg = true }: { className?: string
     })),
     ...(includePayg ? [{ value: "payg", label: "Pay as you go", href: book.href, action: "Book now", external: book.external }] : []),
   ];
-  // Framed (owner, 2026-10-27, option C): the plans in one box with a thin ink edge and fine grey
-  // rules between them; the chosen row turns ink. Join / Book now sits under the box, separate (owner, 2026-10-27).
-  const row = cn("relative border-line px-4 py-4 sm:px-5 [&+&]:border-t", choiceCard);
+  // White cards (owner, 2026-10-30, like the class and FAQ cards): one card per plan, no rules; the chosen card turns ink. Join / Book now sits under the box, separate (owner, 2026-10-27).
+  const row = cn("relative rounded-[1.25rem] border-[1.5px] border-transparent bg-white px-5 py-5", choiceCard);
   return (
     <ChoiceCards name="plan" legend="Choose a membership plan" choices={choices} prompt="Choose your plan to continue."
       className={cn("max-w-lg", className)}
-      frame="overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink"
     >
-      <ul aria-label="Membership plans" className="relative">
+      <ul aria-label="Membership plans" className="relative flex flex-col gap-3">
         {membershipPlans.map((plan) => {
           const f = planFigures(plan, payg.amountGbp);
           return (
@@ -96,7 +94,7 @@ export function PlanList({ className, includePayg = true }: { className?: string
         ) : null}
       </ul>
       {/* Alex's mockup: how the savings are worked out. */}
-      <p className="border-t border-line px-4 py-4 text-sm sm:px-5">
+      <p className="mt-4 text-sm">
         Savings are calculated against paying £{payg.amountGbp} per class for the same number of bookings within {BILLING_WEEKS} weeks.
       </p>
     </ChoiceCards>
