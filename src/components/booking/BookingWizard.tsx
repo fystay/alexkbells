@@ -20,6 +20,8 @@ import { classAvailability } from "@/lib/availability/timetable";
 import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
+import { membershipPlans } from "@/content/memberships";
+import { formatPenceShort } from "@/lib/membership";
 import { cn } from "@/lib/cn";
 import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
 import { useSignedInDetails } from "@/lib/signed-in-details";
@@ -468,6 +470,14 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                       </p>
                     )}
                     {chosenClass && date ? <ClassDetails info={classInfo} date={date} session={chosenClass} /> : null}
+                    {payNow && !credit && !demo ? (
+                      <p className="text-sm">
+                        Members pay from {formatPenceShort(Math.min(...membershipPlans.map((p) => Math.round((p.priceGbp * 100) / p.credits))))} a class.{" "}
+                        <Link href="/memberships" target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4 hover:no-underline">
+                          See memberships<span className="sr-only"> (opens in a new tab)</span>
+                        </Link>
+                      </p>
+                    ) : null}
                   </>
                 ) : (
                   <>
@@ -497,7 +507,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
               </div>
               <ActionBar
                 onBack={() => setStep(0)}
-                next={{ label: "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
+                next={{ label: payNow && !credit && !demo && whenComplete ? `Continue · ${pay?.price}` : "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
                 hint={
                   whenComplete
                     ? undefined
@@ -525,6 +535,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
               >
                 <span id="step-heading">Your details</span>
               </StepHeading>
+              {payNow && !demo && !credit && chosenClass && date && pay ? <PayCard info={classInfo} date={date} session={chosenClass} price={pay.price} hold={pay.hold} /> : null}
               <form
                 action={formAction}
                 noValidate
@@ -636,7 +647,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                         </button>
                       </>
                     ) : (
-                      <p>Stripe&apos;s secure page takes the payment. {pay.hold}</p>
+                      <p>Stripe&apos;s secure page takes the payment.</p>
                     )}
                     <p className="text-muted">{pay.cancel}</p>
                   </div>
@@ -659,6 +670,27 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
       <aside aria-label={demo ? "Your selection (demonstration)" : "Your booking request"} className="hidden lg:col-span-4 lg:block">
         <div className="sticky top-28">{summary}</div>
       </aside>
+    </div>
+  );
+}
+
+/**
+ * Pay as you go, last screen: what you're paying for, up front (class, date,
+ * time, price) with how the place is held, so the price is never a surprise
+ * and phones (which have no side summary) see it. Details and the Pay button follow.
+ */
+function PayCard({ info, date, session, price, hold }: { info: ClassInfo; date: DateKey; session: PublishedClass; price: string; hold: string }) {
+  const minutes = session.durationMinutes;
+  return (
+    <div className="card mt-6 p-5">
+      <p className="eyebrow text-muted">Your class</p>
+      <p className="mt-2 font-display text-h3">
+        {info.name} · {formatLongDate(date)}, {formatTime(session.start)}
+      </p>
+      <p className="mt-1 text-sm">
+        {[minutes ? (minutes === 60 ? "1 hr" : `${minutes} min`) : "", "with Alex"].filter(Boolean).join(" · ")} · <span className="font-semibold">{price}</span>
+      </p>
+      <p className="mt-3 text-sm">{hold}</p>
     </div>
   );
 }

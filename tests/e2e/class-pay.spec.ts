@@ -57,9 +57,26 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.describe("booking a group class and paying online", () => {
+  test("the class screen shows the price and what a membership would save before you continue", async ({ page }) => {
+    await page.goto(`${PAY}/book/group-class`);
+    await expect(page.getByRole("heading", { name: "Choose a class" })).toBeVisible();
+    const days = classAvailability(timetable.sessions, toDateKey(new Date())).days;
+    const day = days.filter((d) => d.date >= addDays(toDateKey(new Date()), 3))[0];
+    if (day.date.slice(0, 7) !== days[0].date.slice(0, 7)) await page.getByRole("button", { name: "Next month" }).click();
+    await page.locator("label").filter({ has: page.getByLabel(`${formatLongDate(day.date)}, available`) }).click();
+    await page.locator("#times label").first().click();
+    await expect(page.getByRole("button", { name: "Continue · £12" })).toBeEnabled();
+    await expect(page.getByText(/^Members pay from £\d/)).toBeVisible();
+    await expect(page.getByRole("link", { name: /See memberships/ })).toHaveAttribute("target", "_blank");
+  });
+
   test("pay on Stripe's page, come back booked; cancel by the emailed link; the credit books another class free", async ({ page, request }) => {
     const email = `class-${Date.now()}@example.com`;
     await toDetails(page, `${PAY}/book/group-class`, 0, "Class Payer", email);
+    // The last screen says what you are paying for, up front: class, date, time, price and the hold (owner, 2026-10-30).
+    const your = page.locator(".card").filter({ hasText: "Your class" });
+    await expect(your).toContainText("£12");
+    await expect(your).toContainText("Your place is held for 15 minutes while you pay.");
     await expect(page.getByText("Your place is held for 15 minutes while you pay.")).toBeVisible();
     await expect(page.getByText(/^Cancel 24 hours or more before/)).toBeVisible();
     await page.getByRole("button", { name: "Pay £12" }).click();
