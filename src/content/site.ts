@@ -42,12 +42,17 @@ export const site = {
   },
 
   contact: {
-    /** Not yet supplied. Leave null until verified; null values are not rendered. */
-    email: null as string | null,
-    phone: null as string | null,
+    /** Supplied by the owner, 2026-10-30. The phone number is only ever sent to the browser scrambled and shown on a tap (components/ui/RevealPhone.tsx), so scrapers reading the page don't get it. */
+    email: "hello@raengfitness.co.uk" as string | null,
+    phone: "07452 825256" as string | null,
   },
 
   social: {
+    /** RAENG's own Instagram account, supplied by the owner 2026-10-30 (FAQs & Contact). Alex's own account is below. */
+    raeng: {
+      handle: "@raeng.fitness",
+      url: "https://www.instagram.com/raeng.fitness/",
+    },
     instagram: {
       handle: "@alex.kbells",
       url: "https://www.instagram.com/alex.kbells/",

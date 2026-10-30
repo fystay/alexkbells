@@ -1,3 +1,5 @@
+import { RevealPhone } from "@/components/ui/RevealPhone";
+import { scramblePhone } from "@/lib/phone";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { footerNav, formatAddressLines, mapsUrl, site } from "@/content/site";
@@ -86,10 +88,8 @@ export function SiteFooter() {
                 </li>
               ) : null}
               {phone ? (
-                <li>
-                  <a href={`tel:${phone.replace(/\s+/g, "")}`} className={footerLink}>
-                    {phone}
-                  </a>
+                <li className="text-sm">
+                  <RevealPhone mode="footer" scrambled={scramblePhone(phone)} />
                 </li>
               ) : null}
             </ul>

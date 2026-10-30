@@ -205,12 +205,12 @@ test("skip link moves focus to main content", async ({ page }) => {
 
 
 
-test("the contact page leads to Alex's Instagram", async ({ page }) => {
+test("the contact page leads to RAENG's Instagram", async ({ page }) => {
   await page.goto("/contact");
   await expect(page.locator("h1")).toHaveText("FAQs & Contact.");
   // In Alex's order (2026-10-29) the questions come first, then the contact details, then Instagram.
-  const ig = page.getByRole("link", { name: /message alex on instagram/i });
-  await expect(ig).toHaveAttribute("href", "https://www.instagram.com/alex.kbells/");
+  const ig = page.getByRole("link", { name: /message raeng on instagram/i });
+  await expect(ig).toHaveAttribute("href", "https://www.instagram.com/raeng.fitness/");
   await expect(ig).toHaveAttribute("target", "_blank");
 });
 
@@ -224,7 +224,25 @@ test("FAQs & Contact: questions, contact details, Instagram, getting started, in
   // No Book row and no Facebook here (the footer has Facebook); no "Follow" button.
   await expect(ways.getByRole("link", { name: /book/i })).toHaveCount(0);
   await expect(page.locator("main").getByRole("link", { name: /facebook|follow/i })).toHaveCount(0);
-  await expect(page.locator("#instagram")).toContainText("@alex.kbells");
+  await expect(page.locator("#instagram")).toContainText("@raeng.fitness");
+});
+
+test("contact details: email shown, phone number hidden until tapped and never in the page source", async ({ page, request }) => {
+  const html = await (await request.get("/contact")).text();
+  expect(html).not.toContain("07452");
+  expect(html).not.toContain("07452825256");
+  await page.goto("/contact");
+  const ways = page.locator("#ways");
+  await expect(ways.getByRole("link", { name: /hello@raengfitness\.co\.uk/ })).toHaveAttribute("href", "mailto:hello@raengfitness.co.uk");
+  await expect(ways).not.toContainText("07452");
+  await ways.getByRole("button", { name: "Show number" }).click();
+  await expect(ways).toContainText("07452 825256");
+  await expect(ways.getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:07452825256");
+  // The footer hides it too.
+  const footer = page.getByRole("contentinfo");
+  await expect(footer).not.toContainText("07452");
+  await footer.getByRole("button", { name: "Show phone number" }).click();
+  await expect(footer.getByRole("link", { name: "07452 825256" })).toHaveAttribute("href", "tel:07452825256");
 });
 
 test("header: menu at the left, logo centred, nothing at the right, no overlap", async ({ page }) => {

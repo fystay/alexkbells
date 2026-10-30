@@ -75,7 +75,7 @@ Legend: **C** confirmed · **P** provisional (needs client approval) · **U** un
 | FAQ: beginners, first session, what to bring, class length (60 min), kettlebells provided | P→C | Industry-standard answers published at the owner's request 2026-10-15; class length confirmed 2026-10-17. **Alex to check the rest** |
 | Session duration, availability, contract terms | U | |
 | Membership | U | Under consideration; not on the site |
-| Email, phone | U | `site.contact` is null; not rendered |
+| Email, phone, RAENG Instagram | C | Supplied by the owner 2026-10-30: hello@raengfitness.co.uk, 07452 825256, @raeng.fitness (`site.contact`, `site.social.raeng`). Shown on FAQs & Contact and in the footer. The phone number is never in the page source: it is sent scrambled and shown on a tap ("Show number") to stop scrapers (`RevealPhone`, `lib/phone.ts`) |
 | Logo artwork | C | Supplied 2026-10-15 (`assets/brand/alexkbells-logo-source.jpg`). Monogram "AR" with kettlebell (confirmed intentional); wordmark ALEX.KBELLS; descriptor KETTLEBELL COACH. This JPG is the only version — no vector exists |
 | Photography of Alex / coaching | U | No stills supplied |
 | Training stills | C | Three frames from the same reel (`public/images/training/`), plus two header stills cut from the hero loop on 2026-10-16 (`double-swing.jpg`, `bell-hold.jpg`, `scripts/video_stills.py`); same permission caveat as the hero footage (the bell-hold frame shows another person in the background) |

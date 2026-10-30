@@ -1,3 +1,5 @@
+import { RevealPhone } from "@/components/ui/RevealPhone";
+import { scramblePhone } from "@/lib/phone";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -67,13 +69,7 @@ export default function ContactPage() {
                 </a>
               </Way>
             ) : null}
-            {phone ? (
-              <Way title="Phone" detail={phone}>
-                <a href={`tel:${phone.replace(/\s+/g, "")}`} className={linkClass}>
-                  Call<span className="sr-only"> {phone}</span>
-                </a>
-              </Way>
-            ) : null}
+            {phone ? <RevealPhone mode="row" scrambled={scramblePhone(phone)} /> : null}
             <Way title={l.street} detail={<address className="not-italic">{`${l.town}, ${l.city}, ${l.postcode}`}</address>}>
               <a href={mapsUrl()} target="_blank" rel="noopener noreferrer" className={linkClass}>
                 Directions<span className="sr-only"> to the class location (opens in a new tab)</span>
@@ -85,10 +81,10 @@ export default function ContactPage() {
 
       <Section tone="plain" id="instagram" labelledBy="instagram-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
-          <SectionHeading id="instagram-heading" className="lg:col-span-5" eyebrow="Instagram" title={site.social.instagram.handle} />
+          <SectionHeading id="instagram-heading" className="lg:col-span-5" eyebrow="Instagram" title={site.social.raeng.handle} />
           <p className="mt-6 lg:col-span-7 lg:mt-0">
-            <a href={site.social.instagram.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
-              Message Alex on Instagram<span className="sr-only"> (opens in a new tab)</span>
+            <a href={site.social.raeng.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              Message RAENG on Instagram<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </p>
         </div>
