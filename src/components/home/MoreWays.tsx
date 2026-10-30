@@ -12,8 +12,8 @@ function leadPrice(id: "one-to-one") {
 
 /**
  * Services, straight under the hero (Alex's layout, 2026-10-29; he offers group
- * kettlebell classes, 1:1 coaching and small group coaching): one row each
- * between thin rules, name and price on the first line, what it is and "Explore"
+ * kettlebell classes, 1:1 coaching and small group coaching): one white card
+ * each, name and price on the first line, what it is and "Explore"
  * on the second. The whole row is the way into its page. Only confirmed prices
  * are shown (small group coaching has none yet).
  */
@@ -28,10 +28,10 @@ export function MoreWays() {
     <Section id="ways" labelledBy="ways-heading">
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
         <SectionHeading id="ways-heading" className="lg:col-span-5" eyebrow="Services" title="Ways to train." />
-        <ul className="mt-6 lg:col-span-7 lg:mt-0">
+        <ul className="mt-8 flex flex-col gap-3 lg:col-span-7 lg:mt-0">
           {ways.map((w) => (
             <li key={w.href}>
-              <Link href={w.href} className="group block py-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+              <Link href={w.href} className="group block rounded-[1.25rem] bg-white px-5 py-5 hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="card-title">{w.title}</span>
                   {w.price ? <span className="shrink-0 text-[0.9375rem] font-semibold lg:text-base">{w.price}</span> : null}
