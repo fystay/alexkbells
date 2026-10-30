@@ -35,7 +35,7 @@ export default function ClassesPage() {
   const booking = getPrimaryCtaFor("group-class");
 
   return (
-    <>
+    <div className="section-rules">
       <ClassesHero
         photo={images.classes}
         title="Group kettlebell training."
@@ -55,7 +55,7 @@ export default function ClassesPage() {
         </div>
       </Section>
 
-      <Section id="location" labelledBy="location-heading" className="pt-0 sm:pt-0 lg:pt-0">
+      <Section id="location" labelledBy="location-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="location-heading" className="lg:col-span-5" eyebrow="Studio location" title="Where we train." />
           <StudioLocation className="mt-8 lg:col-span-7 lg:mt-0" />
@@ -72,7 +72,7 @@ export default function ClassesPage() {
         </div>
       </Section>
 
-      <Section id="pay-as-you-go" labelledBy="payg-heading" className="pt-0 sm:pt-0 lg:pt-0">
+      <Section id="pay-as-you-go" labelledBy="payg-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="payg-heading" className="lg:col-span-5" title="Pay as you go." />
           <PayAsYouGo className="mt-8 lg:col-span-7 lg:mt-0" />
@@ -82,6 +82,6 @@ export default function ClassesPage() {
       <CancellationPolicy title="Booking and cancellation policy" />
 
       <Faq tone="plain" ids={["when", "where", "length", "beginners", "first-session", "bring"]} />
-    </>
+    </div>
   );
 }

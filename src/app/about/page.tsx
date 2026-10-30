@@ -28,7 +28,7 @@ export default function AboutPage() {
   const tone = (): SectionTone => (n++ % 2 === 0 ? "white" : "plain");
 
   return (
-    <>
+    <div className="section-rules">
       <PageHeader eyebrow="About" title="About RAENG." />
 
       <CoachStory showAboutLink={false} showPhotos={false} portrait={images.coach} tone={tone()} eyebrow="Alex's story">
@@ -39,14 +39,14 @@ export default function AboutPage() {
 
       <Section tone={tone()} id="values" labelledBy="values-heading">
         <SectionHeading id="values-heading" title="What we stand for." />
-        {/* Owner's /about design (2026-10-28): the value beside its line from 420 px, between thin rules. */}
-        <ul className="mt-8 max-w-2xl border-t border-line">
+        {/* Owner's /about design (2026-10-28): the value beside its line from 420 px, as white cards. */}
+        <ul className="mt-8 flex max-w-2xl flex-col gap-3">
           {pillars.map((p, i) => (
             <li
               key={p.title}
               data-reveal
               style={revealDelay(i)}
-              className="grid grid-cols-1 gap-1 border-b border-line py-5 min-[421px]:grid-cols-[7.5rem_1fr] min-[421px]:gap-4 motion-safe:transition-[padding] motion-safe:duration-300 lg:hover:pl-2.5"
+              className="grid grid-cols-1 gap-1 rounded-[1.25rem] bg-white px-5 py-5 min-[421px]:grid-cols-[7.5rem_1fr] min-[421px]:gap-4"
             >
               <h3 className="font-bold">{p.title}</h3>
               <p className="min-w-0">{p.body}</p>
@@ -56,6 +56,6 @@ export default function AboutPage() {
       </Section>
 
       <CtaBand body="Come and train with us." tone={tone()} />
-    </>
+    </div>
   );
 }

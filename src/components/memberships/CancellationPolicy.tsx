@@ -22,19 +22,19 @@ export function CancellationPolicy({ title = "Class cancellation policy" }: { ti
               </li>
             ))}
           </ul>
-          <div className="mt-8 space-y-6 text-sm">
-            <div>
+          <div className="mt-3 flex flex-col gap-3">
+            <div className="rounded-[1.25rem] bg-white px-5 py-[1.125rem]">
               <h3 className="font-semibold">Membership credits</h3>
-              <p className="mt-1">{policy.credits}</p>
+              <p className="mt-0.5">{policy.credits}</p>
             </div>
-            <div>
+            <div className="rounded-[1.25rem] bg-white px-5 py-[1.125rem]">
               <h3 className="font-semibold">Class cancellations by the coach</h3>
-              <p className="mt-1">{policy.coachCancellations}</p>
+              <p className="mt-0.5">{policy.coachCancellations}</p>
             </div>
-            <p>
-              {policy.agreement} {policy.thanks}
-            </p>
           </div>
+          <p className="mt-6 text-sm">
+            {policy.agreement} {policy.thanks}
+          </p>
         </div>
       </div>
     </Section>

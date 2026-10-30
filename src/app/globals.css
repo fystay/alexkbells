@@ -144,12 +144,15 @@
 @utility rule-list {
   border-top: 1px solid var(--color-line);
 }
-/* Short lists as rows between thin lines, no bullets (owner after the audit, 2026-10-27: one list style site-wide). */
+/* Short lists as white cards, no bullets, no lines (owner, 2026-10-30: lines only between sections, white cards for the items inside one). */
 @utility lined {
-  border-top: 1px solid var(--color-line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   & > li {
-    border-bottom: 1px solid var(--color-line);
-    padding-block: 0.875rem;
+    background: var(--color-white);
+    border-radius: 1.25rem;
+    padding: 1.125rem 1.25rem;
   }
 }
 @utility rule-row {
@@ -191,12 +194,14 @@
 /*
  * A hairline where one home-page section ends and the next begins (owner,
  * 2026-10-30: "not too obvious, not too blocky"). It sits in the space between
- * sections at the page's text width, none after the film. Decorative only.
+ * sections at the page's text width, none after the film or a page header.
+ * Lines are only used between sections; the items inside one are white cards.
+ * Decorative only.
  */
 .section-rules > section {
   position: relative;
 }
-.section-rules > section + section:not(:nth-child(2))::before {
+.section-rules > section + section::before {
   content: "";
   position: absolute;
   top: 0;

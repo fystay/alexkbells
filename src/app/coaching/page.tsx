@@ -44,7 +44,7 @@ export default function CoachingPage() {
   const prices = publishable(service.prices);
 
   return (
-    <>
+    <div className="section-rules">
       <PageHeader
         panel={<FocusFrame photo={images.coachHeader} />}
         eyebrow="1:1 Coaching"
@@ -72,14 +72,14 @@ export default function CoachingPage() {
             title="Attention that stays on you."
             intro="For people who want training designed around them, not a group session."
           />
-          {/* Plain rows, no icons (owner's pick B, 2026-10-29): the name beside its line, like "What we stand for" on About. */}
-          <ul className="mt-8 border-t border-line lg:col-span-7 lg:mt-0">
+          {/* White cards, no icons (owner, 2026-10-30): the name beside its line, like "What we stand for" on About. */}
+          <ul className="mt-8 flex flex-col gap-3 lg:col-span-7 lg:mt-0">
             {focus.map((f, i) => (
               <li
                 key={f.title}
                 data-reveal
                 style={revealDelay(i)}
-                className="grid grid-cols-1 gap-1 border-b border-line py-5 min-[421px]:grid-cols-[7.5rem_1fr] min-[421px]:gap-4"
+                className="grid grid-cols-1 gap-1 rounded-[1.25rem] bg-white px-5 py-5 min-[421px]:grid-cols-[7.5rem_1fr] min-[421px]:gap-4"
               >
                 <h3 className="font-bold">{f.title}</h3>
                 <p className="min-w-0">{f.body}</p>
@@ -139,6 +139,6 @@ export default function CoachingPage() {
 
       {/* "Get in touch" here is the owner's own wording (2026-10-29); it still opens the 1:1 booking request. */}
       <CtaBand title="Ready to train 1:1?" body={null} service="one-to-one" label="Get in touch" />
-    </>
+    </div>
   );
 }

@@ -22,7 +22,7 @@ const linkClass = "inline-flex min-h-11 shrink-0 items-center font-semibold unde
 /** One way in: what it is (and its detail), and its link on the right. */
 function Way({ title, detail, children }: { title: string; detail?: ReactNode; children: ReactNode }) {
   return (
-    <li className="flex items-center justify-between gap-4 border-line px-4 py-3 sm:px-6 [&+&]:border-t">
+    <li className="flex items-center justify-between gap-4 rounded-[1.25rem] bg-white px-5 py-3 sm:px-6">
       <div className="min-w-0 py-1">
         <p className="card-title">{title}</p>
         {detail ? <div className="mt-0.5 text-[0.9375rem]">{detail}</div> : null}
@@ -51,7 +51,7 @@ export default function ContactPage() {
   if (live("bring")) started.push(firstClassSteps.bring);
 
   return (
-    <>
+    <div className="section-rules">
       <PageHeader eyebrow="FAQs & Contact" title="FAQs & Contact" intro="Book, message Alex, or come and find us." />
 
       <Faq tone="plain" />
@@ -59,7 +59,7 @@ export default function ContactPage() {
       <Section tone="white" id="contact-details" labelledBy="details-heading">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-14">
           <SectionHeading id="details-heading" className="lg:col-span-5" eyebrow="Contact details" title="Find us." />
-          <ul id="ways" className="mt-8 max-w-2xl overflow-hidden rounded-[1.75rem] border-[1.5px] border-ink lg:col-span-7 lg:mt-0">
+          <ul id="ways" className="mt-8 flex max-w-2xl flex-col gap-3 lg:col-span-7 lg:mt-0">
             {email ? (
               <Way title="Email" detail={email}>
                 <a href={`mailto:${email}`} className={linkClass}>
@@ -111,6 +111,6 @@ export default function ContactPage() {
           </div>
         </Section>
       ) : null}
-    </>
+    </div>
   );
 }
