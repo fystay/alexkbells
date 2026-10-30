@@ -62,7 +62,7 @@ export default function HomePage() {
               title="Memberships."
             />
             <div className="mt-8 lg:col-span-7 lg:mt-0">
-              <PlanList includePayg={false} />
+              <PlanList />
               <PlanTerms className="mt-8" />
             </div>
           </div>

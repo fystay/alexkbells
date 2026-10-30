@@ -928,8 +928,9 @@ test("home: each plan row is one choice, class times appear once, and secondary 
     const card = cards.filter({ has: page.getByRole("heading", { name }) });
     await expect(card.getByRole("radio", { name: new RegExp(`^${name},`) })).toHaveCount(1);
   }
-  // Pay as you go has its own topic on Classes, not a row in the home preview (Alex's layout, 2026-10-29).
-  await expect(cards).toHaveCount(3);
+  // Pay as you go is the fourth card, below Dedicated (owner, 2026-10-30).
+  await expect(cards).toHaveCount(4);
+  await expect(cards.nth(3).getByRole("heading", { name: "Pay as you go" })).toBeVisible();
   // The extra-cost table and the full terms live on /memberships, not here.
   await expect(page.getByRole("table")).toHaveCount(0);
   // "Ready to start?" closes the page (the owner, 2026-10-29), opening the booking flow at step 1.
