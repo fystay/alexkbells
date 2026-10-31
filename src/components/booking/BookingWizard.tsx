@@ -219,6 +219,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
 
   // Booked and paid online, not requested: group classes without a membership plan.
   const payNow = Boolean(pay) && usesSessions && !chosenPlan;
+  // The paying screens in the labelled demo (previews only), so they can be seen before Stripe is on.
+  const demoPay = demo && Boolean(pay) && service === "group-class";
   const linkCredit = useSyncExternalStore(subscribe, getCredit, getServerToday);
   const [creditDropped, setCreditDropped] = useState(false);
   const credit = payNow && !creditDropped ? linkCredit : null;
@@ -457,7 +459,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                         date={date}
                         slotId={slotId}
                         noun={noun}
-                        placesLeft={service === "group-class" && places.size !== null ? (slot, day) => places.left[`${slot}|${day}`] ?? places.size : undefined}
+                        placesLeft={demoPay ? samplePlaces : service === "group-class" && places.size !== null ? (slot, day) => places.left[`${slot}|${day}`] ?? places.size : undefined}
                         onDate={(d) => {
                           setDate(d);
                           setSlotId(null);
@@ -476,7 +478,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                       </p>
                     )}
                     {chosenClass && date ? <ClassDetails info={classInfo} date={date} session={chosenClass} /> : null}
-                    {payNow && !credit && !demo ? (
+                    {(payNow && !credit && !demo) || demoPay ? (
                       <p className="text-sm">
                         Members pay from {formatPenceShort(Math.min(...membershipPlans.map((p) => Math.round((p.priceGbp * 100) / p.credits))))} a class.{" "}
                         <Link href="/memberships" target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-4 hover:no-underline">
@@ -513,7 +515,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
               </div>
               <ActionBar
                 onBack={() => setStep(0)}
-                next={{ label: payNow && !credit && !demo && whenComplete ? `Continue · ${pay?.price}` : "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
+                next={{ label: ((payNow && !credit && !demo) || demoPay) && whenComplete ? `Continue · ${pay?.price}` : "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
                 hint={
                   whenComplete
                     ? undefined
@@ -541,7 +543,11 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
               >
                 <span id="step-heading">Your details</span>
               </StepHeading>
-              {payNow && !demo && !credit && chosenClass && date && pay ? <PayCard info={classInfo} date={date} session={chosenClass} price={pay.price} hold={pay.hold} /> : null}
+              {payNow && !demo && !credit && chosenClass && date && pay ? (
+                <PayCard info={classInfo} date={date} when={formatTime(chosenClass.start)} minutes={chosenClass.durationMinutes} price={pay.price} hold={pay.hold} />
+              ) : demoPay && date && chosenSlot && pay ? (
+                <PayCard info={classInfo} date={date} when={formatTime(chosenSlot.time)} minutes={groupClassMinutes} price={pay.price} hold={pay.hold} />
+              ) : null}
               <form
                 action={formAction}
                 noValidate
@@ -557,7 +563,9 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                 }}
                 className="mt-6 space-y-8"
               >
-                {demo ? (
+                {demoPay ? (
+                  <DemoNotice>Preview of paying online: nothing is charged, booked or sent. On the live site you&apos;d pay on Stripe&apos;s secure page.</DemoNotice>
+                ) : demo ? (
                   <DemoNotice>Demonstration: these details aren&apos;t sent anywhere.</DemoNotice>
                 ) : null}
                 {serverState.status === "error" ? (
@@ -638,6 +646,12 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                 {!demo && !usesSessions ? times.map((t) => <input key={t} type="hidden" name="times" value={t} />) : null}
                 <SubmissionMeta meta={meta} />
 
+                {demoPay && pay ? (
+                  <div className="rule-list space-y-2 pt-4 text-sm">
+                    <p>Stripe&apos;s secure page takes the payment.</p>
+                    <p className="text-muted">{pay.cancel}</p>
+                  </div>
+                ) : null}
                 {payNow && pay ? (
                   <div id="credit" tabIndex={-1} className="rule-list space-y-2 pt-4 text-sm">
                     {credit ? (
@@ -701,7 +715,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                 <ActionBar
                   onBack={() => setStep(1)}
                   next={{
-                    label: demo ? "Finish demo" : payNow ? (credit ? "Book with your credit" : `Pay ${pay?.price}`) : "Send request",
+                    label: demoPay ? `Pay ${pay?.price} (preview)` : demo ? "Finish demo" : payNow ? (credit ? "Book with your credit" : `Pay ${pay?.price}`) : "Send request",
                     type: "submit",
                     pending,
                   }}
@@ -724,13 +738,12 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
  * time, price) with how the place is held, so the price is never a surprise
  * and phones (which have no side summary) see it. Details and the Pay button follow.
  */
-function PayCard({ info, date, session, price, hold }: { info: ClassInfo; date: DateKey; session: PublishedClass; price: string; hold: string }) {
-  const minutes = session.durationMinutes;
+function PayCard({ info, date, when, minutes, price, hold }: { info: ClassInfo; date: DateKey; when: string; minutes?: number; price: string; hold: string }) {
   return (
     <div className="card mt-6 p-5">
       <p className="eyebrow text-muted">Your class</p>
       <p className="mt-2 font-display text-h3">
-        {info.name} · {formatLongDate(date)}, {formatTime(session.start)}
+        {info.name} · {formatLongDate(date)}, {when}
       </p>
       <p className="mt-1 text-sm">
         {[minutes ? (minutes === 60 ? "1 hr" : `${minutes} min`) : "", "with Alex"].filter(Boolean).join(" · ")} · <span className="font-semibold">{price}</span>
@@ -739,6 +752,16 @@ function PayCard({ info, date, session, price, hold }: { info: ClassInfo; date: 
     </div>
   );
 }
+
+/** Sample "places left" for the paying preview only (labelled demo data): a steady number per class date, never real. */
+function samplePlaces(slotId: string, date: DateKey): number {
+  let h = 0;
+  for (const c of `${slotId}${date}`) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return 2 + (h % 12);
+}
+
+/** Length of a group class, for the paying preview. */
+const groupClassMinutes = 60;
 
 /** The chosen class, set out like Alex's own class listing. */
 function ClassDetails({ info, date, session }: { info: ClassInfo; date: DateKey; session: PublishedClass }) {

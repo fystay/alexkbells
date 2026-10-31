@@ -26,7 +26,9 @@ export function BookingPage({ title, initialService }: BookingPageProps) {
   const price = publishable(getService("group-classes").prices)[0];
   const classInfo: ClassInfo = groupClass;
   // Group classes are booked and paid online where Stripe is set up (owner, 2026-10-27); 1:1 stays a request.
-  const pay = mode === "request" && price && onlineJoinEnabled() ? { price: formatGbp(price.amountGbp), ...onlineClassBooking } : null;
+  // BOOKING_DEMO_PAY (previews only, with BOOKING_DEMO) shows the paying screens in the labelled demo, so they can be looked at before Stripe is on: nothing is charged, booked or sent.
+  const showPay = (mode === "request" && onlineJoinEnabled()) || (mode === "demo" && process.env.BOOKING_DEMO_PAY === "true");
+  const pay = showPay && price ? { price: formatGbp(price.amountGbp), ...onlineClassBooking } : null;
 
   const intro =
     mode === "demo"
