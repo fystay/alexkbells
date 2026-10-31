@@ -309,11 +309,14 @@ export function ActionBar({
   backLabel = "Back",
   next,
   hint,
+  total,
 }: {
   onBack?: () => void;
   backLabel?: string;
   next: { label: string; disabled?: boolean; onClick?: () => void; type?: "button" | "submit"; pending?: boolean };
   hint?: string;
+  /** The price, shown beside the button (not inside it) once a class is chosen: "Total £12". */
+  total?: string;
 }) {
   return (
     <div className="sticky bottom-0 z-10 -mx-4 mt-10 border-t border-line bg-paper px-4 py-3 sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
@@ -329,6 +332,12 @@ export function ActionBar({
         ) : (
           <span />
         )}
+        {total ? (
+          <p className="ml-auto flex flex-col leading-tight">
+            <span className="text-xs">Total</span>
+            <span className="text-lg font-bold tabular-nums">{total}</span>
+          </p>
+        ) : null}
         <button
           type={next.type ?? "button"}
           onClick={next.onClick}

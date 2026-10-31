@@ -515,7 +515,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
               </div>
               <ActionBar
                 onBack={() => setStep(0)}
-                next={{ label: ((payNow && !credit && !demo) || demoPay) && whenComplete ? `Continue · ${pay?.price}` : "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
+                next={{ label: "Continue", disabled: !whenComplete, onClick: () => setStep(2) }}
+                total={((payNow && !credit && !demo) || demoPay) && whenComplete ? pay?.price : undefined}
                 hint={
                   whenComplete
                     ? undefined

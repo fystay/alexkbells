@@ -66,7 +66,9 @@ test.describe("booking a group class and paying online", () => {
     if (day.date.slice(0, 7) !== days[0].date.slice(0, 7)) await page.getByRole("button", { name: "Next month" }).click();
     await page.locator("label").filter({ has: page.getByLabel(`${formatLongDate(day.date)}, available`) }).click();
     await page.locator("#times label").first().click();
-    await expect(page.getByRole("button", { name: "Continue · £12" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Continue" })).toBeEnabled();
+    await expect(page.getByText("Total", { exact: true })).toBeVisible();
+    await expect(page.getByText("£12", { exact: true }).first()).toBeVisible();
     await expect(page.getByText(/^Members pay from £\d/)).toBeVisible();
     await expect(page.getByRole("link", { name: /See memberships/ })).toHaveAttribute("target", "_blank");
   });
