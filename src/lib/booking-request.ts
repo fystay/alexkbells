@@ -16,6 +16,7 @@ import { formatLongDate, fromDateKey, toDateKey, type DateKey } from "./availabi
 import { isClassDate } from "./availability/timetable";
 import type { PublishedClass } from "./class-sessions";
 import { BILLING_WEEKS, membershipPlans, type MembershipPlan } from "../content/memberships";
+import { classWaiver } from "../content/policy";
 
 /**
  * Booking requests from /book: server-side validation, spam checks, the
@@ -76,9 +77,11 @@ export interface BookingRequest {
   phone: string;
   message: string;
   submissionId: string;
+  /** The participation and risk terms ticked (content/policy.ts classWaiver), with the wording's version and when. */
+  waiver: { version: string; at: string };
 }
 
-export type BookingField = "service" | "when" | "experience" | "name" | "email" | "phone" | "message" | "credit";
+export type BookingField = "service" | "when" | "experience" | "name" | "email" | "phone" | "message" | "credit" | "waiver";
 export type FieldErrors<F extends string = BookingField> = Partial<Record<F, string>>;
 
 export type ParseResult<T, F extends string> =
@@ -125,6 +128,8 @@ export function parseBookingRequest(
     errors.when = "Choose at least one day that suits you.";
   }
   if (!BOOKING_EXPERIENCE.some((o) => o.value === experience)) errors.experience = "Choose the option that best describes you.";
+  // The participation and risk terms must be ticked (owner, 2026-10-30): checked here, never only in the browser.
+  if (text(source, "waiver") !== "yes") errors.waiver = classWaiver.error;
 
   const fieldErrors = { name: nameError(name), email: emailError(email), phone: phoneError(phone, true), message: messageError(message) };
   for (const [field, error] of Object.entries(fieldErrors)) if (error) errors[field as BookingField] = error;
@@ -145,6 +150,7 @@ export function parseBookingRequest(
       phone,
       message,
       submissionId: submissionId(source),
+      waiver: { version: classWaiver.version, at: new Date(now).toISOString() },
     },
   };
 }
@@ -188,6 +194,7 @@ export function bookingEmail(data: BookingRequest): { subject: string; text: str
     `Name: ${data.name}`,
     `Email: ${data.email}`,
     `Phone: ${data.phone || "not given"}`,
+    `Agreed to the participation and risk terms (version ${data.waiver.version}): ${data.waiver.at}`,
     "",
     "Message:",
     data.message || "(none)",

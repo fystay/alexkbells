@@ -18,7 +18,7 @@ import { fullClasses, fullKey } from "@/lib/class-capacity";
 import { londonToday } from "@/lib/coach/time";
 import { deliverRequest } from "@/lib/deliver-request";
 import { idempotencyKey } from "@/lib/send-email";
-import { startClassCheckout } from "@/lib/class-checkout";
+import { recordWaiver, startClassCheckout } from "@/lib/class-checkout";
 import { coachDb } from "@/lib/coach/db";
 import { onlineJoinEnabled } from "@/lib/membership-checkout";
 import { stripeConfig } from "@/lib/stripe/config";
@@ -89,7 +89,11 @@ export async function submitBookingRequest(
       idempotencyKey: key,
       creditToken: typeof credit === "string" && credit ? credit : null,
     });
-    if (checkout.ok) redirect(checkout.url);
+    if (checkout.ok) {
+      // Keep the record of the ticked terms with the booking (best effort: the booking itself is already made).
+      await recordWaiver(db, checkout.bookingId, data.waiver).catch(() => undefined);
+      redirect(checkout.url);
+    }
     const whenError: Partial<Record<typeof checkout.reason, string>> = {
       class_full: "That class is now full. Choose another date.",
       class_cancelled: "That class has been cancelled. Choose another date.",
@@ -136,7 +140,10 @@ export async function submitBookingRequest(
  * the preferred days and times for one-to-one.
  */
 function requestDetails(data: BookingRequest): Record<string, string> {
-  const details: Record<string, string> = { experience: labelFor(BOOKING_EXPERIENCE, data.experience) };
+  const details: Record<string, string> = {
+    experience: labelFor(BOOKING_EXPERIENCE, data.experience),
+    waiver: `Agreed to the participation and risk terms (version ${data.waiver.version}) at ${data.waiver.at}`,
+  };
   const slot = publishedClasses().find((c) => c.label === data.session);
   if (data.session && data.classDate && slot) {
     details.classDate = data.classDate;

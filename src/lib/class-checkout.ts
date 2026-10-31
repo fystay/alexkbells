@@ -3,7 +3,7 @@ import { getService } from "@/content/services";
 import { site } from "@/content/site";
 import { bookingDeliveryConfig } from "./booking-request";
 import type { PublishedClass } from "./class-sessions";
-import { inList, rpc, select, update, type Db, type DbError } from "./coach/db";
+import { inList, insert, rpc, select, update, type Db, type DbError } from "./coach/db";
 import { formatLongDate, londonToUtc, toLondon, formatClock, type DateKey } from "./coach/time";
 import type { Env } from "./env";
 import { isToken, memberLinkOrigin, randomToken, sha256Hex, SIGN_IN_PATH } from "./member-auth";
@@ -76,6 +76,18 @@ export async function startClassCheckout(
   const link = await createChargeLink(db, stripe, created.data.charge_id, options.fetchImpl, { buyerEmail: booker.email, redirectUrl: done });
   if (!link.ok) return { ok: false, reason: "unavailable" };
   return { ok: true, url: link.url, bookingId: created.data.booking_id, confirmed: false };
+}
+
+/**
+ * The booker ticked the participation and risk terms (content/policy.ts
+ * classWaiver): keep which wording and when, with the booking, in the event
+ * log the coach area reads. Only a version and a time, nothing about health.
+ */
+export async function recordWaiver(db: Db, bookingId: string, waiver: { version: string; at: string }): Promise<void> {
+  const rows = await select<{ client_id: string }>(db, "akb_class_bookings", [["select", "client_id"], ["id", `eq.${bookingId}`]]);
+  const clientId = rows.ok ? rows.data[0]?.client_id : undefined;
+  if (!clientId) return;
+  await insert(db, "akb_events", { client_id: clientId, entity: "class_booking", entity_id: bookingId, action: "waiver_accepted", detail: { version: waiver.version, at: waiver.at } });
 }
 
 function ruleReason(error: DbError): Exclude<ClassCheckoutResult, { ok: true }>["reason"] {

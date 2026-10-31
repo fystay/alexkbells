@@ -49,7 +49,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         experience and where you train), your name, email address, how you&apos;d like to be
         contacted and the phone number or Instagram username you give for that. When you send a
         membership request we also receive the plan you choose, your first class if you pick one, and the
-        date and time you agreed to the membership terms and cancellation policy. If you pay online, you pay on
+        date and time you agreed to the membership terms and cancellation policy. When you book a class or session we keep a record that you ticked the participation and risk terms: which version of the wording, and when. We don&apos;t ask for or keep any health details. If you pay online, you pay on
         Stripe&apos;s secure page: Stripe receives your card details, and we never see them; we receive the amount,
         the date and Stripe&apos;s reference for the payment. For a membership, you then set up a Direct Debit on
         Stripe&apos;s page: Stripe receives your bank details and the mandate, and we never see them; we keep

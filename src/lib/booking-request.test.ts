@@ -1,3 +1,4 @@
+import { classWaiver } from "../content/policy";
 import { describe, expect, it } from "vitest";
 import {
   MIN_FILL_MS,
@@ -28,6 +29,7 @@ const valid = {
   email: "Sam@Example.com",
   phone: "07700 900123",
   message: "See you soon",
+  waiver: "yes",
   website: "",
   startedAt: String(NOW - 20_000),
   submissionId: "abc-123",
@@ -54,6 +56,16 @@ describe("parseBookingRequest", () => {
 
   it("allows message and time of day to be blank", () => {
     expect(parseBookingRequest(form({ ...valid, message: "", times: [] }), { now: NOW }).kind).toBe("valid");
+  });
+
+  it("requires the participation and risk terms to be ticked, and records which wording and when (owner, 2026-10-30)", () => {
+    const missing = parseBookingRequest(form({ ...valid, waiver: "" }), { now: NOW });
+    expect(missing.kind).toBe("invalid");
+    if (missing.kind === "invalid") expect(missing.errors.waiver).toBe(classWaiver.error);
+    for (const wrong of ["no", "true", "on", "YES"]) expect(parseBookingRequest(form({ ...valid, waiver: wrong }), { now: NOW }).kind).toBe("invalid");
+    const ok = parseBookingRequest(form(valid), { now: NOW });
+    expect(ok.kind === "valid" && ok.data.waiver).toEqual({ version: classWaiver.version, at: new Date(NOW).toISOString() });
+    expect(ok.kind === "valid" && bookingEmail(ok.data).text).toContain(`Agreed to the participation and risk terms (version ${classWaiver.version}): ${new Date(NOW).toISOString()}`);
   });
 
   it("requires a phone number (owner, 2026-10-30)", () => {

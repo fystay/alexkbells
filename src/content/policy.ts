@@ -77,3 +77,53 @@ export const membershipCancellation = {
     "Once a period is paid you get its credits and keep them until the period ends. Cancelling stops further payments and new periods; it doesn't refund a period you've already paid for.",
   ],
 } as const;
+
+/**
+ * The participation and risk disclaimer ticked before every booking (owner,
+ * 2026-10-30, written 2026-10-31). A draft in the usual form for UK fitness
+ * classes: it should be read by a solicitor and checked against RAENG's
+ * insurance before it is relied on. In Scotland and the rest of the UK a
+ * business cannot exclude or limit liability for death or personal injury
+ * caused by its own negligence (Unfair Contract Terms Act 1977; Consumer
+ * Rights Act 2015), so it says it does not try to; what it does is record
+ * that the person is fit to take part, knows the risks, agrees to follow the
+ * coach, and is responsible for their own belongings and choices. Change
+ * `version` whenever the wording changes: it is stored with each acceptance.
+ */
+export const classWaiver = {
+  version: "2026-10-31",
+  title: "Taking part: health, risk and responsibility",
+  intro: "Please read this before you book. It is about keeping you safe and being clear who is responsible for what. It does not take away any rights you have under the law.",
+  points: [
+    {
+      title: "Your health",
+      body: "I am in good health and fit to take part in exercise. I have no medical condition, injury, pregnancy or other reason that would make exercise unsafe for me, or I have checked with my doctor and they are happy for me to train. I will tell the coach before a class if that changes or if I feel unwell.",
+    },
+    {
+      title: "The risks",
+      body: "I understand kettlebell and conditioning training is physically demanding and carries a risk of injury, such as muscle and joint strains, bruises and falls and, rarely, more serious injury, including from equipment and other people. I am taking part voluntarily and I accept the normal risks of exercise.",
+    },
+    {
+      title: "Following the coach",
+      body: "I will follow the coach's instructions, use equipment as shown, work at my own level, and stop and say if something hurts or I feel unwell. I can scale or skip any exercise. The coach can ask me to stop or leave if I or others are at risk.",
+    },
+    {
+      title: "Looking after each other and the space",
+      body: "I will keep the space clear, treat the equipment and venue with care, and respect other people in the class.",
+    },
+    {
+      title: "If something happens",
+      body: "If I am hurt or unwell, I agree the coach can arrange first aid or call the emergency services for me.",
+    },
+    {
+      title: "Belongings",
+      body: "I am responsible for my own belongings. RAENG is not responsible for them being lost or damaged, unless the law says otherwise.",
+    },
+    {
+      title: "Responsibility",
+      body: "RAENG will take reasonable care of me during classes and sessions. Nothing here limits or excludes RAENG's responsibility for death or personal injury caused by its negligence, for fraud, or for anything else the law does not allow to be limited. Otherwise, RAENG is not responsible for injury, loss or damage caused by my own actions, by my not following instructions, by a health condition I have not told the coach about, or by events outside RAENG's reasonable control.",
+    },
+  ],
+  tick: "I have read and agree to the participation and risk terms above, and I confirm I am fit to take part.",
+  error: "Please tick to confirm you have read and agree to the participation and risk terms.",
+} as const;

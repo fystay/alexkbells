@@ -21,6 +21,7 @@ import type { AvailabilityWindow } from "@/lib/availability/types";
 import type { PublishedClass } from "@/lib/class-sessions";
 import { addMinutes, formatTime } from "@/lib/schedule";
 import { membershipPlans } from "@/content/memberships";
+import { classWaiver } from "@/content/policy";
 import { formatPenceShort } from "@/lib/membership";
 import { cn } from "@/lib/cn";
 import { useChosenPlan, useQueryParam } from "@/lib/chosen-plan";
@@ -107,6 +108,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
   const cancelledSet = new Set(full.cancelled);
   const initialStep = initialService ? 1 : 0;
   const [step, setStepState] = useState(initialStep);
+  // The participation and risk terms, ticked just before booking (owner, 2026-10-30).
+  const [waiver, setWaiver] = useState(false);
   // The first step appears without the fade; later steps fade in so the change is noticed.
   const [moved, setMoved] = useState(false);
   const router = useRouter();
@@ -331,6 +334,8 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
       message: messageError(details.message),
     };
     for (const [field, error] of Object.entries(checks)) if (error) errors[field as BookingField] = error;
+    // Last, so the first problem the page jumps to is the first field on it.
+    if (!waiver) errors.waiver = classWaiver.error;
     return errors;
   };
 
@@ -341,6 +346,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
 
   const reset = () => {
     setStep(0);
+    setWaiver(false);
     setService("");
     setDate(null);
     setSlotId(null);
@@ -653,6 +659,45 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   </div>
                 ) : null}
                 <PrivacyLine action={demo ? "continuing" : payNow ? "booking" : "sending this request"} />
+                <div>
+                  <details className="card px-5 py-4 sm:px-6">
+                    <summary className="cursor-pointer font-semibold">{classWaiver.title}</summary>
+                    <p className="mt-3">{classWaiver.intro}</p>
+                    <ol className="mt-3 space-y-3 text-sm">
+                      {classWaiver.points.map((p, i) => (
+                        <li key={p.title}>
+                          <span className="font-semibold">
+                            {i + 1}. {p.title}.
+                          </span>{" "}
+                          {p.body}
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                  <label className={cn("card mt-3 flex cursor-pointer items-start gap-4 px-5 py-4 sm:px-6", errors.waiver && "outline-2 outline-ink")}>
+                    <input
+                      id="waiver"
+                      type="checkbox"
+                      name="waiver"
+                      value="yes"
+                      checked={waiver}
+                      onChange={(e) => {
+                        setWaiver(e.target.checked);
+                        if (e.target.checked) setClientErrors((x) => ({ ...x, waiver: undefined }));
+                      }}
+                      aria-invalid={errors.waiver ? true : undefined}
+                      aria-describedby={errors.waiver ? "waiver-error" : undefined}
+                      className="mt-0.5 size-6 shrink-0 accent-ink"
+                    />
+                    <span>{classWaiver.tick}</span>
+                  </label>
+                  {errors.waiver ? (
+                    <p id="waiver-error" className="mt-2 text-sm font-semibold">
+                      <span aria-hidden="true">✕ </span>
+                      {errors.waiver}
+                    </p>
+                  ) : null}
+                </div>
                 <ActionBar
                   onBack={() => setStep(1)}
                   next={{
