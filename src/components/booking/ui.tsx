@@ -394,10 +394,10 @@ export function DemoNotice({ children }: { children: ReactNode }) {
   );
 }
 
-export function PrivacyLine({ action }: { action: string }) {
+export function PrivacyLine({ action, booking = false }: { action: string; /** A paid booking, not an enquiry: the details confirm the booking rather than get a reply. */ booking?: boolean }) {
   return (
     <p className="text-sm text-muted">
-      By {action}, you agree to Alex using these details to reply. Read the{" "}
+      {booking ? "We use these details to confirm your booking and email you about it." : `By ${action}, you agree to Alex using these details to reply.`} Read the{" "}
       <Link href="/privacy" className="underline underline-offset-4">
         privacy notice
       </Link>

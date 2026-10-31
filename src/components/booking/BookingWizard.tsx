@@ -538,7 +538,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                   demo
                     ? undefined
                     : payNow
-                      ? "For your booking confirmation. Returning? Your browser can fill these in."
+                      ? "We'll send your confirmation here. Returning? Your browser can fill these in."
                       : "So Alex can reply to confirm. Returning? Your browser can fill these in."
                 }
               >
@@ -649,7 +649,7 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
 
                 {demoPay && pay ? (
                   <div className="rule-list space-y-2 pt-4 text-sm">
-                    <p>Stripe&apos;s secure page takes the payment.</p>
+                    <p>Next, you&apos;ll pay securely on Stripe&apos;s page.</p>
                     <p className="text-muted">{pay.cancel}</p>
                   </div>
                 ) : null}
@@ -668,12 +668,12 @@ export function BookingWizard({ mode, initialService, classes, classInfo, pay = 
                         </button>
                       </>
                     ) : (
-                      <p>Stripe&apos;s secure page takes the payment.</p>
+                      <p>Next, you&apos;ll pay securely on Stripe&apos;s page.</p>
                     )}
                     <p className="text-muted">{pay.cancel}</p>
                   </div>
                 ) : null}
-                <PrivacyLine action={demo ? "continuing" : payNow ? "booking" : "sending this request"} />
+                <PrivacyLine action={demo ? "continuing" : payNow ? "booking" : "sending this request"} booking={payNow || demoPay} />
                 <div>
                   <details className="card px-5 py-4 sm:px-6">
                     <summary className="cursor-pointer font-semibold">{classWaiver.title}</summary>

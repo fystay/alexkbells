@@ -52,5 +52,5 @@ export const onlineClassBooking = {
   paymentMethods: ["Pay online when you book"],
   hold: "Your place is held for 15 minutes while you pay.",
   cancel:
-    "Cancel 24 hours or more before and you get a credit for another class within 4 weeks. Later than that, or not turning up, the class is used.",
+    "Cancel at least 24 hours before and you'll get a credit for another class within 4 weeks. Later than that, or if you don't turn up, there's no credit.",
 } as const;

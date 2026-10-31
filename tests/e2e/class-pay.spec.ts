@@ -48,7 +48,7 @@ async function toDetails(page: Page, url: string, nth: number, name: string, ema
   await page.getByRole("textbox", { name: "Name" }).fill(name);
   await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-  await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+  await page.getByLabel(/I've read and agree to the health and risk terms/).check();
   // The form's anti-spam check refuses anything sent within 3 seconds of opening it.
   await page.waitForTimeout(3100);
 }
@@ -81,7 +81,7 @@ test.describe("booking a group class and paying online", () => {
     await expect(your).toContainText("£12");
     await expect(your).toContainText("Your place is held for 15 minutes while you pay.");
     await expect(page.getByText("Your place is held for 15 minutes while you pay.")).toBeVisible();
-    await expect(page.getByText(/^Cancel 24 hours or more before/)).toBeVisible();
+    await expect(page.getByText(/^Cancel at least 24 hours before/)).toBeVisible();
     await page.getByRole("button", { name: "Pay £12" }).click();
 
     await expect(page).toHaveURL(new RegExp(`^${STRIPE}/checkout/`));

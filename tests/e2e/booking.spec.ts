@@ -105,10 +105,10 @@ test.describe("booking prototype (demo availability)", () => {
     // The phone number is required (owner, 2026-10-30), and so are the participation and risk terms.
     await page.getByRole("button", { name: "Finish demo" }).click();
     await expect(page.getByText("Enter your phone number.")).toBeVisible();
-    await expect(page.getByText("Please tick to confirm you have read and agree to the participation and risk terms.")).toBeVisible();
-    await expect(page.getByText("Taking part: health, risk and responsibility")).toBeVisible();
+    await expect(page.getByText("Please tick to confirm you have read and agree to the health and risk terms.")).toBeVisible();
+    await expect(page.getByText("Health and risk terms", { exact: true })).toBeVisible();
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.getByRole("button", { name: "Finish demo" }).click();
 
     const outcome = page.getByRole("status");
@@ -295,7 +295,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Prod Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("prod@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.getByRole("button", { name: /add a note/i }).click();
     await page.getByLabel(/^Note/).fill("First class");
     await page.waitForTimeout(3100);
@@ -345,7 +345,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("EMAIL-DOWN Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("email-down@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     // Stored, so the visitor is told it was sent; nothing claims a confirmed booking.
@@ -384,7 +384,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Plan Chooser");
     await page.getByRole("textbox", { name: "Email" }).fill("plan-chooser@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.getByRole("status")).toContainText("Request sent");
@@ -548,7 +548,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("FAIL-TEST Booker");
     await page.getByRole("textbox", { name: "Email" }).fill("fail@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.waitForTimeout(3100);
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("couldn't be sent");
@@ -564,7 +564,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Speedy Bot");
     await page.getByRole("textbox", { name: "Email" }).fill("bot@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.locator('input[name="startedAt"]').evaluate((el: HTMLInputElement) => (el.value = String(Date.now())));
     await page.getByRole("button", { name: "Send request" }).click();
     await expect(page.locator("main [role=alert]")).toContainText("Please wait a few seconds");
@@ -581,7 +581,7 @@ test.describe("production configuration", () => {
     await page.getByRole("textbox", { name: "Name" }).fill("Slot Poster");
     await page.getByRole("textbox", { name: "Email" }).fill("slot@example.com");
     await page.getByRole("textbox", { name: "Phone" }).fill("07700 900123");
-    await page.getByLabel(/I have read and agree to the participation and risk terms/).check();
+    await page.getByLabel(/I've read and agree to the health and risk terms/).check();
     await page.locator("form").evaluate((form) => {
       const input = document.createElement("input");
       input.type = "hidden";

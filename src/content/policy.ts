@@ -92,7 +92,7 @@ export const membershipCancellation = {
  */
 export const classWaiver = {
   version: "2026-10-31",
-  title: "Taking part: health, risk and responsibility",
+  title: "Health and risk terms",
   intro: "Please read this before you book. It is about keeping you safe and being clear who is responsible for what. It does not take away any rights you have under the law.",
   points: [
     {
@@ -124,6 +124,6 @@ export const classWaiver = {
       body: "RAENG will take reasonable care of me during classes and sessions. Nothing here limits or excludes RAENG's responsibility for death or personal injury caused by its negligence, for fraud, or for anything else the law does not allow to be limited. Otherwise, RAENG is not responsible for injury, loss or damage caused by my own actions, by my not following instructions, by a health condition I have not told the coach about, or by events outside RAENG's reasonable control.",
     },
   ],
-  tick: "I have read and agree to the participation and risk terms above, and I confirm I am fit to take part.",
-  error: "Please tick to confirm you have read and agree to the participation and risk terms.",
+  tick: "I've read and agree to the health and risk terms (tap the title to read them), and I'm fit to take part.",
+  error: "Please tick to confirm you have read and agree to the health and risk terms.",
 } as const;
